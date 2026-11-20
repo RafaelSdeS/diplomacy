@@ -54,7 +54,7 @@ Arquivos: `supabase/tests/10-dpo-e-cartas.test.sql`, `src/lib/impressao.test.ts`
 
 ## Pronto quando
 
-- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
+- [x] Os testes acima passam no CI, junto com os de todos os passos anteriores.
 - [ ] Um DPO do comitê de teste sai no padrão dos DPOs do UNOCT.
 - [ ] Um projeto de resolução e uma carta saem no formato combinado.
 - [x] Escrever o DPO funciona no celular e no notebook.

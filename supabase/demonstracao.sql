@@ -1,5 +1,5 @@
 -- Dados de demonstração para o projeto na nuvem: o comitê de teste CSNU-T, com as
--- 15 delegações e as regras do CSNU, no evento UFRGSMUN 2027. Nenhum dado
+-- 15 delegações, as regras do CSNU e o veículo da press, no evento UFRGSMUN 2027. Nenhum dado
 -- pessoal: as contas e os convites são criados à parte (veja docs/publicar.md).
 -- Pode rodar mais de uma vez; é um comando só, então ou aplica tudo, ou nada.
 --
@@ -20,6 +20,11 @@ with evento as (
 	from evento
 	on conflict (evento_id, sigla) do update set nome = excluded.nome
 	returning id
+), veiculo as (
+	-- O veículo da press do comitê (o nome de um veículo real, só o nome).
+	insert into public.veiculo (comite_id, nome, linha_editorial)
+	select id, 'Al Jazeera', 'Cobertura do Oriente Médio e do Sul Global.' from comite
+	on conflict (comite_id) do nothing
 )
 insert into public.delegacao (comite_id, nome, nome_oficial, bandeira)
 select comite.id, d.nome, d.nome_oficial, d.bandeira

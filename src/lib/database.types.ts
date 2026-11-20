@@ -249,6 +249,32 @@ isOneToOne: false
       referencedColumns: ["id","comite_id"]
     }
                   ]
+                },"citacao": {
+                  Row: {
+                    "delegacao_id": string,"noticia_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "delegacao_id": string,"noticia_id": string
+                  }
+                  Update: {
+                    "delegacao_id"?: string,"noticia_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "citacao_delegacao_id_fkey"
+      columns: ["delegacao_id"]
+isOneToOne: false
+      referencedRelation: "delegacao"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "citacao_noticia_id_fkey"
+      columns: ["noticia_id"]
+isOneToOne: false
+      referencedRelation: "noticia"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"clausula": {
                   Row: {
                     "atualizado_em": string,"comite_id": string,"documento_id": string,"id": string,"ordem": number,"origem_id": string | null,"pai_id": string | null,"status": string,"texto": string,"tipo": string,"versao": number
@@ -408,6 +434,32 @@ isOneToOne: false
       columns: ["comite_id"]
 isOneToOne: false
       referencedRelation: "comite"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"denuncia": {
+                  Row: {
+                    "autor_id": string | null,"criado_em": string,"id": string,"motivo": string,"noticia_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "autor_id"?: string | null,"criado_em"?: string,"id"?: string,"motivo": string,"noticia_id": string
+                  }
+                  Update: {
+                    "autor_id"?: string | null,"criado_em"?: string,"id"?: string,"motivo"?: string,"noticia_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "denuncia_autor_id_fkey"
+      columns: ["autor_id"]
+isOneToOne: false
+      referencedRelation: "pessoa"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "denuncia_noticia_id_fkey"
+      columns: ["noticia_id"]
+isOneToOne: false
+      referencedRelation: "noticia"
       referencedColumns: ["id"]
     }
                   ]
@@ -577,6 +629,32 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "pessoa"
       referencedColumns: ["id"]
+    }
+                  ]
+                },"noticia": {
+                  Row: {
+                    "autor_id": string | null,"comite_id": string,"data_simulacao": string | null,"id": string,"imagem_descricao": string | null,"imagem_path": string | null,"linha_fina": string | null,"motivo_ocultacao": string | null,"publicada_em": string,"status": string,"texto": string,"tipo": string,"titulo": string,"veiculo_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "autor_id"?: string | null,"comite_id": string,"data_simulacao"?: string | null,"id": string,"imagem_descricao"?: string | null,"imagem_path"?: string | null,"linha_fina"?: string | null,"motivo_ocultacao"?: string | null,"publicada_em"?: string,"status"?: string,"texto": string,"tipo": string,"titulo": string,"veiculo_id": string
+                  }
+                  Update: {
+                    "autor_id"?: string | null,"comite_id"?: string,"data_simulacao"?: string | null,"id"?: string,"imagem_descricao"?: string | null,"imagem_path"?: string | null,"linha_fina"?: string | null,"motivo_ocultacao"?: string | null,"publicada_em"?: string,"status"?: string,"texto"?: string,"tipo"?: string,"titulo"?: string,"veiculo_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "noticia_autor_id_fkey"
+      columns: ["autor_id"]
+isOneToOne: false
+      referencedRelation: "pessoa"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "noticia_veiculo_id_comite_id_fkey"
+      columns: ["veiculo_id","comite_id"]
+isOneToOne: false
+      referencedRelation: "veiculo"
+      referencedColumns: ["id","comite_id"]
     }
                   ]
                 },"participacao": {
@@ -819,6 +897,32 @@ isOneToOne: false
       referencedColumns: ["id","comite_id"]
     }
                   ]
+                },"registro": {
+                  Row: {
+                    "acao": string,"alvo": string | null,"detalhe": string | null,"em": string,"evento_id": string,"id": number,"pessoa_id": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "acao": string,"alvo"?: string | null,"detalhe"?: string | null,"em"?: string,"evento_id": string,"id"?: never,"pessoa_id"?: string | null
+                  }
+                  Update: {
+                    "acao"?: string,"alvo"?: string | null,"detalhe"?: string | null,"em"?: string,"evento_id"?: string,"id"?: never,"pessoa_id"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "registro_evento_id_fkey"
+      columns: ["evento_id"]
+isOneToOne: false
+      referencedRelation: "evento"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "registro_pessoa_id_fkey"
+      columns: ["pessoa_id"]
+isOneToOne: false
+      referencedRelation: "pessoa"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"rodada": {
                   Row: {
                     "comite_id": string,"documento_id": string,"fim": string,"inicio": string,"numero": number
@@ -889,6 +993,26 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "delegacao"
       referencedColumns: ["id","comite_id"]
+    }
+                  ]
+                },"veiculo": {
+                  Row: {
+                    "comite_id": string,"id": string,"linha_editorial": string | null,"nome": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "comite_id": string,"id"?: string,"linha_editorial"?: string | null,"nome": string
+                  }
+                  Update: {
+                    "comite_id"?: string,"id"?: string,"linha_editorial"?: string | null,"nome"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "veiculo_comite_id_fkey"
+      columns: ["comite_id"]
+isOneToOne: true
+      referencedRelation: "comite"
+      referencedColumns: ["id"]
     }
                   ]
                 },"votacao": {
@@ -1008,6 +1132,9 @@ isOneToOne: false
 "aprovar_documento":
 { Args: { "p_aprovar": boolean,"p_documento": string }; Returns: undefined
                            },
+"aprovar_noticia":
+{ Args: { "p_noticia": string }; Returns: undefined
+                           },
 "assinar":
 { Args: { "p_assinar": boolean,"p_documento": string }; Returns: undefined
                            },
@@ -1040,6 +1167,9 @@ isOneToOne: false
                            },
 "definir_redator":
 { Args: { "p_bloco": string,"p_delegacao": string,"p_redator": boolean }; Returns: undefined
+                           },
+"denunciar_noticia":
+{ Args: { "p_motivo": string,"p_noticia": string }; Returns: undefined
                            },
 "dois_tercos":
 { Args: { "p_base": number }; Returns: number
@@ -1118,6 +1248,29 @@ isOneToOne: false
 "exigir_mesa":
 { Args: { "p_comite": string }; Returns: undefined
                            },
+"exigir_moderacao":
+{ Args: { "p_noticia": string }; Returns: {
+              "autor_id": string | null,
+"comite_id": string,
+"data_simulacao": string | null,
+"id": string,
+"imagem_descricao": string | null,
+"imagem_path": string | null,
+"linha_fina": string | null,
+"motivo_ocultacao": string | null,
+"publicada_em": string,
+"status": string,
+"texto": string,
+"tipo": string,
+"titulo": string,
+"veiculo_id": string
+            }
+                          SetofOptions: {
+        from: "*"
+        to: "noticia"
+        isOneToOne: true
+        isSetofReturn: false
+      } },
 "exigir_presidencia":
 { Args: { "p_comite": string }; Returns: undefined
                            },
@@ -1160,6 +1313,9 @@ isOneToOne: false
 "mudar_forma":
 { Args: { "p_comite": string,"p_forma": Database["public"]['Enums']["forma_debate"],"p_minutos"?: number }; Returns: undefined
                            },
+"ocultar_noticia":
+{ Args: { "p_motivo": string,"p_noticia": string }; Returns: undefined
+                           },
 "participa_do_comite":
 { Args: { "p_comite": string }; Returns: boolean
                            },
@@ -1184,6 +1340,9 @@ isOneToOne: false
 "pode_ver_dpo":
 { Args: { "p_dpo": string }; Returns: boolean
                            },
+"pode_ver_noticia":
+{ Args: { "p_noticia": string }; Returns: boolean
+                           },
 "pode_ver_pessoa":
 { Args: { "p_pessoa": string }; Returns: boolean
                            },
@@ -1198,6 +1357,9 @@ isOneToOne: false
                            },
 "publicar_atualizacao":
 { Args: { "p_comites": (string)[],"p_texto": string }; Returns: string
+                           },
+"publicar_noticia":
+{ Args: { "p_citadas"?: (string)[],"p_data_simulacao"?: string,"p_id": string,"p_imagem_descricao"?: string,"p_imagem_path"?: string,"p_linha_fina"?: string,"p_texto": string,"p_tipo": string,"p_titulo": string,"p_veiculo": string }; Returns: string
                            },
 "quorum":
 { Args: { "p_comite": string }; Returns: number
@@ -1270,6 +1432,19 @@ isOneToOne: false
 "validar_voto":
 { Args: { "p_delegacao": string,"p_escolha": Database["public"]['Enums']["escolha_voto"],"p_votacao": string }; Returns: string
                            },
+"veiculo_da_pasta":
+{ Args: { "p_nome": string }; Returns: {
+              "comite_id": string,
+"id": string,
+"linha_editorial": string | null,
+"nome": string
+            }
+                          SetofOptions: {
+        from: "*"
+        to: "veiculo"
+        isOneToOne: true
+        isSetofReturn: false
+      } },
 "votar":
 { Args: { "p_escolha": Database["public"]['Enums']["escolha_voto"],"p_votacao": string }; Returns: undefined
                            }

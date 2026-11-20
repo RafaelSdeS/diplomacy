@@ -9,6 +9,7 @@
 	import House from '@lucide/svelte/icons/house';
 	import Landmark from '@lucide/svelte/icons/landmark';
 	import Megaphone from '@lucide/svelte/icons/megaphone';
+	import Newspaper from '@lucide/svelte/icons/newspaper';
 	import Users from '@lucide/svelte/icons/users';
 	import { supabase, type Papel } from '#lib/supabase.ts';
 	import { assinarAvisos } from '#lib/tempo-real.ts';
@@ -32,6 +33,7 @@
 				]
 			: []),
 		...(siglaCrise ? [{ href: `/crise/${siglaCrise}`, rotulo: 'Crise', icone: Siren, papeis: ['crise' as const] }] : []),
+		{ href: '/press', rotulo: 'Press', icone: Newspaper },
 		{ href: '/cronograma', rotulo: 'Cronograma', icone: CalendarDays },
 		{ href: '/avisos', rotulo: 'Avisos', icone: Megaphone },
 		{ href: '/secretaria/participantes', rotulo: 'Participantes', icone: Users, papeis: ['secretaria'] }

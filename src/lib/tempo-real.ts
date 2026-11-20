@@ -43,6 +43,16 @@ export function assinarComite(
 	);
 }
 
+/** Mudanças em tabelas de todo o evento, sem filtro (a RLS decide quem recebe o quê). */
+export function assinarEvento(tabelas: string[], aoMudar: () => void, aoConectar: (ok: boolean) => void) {
+	return assinar(
+		'evento',
+		tabelas.map((table) => ({ table })),
+		aoMudar,
+		aoConectar
+	);
+}
+
 /** Tudo o que muda num documento: o próprio documento, cláusulas, propostas, comentários... */
 export function assinarDocumento(documentoId: string, aoMudar: () => void, aoConectar: (ok: boolean) => void) {
 	const filter = `documento_id=eq.${documentoId}`;
@@ -59,7 +69,7 @@ export function assinarDocumento(documentoId: string, aoMudar: () => void, aoCon
 
 function assinar(
 	nome: string,
-	entradas: { table: string; filter: string }[],
+	entradas: { table: string; filter?: string }[],
 	aoMudar: () => void,
 	aoConectar: (ok: boolean) => void
 ): () => void {

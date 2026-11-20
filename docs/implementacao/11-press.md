@@ -6,6 +6,17 @@
 
 As redes da press são separadas das institucionais: `@press.ufrgsmun` para a press e `@ufrgsmun` para o evento. A coletiva de imprensa acontece no fim do terceiro dia.
 
+## Como ficou
+
+- **Diretoria da Press:** no piloto, usa uma conta da secretaria (aprova, oculta e lê denúncias). Um papel próprio, só com esses poderes, vem com a coletiva no passo 17.
+- **Endereço do veículo:** `/press/[sigla do comitê]`, já que cada comitê tem um veículo; a matéria aberta vai em `?n=<id>`.
+- **Urgente:** é o tipo `nota_urgente`, sem a coluna `urgente` separada.
+- **Citação:** em vez de um aviso novo, a Agora tem o cartão "Na press" com as últimas matérias que citam a delegação.
+- **Imagem:** pede uma descrição (texto alternativo); sem ela, a publicação com imagem é recusada.
+- `noticia` guarda também o `comite_id` do veículo, para o filtro do tempo real (feed e telão). A capa acompanha o evento todo (`assinarEvento`).
+- O telão mostra o plantão mais recente, de crise ou da press, por 5 minutos.
+- O aviso de palavrão fica em `src/lib/palavroes.ts`.
+
 ## Banco
 
 ```sql
@@ -58,20 +69,21 @@ create table registro (id bigint generated always as identity, pessoa_id uuid, a
 
 ## Testes
 
-Arquivos: `supabase/tests/11-press.test.sql`, `src/lib/press/palavroes.test.ts` e `tests/11-press.spec.ts`.
+Arquivos: `supabase/tests/11-press.test.sql`, `src/lib/palavroes.test.ts` e `tests/11-press.spec.ts`.
 
-- [ ] pgTAP: a press de um veículo não publica em outro, e delegados não publicam.
-- [ ] pgTAP: notícia oculta some para todos, menos para a mesa da press, e a ocultação fica em `registro`.
-- [ ] pgTAP: com a revisão ligada, a notícia `aguardando` não aparece para o público.
-- [ ] pgTAP: qualquer participante denuncia, e só a mesa da press lê as denúncias.
-- [ ] pgTAP: ao publicar, cada delegação citada recebe um aviso.
-- [ ] Vitest: a checagem de palavrões encontra variações com e sem acento nas três línguas, sem acusar palavras comuns parecidas.
-- [ ] Ponta a ponta: uma matéria publicada no celular aparece na capa e no feed do veículo.
-- [ ] Ponta a ponta: uma notícia urgente aparece no telão do comitê.
+- [x] pgTAP: a press de um veículo não publica em outro, e delegados não publicam.
+- [x] pgTAP: notícia oculta some para todos, menos para a Diretoria da Press (e a press do veículo), e a ocultação fica em `registro`.
+- [x] pgTAP: com a revisão ligada, a notícia `aguardando` não aparece para o público.
+- [x] pgTAP: qualquer participante denuncia, e só a Diretoria da Press lê as denúncias.
+- [x] pgTAP: ao publicar, cada delegação citada fica registrada e vê a citação (a de outro evento, não).
+- [x] Vitest: a checagem de palavrões encontra variações com e sem acento nas três línguas, sem acusar palavras comuns parecidas.
+- [x] Ponta a ponta: uma matéria publicada no celular, com imagem, aparece na capa (sem recarregar) e no feed do veículo; a delegação citada a vê na Agora.
+- [x] Ponta a ponta: denunciada, a matéria é ocultada pela Diretoria da Press e some da capa.
+- [x] Ponta a ponta: uma notícia urgente aparece no telão do comitê.
 
 ## Pronto quando
 
 - [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
-- [ ] A press do comitê de teste publica do celular, e a matéria chega à capa e ao telão.
-- [ ] A delegação citada é avisada.
-- [ ] Ocultar uma matéria fica registrado.
+- [x] A press do comitê de teste publica do celular, e a matéria chega à capa e ao telão.
+- [x] A delegação citada é avisada.
+- [x] Ocultar uma matéria fica registrado.

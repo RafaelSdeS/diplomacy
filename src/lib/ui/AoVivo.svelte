@@ -2,13 +2,14 @@
 	import { onMount } from 'svelte';
 	import { invalidate } from '$app/navigation';
 	import { medirRelogio } from '#lib/sessao.ts';
-	import { assinarComite, assinarDocumento, TABELAS_SESSAO } from '#lib/tempo-real.ts';
+	import { assinarComite, assinarDocumento, assinarEvento, TABELAS_SESSAO } from '#lib/tempo-real.ts';
 
 	// Liga uma tela do comitê ao tempo real e mede o relógio do servidor. Cada
 	// mudança nas tabelas recarrega os dados que dependem de `dependencia`.
-	// Com `documentoId`, acompanha um documento em vez das tabelas do comitê.
+	// Com `documentoId`, acompanha um documento em vez das tabelas do comitê; sem
+	// comitê nem documento, acompanha as tabelas no evento todo (a capa da press).
 	type Props = {
-		comiteId: string;
+		comiteId?: string;
 		documentoId?: string;
 		tabelas?: string[];
 		dependencia?: `${string}:${string}`;
@@ -30,9 +31,9 @@
 	$effect(() => {
 		const aoMudar = () => invalidate(dependencia);
 		const aoConectar = (ok: boolean) => (conectado = ok);
-		return documentoId
-			? assinarDocumento(documentoId, aoMudar, aoConectar)
-			: assinarComite(comiteId, tabelas, aoMudar, aoConectar);
+		if (documentoId) return assinarDocumento(documentoId, aoMudar, aoConectar);
+		if (comiteId) return assinarComite(comiteId, tabelas, aoMudar, aoConectar);
+		return assinarEvento(tabelas, aoMudar, aoConectar);
 	});
 </script>
 

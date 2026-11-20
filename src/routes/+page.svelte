@@ -93,6 +93,22 @@
 		</article>
 	{/if}
 
+	{#if data.citacoes.length}
+		<article class="cartao" aria-labelledby="c-press">
+			<h2 id="c-press">Na press</h2>
+			<ul class="lista">
+				{#each data.citacoes as n (n.id)}
+					<li>
+						<span>
+							<a href={`/press/${n.veiculo?.comite?.sigla}?n=${n.id}`}>{n.titulo}</a>
+							<span class="detalhe">{n.veiculo?.nome} cita a sua delegação</span>
+						</span>
+					</li>
+				{/each}
+			</ul>
+		</article>
+	{/if}
+
 	{#if data.dpos.length}
 		<article class="cartao" aria-labelledby="c-dpo">
 			<h2 id="c-dpo">Seus DPOs</h2>

@@ -1298,6 +1298,113 @@ kbd {
 	font-weight: 600;
 }
 
+/* Press (passo 11) */
+
+.capa {
+	display: grid;
+	gap: 1rem;
+	margin: 0 0 1.5rem;
+	padding: 0;
+	list-style: none;
+}
+
+@media (min-width: 720px) {
+	.capa {
+		grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+	}
+}
+
+.manchete {
+	height: 100%;
+	max-width: none;
+}
+
+.manchete h3 {
+	margin: 0.25rem 0;
+	font-family: var(--fonte-titulo);
+	font-size: 1.2rem;
+}
+
+.manchete img,
+.materia-imagem {
+	display: block;
+	width: 100%;
+	max-height: 24rem;
+	object-fit: cover;
+	border-radius: 0.25rem;
+}
+
+.manchete img {
+	max-height: 12rem;
+}
+
+.linha-fina {
+	color: var(--cor-texto-suave);
+	font-size: 1.1rem;
+}
+
+.press-feed {
+	display: grid;
+	gap: 1rem;
+}
+
+.press-feed .materia {
+	max-width: none;
+	min-width: 0;
+}
+
+.press-feed a[aria-current='true'] strong {
+	text-decoration: underline;
+}
+
+@media (min-width: 1024px) {
+	.press-feed {
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+		align-items: start;
+	}
+
+	/* No notebook, a lista à esquerda e a matéria aberta ao lado. */
+	.press-feed > section {
+		grid-column: 1;
+		grid-row: 1;
+	}
+
+	.press-feed > .materia {
+		grid-column: 2;
+	}
+}
+
+.aviso-palavrao:not(:empty) {
+	padding: 0.5rem 0.75rem;
+	border-radius: 0.25rem;
+	background: var(--cor-alerta-fundo);
+	color: var(--cor-alerta);
+}
+
+.escrever {
+	display: grid;
+	gap: 1rem;
+}
+
+.escrever .previa {
+	max-width: none;
+	min-width: 0;
+}
+
+.previa-titulo {
+	margin: 0.25rem 0;
+	font-family: var(--fonte-titulo);
+	font-size: 1.5rem;
+	font-weight: 600;
+}
+
+@media (min-width: 1024px) {
+	.escrever {
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		align-items: start;
+	}
+}
+
 /* Impressão (passo 10): folha A4 com o formato dos documentos do UNOCT. A folha é
    sempre clara, como papel, nos dois temas. */
 
@@ -1322,7 +1429,16 @@ kbd {
 	background: #ffffff;
 	color: #1f2933;
 	font-family: var(--fonte-titulo);
+	font-weight: 400;
 	line-height: 1.55;
+}
+
+.a4 h1,
+.a4 h2,
+.a4 .faixa,
+.a4 .carta-remetente,
+.a4 .linha-do-comite {
+	font-weight: 600;
 }
 
 .a4 h1,
@@ -1440,6 +1556,7 @@ kbd {
 	}
 
 	.impressao {
+		display: block;
 		padding: 0;
 	}
 

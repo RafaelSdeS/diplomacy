@@ -73,6 +73,6 @@ Arquivos: `supabase/tests/09-editor.test.sql` (30 testes), `src/lib/formatacao.t
 
 ## Pronto quando
 
-- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
+- [x] Os testes acima passam no CI, junto com os de todos os passos anteriores.
 - [x] Um bloco de teste escreve um working paper, junta as cláusulas num projeto e envia à mesa.
 - [x] Tudo funciona no celular e no notebook.

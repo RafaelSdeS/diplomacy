@@ -93,6 +93,19 @@ const delegacoes = verificar(
 );
 const delegacaoPorNome = new Map(delegacoes.map((d) => [d.nome, d.id]));
 
+// O veículo da press do comitê (o nome de um veículo real, só o nome).
+verificar(
+	await db
+		.from('veiculo')
+		.upsert(
+			{ comite_id: comite.id, nome: 'Al Jazeera', linha_editorial: 'Cobertura do Oriente Médio e do Sul Global.' },
+			{ onConflict: 'comite_id' }
+		)
+		.select()
+		.single(),
+	'veículo'
+);
+
 // Contas: um delegado por delegação, um segundo delegado dos EUA (delegação com
 // dois), uma conta por papel e uma conta sem convite (tela "sem acesso").
 type Conta = { email: string; nome: string; papel?: string; delegacao?: string };

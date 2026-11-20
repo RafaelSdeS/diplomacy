@@ -63,11 +63,11 @@ test('conta sem convite cai em /sem-acesso, sem menu', async ({ page }) => {
 });
 
 const MENUS = {
-	delegado: ['Agora', 'Sessão', 'Comitê', 'Cronograma', 'Avisos'],
-	mesa: ['Agora', 'Sessão', 'Comitê', 'Cronograma', 'Avisos'],
-	crise: ['Agora', 'Sessão', 'Comitê', 'Crise', 'Cronograma', 'Avisos'],
-	press: ['Agora', 'Sessão', 'Comitê', 'Cronograma', 'Avisos'],
-	secretaria: ['Agora', 'Cronograma', 'Avisos', 'Participantes']
+	delegado: ['Agora', 'Sessão', 'Comitê', 'Press', 'Cronograma', 'Avisos'],
+	mesa: ['Agora', 'Sessão', 'Comitê', 'Press', 'Cronograma', 'Avisos'],
+	crise: ['Agora', 'Sessão', 'Comitê', 'Crise', 'Press', 'Cronograma', 'Avisos'],
+	press: ['Agora', 'Sessão', 'Comitê', 'Press', 'Cronograma', 'Avisos'],
+	secretaria: ['Agora', 'Press', 'Cronograma', 'Avisos', 'Participantes']
 } as const;
 
 for (const [papel, itens] of Object.entries(MENUS)) {

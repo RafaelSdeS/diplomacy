@@ -8,7 +8,7 @@ export const load: PageLoad = async ({ parent, depends }) => {
 
 	const delegacoes = participacoes.filter((p) => p.papel === 'delegado' && p.delegacao_id).map((p) => p.delegacao_id!);
 
-	const [cronograma, avisos, pessoa, comitesAoVivo, respostasCrise, dpos] = await Promise.all([
+	const [cronograma, avisos, pessoa, comitesAoVivo, respostasCrise, dpos, citacoes] = await Promise.all([
 		supabase.from('cronograma_item').select('id, titulo, local, inicio, fim, comite_id').order('inicio'),
 		supabase.from('aviso').select('id, texto, criado_em').order('criado_em', { ascending: false }).limit(20),
 		supabase.from('pessoa').select('avisos_vistos_em').eq('id', usuario!.id).single(),
@@ -23,9 +23,18 @@ export const load: PageLoad = async ({ parent, depends }) => {
 			.order('respondida_em', { ascending: false })
 			.limit(3),
 		// Os DPOs da delegação da pessoa, um por tópico.
-		supabase.from('dpo').select('id, topico, status, comite_id').in('delegacao_id', delegacoes).order('topico')
+		supabase.from('dpo').select('id, topico, status, comite_id').in('delegacao_id', delegacoes).order('topico'),
+		// As últimas matérias publicadas que citam a delegação da pessoa.
+		supabase
+			.from('citacao')
+			.select('noticia!inner(id, titulo, publicada_em, status, veiculo(nome, comite(sigla)))')
+			.in('delegacao_id', delegacoes)
+			.eq('noticia.status', 'publicada')
+			.order('noticia(publicada_em)', { ascending: false })
+			.limit(3)
 	]);
 	if (dpos.error) throw dpos.error;
+	if (citacoes.error) throw citacoes.error;
 	if (comitesAoVivo.error) throw comitesAoVivo.error;
 	if (respostasCrise.error) throw respostasCrise.error;
 	if (cronograma.error) throw cronograma.error;
@@ -38,6 +47,7 @@ export const load: PageLoad = async ({ parent, depends }) => {
 		avisosVistosEm: pessoa.data.avisos_vistos_em,
 		comitesAoVivo: comitesAoVivo.data,
 		respostasCrise: respostasCrise.data,
-		dpos: dpos.data
+		dpos: dpos.data,
+		citacoes: citacoes.data.map((c) => c.noticia)
 	};
 };

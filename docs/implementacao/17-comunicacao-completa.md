@@ -15,6 +15,7 @@
 
 ## Press
 
+- [ ] **Diretoria da Press** com papel próprio (hoje usa uma conta da secretaria, que vê mais do que precisa): aprova, oculta, lê denúncias e abre a coletiva.
 - [ ] **Entrevista:** o jornalista pede pelo app, e o delegado aceita e escolhe um horário.
 - [ ] **Coletiva conjunta:** a mesa da press abre a coletiva; cada jornalista escolhe 3 ou 4 entrevistados do seu comitê, com uma pergunta para cada; depois vira matéria.
 - [ ] **Edição do dia:** modelo de impressão com a edição breve de cada jornal no fim do dia e a edição especial do último dia.
