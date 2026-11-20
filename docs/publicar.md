@@ -117,6 +117,13 @@ Ela usa a chave de serviço que o próprio Supabase dá às funções; nenhuma c
 
 No evento, todos entram pelo mesmo wi-fi, ou seja, pelo mesmo IP. Antes do credenciamento, em **Authentication → Rate Limits**, suba **Token verifications** para pelo menos 500 a cada 5 minutos. O padrão (30) barraria a fila do credenciamento.
 
+## 6. Depois do evento (passo 19)
+
+1. Em **Secretaria → Participantes → Dados e arquivo**, imprima o arquivo da edição (PDF) e baixe os dados públicos (JSON). Entregue os dois à organização.
+2. Faça um backup final: no plano Pro, **Database → Backups** (baixe o mais recente); no gratuito, `npx supabase db dump --remote -f backup.sql` (guarde fora do repositório).
+3. No prazo combinado, apague os dados pessoais na mesma tela.
+4. Volte o Supabase para o plano gratuito em **Settings → Billing**.
+
 ## A cada passo novo com migração
 
 O Cloudflare publica o app a cada push na `main`, mas as migrações vão para a nuvem à mão. Se o código chegar antes do banco, o app publicado quebra. A ordem é sempre esta:

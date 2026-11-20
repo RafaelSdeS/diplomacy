@@ -1714,3 +1714,8 @@ kbd {
 	padding-bottom: 1rem;
 	border-bottom: 1px solid #d9dee5;
 }
+
+/* Arquivo da edição (passo 19): cada comitê começa numa página. */
+.arquivo-comite + .arquivo-comite {
+	break-before: page;
+}

@@ -69,6 +69,7 @@
 	<a class="botao botao--secundario" href="/imprimir/crachas">Crachás</a>
 	<a class="botao botao--secundario" href="/secretaria/checkin">Check-in</a>
 	<a class="botao botao--secundario" href="/secretaria/certificados">Certificados</a>
+	<a class="botao botao--secundario" href="/secretaria/dados">Dados e arquivo</a>
 </nav>
 <p class="suave">
 	Cada convite dá um papel a um e-mail. Quem já tem conta recebe o papel na hora; quem ainda não tem,

@@ -58,6 +58,13 @@ test('a nota de crise chega à crise e à delegação, sem passar pelo canal do 
 	await comClientes([CONTAS.crise, CONTAS.delegado, contaDaDelegacao('Brasil')], async ([crise, eua, brasil]) => {
 		const csnu = (await eua.from('comite').select('id').eq('sigla', 'CSNU-T').single()).data!.id;
 		const delegacaoEua = (await eua.from('delegacao').select('id').eq('comite_id', csnu).eq('nome', 'EUA').single()).data!.id;
+		// Notas de outros testes esperando resposta não podem barrar a nova (limite de pendentes).
+		const pendentes = (
+			await crise.from('nota_crise').select('id').eq('delegacao_id', delegacaoEua).in('status', ['pendente', 'em_analise'])
+		).data!;
+		if (pendentes.length) {
+			await crise.rpc('responder_notas', { p_ids: pendentes.map((n) => n.id), p_status: 'aprovada', p_resposta: 'Ok.' });
+		}
 
 		// Cada um ouve o próprio canal e anota as tabelas avisadas.
 		const ouvidos: Record<string, string[]> = { crise: [], eua: [], comite: [] };

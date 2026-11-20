@@ -64,6 +64,7 @@
 
 <p class="rotulo">Conta</p>
 <h1>Perfil</h1>
+<p class="acoes"><a class="botao botao--secundario" href="/perfil/meus-dados">Meus dados (LGPD)</a> <a class="botao botao--secundario" href="/pesquisa">Pesquisa de satisfação</a></p>
 
 <section aria-labelledby="t-participacao">
 	<h2 id="t-participacao">Sua participação</h2>

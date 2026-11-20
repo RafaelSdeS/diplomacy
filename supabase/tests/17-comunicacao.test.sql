@@ -55,7 +55,7 @@ select is(pg_temp.vejo('bilhete'), 0, 'com a leitura desligada, a mesa não lê'
 select public.definir_bilhetes('00000000-0000-0000-0000-0000000000c1', true, false);
 select is(pg_temp.vejo('bilhete'), 1, 'com a leitura ligada, a mesa lê');
 reset role;
-select results_eq($$select acao from public.registro where evento_id = '00000000-0000-0000-0000-0000000000e1'$$, array['regra_bilhetes'], 'a mudança da regra fica no registro');
+select results_eq($$select acao from public.registro where evento_id = '00000000-0000-0000-0000-0000000000e1' and acao <> 'papel_concedido'$$, array['regra_bilhetes'], 'a mudança da regra fica no registro');
 select pg_temp.entrar(4);
 select public.definir_bilhetes('00000000-0000-0000-0000-0000000000c1', false, true);
 select pg_temp.entrar(1);

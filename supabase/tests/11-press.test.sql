@@ -83,7 +83,7 @@ select throws_ok($$select public.ocultar_noticia('00000000-0000-0000-0000-000000
 	'42501', null, 'a press não oculta');
 select pg_temp.entrar(4);
 select public.ocultar_noticia('00000000-0000-0000-0000-000000000101', 'Ataque pessoal.');
-select results_eq($$select acao, detalhe from public.registro$$, $$values ('ocultar_noticia', 'Ataque pessoal.')$$,
+select results_eq($$select acao, detalhe from public.registro where acao = 'ocultar_noticia'$$, $$values ('ocultar_noticia', 'Ataque pessoal.')$$,
 	'a ocultação fica no registro');
 select pg_temp.entrar(1);
 select is_empty($$select 1 from public.noticia$$, 'oculta, a notícia some para os delegados');

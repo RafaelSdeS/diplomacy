@@ -92,6 +92,8 @@
 	<button class="botao botao--secundario" type="button" onclick={entrarComGoogle}>Entrar com Google</button>
 {/if}
 
+<p class="suave"><a href="/privacidade">Aviso de privacidade</a></p>
+
 <p class="suave">Tem crachá? Leia o QR com a câmera do celular: ele já entra no app.</p>
 
 <section aria-labelledby="t-codigo">

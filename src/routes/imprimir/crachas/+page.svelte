@@ -20,15 +20,22 @@
 		data.convites.filter((c) => !comite || c.comite_id === comite).map((c) => c.email.toLowerCase())
 	);
 
+	// Em lotes de 500: a API devolve no máximo 1000 linhas por chamada, e um código que
+	// não volta não pode ser impresso.
 	async function emitir() {
 		emitindo = true;
 		erro = '';
-		const { data: emitidos, error } = await supabase.rpc('emitir_crachas', {
-			p_evento: data.evento,
-			p_emails: comite ? doComite : undefined
-		});
+		const emails = [...new Set(doComite)];
+		const emitidos: { email: string; nome: string; codigo: string }[] = [];
+		for (let i = 0; i < emails.length; i += 500) {
+			const { data: lote, error } = await supabase.rpc('emitir_crachas', { p_evento: data.evento, p_emails: emails.slice(i, i + 500) });
+			if (error) {
+				emitindo = false;
+				return (erro = mensagemDeErro(error));
+			}
+			emitidos.push(...lote);
+		}
 		emitindo = false;
-		if (error) return (erro = mensagemDeErro(error));
 		crachas = emitidos.map((c) => {
 			const link = `${location.origin}/entrar/cracha#${c.codigo}`;
 			const qr = qrcode(0, 'M');

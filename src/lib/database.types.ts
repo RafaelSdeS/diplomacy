@@ -1025,6 +1025,26 @@ isOneToOne: false
       referencedColumns: ["id","comite_id"]
     }
                   ]
+                },"pedido_exclusao": {
+                  Row: {
+                    "atendido_em": string | null,"criado_em": string,"id": string,"nome": string,"pessoa_id": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "atendido_em"?: string | null,"criado_em"?: string,"id"?: string,"nome": string,"pessoa_id"?: string | null
+                  }
+                  Update: {
+                    "atendido_em"?: string | null,"criado_em"?: string,"id"?: string,"nome"?: string,"pessoa_id"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "pedido_exclusao_pessoa_id_fkey"
+      columns: ["pessoa_id"]
+isOneToOne: false
+      referencedRelation: "pessoa"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"pedido_fala": {
                   Row: {
                     "comite_id": string,"criado_em": string,"delegacao_id": string,"id": string,"sessao_id": string,"situacao": string
@@ -1075,6 +1095,52 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "delegacao"
       referencedColumns: ["id","comite_id"]
+    }
+                  ]
+                },"pesquisa_respondida": {
+                  Row: {
+                    "evento_id": string,"pessoa_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "evento_id": string,"pessoa_id": string
+                  }
+                  Update: {
+                    "evento_id"?: string,"pessoa_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "pesquisa_respondida_evento_id_fkey"
+      columns: ["evento_id"]
+isOneToOne: false
+      referencedRelation: "evento"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "pesquisa_respondida_pessoa_id_fkey"
+      columns: ["pessoa_id"]
+isOneToOne: false
+      referencedRelation: "pessoa"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"pesquisa_resposta": {
+                  Row: {
+                    "criado_em": string,"evento_id": string,"id": string,"nota": number,"papel": Database["public"]['Enums']["papel"],"respostas": NonNullable<Json>
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "criado_em"?: string,"evento_id": string,"id"?: string,"nota": number,"papel": Database["public"]['Enums']["papel"],"respostas"?: NonNullable<Json>
+                  }
+                  Update: {
+                    "criado_em"?: string,"evento_id"?: string,"id"?: string,"nota"?: number,"papel"?: Database["public"]['Enums']["papel"],"respostas"?: NonNullable<Json>
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "pesquisa_resposta_evento_id_fkey"
+      columns: ["evento_id"]
+isOneToOne: false
+      referencedRelation: "evento"
+      referencedColumns: ["id"]
     }
                   ]
                 },"pessoa": {
@@ -1497,6 +1563,12 @@ isOneToOne: false
 "agora":
 { Args: Record<PropertyKey, never>; Returns: string
                            },
+"apagar_dados_pessoais":
+{ Args: { "p_evento": string }; Returns: number
+                           },
+"apagar_pessoa":
+{ Args: { "p_pessoa": string }; Returns: undefined
+                           },
 "aplicar_convites":
 { Args: { "p_email": string,"p_usuario": string }; Returns: undefined
                            },
@@ -1514,6 +1586,9 @@ isOneToOne: false
                            },
 "aprovar_por_consenso":
 { Args: { "p_documento": string }; Returns: undefined
+                           },
+"arquivo_publico":
+{ Args: { "p_evento": string }; Returns: Json
                            },
 "assinar":
 { Args: { "p_assinar": boolean,"p_documento": string }; Returns: undefined
@@ -1550,6 +1625,9 @@ isOneToOne: false
                            },
 "comentar":
 { Args: { "p_clausula": string,"p_texto": string }; Returns: undefined
+                           },
+"copiar_evento":
+{ Args: { "p_ano": number,"p_nome": string,"p_origem": string }; Returns: string
                            },
 "criar_bloco":
 { Args: { "p_comite": string,"p_nome": string }; Returns: string
@@ -1714,6 +1792,9 @@ isOneToOne: false
 "focar_clausula":
 { Args: { "p_clausula": string,"p_documento": string }; Returns: undefined
                            },
+"fotos_do_evento":
+{ Args: { "p_evento": string }; Returns: string[]
+                           },
 "hash_codigo":
 { Args: { "p_codigo": string }; Returns: string
                            },
@@ -1750,6 +1831,9 @@ isOneToOne: false
 "marcar_ponto_pauta":
 { Args: { "p_ponto": string,"p_status": string }; Returns: undefined
                            },
+"meus_dados":
+{ Args: Record<PropertyKey, never>; Returns: Json
+                           },
 "minha_delegacao":
 { Args: { "p_comite": string }; Returns: string
                            },
@@ -1782,6 +1866,9 @@ isOneToOne: false
                            },
 "pedir_entrevista":
 { Args: { "p_delegacao": string,"p_tema": string }; Returns: string
+                           },
+"pedir_exclusao":
+{ Args: Record<PropertyKey, never>; Returns: undefined
                            },
 "pedir_reabertura":
 { Args: { "p_clausula": string }; Returns: undefined
@@ -1867,6 +1954,9 @@ isOneToOne: false
 "responder_notas":
 { Args: { "p_ids": (string)[],"p_resposta": string,"p_status": Database["public"]['Enums']["status_nota"] }; Returns: undefined
                            },
+"responder_pesquisa":
+{ Args: { "p_evento": string,"p_nota": number,"p_papel": Database["public"]['Enums']["papel"],"p_respostas": Json }; Returns: undefined
+                           },
 "responder_ponto":
 { Args: { "p_ponto": string,"p_status": string }; Returns: undefined
                            },
@@ -1892,6 +1982,9 @@ isOneToOne: false
                            },
 "salvar_proposta_agenda":
 { Args: { "p_comite": string,"p_itens": Json,"p_topico": number }; Returns: string
+                           },
+"secretaria_da_pessoa":
+{ Args: { "p_pessoa": string }; Returns: boolean
                            },
 "sessao_atual":
 { Args: { "p_comite": string }; Returns: string
