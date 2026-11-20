@@ -66,7 +66,7 @@ O relógio dos testes fica no passado (as datas do evento de teste no seed são 
 
 ## Pronto quando
 
-- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
+- [x] Os testes acima passam no CI, junto com os de todos os passos anteriores: 66 do banco, 12 de unidade e 101 de ponta a ponta.
 - [x] A Agora mostra a sessão atual, o próximo item e os avisos.
 - [x] Um aviso novo chega sem recarregar a página.
 - [x] As telas funcionam com 360 px e com 1366 px.
