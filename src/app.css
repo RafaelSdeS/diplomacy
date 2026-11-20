@@ -1,0 +1,405 @@
+/*
+ * Aparência: leve, profissional, diplomática, limpa e com cara de oficial.
+ * Regras completas em docs/implementacao/README.md, seção "Aparência".
+ * Contraste pensado para WCAG AA nos dois temas; o axe confere nos testes.
+ */
+
+:root {
+	color-scheme: light dark;
+
+	--cor-fundo: #ffffff;
+	--cor-superficie: #f5f6f8;
+	--cor-linha: #d9dee5;
+	--cor-texto: #1f2933;
+	--cor-texto-suave: #52606d;
+	--cor-marinho: #1b365d;
+	--cor-marinho-suave: #e9eef5;
+	--cor-sobre-marinho: #ffffff;
+	--cor-dourado: #8c6d2c; /* só presidência e prêmios */
+	--cor-foco: #1b365d;
+
+	/* Situação: sempre com ícone e texto, nunca só a cor. */
+	--cor-ok: #1e6b3a;
+	--cor-ok-fundo: #e7f3eb;
+	--cor-alerta: #7a5000;
+	--cor-alerta-fundo: #fbf1dc;
+	--cor-erro: #a1231b;
+	--cor-erro-fundo: #fbe9e7;
+
+	--fonte-ui: system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans', sans-serif;
+	--fonte-titulo: 'Source Serif 4', Georgia, 'Noto Serif', serif;
+	--fonte-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', 'Noto Sans Mono', monospace;
+
+	--raio: 6px;
+	--linha: 1px solid var(--cor-linha);
+	--transicao: 150ms ease;
+	--altura-nav: 3.5rem;
+	--largura-nav: 15rem;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--cor-fundo: #0e1a2b;
+		--cor-superficie: #15243a;
+		--cor-linha: #2b3d57;
+		--cor-texto: #e7ecf3;
+		--cor-texto-suave: #a7b4c6;
+		--cor-marinho: #a9c1e6;
+		--cor-marinho-suave: #1c2f4b;
+		--cor-sobre-marinho: #0e1a2b;
+		--cor-dourado: #d2b26a;
+		--cor-foco: #a9c1e6;
+
+		--cor-ok: #8fd0a6;
+		--cor-ok-fundo: #15301f;
+		--cor-alerta: #e8c27a;
+		--cor-alerta-fundo: #33270f;
+		--cor-erro: #f0a39b;
+		--cor-erro-fundo: #3a1714;
+	}
+}
+
+/* Base */
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	background: var(--cor-fundo);
+	color: var(--cor-texto);
+	font: 1rem/1.55 var(--fonte-ui);
+}
+
+h1,
+h2,
+h3 {
+	font-family: var(--fonte-titulo);
+	font-weight: 600;
+	line-height: 1.25;
+	color: var(--cor-marinho);
+	margin: 1.75rem 0 0.5rem;
+}
+
+h1 {
+	font-size: 1.75rem;
+	margin-top: 0;
+}
+
+h2 {
+	font-size: 1.35rem;
+	padding-bottom: 0.35rem;
+	border-bottom: var(--linha);
+}
+
+h3 {
+	font-size: 1.1rem;
+}
+
+p {
+	margin: 0 0 1rem;
+	max-width: 70ch;
+}
+
+a {
+	color: var(--cor-marinho);
+}
+
+:focus-visible {
+	outline: 2px solid var(--cor-foco);
+	outline-offset: 2px;
+}
+
+.suave {
+	color: var(--cor-texto-suave);
+}
+
+/* Rótulo curto em versalete, como em papel oficial. */
+.rotulo {
+	font-variant-caps: all-small-caps;
+	letter-spacing: 0.08em;
+	font-weight: 600;
+	color: var(--cor-texto-suave);
+	margin: 0 0 0.25rem;
+}
+
+/* Código de documento: UFRGSMUN/CSNU/RES/3 */
+.codigo-doc {
+	font-family: var(--fonte-mono);
+	font-size: 0.875rem;
+	letter-spacing: 0.02em;
+	color: var(--cor-texto-suave);
+}
+
+.linha {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.75rem;
+	margin-bottom: 1rem;
+}
+
+/* Estrutura: cabeçalho timbrado, navegação e conteúdo */
+
+.pular {
+	position: absolute;
+	left: 0.5rem;
+	top: -3rem;
+	z-index: 10;
+	padding: 0.5rem 0.75rem;
+	border-radius: var(--raio);
+	background: var(--cor-marinho);
+	color: var(--cor-sobre-marinho);
+}
+
+.pular:focus {
+	top: 0.5rem;
+}
+
+.app {
+	min-height: 100dvh;
+	display: grid;
+	grid-template-rows: auto 1fr;
+	grid-template-areas: 'timbre' 'conteudo';
+}
+
+.timbre {
+	grid-area: timbre;
+	padding: 0.75rem 1rem;
+	border-top: 3px solid var(--cor-marinho);
+	border-bottom: var(--linha);
+}
+
+.marca {
+	display: inline-flex;
+	flex-direction: column;
+	color: inherit;
+	text-decoration: none;
+}
+
+.marca-sigla {
+	font-family: var(--fonte-titulo);
+	font-weight: 600;
+	font-size: 1.15rem;
+	letter-spacing: 0.12em;
+	color: var(--cor-marinho);
+}
+
+.marca-nome {
+	font-size: 0.9rem;
+	font-variant-caps: all-small-caps;
+	letter-spacing: 0.08em;
+	color: var(--cor-texto-suave);
+}
+
+main {
+	grid-area: conteudo;
+	min-width: 0;
+	padding: 1.5rem 1rem calc(var(--altura-nav) + 1.5rem + env(safe-area-inset-bottom));
+}
+
+/* Celular e tablet: navegação fixa embaixo. */
+.navegacao {
+	position: fixed;
+	inset: auto 0 0 0;
+	z-index: 5;
+	padding-bottom: env(safe-area-inset-bottom);
+	background: var(--cor-fundo);
+	border-top: var(--linha);
+}
+
+.navegacao ul {
+	display: flex;
+	justify-content: space-around;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.navegacao a {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 0.15rem;
+	min-width: 4rem;
+	min-height: var(--altura-nav);
+	padding: 0.25rem 0.75rem;
+	font-size: 0.8rem;
+	color: var(--cor-texto-suave);
+	text-decoration: none;
+	transition:
+		background-color var(--transicao),
+		color var(--transicao);
+}
+
+.navegacao a[aria-current='page'] {
+	color: var(--cor-marinho);
+	font-weight: 600;
+}
+
+/* Notebook: navegação na lateral. */
+@media (min-width: 1024px) {
+	.app {
+		grid-template-columns: var(--largura-nav) 1fr;
+		grid-template-areas: 'timbre timbre' 'nav conteudo';
+	}
+
+	.timbre {
+		padding: 1rem 1.5rem;
+	}
+
+	.navegacao {
+		position: static;
+		grid-area: nav;
+		padding: 1rem 0.75rem;
+		border-top: 0;
+		border-right: var(--linha);
+	}
+
+	.navegacao ul {
+		flex-direction: column;
+		justify-content: flex-start;
+		gap: 0.25rem;
+	}
+
+	.navegacao a {
+		flex-direction: row;
+		justify-content: flex-start;
+		gap: 0.6rem;
+		min-height: 2.75rem;
+		font-size: 0.95rem;
+		border-radius: var(--raio);
+	}
+
+	.navegacao a[aria-current='page'] {
+		background: var(--cor-marinho-suave);
+	}
+
+	main {
+		padding: 2rem 2.5rem;
+	}
+}
+
+/* Componentes base: classes simples; componente Svelte só quando houver comportamento. */
+
+.botao {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	min-height: 2.75rem;
+	padding: 0.5rem 1.1rem;
+	border: 1px solid var(--cor-marinho);
+	border-radius: var(--raio);
+	background: var(--cor-marinho);
+	color: var(--cor-sobre-marinho);
+	font: inherit;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background-color var(--transicao);
+}
+
+.botao:hover {
+	background: color-mix(in srgb, var(--cor-marinho) 85%, var(--cor-fundo));
+}
+
+.botao--secundario {
+	background: transparent;
+	color: var(--cor-marinho);
+}
+
+.botao--secundario:hover {
+	background: var(--cor-marinho-suave);
+}
+
+.cartao {
+	max-width: 36rem;
+	padding: 1rem 1.25rem;
+	border: var(--linha);
+	border-radius: var(--raio);
+	background: var(--cor-fundo);
+}
+
+/* Cabeçalho do cartão no estilo papel timbrado. */
+.cartao-timbre {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	align-items: baseline;
+	gap: 0.5rem 1rem;
+	margin-bottom: 0.75rem;
+	padding-bottom: 0.5rem;
+	border-bottom: var(--linha);
+}
+
+.selo {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	padding: 0.2rem 0.6rem;
+	border-radius: 999px;
+	font-size: 0.875rem;
+	font-weight: 600;
+}
+
+.selo--ok {
+	color: var(--cor-ok);
+	background: var(--cor-ok-fundo);
+}
+
+.selo--alerta {
+	color: var(--cor-alerta);
+	background: var(--cor-alerta-fundo);
+}
+
+.selo--erro {
+	color: var(--cor-erro);
+	background: var(--cor-erro-fundo);
+}
+
+/* Carimbo: para documentos e situações formais. Usar com moderação. */
+.carimbo {
+	display: inline-block;
+	padding: 0.15rem 0.6rem;
+	border: 1.5px solid currentColor;
+	border-radius: 3px;
+	color: var(--cor-ok);
+	font-family: var(--fonte-titulo);
+	font-size: 0.85rem;
+	font-weight: 600;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+}
+
+.carimbo--confidencial {
+	color: var(--cor-erro);
+}
+
+dialog {
+	max-width: min(28rem, calc(100vw - 2rem));
+	padding: 1.25rem 1.5rem;
+	border: var(--linha);
+	border-radius: var(--raio);
+	background: var(--cor-fundo);
+	color: var(--cor-texto);
+}
+
+dialog::backdrop {
+	background: rgb(14 26 43 / 0.45);
+}
+
+dialog h3 {
+	margin-top: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		transition: none !important;
+		animation: none !important;
+	}
+}

@@ -4,6 +4,10 @@
 **Depende de:** 03
 **Objetivo:** dar a cada pessoa uma tela inicial com o que importa naquele minuto, mais as informações do evento.
 
+## Vitest
+
+Este passo tem o primeiro teste de unidade (redução de imagem), então o Vitest entra aqui: instalar, criar o script `npm run test:unit` e incluí-lo no `npm run testar` e no CI.
+
 ## Banco
 
 ```sql

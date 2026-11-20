@@ -6,6 +6,13 @@
 
 ## O que construir
 
+### Cliente do Supabase
+
+Veio do passo 01, porque este é o primeiro passo que usa o Supabase no app.
+
+- [ ] `.env.example` com a URL do projeto e a chave pública (anon ou publishable).
+- [ ] `src/lib/supabase.ts` com o cliente único. No SvelteKit 3, conferir como o módulo `$app/env` expõe as variáveis públicas.
+
 ### Supabase Auth
 
 - [ ] Provedor Google: cliente OAuth no Google Cloud, com URLs de retorno do `localhost` e do `*.pages.dev`.

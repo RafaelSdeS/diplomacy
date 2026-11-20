@@ -30,7 +30,7 @@ Cada passo só começa quando os passos de que ele depende estão prontos.
 
 ## Convenções
 
-**Stack:** SvelteKit 2 com Svelte 5, em modo SPA (`adapter-static`), TypeScript, Supabase (Postgres, Auth, Realtime e Storage) e Cloudflare Pages.
+**Stack:** SvelteKit 3 com Svelte 5, em modo SPA (`adapter-static`), TypeScript, Supabase (Postgres, Auth, Realtime e Storage) e Cloudflare Pages. Node 24 (`.nvmrc`).
 
 **Estrutura de pastas:**
 
@@ -43,13 +43,15 @@ src/
     tempo-real.ts      todas as assinaturas de tempo real
     regras/            leitura e exibição das regras de procedimento
     impressao/         modelos de impressão (DPO, resolução, carta)
-    ui/                componentes compartilhados
+    ui/                componentes com comportamento (o visual base são classes em src/app.css)
 supabase/
   migrations/          uma migração por mudança no banco
   tests/               testes pgTAP (regras de acesso e funções)
 scripts/
   seed.ts              dados fictícios (só local e projeto de teste)
+  tamanho.js           limite de 300 KB
 tests/                 testes de ponta a ponta (Playwright)
+  capturas/            capturas de referência, geradas no CI
 ```
 
 **Regras de código:**
@@ -59,7 +61,7 @@ tests/                 testes de ponta a ponta (Playwright)
 - Toda tabela tem regras de acesso por linha (RLS). Funções `security definer` só para ações que precisam de checagem extra, como assumir uma nota ou votar.
 - CSS próprio com variáveis e estilos por componente, sem framework de CSS.
 - Nenhum dado pessoal real no repositório. As seeds são fictícias.
-- Commits pequenos na `main`. Um passo pode virar vários commits.
+- Commits pequenos direto na `main`. Um passo pode virar vários commits.
 
 ## Definição de pronto (vale para todo passo)
 
@@ -80,11 +82,11 @@ Cada passo tem uma seção "Testes" com os testes que provam que ele funciona e 
 | Camada | Ferramenta | O que garante | Onde fica |
 |---|---|---|---|
 | Banco | pgTAP (`supabase test db`) | Regras de acesso, funções e regras de negócio | `supabase/tests/NN-nome.test.sql` |
-| Unidade | Vitest | Funções puras: cálculos, formatação e validações | Ao lado do código, `*.test.ts` |
+| Unidade | Vitest (a partir do passo 04) | Funções puras: cálculos, formatação e validações | Ao lado do código, `*.test.ts` |
 | Ponta a ponta | Playwright, nas três telas | Fluxos completos como o usuário faz, inclusive tempo real com dois navegadores | `tests/NN-nome.spec.ts` |
 | Acessibilidade | axe dentro do Playwright | Erros de acessibilidade em cada rota | Junto dos testes de ponta a ponta |
-| Aparência | Capturas de tela de referência do Playwright | Mudanças de layout sem querer | Junto dos testes de ponta a ponta |
-| Tamanho | Script no CI | Primeira abertura abaixo de 300 KB | `scripts/tamanho.ts` |
+| Aparência | Capturas de tela de referência do Playwright, geradas só no CI | Mudanças de layout sem querer | `tests/capturas/` |
+| Tamanho | Script no CI | Primeira abertura abaixo de 300 KB | `scripts/tamanho.js` |
 | Manual | Lista no próprio passo | O que não dá para automatizar: celulares reais, leitor de tela, login do Google, projetor | Seção "Testes" do passo |
 
 ### Testes que valem para o projeto inteiro
@@ -97,9 +99,9 @@ Cada passo tem uma seção "Testes" com os testes que provam que ele funciona e 
 
 ### Como os testes rodam
 
-- Cada passo é feito numa branch `passo-NN` e entra na `main` por pull request.
-- A `main` tem uma regra de proteção: o merge só acontece com o CI verde.
-- `npm run testar` roda localmente tudo o que o CI roda.
+- O trabalho vai direto para a `main`, porque há uma pessoa só no projeto. O CI roda a cada push.
+- Um passo só é dado como pronto com o CI verde.
+- `npm run testar` roda localmente tudo o que o CI roda, antes do push.
 - Testes de tempo real usam dois navegadores (dois contextos do Playwright) e esperam a atualização chegar.
 - Testes que dependem de horário usam o relógio controlado do Playwright (`page.clock`).
 - Os dados vêm do seed fictício, e cada teste de ponta a ponta começa com o banco no estado do seed.

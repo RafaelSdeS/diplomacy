@@ -6,10 +6,16 @@
 # Dados reais de inscritos ou de comitês (LGPD): nunca versionar
 dados-reais/
 
-# Dependências e builds (a partir da fase 0)
+# Dependências e builds
 node_modules/
 .svelte-kit/
 build/
 supabase/.temp/
+vite.config.ts.timestamp-*
+
+# Testes
+test-results/
+playwright-report/
+blob-report/
 
 .DS_Store

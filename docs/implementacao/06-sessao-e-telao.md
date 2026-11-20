@@ -110,6 +110,7 @@ Arquivos: `supabase/tests/06-sessao.test.sql`, `src/lib/sessao/cronometro.test.t
 - [ ] Ponta a ponta: dois navegadores mostram o mesmo tempo, com diferença máxima de 1 segundo.
 - [ ] Ponta a ponta: os atalhos de teclado do painel funcionam.
 - [ ] Ponta a ponta: o telão em 1920 × 1080 mostra orador, bandeira e cronômetro sem rolagem.
+- [ ] Ponta a ponta: a navegação do app não aparece nas rotas `/telao/*`.
 - [ ] Aparência: capturas de referência do painel da presidência e do telão.
 - [ ] Manual: o telão num projetor de verdade, lido do fundo da sala.
 

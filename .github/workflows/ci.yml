@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      atualizar_capturas:
+        description: Gerar novas capturas de referência (baixe o artefato "capturas" e faça o commit)
+        type: boolean
+        default: false
+
+jobs:
+  testes:
+    runs-on: ubuntu-latest
+    # Mesma versão do @playwright/test (fixada no package.json). As capturas de
+    # referência só são geradas aqui, para não variar de máquina para máquina.
+    container: mcr.microsoft.com/playwright:v1.65.1-noble
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+      - name: Checagem de tipos
+        run: npm run check
+      - run: npm run build
+      - name: Tamanho da primeira abertura
+        run: npm run tamanho
+
+      - name: Testes de ponta a ponta
+        if: ${{ !inputs.atualizar_capturas }}
+        run: npx playwright test
+
+      - name: Gerar capturas de referência
+        if: ${{ inputs.atualizar_capturas }}
+        run: npx playwright test --update-snapshots
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ inputs.atualizar_capturas }}
+        with:
+          name: capturas
+          path: tests/capturas/
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ failure() }}
+        with:
+          name: relatorio-playwright
+          path: playwright-report/

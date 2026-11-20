@@ -4,6 +4,16 @@
 **Depende de:** 01
 **Objetivo:** criar as tabelas centrais, as regras de acesso de cada função e um conjunto de dados fictícios para desenvolver e testar.
 
+## Supabase
+
+Veio do passo 01, porque aqui o banco passa a ser usado.
+
+- [ ] Supabase CLI como dependência de desenvolvimento e `supabase init`.
+- [ ] Ambiente local com Docker (`supabase start`).
+- [ ] Projeto gratuito na nuvem, região São Paulo, ligado com `supabase link`.
+- [ ] Script `npm run db:types`, que gera `src/lib/database.types.ts`.
+- [ ] No CI: `supabase start`, `supabase db reset` e `supabase test db`.
+
 ## Banco
 
 ```sql

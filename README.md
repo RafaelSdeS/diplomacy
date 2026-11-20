@@ -2,7 +2,7 @@
 
 App web tudo em um para simulações da ONU (MUNs), começando pelo [UFRGSMUN](https://www.ufrgs.br/ufrgsmun/). Funciona no celular e no computador, sem instalar nada.
 
-> **Status:** fase 0 (validação). Por enquanto o repositório só tem o planejamento; o código começa nesta fase.
+> **Status:** passo 01 de 19, a fundação do projeto.
 
 ## O problema
 
@@ -87,6 +87,23 @@ As fases do projeto (validação, piloto, evento e crescimento) e o calendário 
   ```sh
   chromium --headless --no-pdf-header-footer --print-to-pdf=docs/plano-do-app.pdf docs/plano-do-app.html
   ```
+
+## Desenvolvimento
+
+Requer Node 24 (`nvm install 24 && nvm use`).
+
+```sh
+npm install
+npx playwright install chromium
+npm run dev       # app em http://localhost:5173
+npm run testar    # tipos, build, tamanho e testes de ponta a ponta
+```
+
+**Capturas de referência:** os testes de aparência comparam telas com capturas geradas no CI, sempre no mesmo contêiner. No seu computador eles são pulados. Para gerar ou atualizar as capturas:
+
+1. Em Actions, abra o workflow "CI", clique em "Run workflow" na branch desejada e marque "Gerar novas capturas".
+2. Baixe o artefato `capturas`.
+3. Coloque o conteúdo em `tests/capturas/` e faça o commit.
 
 ## Privacidade
 
