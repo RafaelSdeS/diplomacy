@@ -3,6 +3,7 @@
 	import { rotuloPapel } from '#lib/papeis.ts';
 	import Bandeira from '#lib/ui/Bandeira.svelte';
 	import { FASES } from '#lib/votacao.ts';
+	import { SELO_NOTA, STATUS_NOTA, type StatusNota } from '#lib/crise.ts';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -68,6 +69,28 @@
 		{/each}
 		<p><a href="/avisos">Ver todos os avisos</a></p>
 	</article>
+
+	{#if data.respostasCrise.length}
+		<article class="cartao" aria-labelledby="c-crise">
+			<h2 id="c-crise">Respostas da crise</h2>
+			<ul class="lista">
+				{#each data.respostasCrise as nota (nota.id)}
+					<li>
+						<span>
+							<span class="selo {SELO_NOTA[nota.status as StatusNota]}">{STATUS_NOTA[nota.status as StatusNota]}</span>
+							{nota.titulo}
+							<span class="detalhe">{nota.resposta}</span>
+						</span>
+					</li>
+				{/each}
+			</ul>
+			<p>
+				<a href={`/comite/${data.participacoes.find((p) => p.comite_id === data.respostasCrise[0].comite_id)?.comite_sigla}/crise`}
+					>Ver as notas de crise</a
+				>
+			</p>
+		</article>
+	{/if}
 
 	<article class="cartao" aria-labelledby="c-voce">
 		<h2 id="c-voce">Você</h2>

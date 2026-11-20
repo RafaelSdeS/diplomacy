@@ -6,87 +6,62 @@
 
 ## Banco
 
-```sql
-create type status_nota as enum ('pendente', 'em_analise', 'aprovada', 'rejeitada', 'pede_ajuste');
+Migração `supabase/migrations/20261125090000_crise.sql`.
 
-create table nota_crise (
-  id uuid primary key,                        -- gerado no aparelho: reenviar nunca duplica
-  comite_id uuid not null references comite,
-  delegacao_id uuid not null references delegacao,
-  autor_id uuid not null references pessoa,
-  tipo text not null check (tipo in ('nota', 'diretiva')),
-  titulo text not null,
-  texto text not null,
-  criado_em timestamptz not null default now(),
-  status status_nota not null default 'pendente',
-  responsavel_id uuid references pessoa,
-  resposta text,
-  respondida_em timestamptz
-);
-
-create table atualizacao_crise (
-  id uuid primary key default gen_random_uuid(),
-  evento_id uuid not null references evento,
-  texto text not null,
-  autor_id uuid references pessoa,
-  publicada_em timestamptz not null default now()
-);
-
-create table atualizacao_comite (              -- crise conjunta: uma atualização, vários comitês
-  atualizacao_id uuid references atualizacao_crise, comite_id uuid references comite,
-  primary key (atualizacao_id, comite_id)
-);
-```
-
-- `ficha_delegacao`: view com as notas aprovadas de cada delegação, em ordem.
-- `linha_do_tempo`: view que junta atualizações e notas aprovadas do comitê.
+- [x] `nota_crise`: o `id` vem do aparelho, então reenviar a mesma nota não duplica. Guarda tipo (nota ou diretiva), título, texto, situação, responsável, resposta e quando foi respondida. `criado_em` usa `clock_timestamp()`, para a ordem da fila ficar certa.
+- [x] `atualizacao_crise` e `atualizacao_comite`: uma atualização pode valer para vários comitês do mesmo evento (crise conjunta). As chaves compostas impedem misturar comitês de eventos diferentes.
+- [x] As visões `ficha_delegacao` e `linha_do_tempo` não foram criadas. O filtro por delegação na fila e a lista de atualizações de cada tela cobrem o mesmo uso, com menos peças.
 
 ## Regras no banco
 
-- `enviar_nota(id, tipo, titulo, texto)`: `insert ... on conflict (id) do nothing`. Antes, trava a linha da delegação (`select ... for update`) e confere `limite_notas_pendentes` das regras, o que evita corrida entre dois envios.
-- `assumir_nota(id)`: `update ... set responsavel_id = auth.uid(), status = 'em_analise' where id = $1 and responsavel_id is null`. Se duas pessoas tentam ao mesmo tempo, só uma consegue.
-- `responder_nota(id, status, resposta)`: só quem assumiu, ou alguém da crise do comitê.
-- `posicao_na_fila(id)`: quantas notas pendentes do comitê são mais antigas.
+- [x] `enviar_nota(id, comite, tipo, título, texto)`: só delegados, só em comitê com crise. Trava a linha da delegação (`for update`), confere `limite_notas_pendentes` das regras (pendentes e em análise) e ignora um id já recebido.
+- [x] `assumir_nota(id)`: `update ... where responsavel_id is null and status = 'pendente'`. Se duas pessoas tentam ao mesmo tempo, só uma consegue; a outra recebe "Outra pessoa da crise já assumiu esta nota".
+- [x] `responder_notas(ids, status, resposta)`: responde uma ou várias notas parecidas de uma vez (aprovar, rejeitar ou pedir ajuste). Só a equipe de crise de cada comitê envolvido.
+- [x] `posicao_na_fila(id)`: quantas notas pendentes do comitê são mais antigas, mais um. A delegação vê a posição da própria nota sem ver as outras.
+- [x] `publicar_atualizacao(comites, texto)`: quem publica é da crise de todos os comitês escolhidos.
 
 ## Regras de acesso
 
-- O delegado vê só as notas da própria delegação.
-- A equipe de crise do comitê vê todas as notas do comitê. A mesa não vê notas de crise.
-- Atualizações são visíveis para os participantes dos comitês ligados a elas.
+- [x] O delegado vê só as notas da própria delegação. A equipe de crise do comitê (e a secretaria) vê todas. A mesa e a press não veem notas de crise.
+- [x] Uma atualização aparece para quem participa de pelo menos um dos comitês ligados a ela.
+- [x] `nota_crise` e `atualizacao_comite` estão no tempo real. A RLS decide quem recebe cada nota.
 
 ## Telas
 
-| Tela | Celular | Notebook |
-|---|---|---|
-| Delegado `/comite/[sigla]/crise` | Escrever nota ou diretiva; "minhas notas" com situação e posição na fila; respostas com cara de telegrama | Igual, com a lista ao lado do formulário |
-| Equipe `/crise/[sigla]` | Lista; um toque abre a nota | Fila à esquerda e nota aberta à direita; contador de pendentes e tempo da mais antiga no topo, em vermelho acima do limite; filtro por delegação; seleção de várias notas parecidas para a mesma resposta; respostas prontas |
-| Atualização | Formulário curto | Formulário com escolha de um ou vários comitês |
-| Telão | Não se aplica | A atualização aparece como plantão em destaque |
+| Tela | O que tem |
+|---|---|
+| Delegado `/comite/[sigla]/crise` | Atualizações de crise; escrever nota ou diretiva (o id nasce com o rascunho, e reenviar depois de uma falha de rede não duplica); notas da delegação com situação, posição na fila e a resposta com cara de telegrama |
+| Equipe `/crise/[sigla]` | Contador de pendentes e espera da mais antiga, em alerta a partir de 10 minutos; fila (primeiro as que esperam, da mais antiga) com filtro por delegação e "só as que esperam"; seleção de várias notas; nota aberta ao lado no notebook (no celular, abaixo, e o toque rola até ela); assumir; respostas prontas; aprovar, pedir ajuste ou rejeitar; publicar atualização para um ou vários comitês |
+| Telão | A atualização mais recente aparece como plantão em destaque por 5 minutos |
+| Agora | Cartão "Respostas da crise" com as últimas respostas às notas da delegação |
 
-A Agora do delegado ganha um cartão "nova resposta de crise".
-
-**Resolução de crise:** um botão na atualização cria um documento `resolucao_crise` ligado a ela, usando o editor do passo 09.
+- [x] "Crise" no menu para a equipe de crise. Os delegados chegam pela tela da sessão ("Notas de crise") e pelo cartão da Agora.
+- [ ] **Resolução de crise:** o botão que cria um documento `resolucao_crise` ligado à atualização fica para o passo 09, com o editor.
+- [ ] Com tecnologia restrita (OEA), os delegados não escrevem notas pelo app. Fica para o passo 16.
 
 ## Testes
 
-Arquivos: `supabase/tests/08-crise.test.sql` e `tests/08-crise.spec.ts`.
+Arquivos: `supabase/tests/08-crise.test.sql` (21 testes), `src/lib/crise.test.ts` (3 testes) e `tests/08-crise.spec.ts` (em série, num projeto; começa respondendo o que sobrou de outra execução).
 
-- [ ] pgTAP: **a delegação A não lê a nota da delegação B.** Este é o teste de privacidade principal.
-- [ ] pgTAP: a mesa e a press não leem notas de crise.
-- [ ] pgTAP: o limite de notas pendentes é respeitado, inclusive com dois envios simultâneos.
-- [ ] pgTAP: com duas pessoas assumindo a mesma nota, só uma consegue.
-- [ ] pgTAP: enviar a mesma nota duas vezes cria uma só.
-- [ ] pgTAP: só a equipe de crise do comitê responde notas e publica atualizações.
-- [ ] pgTAP: uma atualização ligada a dois comitês aparece para os dois e não para um terceiro.
-- [ ] pgTAP: `posicao_na_fila` dá a posição certa.
-- [ ] Ponta a ponta: um script insere 30 notas de 15 delegações em poucos segundos; o contador, a nota mais antiga e a ordem da fila ficam certos.
-- [ ] Ponta a ponta: a resposta chega ao celular do delegado sem recarregar.
-- [ ] Ponta a ponta: no notebook, a fila e a nota aberta ficam lado a lado; no celular, um toque na lista abre a nota.
-- [ ] Aparência: capturas de referência da fila da crise com 30 notas.
+- [x] pgTAP: **a delegação A não lê a nota da delegação B.** Este é o teste de privacidade principal.
+- [x] pgTAP: a mesa e a press não leem notas de crise.
+- [x] pgTAP: o limite de notas pendentes é respeitado; com os envios simultâneos, no teste de ponta a ponta (três de uma vez, só dois passam).
+- [x] pgTAP: com duas pessoas assumindo a mesma nota, só uma consegue.
+- [x] pgTAP: enviar a mesma nota duas vezes cria uma só.
+- [x] pgTAP: só a equipe de crise do comitê responde notas e publica atualizações; várias notas respondidas de uma vez.
+- [x] pgTAP: uma atualização ligada a dois comitês aparece para eles e não para um terceiro.
+- [x] pgTAP: `posicao_na_fila` dá a posição certa, e a delegação não vê a posição da nota de outra.
+- [x] Ponta a ponta: 30 notas de 15 delegações chegam em poucos segundos pela API, com três envios simultâneos por delegação (só dois passam); o contador, a nota mais antiga e a ordem da fila ficam certos.
+- [x] Ponta a ponta: a resposta chega ao celular do delegado sem recarregar.
+- [x] Ponta a ponta: várias notas parecidas respondidas de uma vez; a atualização chega ao delegado e vira plantão no telão.
+- [x] Vitest: ordem da fila, contador com alerta e tempo de espera por extenso.
+- [x] Acessibilidade: axe sem erros nas duas telas, nos dois temas, e reflow com 320 px.
+- [x] Ponta a ponta: no notebook, a fila e a nota aberta ficam lado a lado; no celular, um toque na lista abre a nota.
+- [x] Aparência: capturas de referência da fila da crise com 30 notas.
 
 ## Pronto quando
 
 - [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
-- [ ] 15 delegações escrevendo ao mesmo tempo não quebram a fila nem duplicam notas.
-- [ ] O teste de privacidade passa no CI.
-- [ ] O delegado vê a posição da própria nota na fila.
+- [x] 15 delegações escrevendo ao mesmo tempo não quebram a fila nem duplicam notas.
+- [x] O teste de privacidade passa.
+- [x] O delegado vê a posição da própria nota na fila.

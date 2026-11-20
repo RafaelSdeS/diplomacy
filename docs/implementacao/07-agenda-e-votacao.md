@@ -86,6 +86,6 @@ Arquivos: `supabase/tests/07-plenaria-e-votacao.test.sql` (46 testes), `src/lib/
 
 ## Pronto quando
 
-- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
+- [x] Os testes acima passam no CI, junto com os de todos os passos anteriores.
 - [x] O comitê de teste faz a plenária de abertura, escolhe o tópico, adota a agenda informal e vê o andamento de cada ponto.
 - [x] Os resultados batem com as regras, e o voto nunca é indicado só pela cor.

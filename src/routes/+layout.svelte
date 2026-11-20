@@ -5,6 +5,7 @@
 	import { page } from '$app/state';
 	import CalendarDays from '@lucide/svelte/icons/calendar-days';
 	import Gavel from '@lucide/svelte/icons/gavel';
+	import Siren from '@lucide/svelte/icons/siren';
 	import House from '@lucide/svelte/icons/house';
 	import Landmark from '@lucide/svelte/icons/landmark';
 	import Megaphone from '@lucide/svelte/icons/megaphone';
@@ -19,6 +20,7 @@
 
 	const papeis = $derived(new Set(data.participacoes.map((p) => p.papel)));
 	const sigla = $derived(data.participacoes.find((p) => p.comite_sigla)?.comite_sigla);
+	const siglaCrise = $derived(data.participacoes.find((p) => p.papel === 'crise')?.comite_sigla);
 
 	// Cada passo adiciona aqui as telas que cria. Sem "papeis", todos veem.
 	const telas: Tela[] = $derived([
@@ -29,6 +31,7 @@
 					{ href: `/comite/${sigla}`, rotulo: 'Comitê', icone: Landmark }
 				]
 			: []),
+		...(siglaCrise ? [{ href: `/crise/${siglaCrise}`, rotulo: 'Crise', icone: Siren, papeis: ['crise' as const] }] : []),
 		{ href: '/cronograma', rotulo: 'Cronograma', icone: CalendarDays },
 		{ href: '/avisos', rotulo: 'Avisos', icone: Megaphone },
 		{ href: '/secretaria/participantes', rotulo: 'Participantes', icone: Users, papeis: ['secretaria'] }

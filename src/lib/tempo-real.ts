@@ -19,14 +19,24 @@ export function assinarAvisos(aoMudar: () => void): () => void {
 	};
 }
 
+/** O que muda ao vivo numa sessão do comitê. */
+export const TABELAS_SESSAO = ['estado_sessao', 'pedido_fala', 'ponto_mocao', 'presenca', 'lista_oradores', 'votacao', 'voto'];
+/** O que muda ao vivo na crise do comitê (a RLS decide quem recebe cada nota). */
+export const TABELAS_CRISE = ['nota_crise', 'atualizacao_comite'];
+
 /**
- * Tudo o que muda ao vivo numa sessão do comitê. `aoConectar` diz se a conexão
- * está de pé (a tela mostra "Ao vivo" ou "Reconectando").
+ * Mudanças nas tabelas de um comitê, filtradas pelo comitê. `aoConectar` diz se a
+ * conexão está de pé (a tela mostra "Ao vivo" ou "Conectando").
  */
-export function assinarSessao(comiteId: string, aoMudar: () => void, aoConectar: (ok: boolean) => void): () => void {
+export function assinarComite(
+	comiteId: string,
+	tabelas: string[],
+	aoMudar: () => void,
+	aoConectar: (ok: boolean) => void
+): () => void {
 	const filter = `comite_id=eq.${comiteId}`;
-	const canal = supabase.channel(`sessao:${comiteId}:${crypto.randomUUID()}`);
-	for (const table of ['estado_sessao', 'pedido_fala', 'ponto_mocao', 'presenca', 'lista_oradores', 'votacao', 'voto']) {
+	const canal = supabase.channel(`comite:${comiteId}:${crypto.randomUUID()}`);
+	for (const table of tabelas) {
 		canal.on('postgres_changes', { event: '*', schema: 'public', table, filter }, aoMudar);
 	}
 	// Quando a assinatura fica pronta (e o Postgres confirma), recarrega uma vez: o

@@ -240,20 +240,35 @@ test('quem não preside não usa o painel', async ({ page }) => {
 
 test('a agenda informal: propostas em tópicos, lado a lado, e a mesa adota uma', async ({ browser }) => {
 	const delegado = await abrir(browser, contaDaDelegacao(outra), AGENDA);
-	await delegado.getByRole('combobox', { name: /^Tópico/ }).selectOption({ index: 0 });
+	// Um tópico ainda sem agenda adotada (numa nova tentativa, o primeiro já pode estar).
+	const livres = [];
+	for (const n of [1, 2]) {
+		const secao = delegado.getByRole('region', { name: `Agenda informal · tópico ${n}` });
+		if (!(await secao.getByText('Adotada').count())) livres.push(n);
+	}
+	test.skip(!livres.length, 'os dois tópicos já têm agenda adotada (banco reaproveitado)');
+	const n = livres[0];
+	const escolher = async (page: Page) => {
+		const campo = page.getByRole('combobox', { name: /^Tópico/ });
+		const rotulo = await campo.locator('option', { hasText: new RegExp(`^${n}\\.`) }).textContent();
+		await campo.selectOption({ label: rotulo!.trim() });
+	};
+
+	await escolher(delegado);
 	await delegado.getByLabel('Agenda em tópicos').fill('A. Causas\n  A.1 Financiamento\nB. Respostas');
 	await delegado.getByRole('button', { name: 'Salvar proposta' }).click();
 	await expect(delegado.getByRole('status')).toHaveText('Proposta salva.');
 
 	const mesa = await abrir(browser, CONTAS.mesa, AGENDA);
-	await mesa.getByRole('combobox', { name: /^Tópico/ }).selectOption({ index: 0 });
+	await escolher(mesa);
 	await mesa.getByLabel('Agenda em tópicos').fill('A. Contexto\nB. Cooperação\n  B.1 Inteligência');
 	await mesa.getByRole('button', { name: 'Salvar proposta' }).click();
 	await expect(mesa.getByRole('status')).toHaveText('Proposta salva.');
 
 	// No notebook, as propostas do mesmo tópico ficam lado a lado.
-	const daDelegacao = mesa.getByRole('article', { name: `Proposta de ${outra}` });
-	const daMesa = mesa.getByRole('article', { name: 'Proposta de Mesa' });
+	const secao = mesa.getByRole('region', { name: `Agenda informal · tópico ${n}` });
+	const daDelegacao = secao.getByRole('article', { name: `Proposta de ${outra}` });
+	const daMesa = secao.getByRole('article', { name: 'Proposta de Mesa' });
 	const [a, b] = await Promise.all([daDelegacao.boundingBox(), daMesa.boundingBox()]);
 	expect(Math.abs(a!.y - b!.y)).toBeLessThan(5);
 	// A árvore: "A.1 Financiamento" fica dentro de "A. Causas".
@@ -261,7 +276,7 @@ test('a agenda informal: propostas em tópicos, lado a lado, e a mesa adota uma'
 		daDelegacao.getByRole('listitem').filter({ hasText: 'A. Causas' }).getByRole('listitem')
 	).toHaveText(/A\.1 Financiamento/);
 
-	await mesa.getByRole('button', { name: `Adotar a proposta de ${outra}` }).click();
+	await secao.getByRole('button', { name: `Adotar a proposta de ${outra}` }).click();
 	await expect(daDelegacao).toContainText('Adotada');
 	await daDelegacao.getByRole('button', { name: /^Andamento de A\. Causas: Pendente/ }).click();
 	await expect(daDelegacao.getByRole('button', { name: /^Andamento de A\. Causas: Em debate/ })).toBeVisible();

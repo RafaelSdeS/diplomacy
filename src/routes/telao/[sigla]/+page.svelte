@@ -6,6 +6,7 @@
 	import Cronometro from '#lib/ui/Cronometro.svelte';
 	import GradeVotos from '#lib/ui/GradeVotos.svelte';
 	import { ETAPAS, FASES, listaAtiva, presidenciaEmVigor, textoResultado } from '#lib/votacao.ts';
+	import { TABELAS_SESSAO } from '#lib/tempo-real.ts';
 	import type { PageProps } from './$types';
 
 	// O telão roda no notebook do projetor, logado com a conta da mesa, sem botões:
@@ -31,6 +32,17 @@
 		)
 	);
 	const topico = $derived(data.estado?.topico_atual ? data.comite.topicos[data.estado.topico_atual - 1] : null);
+
+	// O plantão de crise fica em destaque por 5 minutos depois de publicado.
+	const PLANTAO_MS = 5 * 60_000;
+	let agora = $state(Date.now());
+	$effect(() => {
+		const relogio = setInterval(() => (agora = Date.now()), 10_000);
+		return () => clearInterval(relogio);
+	});
+	const plantao = $derived(
+		data.plantao && agora + diferenca - Date.parse(data.plantao.publicada_em) < PLANTAO_MS ? data.plantao : null
+	);
 
 	const telaCheia = () => void document.documentElement.requestFullscreen?.().catch(() => {});
 
@@ -81,9 +93,13 @@
 				<span class="rotulo">Presidência</span>
 				<span>{presidenciaEmVigor(data.fase, data.estado?.mesa_assumiu, sessao.presidencia?.nome)}</span>
 			{/if}
-			<AoVivo comiteId={data.comite.id} bind:diferenca />
+			<AoVivo comiteId={data.comite.id} tabelas={[...TABELAS_SESSAO, 'atualizacao_comite']} bind:diferenca />
 		</div>
 	</header>
+
+	{#if plantao}
+		<p class="telao-plantao" role="status"><span class="rotulo">Plantão de crise</span> {plantao.texto}</p>
+	{/if}
 
 	<section class="telao-orador" aria-label="Com a palavra">
 		{#if data.estado?.orador}

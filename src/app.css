@@ -858,8 +858,8 @@ kbd {
 
 	display: grid;
 	grid-template-columns: 1fr minmax(18rem, 26vw);
-	grid-template-rows: auto 1fr;
-	grid-template-areas: 'topo topo' 'orador fila';
+	grid-template-rows: auto auto 1fr;
+	grid-template-areas: 'topo topo' 'plantao plantao' 'orador fila';
 	gap: 2vh 3vw;
 	height: 100dvh;
 	padding: 4vh 4vw;
@@ -1100,5 +1100,97 @@ kbd {
 
 .telao-resultado {
 	margin-bottom: 1.5rem;
+	font-weight: 600;
+}
+
+/* Crise (passo 08) */
+
+.crise {
+	display: grid;
+	gap: 1rem;
+	margin-bottom: 1.5rem;
+}
+
+.crise .cartao {
+	max-width: none;
+	min-width: 0;
+}
+
+@media (min-width: 1024px) {
+	.crise {
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+		align-items: start;
+	}
+}
+
+.contador-crise {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+.fila-crise li {
+	flex-wrap: nowrap;
+	gap: 0.5rem;
+	justify-content: flex-start;
+}
+
+.fila-crise li[aria-current='true'] {
+	background: var(--cor-marinho-suave);
+}
+
+.nota-na-fila {
+	display: grid;
+	gap: 0.15rem;
+	flex: 1;
+	min-width: 0;
+	min-height: 2.75rem;
+	padding: 0.25rem 0;
+	border: 0;
+	background: none;
+	color: inherit;
+	font: inherit;
+	text-align: left;
+	cursor: pointer;
+}
+
+.texto-nota {
+	white-space: pre-wrap;
+}
+
+/* A resposta da crise tem cara de telegrama. */
+.telegrama {
+	display: block;
+	margin-top: 0.5rem;
+	padding: 0.6rem 0.8rem;
+	border: 1px dashed var(--cor-linha);
+	border-radius: var(--raio);
+	background: var(--cor-superficie);
+	font-family: var(--fonte-mono);
+	font-size: 0.9rem;
+	text-transform: uppercase;
+	letter-spacing: 0.02em;
+	white-space: pre-wrap;
+}
+
+.opcoes {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	min-width: 0;
+}
+
+.opcoes legend {
+	margin-bottom: 0.25rem;
+	font-weight: 600;
+}
+
+.telao-plantao {
+	grid-area: plantao;
+	margin: 0;
+	padding: 1.2vh 1.5vw;
+	border-left: 6px solid var(--cor-alerta);
+	background: var(--cor-alerta-fundo);
+	font-size: clamp(1.1rem, 1.8vw, 2.25rem);
 	font-weight: 600;
 }

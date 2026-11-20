@@ -7,7 +7,7 @@ import { supabase } from './supabase.ts';
 export async function comitePorSigla(sigla: string) {
 	const comite = await supabase
 		.from('comite')
-		.select('id, sigla, nome, topicos, guia_url, idioma')
+		.select('id, sigla, nome, topicos, guia_url, idioma, crise_ligada')
 		.eq('sigla', sigla)
 		.limit(1)
 		.maybeSingle();

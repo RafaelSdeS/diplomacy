@@ -23,7 +23,59 @@ export type Database = {
           }
         },"public": {
           Tables: {
-            "aviso": {
+            "atualizacao_comite": {
+                  Row: {
+                    "atualizacao_id": string,"comite_id": string,"evento_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "atualizacao_id": string,"comite_id": string,"evento_id": string
+                  }
+                  Update: {
+                    "atualizacao_id"?: string,"comite_id"?: string,"evento_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "atualizacao_comite_atualizacao_id_evento_id_fkey"
+      columns: ["atualizacao_id","evento_id"]
+isOneToOne: false
+      referencedRelation: "atualizacao_crise"
+      referencedColumns: ["id","evento_id"]
+    },{
+      foreignKeyName: "atualizacao_comite_comite_id_evento_id_fkey"
+      columns: ["comite_id","evento_id"]
+isOneToOne: false
+      referencedRelation: "comite"
+      referencedColumns: ["id","evento_id"]
+    }
+                  ]
+                },"atualizacao_crise": {
+                  Row: {
+                    "autor_id": string | null,"evento_id": string,"id": string,"publicada_em": string,"texto": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "autor_id"?: string | null,"evento_id": string,"id"?: string,"publicada_em"?: string,"texto": string
+                  }
+                  Update: {
+                    "autor_id"?: string | null,"evento_id"?: string,"id"?: string,"publicada_em"?: string,"texto"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "atualizacao_crise_autor_id_fkey"
+      columns: ["autor_id"]
+isOneToOne: false
+      referencedRelation: "pessoa"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "atualizacao_crise_evento_id_fkey"
+      columns: ["evento_id"]
+isOneToOne: false
+      referencedRelation: "evento"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"aviso": {
                   Row: {
                     "autor_id": string | null,"comite_id": string | null,"criado_em": string,"evento_id": string,"id": string,"texto": string
                   }
@@ -228,6 +280,38 @@ isOneToOne: false
       columns: ["ponto_mocao_id"]
 isOneToOne: false
       referencedRelation: "ponto_mocao"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"nota_crise": {
+                  Row: {
+                    "autor_id": string | null,"comite_id": string,"criado_em": string,"delegacao_id": string,"id": string,"respondida_em": string | null,"responsavel_id": string | null,"resposta": string | null,"status": Database["public"]['Enums']["status_nota"],"texto": string,"tipo": string,"titulo": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "autor_id"?: string | null,"comite_id": string,"criado_em"?: string,"delegacao_id": string,"id"?: string,"respondida_em"?: string | null,"responsavel_id"?: string | null,"resposta"?: string | null,"status"?: Database["public"]['Enums']["status_nota"],"texto": string,"tipo": string,"titulo": string
+                  }
+                  Update: {
+                    "autor_id"?: string | null,"comite_id"?: string,"criado_em"?: string,"delegacao_id"?: string,"id"?: string,"respondida_em"?: string | null,"responsavel_id"?: string | null,"resposta"?: string | null,"status"?: Database["public"]['Enums']["status_nota"],"texto"?: string,"tipo"?: string,"titulo"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "nota_crise_autor_id_fkey"
+      columns: ["autor_id"]
+isOneToOne: false
+      referencedRelation: "pessoa"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "nota_crise_delegacao_id_comite_id_fkey"
+      columns: ["delegacao_id","comite_id"]
+isOneToOne: false
+      referencedRelation: "delegacao"
+      referencedColumns: ["id","comite_id"]
+    },{
+      foreignKeyName: "nota_crise_responsavel_id_fkey"
+      columns: ["responsavel_id"]
+isOneToOne: false
+      referencedRelation: "pessoa"
       referencedColumns: ["id"]
     }
                   ]
@@ -573,6 +657,9 @@ isOneToOne: false
 "aplicar_forma":
 { Args: { "p_comite": string,"p_forma": Database["public"]['Enums']["forma_debate"],"p_minutos": number }; Returns: undefined
                            },
+"assumir_nota":
+{ Args: { "p_id": string }; Returns: undefined
+                           },
 "assumir_presidencia":
 { Args: { "p_assumir": boolean,"p_comite": string }; Returns: undefined
                            },
@@ -600,11 +687,17 @@ isOneToOne: false
 "encerrar_votacao":
 { Args: { "p_votacao": string }; Returns: undefined
                            },
+"enviar_nota":
+{ Args: { "p_comite": string,"p_id": string,"p_texto": string,"p_tipo": string,"p_titulo": string }; Returns: undefined
+                           },
 "enviar_ponto":
 { Args: { "p_comite": string,"p_detalhe"?: string,"p_minutos"?: number,"p_tipo": string,"p_topico"?: number }; Returns: undefined
                            },
 "evento_do_comite":
 { Args: { "p_comite": string }; Returns: string
+                           },
+"exigir_crise":
+{ Args: { "p_comite": string }; Returns: undefined
                            },
 "exigir_delegacao":
 { Args: { "p_comite": string }; Returns: string
@@ -654,8 +747,14 @@ isOneToOne: false
 "pode_ver_pessoa":
 { Args: { "p_pessoa": string }; Returns: boolean
                            },
+"posicao_na_fila":
+{ Args: { "p_id": string }; Returns: number
+                           },
 "presentes":
 { Args: { "p_sessao": string }; Returns: number
+                           },
+"publicar_atualizacao":
+{ Args: { "p_comites": (string)[],"p_texto": string }; Returns: string
                            },
 "quorum":
 { Args: { "p_comite": string }; Returns: number
@@ -674,6 +773,9 @@ isOneToOne: false
                            },
 "regras_validas":
 { Args: { "r": Json }; Returns: boolean
+                           },
+"responder_notas":
+{ Args: { "p_ids": (string)[],"p_resposta": string,"p_status": Database["public"]['Enums']["status_nota"] }; Returns: undefined
                            },
 "responder_ponto":
 { Args: { "p_ponto": string,"p_status": string }; Returns: undefined
@@ -712,7 +814,7 @@ isOneToOne: false
                            }
           }
           Enums: {
-            "escolha_voto": "a_favor"|"contra"|"abstencao","fase_comite": "plenaria"|"debate"|"acao"|"encerrado","forma_debate": "formal_formal"|"formal_informal"|"informal_informal","papel": "delegado"|"mesa"|"crise"|"press"|"secretaria","situacao_delegacao": "membro"|"observadora"|"suspensa","situacao_presenca": "presente"|"presente_e_votando"
+            "escolha_voto": "a_favor"|"contra"|"abstencao","fase_comite": "plenaria"|"debate"|"acao"|"encerrado","forma_debate": "formal_formal"|"formal_informal"|"informal_informal","papel": "delegado"|"mesa"|"crise"|"press"|"secretaria","situacao_delegacao": "membro"|"observadora"|"suspensa","situacao_presenca": "presente"|"presente_e_votando","status_nota": "pendente"|"em_analise"|"aprovada"|"rejeitada"|"pede_ajuste"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -832,7 +934,7 @@ export const Constants = {
           }
         },"public": {
           Enums: {
-            "escolha_voto": ["a_favor", "contra", "abstencao"],"fase_comite": ["plenaria", "debate", "acao", "encerrado"],"forma_debate": ["formal_formal", "formal_informal", "informal_informal"],"papel": ["delegado", "mesa", "crise", "press", "secretaria"],"situacao_delegacao": ["membro", "observadora", "suspensa"],"situacao_presenca": ["presente", "presente_e_votando"]
+            "escolha_voto": ["a_favor", "contra", "abstencao"],"fase_comite": ["plenaria", "debate", "acao", "encerrado"],"forma_debate": ["formal_formal", "formal_informal", "informal_informal"],"papel": ["delegado", "mesa", "crise", "press", "secretaria"],"situacao_delegacao": ["membro", "observadora", "suspensa"],"situacao_presenca": ["presente", "presente_e_votando"],"status_nota": ["pendente", "em_analise", "aprovada", "rejeitada", "pede_ajuste"]
           }
         }
 } as const
