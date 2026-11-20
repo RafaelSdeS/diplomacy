@@ -29,6 +29,10 @@
 	]);
 	const itens = $derived(telas.filter((t) => !t.papeis || t.papeis.some((p) => papeis.has(p))));
 	const comMenu = $derived(data.participacoes.length > 0);
+	// A própria tela é a "page"; numa subtela (as regras do comitê), o item do menu
+	// continua marcado como o lugar em que a pessoa está.
+	const atual = (href: string) =>
+		page.url.pathname === href ? 'page' : href !== '/' && page.url.pathname.startsWith(`${href}/`) ? 'true' : undefined;
 
 	// Avisos chegam na hora para quem está no app.
 	$effect(() => {
@@ -70,7 +74,7 @@
 			<ul>
 				{#each itens as item (item.href)}
 					<li>
-						<a href={item.href} aria-current={page.url.pathname === item.href ? 'page' : undefined}>
+						<a href={item.href} aria-current={atual(item.href)}>
 							<item.icone aria-hidden="true" size={20} strokeWidth={1.5} />
 							<span>{item.rotulo}</span>
 						</a>

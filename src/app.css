@@ -287,7 +287,7 @@ main {
 		color var(--transicao);
 }
 
-.navegacao a[aria-current='page'] {
+.navegacao a[aria-current] {
 	color: var(--cor-marinho);
 	font-weight: 600;
 }
@@ -331,7 +331,7 @@ main {
 		border-radius: var(--raio);
 	}
 
-	.navegacao a[aria-current='page'] {
+	.navegacao a[aria-current] {
 		background: var(--cor-marinho-suave);
 	}
 
@@ -461,10 +461,40 @@ main {
 	overflow-wrap: anywhere;
 }
 
-.lista .detalhe {
+.lista .detalhe,
+.ficha .detalhe {
 	display: block;
 	font-size: 0.9rem;
 	color: var(--cor-texto-suave);
+}
+
+/* Ficha de definições (regras do comitê): rótulo e valor; empilha no celular. */
+.ficha {
+	max-width: 48rem;
+	margin: 0 0 1.5rem;
+	border-top: var(--linha);
+}
+
+.ficha div {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: 0.15rem 1rem;
+	padding: 0.75rem 0;
+	border-bottom: var(--linha);
+}
+
+.ficha dt {
+	font-weight: 600;
+}
+
+.ficha dd {
+	margin: 0;
+}
+
+@media (min-width: 640px) {
+	.ficha div {
+		grid-template-columns: 14rem minmax(0, 1fr);
+	}
 }
 
 /* Item que está acontecendo agora (cronograma). */

@@ -24,6 +24,7 @@
 	{#if data.comite.guia_url}
 		<p><a href={data.comite.guia_url} target="_blank" rel="noopener">Guia de estudos</a></p>
 	{/if}
+	<p><a href={`/comite/${data.comite.sigla}/regras`}>Regras de procedimento</a></p>
 </section>
 
 <section aria-labelledby="t-mesa">

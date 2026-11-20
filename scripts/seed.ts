@@ -77,7 +77,12 @@ const comite = verificar(
 					'Crime organizado transnacional, narcotráfico e instabilidade política: desafios na América Latina',
 					'Conflito no Iêmen: ataques no Mar Vermelho e no Golfo de Áden'
 				],
-				guia_url: 'https://www.ufrgs.br/ufrgsmun/'
+				guia_url: 'https://www.ufrgs.br/ufrgsmun/',
+				// As outras regras vêm do Guia de Regras (regras_do_guia no banco).
+				regras: {
+					votacao_substantiva: 'csnu',
+					membros_permanentes: ['China', 'EUA', 'França', 'Reino Unido', 'Rússia']
+				}
 			},
 			{ onConflict: 'evento_id,sigla' }
 		)

@@ -254,6 +254,9 @@ isOneToOne: false
             "aplicar_convites":
 { Args: { "p_email": string,"p_usuario": string }; Returns: undefined
                            },
+"dois_tercos":
+{ Args: { "p_base": number }; Returns: number
+                           },
 "eh_participante":
 { Args: { "p_evento": string }; Returns: boolean
                            },
@@ -262,6 +265,9 @@ isOneToOne: false
                            },
 "evento_do_comite":
 { Args: { "p_comite": string }; Returns: string
+                           },
+"maioria_simples":
+{ Args: { "p_base": number }; Returns: number
                            },
 "marcar_avisos_vistos":
 { Args: Record<PropertyKey, never>; Returns: undefined
@@ -274,6 +280,18 @@ isOneToOne: false
                            },
 "pode_ver_pessoa":
 { Args: { "p_pessoa": string }; Returns: boolean
+                           },
+"quorum":
+{ Args: { "p_comite": string }; Returns: number
+                           },
+"regras":
+{ Args: { "p_comite": string }; Returns: Json
+                           },
+"regras_do_guia":
+{ Args: Record<PropertyKey, never>; Returns: Json
+                           },
+"regras_validas":
+{ Args: { "r": Json }; Returns: boolean
                            },
 "tem_papel":
 { Args: { "p_comite": string,"p_papeis": (Database["public"]['Enums']["papel"])[] }; Returns: boolean

@@ -2,7 +2,7 @@
 
 App web tudo em um para simulações da ONU (MUNs), começando pelo [UFRGSMUN](https://www.ufrgs.br/ufrgsmun/). Funciona no celular e no computador, sem instalar nada.
 
-> **Status:** passo 04 de 19, tela "Agora", perfis, cronograma e avisos. Os passos 01 a 03 estão prontos.
+> **Status:** passo 05 de 19, regras de procedimento. Os passos 01 a 04 estão prontos.
 
 ## O problema
 
