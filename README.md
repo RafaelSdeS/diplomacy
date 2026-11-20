@@ -46,16 +46,35 @@ As regras de procedimento vêm do Guia de Regras do UFRGSMUN e são configuráve
 
 Detalhes e justificativas na seção 16 do plano.
 
-## Plano por fases
+## Plano de implementação
 
-| Fase | Quando | Plano |
-|---|---|---|
-| 0 · Validação | dez/2026 a fev/2027 | [docs/fases/fase-0-validacao.md](docs/fases/fase-0-validacao.md) |
-| 1 · Piloto de teste | mar a jun/2027 | [docs/fases/fase-1-piloto.md](docs/fases/fase-1-piloto.md) |
-| 2 · Evento completo | jul/2027 até a edição de 2027 | [docs/fases/fase-2-evento.md](docs/fases/fase-2-evento.md) |
-| 3 · Crescimento | depois da edição de 2027 | [docs/fases/fase-3-crescimento.md](docs/fases/fase-3-crescimento.md) |
+O app é construído em 19 passos, cada um com o seu plano: o que construir, banco, telas para celular e notebook, testes e quando está pronto. O índice, as convenções de código e a definição de pronto estão em [docs/implementacao/](docs/implementacao/README.md).
 
-Cada fase só começa quando a anterior passa no seu teste.
+| Passo | Entrega |
+|---|---|
+| **Piloto** (grátis, poucos usuários, dados fictícios) | |
+| [01](docs/implementacao/01-fundacao.md) | Projeto, deploy, CI e layout responsivo |
+| [02](docs/implementacao/02-banco-e-permissoes.md) | Banco base, papéis, regras de acesso e dados fictícios |
+| [03](docs/implementacao/03-login-e-papeis.md) | Login e navegação por função |
+| [04](docs/implementacao/04-agora-e-informacoes.md) | Tela "Agora", perfis, comitê, cronograma e avisos |
+| [05](docs/implementacao/05-regras-de-procedimento.md) | Regras do Guia de Regras como configuração |
+| [06](docs/implementacao/06-sessao-e-telao.md) | Sessão e telão |
+| [07](docs/implementacao/07-agenda-e-votacao.md) | Agenda e votação |
+| [08](docs/implementacao/08-crise.md) | Crise |
+| [09](docs/implementacao/09-editor-de-resolucoes.md) | Editor de resoluções |
+| [10](docs/implementacao/10-dpo-e-documentos-em-pdf.md) | DPO, cartas e documentos em PDF |
+| [11](docs/implementacao/11-press.md) | Press |
+| [12](docs/implementacao/12-teste-do-piloto.md) | Teste do piloto |
+| **Evento** (escala do UFRGSMUN) | |
+| [13](docs/implementacao/13-escala-e-tempo-real.md) | Escala e tempo real |
+| [14](docs/implementacao/14-login-completo-e-secretaria.md) | Login completo e secretaria |
+| [15](docs/implementacao/15-offline-e-pwa.md) | Offline, PWA e notificações |
+| [16](docs/implementacao/16-procedimento-completo.md) | Procedimento completo |
+| [17](docs/implementacao/17-comunicacao-completa.md) | Comunicação completa |
+| [18](docs/implementacao/18-idiomas.md) | Idiomas |
+| [19](docs/implementacao/19-lgpd-e-pos-evento.md) | LGPD e pós-evento |
+
+As fases do projeto (validação, piloto, evento e crescimento) e o calendário até a edição de 2027 estão na seção 17 do plano completo.
 
 ## Documentos
 
