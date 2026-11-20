@@ -6,139 +6,86 @@
 
 ## Ajustes dos passos 05 e 06 (regras do UNOCT)
 
-As regras do UNOCT, que valem para todos os comitês, mudam algumas escolhas feitas antes:
+Migração `supabase/migrations/20261124090000_plenaria_e_votacao.sql`.
 
-- [ ] **Regras (passo 05):**
-  - `assinaturas_projeto_fracao` (1/5) vira `assinaturas_projeto_min = 5`;
-  - novas chaves `max_sessoes_presidencia = 2` e `assinaturas_desconfianca_fracao = [1, 5]`;
-  - nova função `quorum_votacao(comite)`: maioria simples das delegações previstas;
-  - os textos de `regrasLegiveis` acompanham as mudanças.
-- [ ] **Sorteio da presidência (passo 06):**
-  - `sortear_presidencia(comite)` sorteia todas as delegações que não são observadoras nem suspensas, sem lista de voluntárias;
-  - observadora nunca preside, e uma delegação preside no máximo `max_sessoes_presidencia` sessões.
-- [ ] **Quem preside:** o bureau preside enquanto o comitê está na plenária de abertura ou na fase de ação, e quando a mesa assume a presidência num caso excepcional (`assumir_presidencia` e `devolver_presidencia`). `pode_presidir` passa a considerar a fase do comitê. A sessão "de votação" do passo 06 dá lugar à fase de ação.
-- [ ] **Formas de debate:** o formal-formal só existe na plenária de abertura. Fora dela, o fluxo normal é o formal-informal: a presidência escolhe entre as placas levantadas, como já faz a fila do passo 06.
-- [ ] **Pontos e moções:**
-  - os tipos passam a ser os do UNOCT: ponto de ordem, de privilégio pessoal e de dúvida; moções de tópico no topo, adiamento do debate, adiamento da sessão, informal-informal, não-confiança, divisão da questão e votação nominal;
-  - saem as moções de formal-informal, suspensão e encerramento do debate;
-  - o ponto de ordem fica bloqueado enquanto outra delegação fala.
+- [x] **Regras (passo 05):** `assinaturas_projeto_fracao` (1/5) virou `assinaturas_projeto_min = 5`; entraram `max_sessoes_presidencia = 2` e `assinaturas_desconfianca_fracao = [1, 5]`, e a função `quorum_votacao(comite)` (maioria simples das previstas). `regrasLegiveis` mostra as regras novas.
+- [x] **Sorteio:** `sortear_presidencia(comite)` sorteia todas as delegações membros, sem voluntárias; observadora e suspensa nunca presidem. O rodízio conta quantas vezes cada uma presidiu (`vezes`), e ninguém passa de `max_sessoes_presidencia`.
+- [x] **Quem preside:** `pode_presidir` só dá a presidência à delegação da vez na fase de debate e quando a mesa não assumiu. O bureau preside a plenária, a fase de ação e os casos excepcionais (`assumir_presidencia(comite, true/false)`). A coluna `sessao.de_votacao` saiu.
+- [x] **Formas de debate:** o formal-formal só existe na plenária, onde a forma não muda. Fora dela, a sessão abre em formal-informal.
+- [x] **Pontos e moções do UNOCT:** ponto de ordem, de dúvida e de privilégio pessoal; moções de tópico no topo, adiamento do debate, adiamento da sessão, informal-informal, não-confiança, divisão da questão e votação nominal (as duas últimas só na votação de um projeto, no passo 16). `enviar_ponto` confere a fase de cada uma, e o ponto de ordem não interrompe outra delegação.
 
 ## Banco
 
-```sql
-create type fase_comite as enum ('plenaria', 'debate', 'acao', 'encerrado');
-
--- Andamento do comitê, na linha de estado_sessao (passo 06):
---   fase fase_comite not null default 'plenaria',
---   etapa_plenaria text check (etapa_plenaria in ('briefing', 'discursos', 'topico')),
---   topico_atual int,                         -- índice em comite.topicos
---   ordem_topicos int[],                      -- definida pela moção de tópico no topo
---   mesa_assumiu boolean not null default false
-
-create table lista_oradores (                 -- discursos de abertura e listas especiais (2 a favor, 2 contra)
-  id uuid primary key default gen_random_uuid(),
-  sessao_id uuid not null, comite_id uuid not null,
-  delegacao_id uuid not null,
-  motivo text not null,                       -- abertura, ou o id da moção da lista especial
-  lado text check (lado in ('a_favor', 'contra')),
-  ordem int not null,
-  falou boolean not null default false
-);
-
-create table proposta_agenda (                -- agenda informal: tópico › subtópicos › pontos
-  id uuid primary key default gen_random_uuid(),
-  comite_id uuid not null references comite,
-  delegacao_id uuid references delegacao,     -- nula: sugestão do bureau
-  topico int not null,
-  adotada boolean not null default false
-);
-
-create table ponto_pauta (
-  id uuid primary key default gen_random_uuid(),
-  proposta_id uuid not null references proposta_agenda on delete cascade,
-  pai_id uuid references ponto_pauta,
-  texto text not null,
-  ordem int not null,
-  status text not null default 'pendente'     -- pendente, em_debate, debatido
-);
-
-create type escolha_voto as enum ('a_favor', 'contra', 'abstencao');
-
-create table votacao (
-  id uuid primary key default gen_random_uuid(),
-  comite_id uuid not null, sessao_id uuid not null,
-  ponto_mocao_id uuid references ponto_mocao, -- a moção votada, quando há
-  objeto text not null,                       -- "Tópico 2 no topo da agenda", "Projeto de resolução 1"...
-  tipo text not null check (tipo in ('procedimental', 'substantiva')),
-  regra text not null,                        -- maioria_simples, dois_tercos (CSNU e unanimidade no passo 16)
-  aberta boolean not null default true
-);
-
-create table voto (
-  votacao_id uuid references votacao,
-  delegacao_id uuid references delegacao,
-  escolha escolha_voto not null,
-  primary key (votacao_id, delegacao_id)      -- um voto por delegação
-);
-```
-
-Como no passo 06, todas as escritas passam por funções que checam quem pode, e as tabelas guardam `comite_id` com chaves compostas.
+- [x] `estado_sessao` guarda o andamento do comitê: `fase` (plenária, debate, ação, encerrado), `etapa_plenaria` (briefing, discursos, tópico), `topico_atual`, `ordem_topicos` e `mesa_assumiu`.
+- [x] `lista_oradores`: discursos de abertura (sem moção) e listas especiais de uma moção (lado a favor ou contra). Vale para o comitê, não para a sessão: a plenária pode atravessar sessões.
+- [x] `votacao` e `voto`, com no máximo uma votação aberta por comitê. O resultado é gravado ao encerrar. `criado_em` usa `clock_timestamp()`, para a ordem ficar certa mesmo dentro de uma transação.
+- [x] `proposta_agenda` (uma por delegação e por tópico, mais a da mesa; uma adotada por tópico) e `ponto_pauta` em árvore.
+- [x] Todas as escritas passam por funções que checam quem pode, e as tabelas guardam `comite_id` com chaves compostas, como no passo 06. Votos, listas e votações estão no tempo real.
 
 ## Regras no banco
 
-- **Plenária de abertura:**
-  - `avancar_plenaria(comite)` (só o bureau) passa de briefing a discursos e de discursos à moção do tópico;
-  - ao entrar nos discursos, todas as delegações presentes entram na lista de oradores, em ordem alfabética;
-  - `dar_palavra` segue a lista enquanto ela existe.
-- **Lista especial:** `inscrever_lista(moção, lado)` aceita até 2 delegações a favor e 2 contra.
-- **Votação:**
-  - `abrir_votacao(...)` (quem preside; na fase de ação, só o bureau);
-  - `votar(votacao, escolha)` confere se a delegação está presente, se a votação está aberta e se a situação dela permite votar. Observadora só vota em questão procedimental; suspensa não vota. Questão procedimental não aceita abstenção, nem a delegação "presente e votando";
-  - `registrar_voto(votacao, delegacao, escolha)`, só da mesa, para os votos contados nas placas;
-  - `encerrar_votacao(votacao)` grava o resultado e aplica o efeito da moção.
-- **Resultado:** `resultado(votacao) returns (a_favor, contra, abstencoes, necessario, aprovada)`.
-  - A base é o número de presentes na sessão. Empate reprova.
-  - Votação substantiva sem o quórum de votação (maioria simples das previstas presentes) não abre.
-- **Efeitos das moções aprovadas:**
-  - **tópico no topo:** define `ordem_topicos` e leva o comitê à fase de debate (rejeitada, entra o outro tópico);
-  - **informal-informal:** muda a forma de debate pelos minutos pedidos;
-  - **adiamento da sessão:** encerra a sessão.
-  - Adiamento do debate, não-confiança, divisão da questão e votação nominal ficam para o passo 16.
+- [x] **Plenária:** `avancar_plenaria(comite)`, só do bureau. Exige a chamada antes dos discursos de abertura e põe todas as delegações presentes na lista, em ordem alfabética. `dar_palavra` marca quem falou nas listas em uso.
+- [x] **Lista especial:** `abrir_lista_especial(moção)` e `inscrever_lista(moção, lado)`, com no máximo 2 a favor e 2 contra. A trava na moção põe as inscrições em fila.
+- [x] **Votação:** `abrir_votacao(moção)` usa a regra da moção: dois terços no adiamento do debate e maioria simples nas outras. `abrir_votacao_livre(comite, objeto, tipo)` exige, na substantiva, o quórum de votação.
+- [x] `votar` e `registrar_voto` (só a mesa, para votos de placa) passam por `validar_voto`: votação aberta, delegação presente e situação que permite votar. Observadora não vota em questão substantiva, suspensa não vota, procedimental não aceita abstenção, e quem está "presente e votando" não se abstém.
+- [x] **Resultado:** `resultado(votacao)`. A base é o número de presentes que votam naquele tipo de questão (nas substantivas, só as membros). Maioria simples e dois terços, como no passo 05. Empate reprova.
+- [x] **Efeitos ao encerrar:**
+  - tópico no topo: aprovada, o tópico vai para o topo; rejeitada, entra o outro. O comitê passa ao debate, e a delegação da vez assume;
+  - adiamento do debate: passa ao outro tópico;
+  - adiamento da sessão: encerra a sessão;
+  - informal-informal: começa, com o limite das regras;
+  - não-confiança: a presidência passa à próxima da lista.
+
+  As assinaturas da não-confiança, a divisão da questão e a votação nominal ficam para o passo 16.
+- [x] **Agenda:** `salvar_proposta_agenda(comite, tópico, itens)` troca a proposta inteira, e nenhum item pula nível. `adotar_proposta` é só da mesa. `marcar_ponto_pauta` é de quem preside, e só na agenda adotada.
 
 ## Agenda
 
-1. **Tópicos:** a moção do tópico no topo, no fim da plenária, define qual dos tópicos do comitê é debatido primeiro. O tópico atual fica fixo no telão e na tela "Agora".
-2. **Agenda informal:** sugerida no briefing, como árvore (tópico › subtópicos › pontos). O bureau sugere; as delegações podem propor outra. As propostas aparecem lado a lado, e o bureau marca a adotada, por consenso ou depois de uma votação por maioria simples. Os pontos mostram o andamento (pendente, em debate, debatido), e os working papers do passo 09 se ligam a eles.
+1. [x] A moção do tópico no topo, no fim da plenária, define a ordem dos tópicos. O tópico em debate aparece na sessão, no telão e na tela Agora.
+2. [x] A agenda informal é escrita em tópicos: um item por linha, e dois espaços ou um traço descem um nível. As propostas aparecem lado a lado no notebook, a mesa adota uma, e quem preside marca o andamento de cada ponto (pendente, em debate, debatido).
 
 ## Telas
 
-| Tela | Celular | Notebook |
-|---|---|---|
-| Plenária (bureau), no painel da presidência | Etapa atual e botão para avançar; lista de oradores dos discursos de abertura | Igual, com a lista ao lado do cronômetro |
-| Agenda `/comite/[sigla]/sessao/agenda` | Tópicos na ordem; propostas de agenda informal, uma de cada vez | Propostas lado a lado |
-| Votar, na tela da sessão | Três botões grandes com ícone e texto (a favor, contra e abstenção, quando cabe) | Igual |
-| Votações, no painel da presidência | Abrir, acompanhar, registrar votos de placa e encerrar | Lista de delegações com o voto de cada uma |
-| Telão | Não se aplica | Etapa da plenária ou tópico atual; na votação, grade de bandeiras com o voto de cada delegação (cor, ícone e texto) e o resultado |
+| Tela | O que tem |
+|---|---|
+| Sessão do delegado | Fase e tópico, votação aberta com botões grandes (só as escolhas permitidas), lista de oradores, inscrição na lista especial, placa (fora da plenária) e os pontos e moções em ordem na fase |
+| Painel da presidência | Plenária para o bureau (etapa e botão de avançar), mesa assume ou devolve a presidência, lista de oradores com "dar a palavra ao próximo", moções com lista especial, votar ou "fora de ordem", votação com a grade de votos, votos de placa e encerramento |
+| Agenda `/comite/[sigla]/sessao/agenda` | Tópicos na ordem, propostas lado a lado, formulário em tópicos e adoção pela mesa |
+| Telão | Etapa da plenária ou fase e forma, tópico em debate, grade de bandeiras na votação (ícone e texto, além da cor) e o resultado; próximos da lista de oradores |
+| Agora | O andamento de cada comitê da pessoa |
+
+- [x] O atalho Enter dá a palavra ao próximo da lista de oradores e, sem lista, ao primeiro da fila de placas.
+- [x] Depois de avançar a plenária, o painel solta o foco do botão. Sem isso, um Enter dado como atalho acionaria o botão, que muda de texto, e avançaria a plenária por engano. O teste pegou isso.
+
+## Correções da revisão (no meio do piloto)
+
+- [x] Banco: `agora()` com `search_path` fixo, e as cinco regras de acesso que recalculavam `auth.uid()` a cada linha passam a usar `(select auth.uid())`. As funções de gatilho (`nova_conta` e `convite_criado`) deixam de aparecer na API (`20261124100000_gatilhos_privados.sql`). O analisador da nuvem (`npx supabase db advisors --remote`) ainda lista as funções da API como executáveis por quem está logado: isso é de propósito, porque cada uma confere a permissão por dentro.
+- [x] Painel: o campo "Tempo de fala" não é mais apagado a cada evento ao vivo.
+- [x] Cronograma: o horário digitado vale no fuso do evento, mesmo num aparelho em outro fuso.
+- [x] Tempo real: cada assinatura usa um canal com nome próprio, porque o realtime-js reaproveita canais pelo nome. Quando a assinatura fica pronta, a tela recarrega uma vez, e o que mudou nesse intervalo não se perde. O teste do voto no telão pegou essa corrida.
+- [x] O seed espera a API do Supabase ficar pronta depois de um `db reset`.
+- [x] Deploy: o guia ganhou a ordem certa (migração na nuvem antes do push), e os planos 13, 14 e 15 foram atualizados.
 
 ## Testes
 
-Arquivos: `supabase/tests/07-plenaria-e-votacao.test.sql`, `src/lib/votacao.test.ts` e `tests/07-plenaria-e-votacao.spec.ts`.
+Arquivos: `supabase/tests/07-plenaria-e-votacao.test.sql` (46 testes), `src/lib/votacao.test.ts` (9 testes) e `tests/06-sessao.spec.ts`. Os testes de ponta a ponta continuam no arquivo do passo 06: o comitê de teste tem uma sessão só, e o fluxo inteiro (chamada, plenária, votação, debate, agenda e telão) roda em série. A conta de cada delegação sai de `scripts/delegacoes.ts`, a mesma lista do seed, porque a presidência é sorteada.
 
-- [ ] pgTAP, ajustes: o sorteio inclui todas as delegações não observadoras, nunca uma observadora; ninguém preside mais de 2 sessões; o bureau preside na plenária e na fase de ação; projeto pede 5 signatários.
-- [ ] pgTAP: os discursos de abertura põem todas as presentes na lista de oradores, em ordem alfabética; a lista especial aceita no máximo 2 a favor e 2 contra.
-- [ ] pgTAP: a mesma delegação não vota duas vezes; abstenção em questão procedimental é recusada.
-- [ ] pgTAP: observadora não vota em questão substantiva; suspensa e ausente não votam; votação encerrada não aceita voto.
-- [ ] pgTAP: só a mesa registra votos de placa.
-- [ ] pgTAP: `resultado()` com os exemplos de maioria das regras; empate reprova; votação substantiva sem quórum de votação não abre.
-- [ ] pgTAP: moção de tópico no topo aprovada põe o tópico escolhido primeiro; rejeitada, entra o outro.
-- [ ] Vitest: textos e cores do resultado (ícone e texto além da cor).
-- [ ] Ponta a ponta: a plenária avança do briefing aos discursos (com a lista de oradores) e à moção do tópico; votada a moção, o comitê entra no debate do tópico escolhido.
-- [ ] Ponta a ponta: uma delegação propõe uma agenda informal em árvore, e no notebook as propostas aparecem lado a lado.
-- [ ] Ponta a ponta: um voto dado no celular aparece no telão.
-- [ ] Acessibilidade: os botões de voto e a grade do telão passam no axe e mostram ícone e texto além da cor.
+- [x] pgTAP, ajustes: o sorteio inclui todas as delegações não observadoras, nunca uma observadora; ninguém preside mais de 2 sessões; o bureau preside na plenária e na fase de ação; projeto pede 5 signatários.
+- [x] pgTAP: os discursos de abertura põem todas as presentes na lista de oradores, em ordem alfabética; a lista especial aceita no máximo 2 a favor e 2 contra.
+- [x] pgTAP: a mesma delegação não vota duas vezes; abstenção em questão procedimental é recusada.
+- [x] pgTAP: observadora não vota em questão substantiva; suspensa e ausente não votam; votação encerrada não aceita voto.
+- [x] pgTAP: só a mesa registra votos de placa.
+- [x] pgTAP: `resultado()` com os exemplos de maioria das regras; empate reprova; votação substantiva sem quórum de votação não abre.
+- [x] pgTAP: moção de tópico no topo aprovada põe o tópico escolhido primeiro; rejeitada, entra o outro.
+- [x] Vitest: escolhas permitidas, texto do resultado, presidência em vigor, listas de oradores e o esboço da agenda.
+- [x] pgTAP: adiamento do debate por dois terços; agenda em árvore, adoção só pela mesa e agenda adotada travada.
+- [x] Ponta a ponta: a plenária avança do briefing aos discursos (com a lista de oradores) e à moção do tópico; votada a moção, o comitê entra no debate do tópico escolhido.
+- [x] Ponta a ponta: uma delegação e a mesa propõem agendas em árvore, que aparecem lado a lado no notebook; a mesa adota uma, e quem preside marca o andamento.
+- [x] Ponta a ponta: um voto dado no celular aparece no telão, e a mesa registra um voto de placa.
+- [x] Acessibilidade: os botões de voto e a grade do telão passam no axe e mostram ícone e texto além da cor.
 
 ## Pronto quando
 
 - [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
-- [ ] O comitê de teste faz a plenária de abertura, escolhe o tópico, adota a agenda informal e vê o andamento de cada ponto.
-- [ ] Os resultados batem com as regras, e o voto nunca é indicado só pela cor.
+- [x] O comitê de teste faz a plenária de abertura, escolhe o tópico, adota a agenda informal e vê o andamento de cada ponto.
+- [x] Os resultados batem com as regras, e o voto nunca é indicado só pela cor.

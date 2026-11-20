@@ -155,14 +155,14 @@ isOneToOne: false
                   ]
                 },"estado_sessao": {
                   Row: {
-                    "atualizado_em": string,"comite_id": string,"cronometro_duracao_seg": number | null,"cronometro_inicio": string | null,"cronometro_pausado_restante_seg": number | null,"forma": Database["public"]['Enums']["forma_debate"],"orador_delegacao_id": string | null,"sessao_id": string | null,"tempo_fala_seg": number
+                    "atualizado_em": string,"comite_id": string,"cronometro_duracao_seg": number | null,"cronometro_inicio": string | null,"cronometro_pausado_restante_seg": number | null,"etapa_plenaria": string,"fase": Database["public"]['Enums']["fase_comite"],"forma": Database["public"]['Enums']["forma_debate"],"mesa_assumiu": boolean,"orador_delegacao_id": string | null,"ordem_topicos": (number)[] | null,"sessao_id": string | null,"tempo_fala_seg": number,"topico_atual": number | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "atualizado_em"?: string,"comite_id": string,"cronometro_duracao_seg"?: number | null,"cronometro_inicio"?: string | null,"cronometro_pausado_restante_seg"?: number | null,"forma"?: Database["public"]['Enums']["forma_debate"],"orador_delegacao_id"?: string | null,"sessao_id"?: string | null,"tempo_fala_seg"?: number
+                    "atualizado_em"?: string,"comite_id": string,"cronometro_duracao_seg"?: number | null,"cronometro_inicio"?: string | null,"cronometro_pausado_restante_seg"?: number | null,"etapa_plenaria"?: string,"fase"?: Database["public"]['Enums']["fase_comite"],"forma"?: Database["public"]['Enums']["forma_debate"],"mesa_assumiu"?: boolean,"orador_delegacao_id"?: string | null,"ordem_topicos"?: (number)[] | null,"sessao_id"?: string | null,"tempo_fala_seg"?: number,"topico_atual"?: number | null
                   }
                   Update: {
-                    "atualizado_em"?: string,"comite_id"?: string,"cronometro_duracao_seg"?: number | null,"cronometro_inicio"?: string | null,"cronometro_pausado_restante_seg"?: number | null,"forma"?: Database["public"]['Enums']["forma_debate"],"orador_delegacao_id"?: string | null,"sessao_id"?: string | null,"tempo_fala_seg"?: number
+                    "atualizado_em"?: string,"comite_id"?: string,"cronometro_duracao_seg"?: number | null,"cronometro_inicio"?: string | null,"cronometro_pausado_restante_seg"?: number | null,"etapa_plenaria"?: string,"fase"?: Database["public"]['Enums']["fase_comite"],"forma"?: Database["public"]['Enums']["forma_debate"],"mesa_assumiu"?: boolean,"orador_delegacao_id"?: string | null,"ordem_topicos"?: (number)[] | null,"sessao_id"?: string | null,"tempo_fala_seg"?: number,"topico_atual"?: number | null
                   }
                   Relationships: [
                     {
@@ -198,6 +198,38 @@ isOneToOne: false
                   }
                   Relationships: [
                     
+                  ]
+                },"lista_oradores": {
+                  Row: {
+                    "comite_id": string,"delegacao_id": string,"falou": boolean,"id": string,"lado": string | null,"ordem": number,"ponto_mocao_id": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "comite_id": string,"delegacao_id": string,"falou"?: boolean,"id"?: string,"lado"?: string | null,"ordem": number,"ponto_mocao_id"?: string | null
+                  }
+                  Update: {
+                    "comite_id"?: string,"delegacao_id"?: string,"falou"?: boolean,"id"?: string,"lado"?: string | null,"ordem"?: number,"ponto_mocao_id"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "lista_oradores_comite_id_fkey"
+      columns: ["comite_id"]
+isOneToOne: false
+      referencedRelation: "comite"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "lista_oradores_delegacao_id_comite_id_fkey"
+      columns: ["delegacao_id","comite_id"]
+isOneToOne: false
+      referencedRelation: "delegacao"
+      referencedColumns: ["id","comite_id"]
+    },{
+      foreignKeyName: "lista_oradores_ponto_mocao_id_fkey"
+      columns: ["ponto_mocao_id"]
+isOneToOne: false
+      referencedRelation: "ponto_mocao"
+      referencedColumns: ["id"]
+    }
                   ]
                 },"participacao": {
                   Row: {
@@ -279,14 +311,14 @@ isOneToOne: false
                   ]
                 },"ponto_mocao": {
                   Row: {
-                    "comite_id": string,"criado_em": string,"delegacao_id": string,"detalhe": string | null,"id": string,"sessao_id": string,"status": string,"tipo": string
+                    "comite_id": string,"criado_em": string,"delegacao_id": string,"detalhe": string | null,"id": string,"minutos": number | null,"sessao_id": string,"status": string,"tipo": string,"topico": number | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "comite_id": string,"criado_em"?: string,"delegacao_id": string,"detalhe"?: string | null,"id"?: string,"sessao_id": string,"status"?: string,"tipo": string
+                    "comite_id": string,"criado_em"?: string,"delegacao_id": string,"detalhe"?: string | null,"id"?: string,"minutos"?: number | null,"sessao_id": string,"status"?: string,"tipo": string,"topico"?: number | null
                   }
                   Update: {
-                    "comite_id"?: string,"criado_em"?: string,"delegacao_id"?: string,"detalhe"?: string | null,"id"?: string,"sessao_id"?: string,"status"?: string,"tipo"?: string
+                    "comite_id"?: string,"criado_em"?: string,"delegacao_id"?: string,"detalhe"?: string | null,"id"?: string,"minutos"?: number | null,"sessao_id"?: string,"status"?: string,"tipo"?: string,"topico"?: number | null
                   }
                   Relationships: [
                     {
@@ -300,6 +332,32 @@ isOneToOne: false
       columns: ["sessao_id","comite_id"]
 isOneToOne: false
       referencedRelation: "sessao"
+      referencedColumns: ["id","comite_id"]
+    }
+                  ]
+                },"ponto_pauta": {
+                  Row: {
+                    "comite_id": string,"id": string,"ordem": number,"pai_id": string | null,"proposta_id": string,"status": string,"texto": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "comite_id": string,"id"?: string,"ordem": number,"pai_id"?: string | null,"proposta_id": string,"status"?: string,"texto": string
+                  }
+                  Update: {
+                    "comite_id"?: string,"id"?: string,"ordem"?: number,"pai_id"?: string | null,"proposta_id"?: string,"status"?: string,"texto"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "ponto_pauta_pai_id_fkey"
+      columns: ["pai_id"]
+isOneToOne: false
+      referencedRelation: "ponto_pauta"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "ponto_pauta_proposta_id_comite_id_fkey"
+      columns: ["proposta_id","comite_id"]
+isOneToOne: false
+      referencedRelation: "proposta_agenda"
       referencedColumns: ["id","comite_id"]
     }
                   ]
@@ -329,16 +387,42 @@ isOneToOne: false
       referencedColumns: ["id","comite_id"]
     }
                   ]
-                },"rodizio_presidencia": {
+                },"proposta_agenda": {
                   Row: {
-                    "comite_id": string,"delegacao_id": string,"ordem": number,"vez_usada": boolean
+                    "adotada": boolean,"comite_id": string,"criado_em": string,"delegacao_id": string | null,"id": string,"topico": number
                   }
                   ComputedFields: never
                   Insert: {
-                    "comite_id": string,"delegacao_id": string,"ordem": number,"vez_usada"?: boolean
+                    "adotada"?: boolean,"comite_id": string,"criado_em"?: string,"delegacao_id"?: string | null,"id"?: string,"topico": number
                   }
                   Update: {
-                    "comite_id"?: string,"delegacao_id"?: string,"ordem"?: number,"vez_usada"?: boolean
+                    "adotada"?: boolean,"comite_id"?: string,"criado_em"?: string,"delegacao_id"?: string | null,"id"?: string,"topico"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "proposta_agenda_comite_id_fkey"
+      columns: ["comite_id"]
+isOneToOne: false
+      referencedRelation: "comite"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "proposta_agenda_delegacao_id_comite_id_fkey"
+      columns: ["delegacao_id","comite_id"]
+isOneToOne: false
+      referencedRelation: "delegacao"
+      referencedColumns: ["id","comite_id"]
+    }
+                  ]
+                },"rodizio_presidencia": {
+                  Row: {
+                    "comite_id": string,"delegacao_id": string,"ordem": number,"vezes": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "comite_id": string,"delegacao_id": string,"ordem": number,"vezes"?: number
+                  }
+                  Update: {
+                    "comite_id"?: string,"delegacao_id"?: string,"ordem"?: number,"vezes"?: number
                   }
                   Relationships: [
                     {
@@ -357,14 +441,14 @@ isOneToOne: false
                   ]
                 },"sessao": {
                   Row: {
-                    "comite_id": string,"de_votacao": boolean,"fim": string | null,"id": string,"informal_min_usados": number,"inicio": string,"numero": number,"presidencia_delegacao_id": string | null
+                    "comite_id": string,"fim": string | null,"id": string,"informal_min_usados": number,"inicio": string,"numero": number,"presidencia_delegacao_id": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "comite_id": string,"de_votacao"?: boolean,"fim"?: string | null,"id"?: string,"informal_min_usados"?: number,"inicio"?: string,"numero": number,"presidencia_delegacao_id"?: string | null
+                    "comite_id": string,"fim"?: string | null,"id"?: string,"informal_min_usados"?: number,"inicio"?: string,"numero": number,"presidencia_delegacao_id"?: string | null
                   }
                   Update: {
-                    "comite_id"?: string,"de_votacao"?: boolean,"fim"?: string | null,"id"?: string,"informal_min_usados"?: number,"inicio"?: string,"numero"?: number,"presidencia_delegacao_id"?: string | null
+                    "comite_id"?: string,"fim"?: string | null,"id"?: string,"informal_min_usados"?: number,"inicio"?: string,"numero"?: number,"presidencia_delegacao_id"?: string | null
                   }
                   Relationships: [
                     {
@@ -378,6 +462,58 @@ isOneToOne: false
       columns: ["presidencia_delegacao_id","comite_id"]
 isOneToOne: false
       referencedRelation: "delegacao"
+      referencedColumns: ["id","comite_id"]
+    }
+                  ]
+                },"votacao": {
+                  Row: {
+                    "a_favor": number | null,"aberta": boolean,"abstencoes": number | null,"aprovada": boolean | null,"base": number | null,"comite_id": string,"contra": number | null,"criado_em": string,"encerrada_em": string | null,"id": string,"necessario": number | null,"objeto": string,"ponto_mocao_id": string | null,"regra": string,"sessao_id": string,"tipo": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "a_favor"?: number | null,"aberta"?: boolean,"abstencoes"?: number | null,"aprovada"?: boolean | null,"base"?: number | null,"comite_id": string,"contra"?: number | null,"criado_em"?: string,"encerrada_em"?: string | null,"id"?: string,"necessario"?: number | null,"objeto": string,"ponto_mocao_id"?: string | null,"regra": string,"sessao_id": string,"tipo": string
+                  }
+                  Update: {
+                    "a_favor"?: number | null,"aberta"?: boolean,"abstencoes"?: number | null,"aprovada"?: boolean | null,"base"?: number | null,"comite_id"?: string,"contra"?: number | null,"criado_em"?: string,"encerrada_em"?: string | null,"id"?: string,"necessario"?: number | null,"objeto"?: string,"ponto_mocao_id"?: string | null,"regra"?: string,"sessao_id"?: string,"tipo"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "votacao_ponto_mocao_id_fkey"
+      columns: ["ponto_mocao_id"]
+isOneToOne: false
+      referencedRelation: "ponto_mocao"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "votacao_sessao_id_comite_id_fkey"
+      columns: ["sessao_id","comite_id"]
+isOneToOne: false
+      referencedRelation: "sessao"
+      referencedColumns: ["id","comite_id"]
+    }
+                  ]
+                },"voto": {
+                  Row: {
+                    "comite_id": string,"criado_em": string,"delegacao_id": string,"escolha": Database["public"]['Enums']["escolha_voto"],"registrado_pela_mesa": boolean,"votacao_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "comite_id": string,"criado_em"?: string,"delegacao_id": string,"escolha": Database["public"]['Enums']["escolha_voto"],"registrado_pela_mesa"?: boolean,"votacao_id": string
+                  }
+                  Update: {
+                    "comite_id"?: string,"criado_em"?: string,"delegacao_id"?: string,"escolha"?: Database["public"]['Enums']["escolha_voto"],"registrado_pela_mesa"?: boolean,"votacao_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "voto_delegacao_id_comite_id_fkey"
+      columns: ["delegacao_id","comite_id"]
+isOneToOne: false
+      referencedRelation: "delegacao"
+      referencedColumns: ["id","comite_id"]
+    },{
+      foreignKeyName: "voto_votacao_id_comite_id_fkey"
+      columns: ["votacao_id","comite_id"]
+isOneToOne: false
+      referencedRelation: "votacao"
       referencedColumns: ["id","comite_id"]
     }
                   ]
@@ -413,14 +549,35 @@ isOneToOne: false
                 }
           }
           Functions: {
-            "abrir_sessao":
-{ Args: { "p_comite": string,"p_votacao"?: boolean }; Returns: string
+            "abrir_lista_especial":
+{ Args: { "p_ponto": string }; Returns: undefined
+                           },
+"abrir_sessao":
+{ Args: { "p_comite": string }; Returns: string
+                           },
+"abrir_votacao":
+{ Args: { "p_ponto": string }; Returns: string
+                           },
+"abrir_votacao_livre":
+{ Args: { "p_comite": string,"p_objeto": string,"p_tipo"?: string }; Returns: string
+                           },
+"adotar_proposta":
+{ Args: { "p_proposta": string }; Returns: undefined
                            },
 "agora":
 { Args: Record<PropertyKey, never>; Returns: string
                            },
 "aplicar_convites":
 { Args: { "p_email": string,"p_usuario": string }; Returns: undefined
+                           },
+"aplicar_forma":
+{ Args: { "p_comite": string,"p_forma": Database["public"]['Enums']["forma_debate"],"p_minutos": number }; Returns: undefined
+                           },
+"assumir_presidencia":
+{ Args: { "p_assumir": boolean,"p_comite": string }; Returns: undefined
+                           },
+"avancar_plenaria":
+{ Args: { "p_comite": string }; Returns: undefined
                            },
 "baixar_placa":
 { Args: { "p_comite": string }; Returns: undefined
@@ -440,8 +597,11 @@ isOneToOne: false
 "encerrar_sessao":
 { Args: { "p_comite": string }; Returns: undefined
                            },
+"encerrar_votacao":
+{ Args: { "p_votacao": string }; Returns: undefined
+                           },
 "enviar_ponto":
-{ Args: { "p_comite": string,"p_detalhe"?: string,"p_tipo": string }; Returns: undefined
+{ Args: { "p_comite": string,"p_detalhe"?: string,"p_minutos"?: number,"p_tipo": string,"p_topico"?: number }; Returns: undefined
                            },
 "evento_do_comite":
 { Args: { "p_comite": string }; Returns: string
@@ -458,6 +618,9 @@ isOneToOne: false
 "iniciar_cronometro":
 { Args: { "p_comite": string,"p_seg": number }; Returns: undefined
                            },
+"inscrever_lista":
+{ Args: { "p_lado": string,"p_ponto": string }; Returns: undefined
+                           },
 "levantar_placa":
 { Args: { "p_comite": string }; Returns: undefined
                            },
@@ -466,6 +629,9 @@ isOneToOne: false
                            },
 "marcar_avisos_vistos":
 { Args: Record<PropertyKey, never>; Returns: undefined
+                           },
+"marcar_ponto_pauta":
+{ Args: { "p_ponto": string,"p_status": string }; Returns: undefined
                            },
 "minha_delegacao":
 { Args: { "p_comite": string }; Returns: string
@@ -494,6 +660,12 @@ isOneToOne: false
 "quorum":
 { Args: { "p_comite": string }; Returns: number
                            },
+"quorum_votacao":
+{ Args: { "p_comite": string }; Returns: number
+                           },
+"registrar_voto":
+{ Args: { "p_delegacao": string,"p_escolha": Database["public"]['Enums']["escolha_voto"],"p_votacao": string }; Returns: undefined
+                           },
 "regras":
 { Args: { "p_comite": string }; Returns: Json
                            },
@@ -506,8 +678,16 @@ isOneToOne: false
 "responder_ponto":
 { Args: { "p_ponto": string,"p_status": string }; Returns: undefined
                            },
+"resultado":
+{ Args: { "p_votacao": string }; Returns: {
+              "a_favor": number,"abstencoes": number,"aprovada": boolean,"base": number,"contra": number,"necessario": number
+            }[]
+                           },
 "retomar":
 { Args: { "p_comite": string }; Returns: undefined
+                           },
+"salvar_proposta_agenda":
+{ Args: { "p_comite": string,"p_itens": Json,"p_topico": number }; Returns: string
                            },
 "sessao_atual":
 { Args: { "p_comite": string }; Returns: string
@@ -516,17 +696,23 @@ isOneToOne: false
 { Args: { "p_comite": string,"p_seg": number }; Returns: undefined
                            },
 "sortear_presidencia":
-{ Args: { "p_comite": string,"p_voluntarias": (string)[] }; Returns: undefined
+{ Args: { "p_comite": string }; Returns: undefined
                            },
 "tem_papel":
 { Args: { "p_comite": string,"p_papeis": (Database["public"]['Enums']["papel"])[] }; Returns: boolean
                            },
 "tomar_proxima_presidencia":
 { Args: { "p_comite": string }; Returns: string
+                           },
+"validar_voto":
+{ Args: { "p_delegacao": string,"p_escolha": Database["public"]['Enums']["escolha_voto"],"p_votacao": string }; Returns: string
+                           },
+"votar":
+{ Args: { "p_escolha": Database["public"]['Enums']["escolha_voto"],"p_votacao": string }; Returns: undefined
                            }
           }
           Enums: {
-            "forma_debate": "formal_formal"|"formal_informal"|"informal_informal","papel": "delegado"|"mesa"|"crise"|"press"|"secretaria","situacao_delegacao": "membro"|"observadora"|"suspensa","situacao_presenca": "presente"|"presente_e_votando"
+            "escolha_voto": "a_favor"|"contra"|"abstencao","fase_comite": "plenaria"|"debate"|"acao"|"encerrado","forma_debate": "formal_formal"|"formal_informal"|"informal_informal","papel": "delegado"|"mesa"|"crise"|"press"|"secretaria","situacao_delegacao": "membro"|"observadora"|"suspensa","situacao_presenca": "presente"|"presente_e_votando"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -646,7 +832,7 @@ export const Constants = {
           }
         },"public": {
           Enums: {
-            "forma_debate": ["formal_formal", "formal_informal", "informal_informal"],"papel": ["delegado", "mesa", "crise", "press", "secretaria"],"situacao_delegacao": ["membro", "observadora", "suspensa"],"situacao_presenca": ["presente", "presente_e_votando"]
+            "escolha_voto": ["a_favor", "contra", "abstencao"],"fase_comite": ["plenaria", "debate", "acao", "encerrado"],"forma_debate": ["formal_formal", "formal_informal", "informal_informal"],"papel": ["delegado", "mesa", "crise", "press", "secretaria"],"situacao_delegacao": ["membro", "observadora", "suspensa"],"situacao_presenca": ["presente", "presente_e_votando"]
           }
         }
 } as const

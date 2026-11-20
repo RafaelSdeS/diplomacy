@@ -97,6 +97,16 @@ Como o cadastro livre está desligado, o Google só entra em contas que já exis
 
 O piloto não envia e-mails. O link e o código por e-mail do passo 14 vão precisar de um SMTP gratuito (por exemplo, Brevo), configurado em **Authentication → Emails → SMTP Settings**. O e-mail embutido do Supabase serve só para testes: manda poucas mensagens por hora.
 
+## A cada passo novo com migração
+
+O Cloudflare publica o app a cada push na `main`, mas as migrações vão para a nuvem à mão. Se o código chegar antes do banco, o app publicado quebra. A ordem é sempre esta:
+
+1. `npx supabase db push --remote --dry-run`, para conferir o que vai ser aplicado;
+2. `npx supabase db push --remote`;
+3. só então `git push`.
+
+Quando a migração só acrescenta tabelas e funções, o app antigo continua funcionando com o banco novo durante o deploy. Quando ela muda ou apaga algo que o app antigo usa (como o passo 07, que troca a assinatura de funções da sessão), o app publicado fica com erro por um ou dois minutos, até o Cloudflare terminar o build novo. Com dados de teste isso não importa; perto do evento, faça essas mudanças em duas etapas (acrescentar, publicar, depois remover o antigo).
+
 ## Depois de publicar
 
 - [x] Supabase na nuvem com as migrações, o cadastro livre desligado e a conta da secretaria.

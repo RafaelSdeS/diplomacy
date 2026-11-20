@@ -2,7 +2,7 @@
 
 App web tudo em um para simulações da ONU (MUNs), começando pelo [UFRGSMUN](https://www.ufrgs.br/ufrgsmun/). Funciona no celular e no computador, sem instalar nada.
 
-> **Status:** passo 06 de 19, sessão e telão. Os passos 01 a 05 estão prontos.
+> **Status:** passo 07 de 19, plenária de abertura, agenda e votação. Os passos 01 a 06 estão prontos, e o piloto está publicado.
 
 ## O problema
 
@@ -106,7 +106,7 @@ npm run testar       # tipos, unidade, banco, build, tamanho e ponta a ponta
 
 Contas do seed para entrar: `delegado01@exemplo.test` a `delegado16`, `mesa01`, `crise01`, `press01`, `secretaria01` e `semconvite` (sem convite), todas `@exemplo.test` com a senha `senha-de-teste`. Não há cadastro livre: as contas são criadas pelo seed ou pelo administrador, e os convites da secretaria definem o papel.
 
-Para ver uma sessão funcionando: entre como `mesa01`, abra Sessão › Chamada e rodízio, sorteie o rodízio e abra a sessão. Em outra janela, entre como um delegado e levante a placa; o telão fica em `/telao/CSNU-T`.
+Para ver uma sessão funcionando: entre como `mesa01`, abra Sessão › Chamada e rodízio, sorteie o rodízio, abra a sessão e marque as presenças. No Painel da presidência, conduza a plenária de abertura (briefing, discursos e moção do tópico no topo); em outra janela, um delegado propõe o tópico e vota. Depois da plenária, preside a delegação sorteada. O telão fica em `/telao/CSNU-T`.
 
 Para parar o Supabase local: `npx supabase stop`. Depois de criar uma migração, rode `npm run db:resetar` (recria o banco), `npm run seed` e `npm run db:tipos`.
 

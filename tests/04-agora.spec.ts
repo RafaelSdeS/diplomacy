@@ -134,7 +134,7 @@ test.describe('zoom de 200% nas telas com login', () => {
 	test.use({ viewport: { width: 320, height: 640 } });
 
 	for (const [conta, rotas] of [
-		[CONTAS.delegado, ['/', '/comite/CSNU-T', '/comite/CSNU-T/regras', '/cronograma', '/avisos', '/perfil']],
+		[CONTAS.delegado, ['/', '/comite/CSNU-T', '/comite/CSNU-T/regras', '/comite/CSNU-T/sessao/agenda', '/cronograma', '/avisos', '/perfil']],
 		[CONTAS.secretaria, ['/cronograma', '/avisos', '/secretaria/participantes']],
 		[CONTAS.mesa, ['/comite/CSNU-T/sessao', '/comite/CSNU-T/sessao/presidencia', '/comite/CSNU-T/sessao/chamada']]
 	] as const) {

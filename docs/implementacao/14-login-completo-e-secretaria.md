@@ -26,7 +26,7 @@
 
 ## Login por e-mail
 
-- [ ] Link e código por e-mail com `signInWithOtp`, enviados por um SMTP gratuito (por exemplo, Brevo).
+- [ ] Link e código por e-mail com `signInWithOtp({ email, options: { shouldCreateUser: false } })`, enviados por um SMTP gratuito (por exemplo, Brevo). Com o cadastro livre desligado, um e-mail sem conta recebe só uma mensagem genérica, sem dizer se a conta existe.
 - [ ] Subir o limite de e-mails de autenticação do Supabase, que é de 30 por hora por padrão.
 - [ ] O campo do código aceita 6 ou 8 dígitos.
 - [ ] Sessão longa, para ninguém precisar entrar de novo durante o evento.

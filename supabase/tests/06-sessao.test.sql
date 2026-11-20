@@ -47,7 +47,7 @@ $$;
 
 select pg_temp.entrar('00000000-0000-0000-0000-0000000000a1');
 select throws_ok(
-	$$select public.sortear_presidencia('00000000-0000-0000-0000-0000000000c1', '{00000000-0000-0000-0000-000000000001}')$$,
+	$$select public.sortear_presidencia('00000000-0000-0000-0000-0000000000c1')$$,
 	'42501', null, 'um delegado não sorteia o rodízio');
 select throws_ok(
 	$$select public.abrir_sessao('00000000-0000-0000-0000-0000000000c1')$$,
@@ -58,25 +58,34 @@ select throws_ok(
 
 select pg_temp.entrar('00000000-0000-0000-0000-0000000000a3');
 select lives_ok(
-	$$select public.sortear_presidencia('00000000-0000-0000-0000-0000000000c1', array[
-		'00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000002',
-		'00000000-0000-0000-0000-000000000002']::uuid[])$$,
+	$$select public.sortear_presidencia('00000000-0000-0000-0000-0000000000c1')$$,
 	'a mesa sorteia o rodízio');
 select results_eq(
 	$$select count(*)::int from public.rodizio_presidencia where comite_id = '00000000-0000-0000-0000-0000000000c1'$$,
-	array[2], 'o rodízio tem cada voluntária uma vez');
+	array[15], 'o sorteio inclui todas as delegações (regras do UNOCT)');
 
--- Guardamos a ordem sorteada para conferir a sequência.
+-- Para conferir a sequência, fixamos a ordem: d01, d02, d03...
+reset role;
+update public.rodizio_presidencia r set ordem = 100 + x.n
+from (select delegacao_id, row_number() over (order by delegacao_id) as n from public.rodizio_presidencia) x
+where r.delegacao_id = x.delegacao_id;
+update public.rodizio_presidencia set ordem = ordem - 100;
 create temp table ordem as
 	select ordem, delegacao_id from public.rodizio_presidencia
 	where comite_id = '00000000-0000-0000-0000-0000000000c1';
 grant select on ordem to authenticated;
+select pg_temp.entrar('00000000-0000-0000-0000-0000000000a3');
 
 -- Primeira sessão: preside o bureau
 
 select lives_ok($$select public.abrir_sessao('00000000-0000-0000-0000-0000000000c1')$$, 'a mesa abre a sessão 1');
 select is(pg_temp.presidencia(), null, 'na primeira sessão, o bureau preside');
 select ok(public.pode_presidir('00000000-0000-0000-0000-0000000000c1'), 'a mesa sempre pode presidir');
+
+-- A plenária de abertura (passo 07) termina aqui: o comitê entra no debate.
+reset role;
+update public.estado_sessao set fase = 'debate', forma = 'formal_informal';
+select pg_temp.entrar('00000000-0000-0000-0000-0000000000a3');
 
 select pg_temp.entrar('00000000-0000-0000-0000-0000000000a1');
 select ok(not public.pode_presidir('00000000-0000-0000-0000-0000000000c1'), 'na sessão 1, o delegado não preside');
@@ -171,7 +180,7 @@ select throws_ok(
 			'00000000-0000-0000-0000-000000000009')$$,
 	'42501', null, 'só a mesa faz a chamada');
 
--- Sessão 2: preside a primeira do rodízio; depois a segunda; depois o bureau
+-- Sessão 2: preside a primeira do rodízio; passada, a segunda, depois a terceira
 
 select pg_temp.entrar('00000000-0000-0000-0000-0000000000a3');
 select public.abrir_sessao('00000000-0000-0000-0000-0000000000c1');
@@ -196,13 +205,17 @@ select pg_temp.entrar('00000000-0000-0000-0000-0000000000a3');
 select public.passar_presidencia('00000000-0000-0000-0000-0000000000c1');
 select is(pg_temp.presidencia(), (select delegacao_id from ordem where ordem = 2), 'passada, vai para a segunda sorteada');
 select public.passar_presidencia('00000000-0000-0000-0000-0000000000c1');
-select is(pg_temp.presidencia(), null, 'sem lista de espera, volta ao bureau');
+select is(pg_temp.presidencia(), (select delegacao_id from ordem where ordem = 3), 'passada de novo, vai para a terceira');
 
-select public.abrir_sessao('00000000-0000-0000-0000-0000000000c1', true);
-select is(pg_temp.presidencia(), null, 'na sessão de votação, o bureau preside');
+-- Na fase de ação, o bureau preside, e a presidência não é passada.
+reset role;
+update public.estado_sessao set fase = 'acao';
+select pg_temp.entrar('00000000-0000-0000-0000-0000000000a4'); -- d03, a delegação da vez
+select ok(not public.pode_presidir('00000000-0000-0000-0000-0000000000c1'), 'na fase de ação, a delegação da vez não preside');
+select pg_temp.entrar('00000000-0000-0000-0000-0000000000a3');
 select throws_ok(
 	$$select public.passar_presidencia('00000000-0000-0000-0000-0000000000c1')$$,
-	'42501', null, 'a presidência da sessão de votação não é passada');
+	'42501', null, 'na fase de ação, a presidência não é passada');
 reset role;
 
 select * from finish();

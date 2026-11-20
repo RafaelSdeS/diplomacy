@@ -2,6 +2,7 @@
 	import { formatarHora, formatarQuando, itensAtuais, proximoItem } from '#lib/cronograma.ts';
 	import { rotuloPapel } from '#lib/papeis.ts';
 	import Bandeira from '#lib/ui/Bandeira.svelte';
+	import { FASES } from '#lib/votacao.ts';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -30,6 +31,12 @@
 <div class="cartoes">
 	<article class="cartao" aria-labelledby="c-agora">
 		<h2 id="c-agora">Acontecendo agora</h2>
+		{#each data.comitesAoVivo as c (c.comite?.sigla)}
+			<p class="topico-atual">
+				<span class="rotulo">{c.comite?.sigla}</span>
+				{c.fase === 'debate' && c.topico_atual ? `Em debate: ${c.comite?.topicos[c.topico_atual - 1]}` : FASES[c.fase]}
+			</p>
+		{/each}
 		{#each atuais as item (item.id)}
 			<p class="destaque">{item.titulo}</p>
 			<p class="suave">{junto(item.local, `até ${formatarHora(item.fim)}`)}</p>

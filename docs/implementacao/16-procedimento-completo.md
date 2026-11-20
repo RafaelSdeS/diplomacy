@@ -34,8 +34,8 @@
 
 ## Moções
 
-- [ ] **Adiamento do debate:** lista especial (2 a favor e 2 contra) e dois terços. Aprovado, o debate passa ao outro tópico.
-- [ ] **Não-confiança:** pedido com assinaturas de 1/5 das delegações previstas (`assinaturas_desconfianca_fracao`), votação por maioria simples, e a presidência passa à próxima delegação da lista de espera.
+- [x] **Adiamento do debate:** lista especial (2 a favor e 2 contra) e dois terços. Aprovado, o debate passa ao outro tópico. (Feito no passo 07.)
+- [ ] **Não-confiança:** pedido com assinaturas de 1/5 das delegações previstas (`assinaturas_desconfianca_fracao`), votação por maioria simples, e a presidência passa à próxima delegação da lista de espera. A votação e a troca da presidência já existem (passo 07); falta exigir as assinaturas antes de abrir a votação.
 
 ## Delegações
 

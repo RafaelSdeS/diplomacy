@@ -7,8 +7,10 @@ export type Regras = {
 	limite_notas_pendentes: number;
 	votacao_substantiva: 'maioria_simples' | 'csnu' | 'unanimidade';
 	membros_permanentes: string[];
-	assinaturas_projeto_fracao: [number, number];
+	max_sessoes_presidencia: number;
+	assinaturas_projeto_min: number;
 	assinaturas_emenda: number;
+	assinaturas_desconfianca_fracao: [number, number];
 	reabrir_clausula_min_delegacoes: number;
 	dpos_publicos: boolean;
 	mesa_le_bilhetes: boolean;
@@ -39,11 +41,26 @@ function votacao(r: Regras) {
 export function regrasLegiveis(r: Regras): RegraLegivel[] {
 	return [
 		{ grupo: 'Sessão', rotulo: 'Quórum', texto: `${fracao(r.quorum_fracao)} das delegações previstas` },
+		{
+			grupo: 'Sessão',
+			rotulo: 'Presidência da sessão',
+			texto: `delegação sorteada, no máximo ${plural(r.max_sessoes_presidencia, 'sessão', 'sessões')}; o bureau preside a plenária de abertura e a fase de ação`
+		},
 		{ grupo: 'Sessão', rotulo: 'Aviso de tempo', texto: `${plural(r.aviso_fala_seg, 'segundo', 'segundos')} antes do fim da fala` },
 		{ grupo: 'Sessão', rotulo: 'Informal-informal', texto: `até ${plural(r.informal_informal_max_min, 'minuto', 'minutos')} por sessão` },
 		{ grupo: 'Votações', rotulo: 'Votação substantiva', texto: votacao(r) },
 		{ grupo: 'Votações', rotulo: 'Votação procedimental', texto: 'maioria simples, sem abstenção' },
-		{ grupo: 'Documentos', rotulo: 'Projeto de resolução', texto: `assinado por ${fracao(r.assinaturas_projeto_fracao)} das delegações` },
+		{ grupo: 'Votações', rotulo: 'Quórum de votação', texto: 'maioria simples das delegações previstas, nas votações substantivas' },
+		{
+			grupo: 'Votações',
+			rotulo: 'Não-confiança',
+			texto: `pedido assinado por ${fracao(r.assinaturas_desconfianca_fracao)} das delegações previstas e maioria simples`
+		},
+		{
+			grupo: 'Documentos',
+			rotulo: 'Projeto de resolução',
+			texto: `no mínimo ${plural(r.assinaturas_projeto_min, 'signatário', 'signatários')}; uma resolução por tópico`
+		},
 		{ grupo: 'Documentos', rotulo: 'Emenda', texto: `assinada por ${plural(r.assinaturas_emenda, 'delegação', 'delegações')}` },
 		{ grupo: 'Documentos', rotulo: 'Reabrir cláusula acordada', texto: `pedido de ${plural(r.reabrir_clausula_min_delegacoes, 'delegação', 'delegações')}` },
 		{ grupo: 'Documentos', rotulo: 'DPOs', texto: r.dpos_publicos ? 'públicos para o comitê' : 'só a mesa lê' },

@@ -4,6 +4,8 @@
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import Bandeira from '#lib/ui/Bandeira.svelte';
 	import Cronometro from '#lib/ui/Cronometro.svelte';
+	import GradeVotos from '#lib/ui/GradeVotos.svelte';
+	import { ETAPAS, FASES, listaAtiva, presidenciaEmVigor, textoResultado } from '#lib/votacao.ts';
 	import type { PageProps } from './$types';
 
 	// O telão roda no notebook do projetor, logado com a conta da mesa, sem botões:
@@ -12,7 +14,23 @@
 	let diferenca = $state(0);
 
 	const sessao = $derived(data.estado?.sessao);
-	const proximos = $derived((sessao?.pedidos ?? []).slice(0, 4));
+	const emDiscussao = $derived(sessao?.pontos.find((p) => p.status === 'em_discussao'));
+	const lista = $derived(listaAtiva(data.lista, emDiscussao?.id, data.fase).filter((i) => !i.falou));
+	// Os próximos: da lista de oradores em uso ou, sem lista, da fila de placas.
+	const proximos = $derived(
+		(lista.length ? lista.map((i) => ({ id: i.id, delegacao: i.delegacao })) : (sessao?.pedidos ?? [])).slice(0, 4)
+	);
+	const votacao = $derived(data.votacao?.aberta ? data.votacao : null);
+	const presentes = $derived(new Set(sessao?.presenca.map((p) => p.delegacao_id)));
+	const votantes = $derived(
+		data.delegacoes.filter(
+			(d) =>
+				presentes.has(d.id) &&
+				d.situacao !== 'suspensa' &&
+				(votacao?.tipo !== 'substantiva' || d.situacao === 'membro')
+		)
+	);
+	const topico = $derived(data.estado?.topico_atual ? data.comite.topicos[data.estado.topico_atual - 1] : null);
 
 	const telaCheia = () => void document.documentElement.requestFullscreen?.().catch(() => {});
 
@@ -49,16 +67,19 @@
 			<p class="telao-comite">{data.comite.sigla} · {data.comite.nome}</p>
 			<h1 class="telao-sessao">
 				{#if sessao && data.estado}
-					Sessão {sessao.numero} · {FORMAS[data.estado.forma]}
+					Sessão {sessao.numero} · {data.fase === 'plenaria'
+						? ETAPAS[data.estado.etapa_plenaria].rotulo
+						: `${FASES[data.fase]} · ${FORMAS[data.estado.forma]}`}
 				{:else}
 					Sessão não iniciada
 				{/if}
 			</h1>
+			{#if topico}<p class="telao-topico">Tópico em debate: {topico}</p>{/if}
 		</div>
 		<div class="telao-presidencia">
 			{#if sessao}
 				<span class="rotulo">Presidência</span>
-				<span>{sessao.presidencia?.nome ?? 'Mesa'}</span>
+				<span>{presidenciaEmVigor(data.fase, data.estado?.mesa_assumiu, sessao.presidencia?.nome)}</span>
 			{/if}
 			<AoVivo comiteId={data.comite.id} bind:diferenca />
 		</div>
@@ -76,14 +97,24 @@
 		{/if}
 	</section>
 
-	<aside class="telao-fila" aria-label="Próximos oradores">
-		<p class="rotulo">Próximos</p>
-		<ol>
-			{#each proximos as pedido (pedido.id)}
-				<li class="com-bandeira"><Bandeira codigo={pedido.delegacao?.bandeira} /> {pedido.delegacao?.nome}</li>
-			{:else}
-				<li class="telao-vazio">Nenhuma placa levantada</li>
-			{/each}
-		</ol>
-	</aside>
+	{#if votacao}
+		<aside class="telao-fila telao-votacao" aria-label="Votação">
+			<p class="rotulo">Votação · {votacao.objeto}</p>
+			<GradeVotos delegacoes={votantes} votos={votacao.votos} />
+		</aside>
+	{:else}
+		<aside class="telao-fila" aria-label="Próximos oradores">
+			{#if data.votacao && !data.votacao.aberta}
+				<p class="telao-resultado">{data.votacao.objeto}. {textoResultado(data.votacao)}</p>
+			{/if}
+			<p class="rotulo">{lista.length ? (emDiscussao ? 'Lista especial' : 'Lista de oradores') : 'Próximos'}</p>
+			<ol>
+				{#each proximos as item (item.id)}
+					<li class="com-bandeira"><Bandeira codigo={item.delegacao?.bandeira} /> {item.delegacao?.nome}</li>
+				{:else}
+					<li class="telao-vazio">Nenhuma placa levantada</li>
+				{/each}
+			</ol>
+		</aside>
+	{/if}
 </div>

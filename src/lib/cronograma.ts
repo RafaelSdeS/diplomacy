@@ -3,6 +3,14 @@
 
 export const FUSO = 'America/Sao_Paulo';
 
+/**
+ * O valor de um campo datetime-local ("2026-11-10T09:30") lido no fuso do evento,
+ * qualquer que seja o fuso do aparelho.
+ * ponytail: Brasília não tem horário de verão desde 2019; um evento em outro fuso
+ * precisaria do deslocamento vindo de Intl.
+ */
+export const instanteNoFuso = (local: string) => new Date(`${local.slice(0, 16)}:00-03:00`).toISOString();
+
 export type ItemCronograma = {
 	id: string;
 	titulo: string;

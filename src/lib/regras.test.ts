@@ -9,8 +9,10 @@ const GUIA: Regras = {
 	limite_notas_pendentes: 2,
 	votacao_substantiva: 'maioria_simples',
 	membros_permanentes: [],
-	assinaturas_projeto_fracao: [1, 5],
+	max_sessoes_presidencia: 2,
+	assinaturas_projeto_min: 5,
 	assinaturas_emenda: 3,
+	assinaturas_desconfianca_fracao: [1, 5],
 	reabrir_clausula_min_delegacoes: 3,
 	dpos_publicos: false,
 	mesa_le_bilhetes: false,
@@ -24,7 +26,9 @@ describe('regrasLegiveis', () => {
 		expect(texto(GUIA, 'Informal-informal')).toBe('até 45 minutos por sessão');
 		expect(texto(GUIA, 'Quórum')).toBe('1/3 das delegações previstas');
 		expect(texto(GUIA, 'Aviso de tempo')).toBe('10 segundos antes do fim da fala');
-		expect(texto(GUIA, 'Projeto de resolução')).toBe('assinado por 1/5 das delegações');
+		expect(texto(GUIA, 'Projeto de resolução')).toBe('no mínimo 5 signatários; uma resolução por tópico');
+		expect(texto(GUIA, 'Não-confiança')).toBe('pedido assinado por 1/5 das delegações previstas e maioria simples');
+		expect(texto(GUIA, 'Presidência da sessão')).toMatch(/^delegação sorteada, no máximo 2 sessões/);
 		expect(texto(GUIA, 'Emenda')).toBe('assinada por 3 delegações');
 		expect(texto(GUIA, 'Votação substantiva')).toMatch(/^maioria simples/);
 		expect(texto(GUIA, 'Press')).toBe('publica sem revisão prévia');
@@ -56,6 +60,6 @@ describe('regrasLegiveis', () => {
 	});
 
 	it('tem uma linha para cada regra', () => {
-		expect(regrasLegiveis(GUIA)).toHaveLength(12);
+		expect(regrasLegiveis(GUIA)).toHaveLength(15);
 	});
 });

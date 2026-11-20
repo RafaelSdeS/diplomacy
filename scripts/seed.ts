@@ -6,6 +6,7 @@
 // de teste, nunca o de produção).
 import { execFileSync } from 'node:child_process';
 import { createClient } from '@supabase/supabase-js';
+import { DELEGACOES } from './delegacoes.ts';
 
 const SENHA = 'senha-de-teste';
 
@@ -29,24 +30,13 @@ if (!local && process.env.SEED_PERMITIR_REMOTO !== '1') {
 
 const db = createClient(url, chave, { auth: { persistSession: false, autoRefreshToken: false } });
 
-// [nome, nome oficial, código da bandeira no flag-icons]
-const DELEGACOES = [
-	['EUA', 'United States of America', 'us'],
-	['Rússia', 'Russian Federation', 'ru'],
-	['China', "People's Republic of China", 'cn'],
-	['Reino Unido', 'United Kingdom of Great Britain and Northern Ireland', 'gb'],
-	['França', 'French Republic', 'fr'],
-	['Brasil', 'Federative Republic of Brazil', 'br'],
-	['México', 'United Mexican States', 'mx'],
-	['Colômbia', 'Republic of Colombia', 'co'],
-	['Paraguai', 'Republic of Paraguay', 'py'],
-	['Irã', 'Islamic Republic of Iran', 'ir'],
-	['Arábia Saudita', 'Kingdom of Saudi Arabia', 'sa'],
-	['Nigéria', 'Federal Republic of Nigeria', 'ng'],
-	['Marrocos', 'Kingdom of Morocco', 'ma'],
-	['Itália', 'Italian Republic', 'it'],
-	['Somália', 'Federal Republic of Somalia', 'so']
-];
+// Logo depois de `db reset`, a API ainda se reconecta ao banco por alguns segundos.
+for (let tentativa = 1; ; tentativa++) {
+	const { error } = await db.from('evento').select('id').limit(1);
+	if (!error) break;
+	if (tentativa === 30) throw new Error(`A API do Supabase não respondeu: ${error.message}`);
+	await new Promise((pronto) => setTimeout(pronto, 500));
+}
 
 function verificar<T>(resposta: { data: T; error: { message: string } | null }, onde: string) {
 	if (resposta.error) throw new Error(`${onde}: ${resposta.error.message}`);

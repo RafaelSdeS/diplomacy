@@ -23,7 +23,7 @@
 
 ### Banco
 
-- [ ] Índices para as consultas mais usadas: `nota_crise (comite_id, status, criado_em)`, `clausula (documento_id, ordem)`, `pedido_fala (sessao_id, atendido, criado_em)` e `voto (votacao_id)`.
+- [ ] Índices para as consultas mais usadas: `nota_crise (comite_id, status, criado_em)`, `clausula (documento_id, ordem)`, `pedido_fala (sessao_id, situacao, criado_em)` e `voto (votacao_id)`. O analisador do Supabase (`npx supabase db advisors`) aponta as chaves estrangeiras sem índice; vale rodá-lo aqui e criar os índices das que aparecem em consultas.
 - [ ] Conferir os planos de consulta (`explain analyze`) com dados no tamanho do evento.
 
 ### Plano do Supabase

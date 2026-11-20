@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { invalidate } from '$app/navigation';
 	import Check from '@lucide/svelte/icons/check';
-	import { agruparPorDia, formatarHora, itensAtuais } from '#lib/cronograma.ts';
+	import { agruparPorDia, formatarHora, instanteNoFuso, itensAtuais } from '#lib/cronograma.ts';
 	import { supabase } from '#lib/supabase.ts';
 	import type { PageProps } from './$types';
 
@@ -33,9 +33,9 @@
 			comite_id: comite || null,
 			titulo: titulo.trim(),
 			local: local.trim() || null,
-			// datetime-local vem no horário do aparelho; o banco guarda com fuso.
-			inicio: new Date(inicio).toISOString(),
-			fim: new Date(fim).toISOString()
+			// O horário digitado é o do evento, mesmo num aparelho em outro fuso.
+			inicio: instanteNoFuso(inicio),
+			fim: instanteNoFuso(fim)
 		});
 		if (error) {
 			erro =

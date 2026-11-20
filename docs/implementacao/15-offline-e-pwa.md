@@ -10,6 +10,7 @@
 
 - [ ] `src/service-worker.ts` (o service worker nativo do SvelteKit): guarda no aparelho a interface e os arquivos de cada versão.
 - [ ] Dados lidos recentemente (cronograma, perfis, pauta, guias abertos) também ficam em cache.
+- [ ] O layout raiz deixa de consultar as participações e o nome a cada troca de tela: hoje são duas consultas por navegação. Guardar em memória e recarregar só em `app:sessao`.
 - [ ] `manifest.webmanifest` com nome, ícones, `display: standalone` e cores do tema.
 
 ### Caixa de saída

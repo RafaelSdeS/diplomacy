@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { agruparPorDia, formatarHora, formatarQuando, itensAtuais, proximoItem, type ItemCronograma } from './cronograma.ts';
+import {
+	agruparPorDia,
+	formatarHora,
+	formatarQuando,
+	instanteNoFuso,
+	itensAtuais,
+	proximoItem,
+	type ItemCronograma
+} from './cronograma.ts';
 
 const item = (titulo: string, inicio: string, fim: string): ItemCronograma => ({
 	id: titulo,
@@ -62,5 +70,13 @@ describe('formatação', () => {
 		const agora = em('2027-11-10T10:45:00-03:00');
 		expect(formatarQuando('2027-11-10T12:30:00-03:00', agora)).toBe('às 12:30');
 		expect(formatarQuando('2027-11-11T09:00:00-03:00', agora)).toBe('quinta-feira, 11 de novembro, às 09:00');
+	});
+});
+
+describe('instanteNoFuso', () => {
+	it('lê o campo no horário de Brasília, qualquer que seja o fuso do aparelho', () => {
+		expect(instanteNoFuso('2026-11-10T09:30')).toBe('2026-11-10T12:30:00.000Z');
+		expect(instanteNoFuso('2026-11-10T23:15')).toBe('2026-11-11T02:15:00.000Z');
+		expect(instanteNoFuso('2026-11-10T09:30:45')).toBe('2026-11-10T12:30:00.000Z');
 	});
 });

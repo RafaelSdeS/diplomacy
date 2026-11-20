@@ -16,35 +16,51 @@ export async function comitePorSigla(sigla: string) {
 	return comite.data;
 }
 
-/** Tudo o que as telas da sessão mostram, numa ida ao banco (mais regras e permissão). */
+/** Tudo o que as telas da sessão mostram: estado, listas, última votação, regras e permissão. */
 export async function carregarSessao(comiteId: string) {
-	const [estado, regras, podePresidir] = await Promise.all([
+	const [estado, lista, delegacoes, regras, podePresidir] = await Promise.all([
 		supabase
 			.from('estado_sessao')
 			.select(
-				`forma, tempo_fala_seg, cronometro_inicio, cronometro_duracao_seg, cronometro_pausado_restante_seg,
+				`forma, fase, etapa_plenaria, topico_atual, ordem_topicos, mesa_assumiu, tempo_fala_seg,
+				cronometro_inicio, cronometro_duracao_seg, cronometro_pausado_restante_seg,
 				orador:delegacao(id, nome, bandeira),
-				sessao(id, numero, de_votacao,
+				sessao(id, numero, informal_min_usados,
 					presidencia:delegacao!sessao_presidencia_delegacao_id_comite_id_fkey(id, nome, bandeira),
+					presenca(delegacao_id, situacao),
 					pedidos:pedido_fala(id, delegacao(id, nome, bandeira)),
-					pontos:ponto_mocao(id, tipo, detalhe, status, delegacao(id, nome)))`
+					pontos:ponto_mocao(id, tipo, detalhe, status, topico, minutos, delegacao(id, nome)),
+					votacoes:votacao(id, objeto, tipo, regra, aberta, a_favor, contra, abstencoes, necessario,
+						aprovada, encerrada_em, votos:voto(delegacao_id, escolha, registrado_pela_mesa)))`
 			)
 			.eq('comite_id', comiteId)
 			.eq('sessao.pedidos.situacao', 'aberto')
 			.order('criado_em', { referencedTable: 'sessao.pedidos' })
 			.order('criado_em', { referencedTable: 'sessao.pontos' })
+			.order('criado_em', { referencedTable: 'sessao.votacoes', ascending: false })
+			.limit(1, { referencedTable: 'sessao.votacoes' })
 			.maybeSingle(),
+		supabase
+			.from('lista_oradores')
+			.select('id, lado, ordem, falou, ponto_mocao_id, delegacao(id, nome, bandeira)')
+			.eq('comite_id', comiteId)
+			.order('ordem'),
+		supabase.from('delegacao').select('id, nome, bandeira, situacao').eq('comite_id', comiteId).order('nome'),
 		supabase.rpc('regras', { p_comite: comiteId }),
 		supabase.rpc('pode_presidir', { p_comite: comiteId })
 	]);
-	if (estado.error) throw estado.error;
-	if (regras.error) throw regras.error;
-	if (podePresidir.error) throw podePresidir.error;
+	for (const r of [estado, lista, delegacoes, regras, podePresidir]) if (r.error) throw r.error;
 
+	const sessao = estado.data?.sessao ?? null;
 	return {
-		estado: estado.data?.sessao ? estado.data : null, // sem sessão aberta
+		estado: sessao ? estado.data : null, // sem sessão aberta
+		// A fase vale para o comitê, com ou sem sessão aberta.
+		fase: estado.data?.fase ?? 'plenaria',
+		lista: lista.data ?? [],
+		delegacoes: delegacoes.data ?? [],
+		votacao: sessao?.votacoes[0] ?? null, // a mais recente da sessão
 		regras: regras.data as Regras,
-		podePresidir: podePresidir.data
+		podePresidir: podePresidir.data ?? false
 	};
 }
 
@@ -57,9 +73,21 @@ export async function medirRelogio(): Promise<number> {
 	return error ? 0 : diferencaRelogio(antes, data, Date.now());
 }
 
+/**
+ * Mensagem para mostrar quando uma ação falha. As regras do banco já explicam o
+ * motivo em português (exceções com código P0001, 42501, 22023, 23505, 23514, P0002);
+ * o resto vira uma mensagem genérica.
+ */
+export function mensagemDeErro(erro: { code?: string; message?: string } | null, padrao = 'Não foi possível. Tente de novo.') {
+	if (!erro) return '';
+	return ['P0001', 'P0002', '42501', '22023', '23505', '23514'].includes(erro.code ?? '') && erro.message
+		? erro.message
+		: padrao;
+}
+
 export const FORMAS = {
-	formal_formal: 'Debate formal',
-	formal_informal: 'Formal-informal (moderado)',
+	formal_formal: 'Formal-formal (lista de oradores)',
+	formal_informal: 'Formal-informal',
 	informal_informal: 'Informal-informal'
 } as const;
 
@@ -67,12 +95,39 @@ export const PONTOS = {
 	ponto_ordem: 'Ponto de ordem',
 	ponto_duvida: 'Ponto de dúvida',
 	privilegio_pessoal: 'Ponto de privilégio pessoal',
-	formal_informal: 'Moção de formal-informal',
-	informal_informal: 'Moção de informal-informal',
-	suspensao_sessao: 'Moção de suspensão da sessão',
+	topico_no_topo: 'Moção de introdução do tópico no topo da agenda',
+	adiamento_debate: 'Moção de adiamento do debate',
 	adiamento_sessao: 'Moção de adiamento da sessão',
-	encerramento_debate: 'Moção de encerramento do debate',
-	voto_desconfianca: 'Moção de voto de desconfiança'
+	informal_informal: 'Moção de informal-informal',
+	voto_desconfianca: 'Moção de não-confiança',
+	divisao_questao: 'Moção de divisão da questão',
+	votacao_nominal: 'Moção de votação nominal'
+} as const;
+export type TipoPonto = keyof typeof PONTOS;
+
+/** Os pontos e moções em ordem em cada fase (o banco confere de novo). */
+export function pontosEmOrdem(fase: string, etapa: string | null | undefined): TipoPonto[] {
+	const pontos: TipoPonto[] = ['ponto_duvida', 'ponto_ordem', 'privilegio_pessoal'];
+	if (fase === 'plenaria') return [...pontos, ...(etapa === 'topico' ? ['topico_no_topo' as const] : []), 'adiamento_sessao'];
+	if (fase === 'debate') return [...pontos, 'informal_informal', 'adiamento_debate', 'adiamento_sessao', 'voto_desconfianca'];
+	return pontos;
+}
+
+export const MOCOES_COM_LISTA: TipoPonto[] = ['topico_no_topo', 'adiamento_debate', 'divisao_questao'];
+export const ehPonto = (tipo: string) => tipo.startsWith('ponto_') || tipo === 'privilegio_pessoal';
+
+export const SITUACAO_PONTO = {
+	aberto: 'Aguardando',
+	em_discussao: 'Lista especial aberta',
+	em_votacao: 'Em votação',
+	aceito: 'Aceito',
+	recusado: 'Recusado'
 } as const;
 
-export const SITUACAO_PONTO = { aberto: 'Aguardando', aceito: 'Aceito', recusado: 'Recusado' } as const;
+/** O nome de uma moção com o detalhe que ela carrega (tópico ou minutos). */
+export function descreverPonto(p: { tipo: string; topico?: number | null; minutos?: number | null }) {
+	const nome = PONTOS[p.tipo as TipoPonto] ?? p.tipo;
+	if (p.tipo === 'topico_no_topo' && p.topico) return `${nome}: tópico ${p.topico}`;
+	if (p.tipo === 'informal_informal' && p.minutos) return `${nome}: ${p.minutos} minutos`;
+	return nome;
+}

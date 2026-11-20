@@ -965,3 +965,140 @@ kbd {
 	margin-left: -1.5em;
 	color: var(--cor-texto-suave);
 }
+
+/* Plenária, votação e agenda (passo 07) */
+
+.cartao--destaque {
+	border-color: var(--cor-marinho);
+	border-width: 2px;
+}
+
+.topico-atual {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0.25rem 0.75rem;
+	margin-bottom: 1rem;
+	font-weight: 600;
+}
+
+/* Próximo da lista de oradores, tópico em debate. */
+.lista li[aria-current='step'] {
+	margin: 0 -0.5rem;
+	padding-inline: 0.5rem;
+	background: var(--cor-marinho-suave);
+}
+
+.painel-coluna {
+	display: grid;
+	gap: 1rem;
+	align-content: start;
+	min-width: 0;
+}
+
+.grade-votos {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+	gap: 0.35rem;
+	margin: 0.75rem 0;
+	padding: 0;
+	list-style: none;
+}
+
+.voto {
+	display: flex;
+	flex-direction: column;
+	gap: 0.15rem;
+	padding: 0.4rem 0.6rem;
+	border: var(--linha);
+	border-left-width: 4px;
+	border-radius: var(--raio);
+}
+
+.voto-escolha {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3rem;
+	font-weight: 600;
+}
+
+.voto--a_favor {
+	border-left-color: var(--cor-ok);
+}
+
+.voto--a_favor .voto-escolha {
+	color: var(--cor-ok);
+}
+
+.voto--contra {
+	border-left-color: var(--cor-erro);
+}
+
+.voto--contra .voto-escolha {
+	color: var(--cor-erro);
+}
+
+.voto--abstencao {
+	border-left-color: var(--cor-texto-suave);
+}
+
+.voto--pendente .voto-escolha {
+	font-weight: 400;
+	color: var(--cor-texto-suave);
+}
+
+.propostas {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+	gap: 1rem;
+}
+
+.propostas .cartao {
+	max-width: none;
+}
+
+.arvore {
+	margin: 0 0 0.75rem;
+	padding-left: 1.25rem;
+}
+
+.arvore .arvore {
+	margin: 0.25rem 0 0;
+	list-style-type: lower-alpha;
+}
+
+.arvore li {
+	margin: 0.25rem 0;
+}
+
+.arvore-item {
+	display: inline-flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.25rem 0.5rem;
+}
+
+.formulario--largo {
+	max-width: 36rem;
+}
+
+.telao-topico {
+	margin: 0.5rem 0 0;
+	font-size: clamp(1rem, 1.6vw, 2rem);
+	color: var(--cor-texto-suave);
+}
+
+.telao-votacao {
+	align-self: stretch;
+	overflow: hidden;
+}
+
+.telao-votacao .grade-votos {
+	grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+	font-size: clamp(0.9rem, 1.1vw, 1.4rem);
+}
+
+.telao-resultado {
+	margin-bottom: 1.5rem;
+	font-weight: 600;
+}
