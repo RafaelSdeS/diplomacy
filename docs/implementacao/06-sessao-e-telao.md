@@ -76,6 +76,6 @@ Os testes de ponta a ponta da sessão rodam em série e só no projeto "notebook
 
 ## Pronto quando
 
-- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
+- [x] Os testes acima passam no CI, junto com os de todos os passos anteriores: 124 do banco, 27 de unidade e 123 de ponta a ponta.
 - [x] Uma sessão de teste roda com chamada, sorteio do rodízio, falas cronometradas, pontos, moções e telão.
 - [x] O telão cabe em 1920 × 1080, e o painel funciona com 360 px e com 1366 px. Falta conferir a leitura do fundo da sala num projetor de verdade (teste manual).
