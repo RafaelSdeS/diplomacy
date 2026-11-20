@@ -13,12 +13,13 @@ O que depende das suas contas, na ordem. Tudo no plano gratuito. Nenhuma chave s
 3. No seu computador, na pasta do projeto, envie as migrações:
 
    ```sh
-   npx supabase login
-   npx supabase link --project-ref <ref do projeto>   # pede a senha do banco
-   npx supabase db push                               # cria tabelas, regras, funções, tempo real e o bucket de fotos
+   npx supabase login                                 # no seu terminal: abre o navegador
+   npx supabase link --project-ref <ref do projeto>
+   npx supabase db push --remote --dry-run            # mostra o que vai ser aplicado
+   npx supabase db push --remote                      # cria tabelas, regras, funções, tempo real e o bucket de fotos
    ```
 
-   O `ref` é o trecho de `https://<ref>.supabase.co`, a URL do projeto.
+   O `ref` é o trecho de `https://<ref>.supabase.co`, a URL do projeto. Na CLI 3, sem `--remote` o `db push` age no Supabase local. Com o login feito, a CLI não pede a senha do banco. A cada passo novo com migração, rode de novo os dois últimos comandos.
 4. Em **Project Settings → API Keys**, copie a chave pública. É a `publishable` ou, na aba das chaves antigas, a `anon`. Em **Project Settings → Data API**, copie a URL do projeto.
 5. Crie a primeira conta da secretaria (a sua). No **SQL Editor**, rode:
 
@@ -38,15 +39,16 @@ O que depende das suas contas, na ordem. Tudo no plano gratuito. Nenhuma chave s
 
 O projeto gratuito pausa depois de cerca de uma semana sem uso. Para voltar, clique em **Restore** no painel; os dados ficam.
 
-## 2. Cloudflare Pages (o site)
+## 2. Cloudflare (o site)
+
+O app é publicado como um **Worker só com arquivos estáticos**. O `wrangler.jsonc` na raiz do repositório diz que a pasta `build` é uma SPA. Por isso, qualquer rota desconhecida devolve o `index.html`.
 
 1. Crie uma conta em [dash.cloudflare.com](https://dash.cloudflare.com).
-2. Vá em **Workers & Pages → Create → Pages → Connect to Git** e autorize o GitHub. Escolha o repositório `diplomacy`, branch `main`.
+2. Vá em **Workers & Pages → Create** e escolha importar um repositório do Git. Autorize o GitHub e escolha o repositório `diplomacy`, branch `main`. O nome do Worker precisa ser `diplomacy`, o mesmo do `wrangler.jsonc`.
 3. Configuração do build:
-   - **Framework preset:** None.
    - **Build command:** `npm run build`.
-   - **Build output directory:** `build`.
-4. Em **Environment variables** (Production), cadastre:
+   - **Deploy command:** `npx wrangler deploy` (o padrão).
+4. Em **Settings → Build → Variables and secrets**, cadastre as variáveis do build (tipo Text). As de **Runtime variables and secrets** não servem: o build não as enxerga.
 
    | Variável | Valor |
    |---|---|
@@ -55,10 +57,12 @@ O projeto gratuito pausa depois de cerca de uma semana sem uso. Para voltar, cli
    | `SUPABASE_CHAVE` | a chave pública do passo 1.4 |
    | `LOGIN_GOOGLE` | `0` (vira `1` no passo 3) |
 
-5. Salve e faça o deploy. O app fica em `https://<nome>.pages.dev`, e cada push na `main` publica de novo.
+5. Rode o build de novo (aba **Deployments**). O app fica em `https://diplomacy.<sua-conta>.workers.dev`, e cada push na `main` publica de novo.
 6. De volta ao Supabase, em **Authentication → URL Configuration**:
-   - **Site URL:** `https://<nome>.pages.dev`;
-   - **Redirect URLs:** adicione `https://<nome>.pages.dev/**` e `http://localhost:5173/**`.
+   - **Site URL:** o endereço do app;
+   - **Redirect URLs:** adicione `<endereço do app>/**` e `http://localhost:5173/**`.
+
+Também funciona como projeto do **Cloudflare Pages**. Nesse caso, use Build output directory `build`, ponha as mesmas variáveis em **Settings → Variables and Secrets** (Production) e ignore o `wrangler.jsonc`.
 
 Teste: entre com a conta da secretaria do passo 1.5.
 
@@ -69,10 +73,10 @@ Teste: entre com a conta da secretaria do passo 1.5.
    - tipo **External**, com o nome do app e o seu e-mail de suporte;
    - em **Audience**, deixe em modo de teste e adicione os e-mails de quem vai testar (até 100).
 3. Em **Clients → Create client**, escolha **Web application** e preencha:
-   - **Authorized JavaScript origins:** `https://<nome>.pages.dev` e `http://localhost:5173`;
+   - **Authorized JavaScript origins:** o endereço do app (sem barra no fim) e `http://localhost:5173`;
    - **Authorized redirect URIs:** `https://<ref>.supabase.co/auth/v1/callback`.
 4. Copie o **Client ID** e o **Client secret**. Cole os dois no Supabase, em **Authentication → Sign In / Providers → Google**, ligue o provedor e salve. O segredo fica só no Supabase.
-5. No Cloudflare, mude `LOGIN_GOOGLE` para `1` e publique de novo (**Deployments → Retry deployment**).
+5. No Cloudflare, mude `LOGIN_GOOGLE` para `1` nas variáveis do build e rode o build de novo.
 
 Como o cadastro livre está desligado, o Google só entra em contas que já existem: crie a conta antes (passo 1.6), com o mesmo e-mail da conta Google. O Supabase liga as duas pelo e-mail.
 

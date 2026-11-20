@@ -20,7 +20,7 @@ O plano original previa cadastro livre por e-mail e senha, sem confirmar o e-mai
 
 - [x] Cadastro livre desligado (`enable_signup = false` no `supabase/config.toml`). No piloto, as contas são criadas pelo seed ou pelo administrador.
 - [x] Os convites da secretaria definem o papel de cada conta.
-- [ ] Provedor Google: cliente OAuth no Google Cloud, com URLs de retorno do `localhost` e do `*.pages.dev`. Depende da sua conta no Google Cloud. O botão fica escondido até `LOGIN_GOOGLE=1`. Com o cadastro desligado, o Google entra em contas já criadas com o mesmo e-mail, que o Supabase liga sozinho.
+- [ ] Provedor Google: cliente OAuth no Google Cloud, com URLs de retorno do `localhost` e do endereço publicado (`*.workers.dev`). Depende da sua conta no Google Cloud. O botão fica escondido até `LOGIN_GOOGLE=1`. Com o cadastro desligado, o Google entra em contas já criadas com o mesmo e-mail, que o Supabase liga sozinho.
 - [ ] No projeto na nuvem, desligar "Allow new users to sign up" no painel do Supabase (o `config.toml` só vale no ambiente local).
 - O login verificado por e-mail (link e código) e pelo crachá vem no passo 14.
 

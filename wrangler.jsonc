@@ -1,0 +1,12 @@
+// Publicação no Cloudflare como Worker só com arquivos estáticos (sem código no
+// servidor). O nome precisa ser o mesmo do Worker no painel. O build
+// (`npm run build`) gera a SPA em build/; qualquer rota desconhecida devolve o
+// index.html, e o roteador do SvelteKit cuida do resto.
+{
+	"name": "diplomacy",
+	"compatibility_date": "2026-11-01",
+	"assets": {
+		"directory": "./build",
+		"not_found_handling": "single-page-application"
+	}
+}

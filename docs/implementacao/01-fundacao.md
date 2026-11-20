@@ -42,8 +42,8 @@
 
 ### Deploy
 
-- [ ] Cloudflare Pages ligado ao repositório: build `npm run build`, pasta `build`, variável `NODE_VERSION=24`. Precisa da sua conta do Cloudflare.
-- [x] Sem `404.html` na raiz, para o Cloudflare Pages tratar o app como SPA.
+- [ ] Cloudflare ligado ao repositório, como Worker só com arquivos estáticos (`wrangler.jsonc`, SPA): build `npm run build`, com as variáveis do build `NODE_VERSION=24`, `SUPABASE_URL`, `SUPABASE_CHAVE` e `LOGIN_GOOGLE`. Passo a passo em [publicar.md](../publicar.md).
+- [x] SPA no Cloudflare: `not_found_handling: single-page-application` no `wrangler.jsonc`, e sem `404.html` na raiz (também funciona no Pages).
 
 ## Mudou em relação ao plano original
 
@@ -69,7 +69,7 @@ Arquivo: `tests/01-fundacao.spec.ts`.
 ## Pronto quando
 
 - [x] Os testes acima passam no CI, junto com os de todos os passos anteriores: 32 testes, nenhum falhando.
-- [ ] Uma página inicial está no ar em `*.pages.dev`. Depende de ligar o repositório ao Cloudflare Pages.
+- [ ] O app está no ar em `diplomacy.<conta>.workers.dev`. Depende do build do Cloudflare.
 - [x] A navegação muda de lugar entre celular (embaixo) e notebook (lateral).
 - [x] O axe não encontra erros.
 - [x] A primeira abertura tem menos de 300 KB: o build inteiro tem 69,3 KB com gzip.
