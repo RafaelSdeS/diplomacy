@@ -2,7 +2,7 @@
 
 App web tudo em um para simulações da ONU (MUNs), começando pelo [UFRGSMUN](https://www.ufrgs.br/ufrgsmun/). Funciona no celular e no computador, sem instalar nada.
 
-> **Status:** passo 11 de 19, press. Os passos 01 a 10 estão prontos, e o piloto está publicado.
+> **Status:** passo 12 de 19, teste do piloto. Os passos 01 a 11 estão prontos, e o piloto está publicado; falta a sessão de teste com pessoas (roteiro em `docs/piloto.md`).
 
 ## O problema
 

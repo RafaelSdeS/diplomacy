@@ -24,3 +24,26 @@ export function contaDaDelegacao(nome: string) {
 	if (i < 0) throw new Error(`Delegação desconhecida: ${nome}`);
 	return `delegado${String(i + 1).padStart(2, '0')}@exemplo.test`;
 }
+
+// O comitê de treino (TREINO): o "mock" do primeiro dia, com um cenário fictício,
+// para ensinar o app. A conta treinoNN@exemplo.test representa a NN-ésima delegação.
+export const DELEGACOES_TREINO = [
+	['Argentina', 'Argentine Republic', 'ar'],
+	['Bolívia', 'Plurinational State of Bolivia', 'bo'],
+	['Brasil', 'Federative Republic of Brazil', 'br'],
+	['Chile', 'Republic of Chile', 'cl'],
+	['Paraguai', 'Republic of Paraguay', 'py'],
+	['Uruguai', 'Oriental Republic of Uruguay', 'uy']
+] as const;
+
+export const TOPICOS_TREINO = [
+	'A crise do Rio Aurora: seca, barragens e fronteiras (cenário fictício)',
+	'Refugiados climáticos na fronteira norte (cenário fictício)'
+];
+
+/** A conta de teste que representa a delegação no comitê de treino. */
+export function contaDoTreino(nome: string) {
+	const i = DELEGACOES_TREINO.findIndex(([d]) => d === nome);
+	if (i < 0) throw new Error(`Delegação desconhecida no treino: ${nome}`);
+	return `treino${String(i + 1).padStart(2, '0')}@exemplo.test`;
+}

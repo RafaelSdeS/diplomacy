@@ -1,12 +1,13 @@
 // Dados fictícios para desenvolver e testar: o evento "UFRGSMUN Teste", o comitê
-// CSNU-T com as 15 delegações do CSNU de 2026 e contas @exemplo.test.
+// CSNU-T com as 15 delegações do CSNU de 2026, o comitê de treino TREINO (cenário
+// fictício, para o "mock" do primeiro dia) e contas @exemplo.test.
 // Usa o fluxo real: cria os convites e depois as contas; o gatilho nova_conta
 // cria a pessoa e as participações. Pode rodar várias vezes sem duplicar nada.
 // Só roda no Supabase local, a menos que SEED_PERMITIR_REMOTO=1 (para um projeto
 // de teste, nunca o de produção).
 import { execFileSync } from 'node:child_process';
 import { createClient } from '@supabase/supabase-js';
-import { DELEGACOES } from './delegacoes.ts';
+import { DELEGACOES, DELEGACOES_TREINO, TOPICOS_TREINO } from './delegacoes.ts';
 
 const SENHA = 'senha-de-teste';
 
@@ -93,22 +94,55 @@ const delegacoes = verificar(
 );
 const delegacaoPorNome = new Map(delegacoes.map((d) => [d.nome, d.id]));
 
-// O veículo da press do comitê (o nome de um veículo real, só o nome).
+const treino = verificar(
+	await db
+		.from('comite')
+		.upsert(
+			{
+				evento_id: evento.id,
+				sigla: 'TREINO',
+				nome: 'Comitê de treino',
+				nome_oficial: 'O Conselho de Treino',
+				idioma: 'pt',
+				crise_ligada: true,
+				topicos: TOPICOS_TREINO
+			},
+			{ onConflict: 'evento_id,sigla' }
+		)
+		.select()
+		.single(),
+	'comitê de treino'
+);
+const delegacoesTreino = verificar(
+	await db
+		.from('delegacao')
+		.upsert(
+			DELEGACOES_TREINO.map(([nome, nome_oficial, bandeira]) => ({ comite_id: treino.id, nome, nome_oficial, bandeira })),
+			{ onConflict: 'comite_id,nome' }
+		)
+		.select(),
+	'delegações do treino'
+);
+const delegacaoDoTreino = new Map(delegacoesTreino.map((d) => [d.nome, d.id]));
+
+// Os veículos da press de cada comitê (nomes de veículos reais, só o nome).
 verificar(
 	await db
 		.from('veiculo')
 		.upsert(
-			{ comite_id: comite.id, nome: 'Al Jazeera', linha_editorial: 'Cobertura do Oriente Médio e do Sul Global.' },
+			[
+				{ comite_id: comite.id, nome: 'Al Jazeera', linha_editorial: 'Cobertura do Oriente Médio e do Sul Global.' },
+				{ comite_id: treino.id, nome: 'Reuters', linha_editorial: 'Notícias rápidas e factuais.' }
+			],
 			{ onConflict: 'comite_id' }
 		)
-		.select()
-		.single(),
-	'veículo'
+		.select(),
+	'veículos'
 );
 
 // Contas: um delegado por delegação, um segundo delegado dos EUA (delegação com
 // dois), uma conta por papel e uma conta sem convite (tela "sem acesso").
-type Conta = { email: string; nome: string; papel?: string; delegacao?: string };
+type Conta = { email: string; nome: string; papel?: string; delegacao?: string; treino?: boolean };
 const contas: Conta[] = [
 	...DELEGACOES.map(([nome], i) => {
 		const n = String(i + 1).padStart(2, '0');
@@ -119,7 +153,13 @@ const contas: Conta[] = [
 	{ email: 'crise01@exemplo.test', nome: 'Crise 01', papel: 'crise' },
 	{ email: 'press01@exemplo.test', nome: 'Press 01', papel: 'press' },
 	{ email: 'secretaria01@exemplo.test', nome: 'Secretaria 01', papel: 'secretaria' },
-	{ email: 'semconvite@exemplo.test', nome: 'Sem Convite' }
+	{ email: 'semconvite@exemplo.test', nome: 'Sem Convite' },
+	// O comitê de treino: uma conta por delegação e uma da mesa.
+	...DELEGACOES_TREINO.map(([nome], i) => {
+		const n = String(i + 1).padStart(2, '0');
+		return { email: `treino${n}@exemplo.test`, nome: `Treino ${n}`, papel: 'delegado', delegacao: nome, treino: true };
+	}),
+	{ email: 'mesa-treino@exemplo.test', nome: 'Mesa do Treino', papel: 'mesa', treino: true }
 ];
 
 verificar(
@@ -130,8 +170,8 @@ verificar(
 				email: c.email,
 				evento_id: evento.id,
 				papel: c.papel,
-				comite_id: c.papel === 'secretaria' ? null : comite.id,
-				delegacao_id: c.delegacao ? delegacaoPorNome.get(c.delegacao) : null
+				comite_id: c.papel === 'secretaria' ? null : c.treino ? treino.id : comite.id,
+				delegacao_id: c.delegacao ? (c.treino ? delegacaoDoTreino : delegacaoPorNome).get(c.delegacao) : null
 			})),
 		{ onConflict: 'email,evento_id,papel,comite_id', ignoreDuplicates: true }
 	),
@@ -200,5 +240,5 @@ if (!avisos.count) {
 }
 
 console.log(
-	`Seed pronto: ${delegacoes.length} delegações e ${contas.length} contas @exemplo.test (senha "${SENHA}") em ${url}.`
+	`Seed pronto: ${delegacoes.length + delegacoesTreino.length} delegações e ${contas.length} contas @exemplo.test (senha "${SENHA}") em ${url}.`
 );

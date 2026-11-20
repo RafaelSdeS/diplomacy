@@ -4,19 +4,27 @@
 **Depende de:** 01 a 11
 **Objetivo:** garantir a qualidade do piloto e rodar uma sessão completa com um grupo pequeno de pessoas.
 
+## Como ficou
+
+- **Resolução votada:** faltava no app o caminho do projeto até a votação. Agora o painel da presidência tem **Projetos de resolução**: a mesa abre a votação substantiva de um projeto que aprovou (`abrir_votacao_projeto`) ou o aprova por consenso. O resultado da votação vale para o projeto (aprovado ou rejeitado); se a sessão acabar no meio, o projeto volta a esperar a mesa. Fase de ação, emendas e regra do CSNU seguem no passo 16.
+- **Comitê de treino:** o seed cria o TREINO (seis delegações sul-americanas, cenário fictício do Rio Aurora, contas `treinoNN@exemplo.test` e `mesa-treino@exemplo.test`); na nuvem, `supabase/treino.sql`.
+- **Roteiro, plano B e questionário:** `docs/piloto.md`.
+- **Métricas:** `supabase/consultas/`. "Matérias lidas" virou pergunta do questionário: o app não registra leituras (LGPD).
+- **Fluxo completo:** as etapas têm os próprios testes de ponta a ponta (06 a 11); `tests/12-piloto.spec.ts` fecha o fluxo no comitê de treino, com a resolução votada.
+
 ## Qualidade
 
 - [ ] Todos os testes automáticos dos passos 01 a 11 passam no CI.
-- [ ] Testes de ponta a ponta do fluxo completo nas três telas: agenda, debate, crise, resolução votada e press.
-- [ ] axe em todas as rotas principais e navegação completa pelo teclado no notebook da mesa.
+- [x] Testes de ponta a ponta do fluxo completo nas três telas: agenda, debate, crise, resolução votada e press (06 a 12).
+- [x] axe em todas as rotas principais (em cada passo) e o teclado no notebook da mesa: abrir e encerrar a votação de um projeto só com Tab e Enter.
 - [ ] Teste manual com leitor de tela: TalkBack no Android e VoiceOver no iPhone.
-- [ ] Primeira abertura abaixo de 300 KB, com o limite checado no CI.
-- [ ] Rede ruim: simulação de 3G lento no navegador, queda e volta da conexão no meio de uma sessão.
+- [x] Primeira abertura abaixo de 300 KB, com o limite checado no CI.
+- [x] Rede ruim: simulação de 3G lento no navegador, queda e volta da conexão no meio de uma sessão.
 - [ ] Cronômetro e fila de crise conferidos em celulares Android e iPhone reais.
 
 ## Sessão de teste
 
-- [ ] Roteiro de 1h30 a 2h com um cenário fictício:
+- [x] Roteiro de 1h30 a 2h com um cenário fictício (`docs/piloto.md`):
   1. chamada, plenária de abertura (briefing, discursos de abertura e moção do tópico no topo) e agenda informal;
   2. debate formal-informal com rodízio da presidência;
   3. uma atualização de crise;
@@ -24,9 +32,9 @@
   5. votação;
   6. press cobrindo tudo.
 - [ ] Contas fictícias para cada pessoa do grupo, entregues na hora.
-- [ ] Plano B em papel à mão, com um combinado claro de quando usá-lo.
+- [x] Plano B em papel à mão, com um combinado claro de quando usá-lo (`docs/piloto.md`).
 - [ ] Um notebook com projetor rodando o telão.
-- [ ] Usar o formato do **mock** do UFRGSMUN: no primeiro dia, o evento já tem um horário de "simulação de treino e regras", com um cenário fictício. É o melhor momento para ensinar o app a todo mundo. O seed ganha um comitê de treino com um cenário fictício próprio, para ensaiar exatamente esse momento.
+- [x] Usar o formato do **mock** do UFRGSMUN: no primeiro dia, o evento já tem um horário de "simulação de treino e regras", com um cenário fictício. É o melhor momento para ensinar o app a todo mundo. O seed ganha um comitê de treino com um cenário fictício próprio, para ensaiar exatamente esse momento.
 
 ## Métricas
 
@@ -37,7 +45,7 @@ Consultas SQL salvas em `supabase/consultas/`:
 - tempo do envio do projeto até a votação;
 - matérias publicadas e lidas.
 
-Depois da sessão, um questionário curto por função: delegado, mesa, crise e press.
+Depois da sessão, um questionário curto por função: delegado, mesa, crise e press (`docs/piloto.md`).
 
 ## Pronto quando
 

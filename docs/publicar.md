@@ -74,6 +74,12 @@ O projeto na nuvem começa vazio: o seed só roda no Supabase local. Para testar
 npx supabase db query --remote --file supabase/demonstracao.sql
 ```
 
+Para a sessão de teste do piloto, `supabase/treino.sql` cria o comitê de treino TREINO, com um cenário fictício (veja `docs/piloto.md`):
+
+```sh
+npx supabase db query --remote --file supabase/treino.sql
+```
+
 Depois, para testar com várias pessoas:
 
 1. Crie as contas de teste no painel (**Authentication → Users → Add user**, com **Auto Confirm User**). Muitos provedores de e-mail aceitam variações do mesmo endereço, como `voce+eua@gmail.com`.

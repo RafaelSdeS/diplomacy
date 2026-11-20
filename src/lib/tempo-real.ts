@@ -19,7 +19,16 @@ export function assinarAvisos(aoMudar: () => void): () => void {
 }
 
 /** O que muda ao vivo numa sessão do comitê. */
-export const TABELAS_SESSAO = ['estado_sessao', 'pedido_fala', 'ponto_mocao', 'presenca', 'lista_oradores', 'votacao', 'voto'];
+export const TABELAS_SESSAO = [
+	'estado_sessao',
+	'pedido_fala',
+	'ponto_mocao',
+	'presenca',
+	'lista_oradores',
+	'votacao',
+	'voto',
+	'documento'
+];
 /** O que muda ao vivo na crise do comitê (a RLS decide quem recebe cada nota). */
 export const TABELAS_CRISE = ['nota_crise', 'atualizacao_comite'];
 /** Blocos e documentos do comitê. */

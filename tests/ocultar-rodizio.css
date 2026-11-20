@@ -1,0 +1,7 @@
+/* Capturas: o que muda com o rodízio da presidência (quem preside e a conta logada)
+   fica invisível. Uma máscara teria a largura do nome, que varia. */
+.telao-presidencia span:not(.rotulo),
+.conta-nome,
+main > h1 + p.suave {
+	visibility: hidden;
+}

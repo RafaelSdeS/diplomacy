@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { invalidate } from '$app/navigation';
 	import type { Database } from '#lib/database.types.ts';
+	import { nomeDoDocumento, STATUS_DOCUMENTO } from '#lib/formatacao.ts';
 	import { descreverPonto, ehPonto, FORMAS, mensagemDeErro, MOCOES_COM_LISTA, type TipoPonto } from '#lib/sessao.ts';
 	import { supabase } from '#lib/supabase.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
@@ -258,6 +259,40 @@
 		</section>
 
 		<div class="painel-coluna">
+			{#if ehMesa && data.projetos.length}
+				<section class="cartao" aria-labelledby="t-projetos">
+					<h2 id="t-projetos">Projetos de resolução</h2>
+					<ul class="lista">
+						{#each data.projetos as p (p.id)}
+							<li>
+								<span>
+									{nomeDoDocumento(p)}
+									<span class="detalhe">
+										<span class="selo {STATUS_DOCUMENTO[p.status].selo}">{STATUS_DOCUMENTO[p.status].rotulo}</span>
+										{#if p.status === 'aprovado_mesa'}· os signatários pedem {p.aprovacao === 'consenso' ? 'consenso' : 'votação'}{/if}
+									</span>
+								</span>
+								{#if p.status === 'aprovado_mesa'}
+									<span class="acoes">
+										<button
+											class="botao botao--pequeno"
+											type="button"
+											aria-label={`Abrir a votação: ${nomeDoDocumento(p)}`}
+											onclick={() => rpc('abrir_votacao_projeto', { p_documento: p.id })}>Abrir votação</button
+										>
+										<button
+											class="botao botao--secundario botao--pequeno"
+											type="button"
+											aria-label={`Aprovar por consenso: ${nomeDoDocumento(p)}`}
+											onclick={() => rpc('aprovar_por_consenso', { p_documento: p.id })}>Aprovar por consenso</button
+										>
+									</span>
+								{/if}
+							</li>
+						{/each}
+					</ul>
+				</section>
+			{/if}
 			{#if votacao}
 				<section class="cartao cartao--destaque" aria-labelledby="t-votacao">
 					<h2 id="t-votacao">{votacao.aberta ? 'Votação aberta' : 'Última votação'}</h2>

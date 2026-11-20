@@ -3,6 +3,8 @@ import AxeBuilder from '@axe-core/playwright';
 import { contaDaDelegacao } from '../scripts/delegacoes.ts';
 import { CONTAS, entrar } from './ajuda.ts';
 
+const OCULTAR_RODIZIO = `${import.meta.dirname}/ocultar-rodizio.css`;
+
 // Passos 06 e 07: sessão, plenária de abertura, votação, debate, agenda e telão.
 const SESSAO = '/comite/CSNU-T/sessao';
 const PRESIDENCIA = '/comite/CSNU-T/sessao/presidencia';
@@ -313,10 +315,8 @@ test.describe('telão em 1920 × 1080', () => {
 		await page.goto(TELAO);
 		await aoVivo(page);
 		await expect(page.getByRole('region', { name: 'Com a palavra' })).toContainText(outra);
-		// A presidência do rodízio depende de quantas vezes o fluxo já rodou: fica de fora.
-		await expect(page).toHaveScreenshot('telao.png', {
-			mask: [page.locator('.cronometro'), page.locator('.telao-presidencia span:not(.rotulo)')]
-		});
+		// A presidência do rodízio depende de quantas vezes o fluxo já rodou: fica invisível.
+		await expect(page).toHaveScreenshot('telao.png', { mask: [page.locator('.cronometro')], stylePath: OCULTAR_RODIZIO });
 	});
 });
 
@@ -326,10 +326,11 @@ test('aparência do painel da presidência', async ({ page }) => {
 	await page.goto(PRESIDENCIA);
 	await aoVivo(page);
 	await expect(page.getByRole('region', { name: 'Com a palavra' })).toContainText(outra);
-	// Quem preside muda com o rodízio: o nome da conta e o subtítulo ficam de fora.
+	// Quem preside muda com o rodízio: o nome da conta e o subtítulo ficam invisíveis.
 	await expect(page).toHaveScreenshot('presidencia.png', {
 		fullPage: true,
-		mask: [page.locator('.cronometro'), page.locator('.conta-nome'), page.locator('main > p.suave').first()]
+		mask: [page.locator('.cronometro')],
+		stylePath: OCULTAR_RODIZIO
 	});
 });
 

@@ -1433,6 +1433,10 @@ kbd {
 	line-height: 1.55;
 }
 
+.a4 p {
+	max-width: none;
+}
+
 .a4 h1,
 .a4 h2,
 .a4 .faixa,
