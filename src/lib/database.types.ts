@@ -1341,6 +1341,9 @@ isOneToOne: false
 "pedir_reabertura":
 { Args: { "p_clausula": string }; Returns: undefined
                            },
+"pode_ouvir":
+{ Args: { "p_topico": string }; Returns: boolean
+                           },
 "pode_presidir":
 { Args: { "p_comite": string }; Returns: boolean
                            },
