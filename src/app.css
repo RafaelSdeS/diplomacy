@@ -1571,3 +1571,125 @@ kbd {
 		border: 0;
 	}
 }
+
+/* Secretaria (passo 14) */
+
+.tabela-rolavel {
+	overflow-x: auto;
+	margin-bottom: 1rem;
+}
+
+.tabela-rolavel table {
+	border-collapse: collapse;
+	min-width: 100%;
+}
+
+.tabela-rolavel th,
+.tabela-rolavel td {
+	padding: 0.35rem 0.6rem;
+	border-bottom: 1px solid var(--cor-linha);
+	text-align: left;
+	white-space: nowrap;
+}
+
+.leitor-qr {
+	width: 100%;
+	max-width: 24rem;
+	border-radius: 0.5rem;
+}
+
+.verificacao {
+	display: grid;
+	grid-template-columns: max-content 1fr;
+	gap: 0.25rem 1rem;
+}
+
+.verificacao dt {
+	font-weight: 600;
+}
+
+.verificacao dd {
+	margin: 0;
+}
+
+/* Crachás: 8 por folha A4 (2 × 4), para cortar. */
+.folha-crachas {
+	display: grid;
+	grid-template-columns: repeat(2, 90mm);
+	gap: 4mm;
+	justify-content: center;
+}
+
+.cracha {
+	display: flex;
+	flex-direction: column;
+	gap: 1mm;
+	height: 66mm;
+	padding: 4mm;
+	overflow: hidden;
+	border: 1px dashed #9aa5b1;
+	background: #ffffff;
+	color: #1f2933;
+	break-inside: avoid;
+}
+
+.cracha p {
+	margin: 0;
+}
+
+.cracha .rotulo {
+	color: #52606d;
+}
+
+.cracha-nome {
+	font-family: var(--fonte-titulo);
+	font-size: 1.25rem;
+	font-weight: 600;
+	color: #1b365d;
+}
+
+.cracha-qr {
+	display: flex;
+	align-items: center;
+	gap: 3mm;
+	margin: auto 0 0;
+	font-size: 0.75rem;
+}
+
+.cracha-qr svg {
+	width: 26mm;
+	height: 26mm;
+}
+
+/* Certificados: um por página. */
+.certificado {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: 1rem;
+	text-align: center;
+}
+
+.certificado + .certificado {
+	break-before: page;
+}
+
+.certificado h2 {
+	font-size: 2rem;
+}
+
+.certificado-texto {
+	font-size: 1.25rem;
+}
+
+.certificado-codigo {
+	margin-top: 3rem;
+	font-size: 0.85rem;
+	color: #52606d;
+}
+
+@media print {
+	.certificado {
+		min-height: 250mm;
+	}
+}

@@ -6,11 +6,12 @@ import type { LayoutLoad } from './$types';
 export const ssr = false;
 
 // Telas que abrem sem login.
-const PUBLICAS = new Set(['/entrar', '/estilo']);
+const PUBLICAS = new Set(['/entrar', '/entrar/cracha', '/estilo']);
+const ehPublica = (caminho: string) => PUBLICAS.has(caminho) || caminho.startsWith('/verificar/');
 
 export const load: LayoutLoad = async ({ url, depends }) => {
 	depends('app:sessao');
-	const publica = PUBLICAS.has(url.pathname);
+	const publica = ehPublica(url.pathname);
 
 	const {
 		data: { session }

@@ -249,6 +249,46 @@ isOneToOne: false
       referencedColumns: ["id","comite_id"]
     }
                   ]
+                },"certificado": {
+                  Row: {
+                    "codigo": string,"email": string,"emitido_em": string,"evento_id": string,"funcao": string,"nome": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "codigo": string,"email": string,"emitido_em"?: string,"evento_id": string,"funcao": string,"nome": string
+                  }
+                  Update: {
+                    "codigo"?: string,"email"?: string,"emitido_em"?: string,"evento_id"?: string,"funcao"?: string,"nome"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "certificado_evento_id_fkey"
+      columns: ["evento_id"]
+isOneToOne: false
+      referencedRelation: "evento"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"checkin": {
+                  Row: {
+                    "dia": string,"em": string,"email": string,"evento_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "dia"?: string,"em"?: string,"email": string,"evento_id": string
+                  }
+                  Update: {
+                    "dia"?: string,"em"?: string,"email"?: string,"evento_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "checkin_evento_id_fkey"
+      columns: ["evento_id"]
+isOneToOne: false
+      referencedRelation: "evento"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"citacao": {
                   Row: {
                     "delegacao_id": string,"noticia_id": string
@@ -361,14 +401,14 @@ isOneToOne: false
                   ]
                 },"convite": {
                   Row: {
-                    "comite_id": string | null,"criado_em": string,"delegacao_id": string | null,"email": string,"evento_id": string,"id": string,"papel": Database["public"]['Enums']["papel"]
+                    "comite_id": string | null,"criado_em": string,"delegacao_id": string | null,"email": string,"evento_id": string,"id": string,"nome": string | null,"papel": Database["public"]['Enums']["papel"]
                   }
                   ComputedFields: never
                   Insert: {
-                    "comite_id"?: string | null,"criado_em"?: string,"delegacao_id"?: string | null,"email": string,"evento_id": string,"id"?: string,"papel": Database["public"]['Enums']["papel"]
+                    "comite_id"?: string | null,"criado_em"?: string,"delegacao_id"?: string | null,"email": string,"evento_id": string,"id"?: string,"nome"?: string | null,"papel": Database["public"]['Enums']["papel"]
                   }
                   Update: {
-                    "comite_id"?: string | null,"criado_em"?: string,"delegacao_id"?: string | null,"email"?: string,"evento_id"?: string,"id"?: string,"papel"?: Database["public"]['Enums']["papel"]
+                    "comite_id"?: string | null,"criado_em"?: string,"delegacao_id"?: string | null,"email"?: string,"evento_id"?: string,"id"?: string,"nome"?: string | null,"papel"?: Database["public"]['Enums']["papel"]
                   }
                   Relationships: [
                     {
@@ -385,6 +425,26 @@ isOneToOne: false
       referencedColumns: ["id","comite_id"]
     },{
       foreignKeyName: "convite_evento_id_fkey"
+      columns: ["evento_id"]
+isOneToOne: false
+      referencedRelation: "evento"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"credencial": {
+                  Row: {
+                    "criada_em": string,"email": string,"evento_id": string,"expira_em": string | null,"hash": string,"id": string,"revogada": boolean,"tipo": string,"usada_em": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "criada_em"?: string,"email": string,"evento_id": string,"expira_em"?: string | null,"hash": string,"id"?: string,"revogada"?: boolean,"tipo": string,"usada_em"?: string | null
+                  }
+                  Update: {
+                    "criada_em"?: string,"email"?: string,"evento_id"?: string,"expira_em"?: string | null,"hash"?: string,"id"?: string,"revogada"?: boolean,"tipo"?: string,"usada_em"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "credencial_evento_id_fkey"
       columns: ["evento_id"]
 isOneToOne: false
       referencedRelation: "evento"
@@ -995,6 +1055,20 @@ isOneToOne: false
       referencedColumns: ["id","comite_id"]
     }
                   ]
+                },"tentativa_login": {
+                  Row: {
+                    "em": string,"origem": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "em"?: string,"origem": string
+                  }
+                  Update: {
+                    "em"?: string,"origem"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
                 },"veiculo": {
                   Row: {
                     "comite_id": string,"id": string,"linha_editorial": string | null,"nome": string
@@ -1165,6 +1239,12 @@ isOneToOne: false
 "baixar_placa":
 { Args: { "p_comite": string }; Returns: undefined
                            },
+"checkin_por_cracha":
+{ Args: { "p_codigo": string,"p_evento": string }; Returns: string
+                           },
+"codigo_curto":
+{ Args: { "p_tamanho": number }; Returns: string
+                           },
 "comentar":
 { Args: { "p_clausula": string,"p_texto": string }; Returns: undefined
                            },
@@ -1195,6 +1275,17 @@ isOneToOne: false
 "eh_secretaria":
 { Args: { "p_evento": string }; Returns: boolean
                            },
+"emitir_certificados":
+{ Args: { "p_evento": string }; Returns: number
+                           },
+"emitir_codigo":
+{ Args: { "p_email": string,"p_evento": string }; Returns: string
+                           },
+"emitir_crachas":
+{ Args: { "p_emails"?: (string)[],"p_evento": string }; Returns: {
+              "codigo": string,"email": string,"nome": string
+            }[]
+                           },
 "encerrar_sessao":
 { Args: { "p_comite": string }; Returns: undefined
                            },
@@ -1203,6 +1294,11 @@ isOneToOne: false
                            },
 "entrar_bloco":
 { Args: { "p_bloco": string }; Returns: undefined
+                           },
+"entrar_com_codigo":
+{ Args: { "p_codigo": string,"p_origem": string }; Returns: {
+              "email": string,"nome": string
+            }[]
                            },
 "enviar_carta":
 { Args: { "p_bloco_remetente"?: string,"p_blocos_destinatarios"?: (string)[],"p_comite": string,"p_corpo": string,"p_destinatarios"?: (string)[],"p_publica": boolean,"p_titulo": string }; Returns: string
@@ -1290,8 +1386,14 @@ isOneToOne: false
 "exigir_redator":
 { Args: { "p_bloco": string }; Returns: undefined
                            },
+"exigir_secretaria":
+{ Args: { "p_evento": string }; Returns: undefined
+                           },
 "focar_clausula":
 { Args: { "p_clausula": string,"p_documento": string }; Returns: undefined
+                           },
+"hash_codigo":
+{ Args: { "p_codigo": string }; Returns: string
                            },
 "importar_clausulas":
 { Args: { "p_clausulas": (string)[],"p_documento": string }; Returns: undefined
@@ -1311,6 +1413,9 @@ isOneToOne: false
 "marcar_avisos_vistos":
 { Args: Record<PropertyKey, never>; Returns: undefined
                            },
+"marcar_checkin":
+{ Args: { "p_email": string,"p_evento": string,"p_presente"?: boolean }; Returns: undefined
+                           },
 "marcar_clausula":
 { Args: { "p_clausula": string,"p_status": string }; Returns: undefined
                            },
@@ -1325,6 +1430,9 @@ isOneToOne: false
                            },
 "mudar_forma":
 { Args: { "p_comite": string,"p_forma": Database["public"]['Enums']["forma_debate"],"p_minutos"?: number }; Returns: undefined
+                           },
+"nome_do_convidado":
+{ Args: { "p_email": string,"p_evento": string }; Returns: string
                            },
 "ocultar_noticia":
 { Args: { "p_motivo": string,"p_noticia": string }; Returns: undefined
@@ -1415,6 +1523,9 @@ isOneToOne: false
 "retomar":
 { Args: { "p_comite": string }; Returns: undefined
                            },
+"revogar_credenciais":
+{ Args: { "p_email": string,"p_evento": string }; Returns: undefined
+                           },
 "sair_bloco":
 { Args: { "p_bloco": string }; Returns: undefined
                            },
@@ -1461,6 +1572,11 @@ isOneToOne: false
         isOneToOne: true
         isSetofReturn: false
       } },
+"verificar_certificado":
+{ Args: { "p_codigo": string }; Returns: {
+              "evento": string,"funcao": string,"nome": string
+            }[]
+                           },
 "votar":
 { Args: { "p_escolha": Database["public"]['Enums']["escolha_voto"],"p_votacao": string }; Returns: undefined
                            }

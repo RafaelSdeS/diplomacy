@@ -101,7 +101,21 @@ Como o cadastro livre está desligado, o Google só entra em contas que já exis
 
 ## 4. E-mail (SMTP): só no passo 14
 
-O piloto não envia e-mails. O link e o código por e-mail do passo 14 vão precisar de um SMTP gratuito (por exemplo, Brevo), configurado em **Authentication → Emails → SMTP Settings**. O e-mail embutido do Supabase serve só para testes: manda poucas mensagens por hora.
+O piloto não envia e-mails. O link e o código por e-mail do passo 14 vão precisar de um SMTP gratuito (por exemplo, Brevo), configurado em **Authentication → Emails → SMTP Settings**. O e-mail embutido do Supabase serve só para testes: manda poucas mensagens por hora. Depois do SMTP, suba o limite de e-mails em **Authentication → Rate Limits** (o padrão é 30 por hora).
+
+O login por e-mail só entra em contas que já existem. A conta nasce no primeiro login pelo crachá ou pelo código da secretaria.
+
+## 5. Login pelo crachá (passo 14)
+
+A Edge Function `entrar-com-cracha` troca o código do crachá por um link de login e cria a conta no primeiro acesso, a partir do convite. Publique-a uma vez (e de novo quando ela mudar):
+
+```sh
+npx supabase functions deploy entrar-com-cracha
+```
+
+Ela usa a chave de serviço que o próprio Supabase dá às funções; nenhuma chave sai do painel.
+
+No evento, todos entram pelo mesmo wi-fi, ou seja, pelo mesmo IP. Antes do credenciamento, em **Authentication → Rate Limits**, suba **Token verifications** para pelo menos 500 a cada 5 minutos. O padrão (30) barraria a fila do credenciamento.
 
 ## A cada passo novo com migração
 
@@ -109,7 +123,8 @@ O Cloudflare publica o app a cada push na `main`, mas as migrações vão para a
 
 1. `npx supabase db push --remote --dry-run`, para conferir o que vai ser aplicado;
 2. `npx supabase db push --remote`;
-3. só então `git push`.
+3. se a Edge Function mudou, `npx supabase functions deploy entrar-com-cracha`;
+4. só então `git push`.
 
 Quando a migração só acrescenta tabelas e funções, o app antigo continua funcionando com o banco novo durante o deploy. Quando ela muda ou apaga algo que o app antigo usa (como o passo 07, que troca a assinatura de funções da sessão), o app publicado fica com erro por um ou dois minutos, até o Cloudflare terminar o build novo. Com dados de teste isso não importa; perto do evento, faça essas mudanças em duas etapas (acrescentar, publicar, depois remover o antigo).
 

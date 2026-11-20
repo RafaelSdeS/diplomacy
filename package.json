@@ -18,7 +18,7 @@
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"tamanho": "node scripts/tamanho.js",
-		"db:iniciar": "supabase start -x studio,imgproxy,edge-runtime,logflare,vector,postgres-meta,mailpit,supavisor",
+		"db:iniciar": "supabase start -x studio,imgproxy,logflare,vector,postgres-meta,mailpit,supavisor",
 		"db:resetar": "supabase db reset",
 		"db:tipos": "supabase gen types typescript --local > src/lib/database.types.ts",
 		"seed": "node scripts/seed.ts",
@@ -45,6 +45,7 @@
 		"@fontsource/source-serif-4": "^5.3.1",
 		"@lucide/svelte": "^1.77.0",
 		"@supabase/supabase-js": "^2.119.2",
-		"flag-icons": "^7.6.0"
+		"flag-icons": "^7.6.0",
+		"qrcode-generator": "1.4.4"
 	}
 }

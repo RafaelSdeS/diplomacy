@@ -32,7 +32,7 @@ test('entra e sai com e-mail e senha', async ({ page }) => {
 
 test('senha errada mostra um aviso e não entra', async ({ page }) => {
 	await page.goto('/entrar');
-	await page.getByLabel('E-mail').fill(CONTAS.delegado);
+	await page.getByLabel('E-mail', { exact: true }).fill(CONTAS.delegado);
 	await page.getByLabel('Senha').fill('senha-errada');
 	await page.getByRole('button', { name: 'Entrar', exact: true }).click();
 	await expect(page.getByRole('alert')).toHaveText('E-mail ou senha incorretos.');
@@ -41,7 +41,7 @@ test('senha errada mostra um aviso e não entra', async ({ page }) => {
 
 test('o formulário de entrar funciona só com o teclado', async ({ page }) => {
 	await page.goto('/entrar');
-	const email = page.getByLabel('E-mail');
+	const email = page.getByLabel('E-mail', { exact: true });
 	await expect(email).toBeVisible();
 	for (let i = 0; i < 6 && !(await email.evaluate((el) => el === document.activeElement)); i++) {
 		await page.keyboard.press('Tab');

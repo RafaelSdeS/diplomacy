@@ -18,7 +18,7 @@ export const CONTAS = {
 
 export async function entrar(page: Page, email: string) {
 	await page.goto('/entrar');
-	await page.getByLabel('E-mail').fill(email);
+	await page.getByLabel('E-mail', { exact: true }).fill(email);
 	await page.getByLabel('Senha').fill(SENHA);
 	await page.getByRole('button', { name: 'Entrar', exact: true }).click();
 	await expect(page).not.toHaveURL(/\/entrar$/);

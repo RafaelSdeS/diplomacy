@@ -1,6 +1,10 @@
-/* Capturas: o que muda com o rodízio da presidência (quem preside e a conta logada)
-   fica invisível. Uma máscara teria a largura do nome, que varia. */
+/* Capturas: o que depende do sorteio da presidência (quem preside, quem fala, a conta
+   logada) fica invisível. O layout continua conferido; uma máscara teria a largura do
+   nome, que varia. */
 .telao-presidencia span:not(.rotulo),
+.telao-orador .bandeira,
+.telao-orador .telao-nome,
+.telao-fila li,
 .conta-nome,
 main > h1 + p.suave {
 	visibility: hidden;

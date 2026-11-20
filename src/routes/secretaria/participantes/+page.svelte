@@ -64,6 +64,12 @@
 
 <p class="rotulo">Secretaria</p>
 <h1>Participantes</h1>
+<nav class="atalhos" aria-label="Ferramentas da secretaria">
+	<a class="botao botao--secundario" href="/secretaria/importar">Importar inscrições</a>
+	<a class="botao botao--secundario" href="/imprimir/crachas">Crachás</a>
+	<a class="botao botao--secundario" href="/secretaria/checkin">Check-in</a>
+	<a class="botao botao--secundario" href="/secretaria/certificados">Certificados</a>
+</nav>
 <p class="suave">
 	Cada convite dá um papel a um e-mail. Quem já tem conta recebe o papel na hora; quem ainda não tem,
 	quando a conta for criada. Remover um convite não tira o papel de quem já o recebeu.
