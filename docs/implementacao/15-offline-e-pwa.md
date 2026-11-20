@@ -52,7 +52,7 @@ Arquivos: `src/lib/caixa-de-saida.test.ts` e `tests/15-offline.spec.ts`.
 
 ## Pronto quando
 
-- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
+- [x] Os testes acima passam no CI, junto com os de todos os passos anteriores.
 - [x] Nada escrito sem conexão se perde nem se duplica.
 - [x] O app abre sem internet.
 - [x] O consumo de dados de um dia está medido e documentado.

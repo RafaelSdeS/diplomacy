@@ -96,3 +96,15 @@ export function lerEsboco(texto: string): ItemEsboco[] {
 /** O contrário de lerEsboco, para editar uma proposta já salva. */
 export const escreverEsboco = (itens: ItemEsboco[]) =>
 	itens.map((i) => `${'  '.repeat(i.nivel)}${i.texto}`).join('\n');
+
+export const REGRAS_VOTACAO: Record<string, string> = {
+	maioria_simples: 'maioria simples',
+	dois_tercos: 'dois terços',
+	csnu: 'regra do CSNU (9 votos, sem voto contra de permanente)',
+	unanimidade: 'unanimidade das delegações previstas'
+};
+
+/** Assinaturas que a não-confiança pede: a fração das regras, das delegações previstas, para cima. */
+export function assinaturasDesconfianca(fracao: [number, number], delegacoes: { situacao: string }[]) {
+	return Math.ceil((delegacoes.filter((d) => d.situacao !== 'suspensa').length * fracao[0]) / fracao[1]);
+}

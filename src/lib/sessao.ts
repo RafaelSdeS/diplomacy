@@ -7,7 +7,7 @@ import { supabase } from './supabase.ts';
 export async function comitePorSigla(sigla: string) {
 	const comite = await supabase
 		.from('comite')
-		.select('id, sigla, nome, topicos, guia_url, idioma, crise_ligada')
+		.select('id, sigla, nome, topicos, guia_url, idioma, crise_ligada, tecnologia_restrita')
 		.eq('sigla', sigla)
 		.limit(1)
 		.maybeSingle();
@@ -18,7 +18,7 @@ export async function comitePorSigla(sigla: string) {
 
 /** Tudo o que as telas da sessão mostram: estado, listas, última votação, regras e permissão. */
 export async function carregarSessao(comiteId: string) {
-	const [estado, lista, delegacoes, regras, podePresidir] = await Promise.all([
+	const [estado, lista, delegacoes, regras, podePresidir, emVotacao] = await Promise.all([
 		supabase
 			.from('estado_sessao')
 			.select(
@@ -29,9 +29,10 @@ export async function carregarSessao(comiteId: string) {
 					presidencia:delegacao!sessao_presidencia_delegacao_id_comite_id_fkey(id, nome, bandeira),
 					presenca(delegacao_id, situacao),
 					pedidos:pedido_fala(id, delegacao(id, nome, bandeira)),
-					pontos:ponto_mocao(id, tipo, detalhe, status, topico, minutos, delegacao(id, nome)),
+					pontos:ponto_mocao(id, tipo, detalhe, status, topico, minutos, delegacao(id, nome), assinaturas:assinatura_mocao(delegacao_id)),
 					votacoes:votacao(id, objeto, tipo, regra, aberta, a_favor, contra, abstencoes, necessario,
-						aprovada, encerrada_em, votos:voto(delegacao_id, escolha, registrado_pela_mesa)))`
+						aprovada, encerrada_em, nominal, partes, votos:voto(delegacao_id, escolha, registrado_pela_mesa),
+						passes:passe(delegacao_id)))`
 			)
 			.eq('comite_id', comiteId)
 			.eq('sessao.pedidos.situacao', 'aberto')
@@ -47,9 +48,11 @@ export async function carregarSessao(comiteId: string) {
 			.order('ordem'),
 		supabase.from('delegacao').select('id, nome, bandeira, situacao').eq('comite_id', comiteId).order('nome'),
 		supabase.rpc('regras', { p_comite: comiteId }, { get: true }),
-		supabase.rpc('pode_presidir', { p_comite: comiteId }, { get: true })
+		supabase.rpc('pode_presidir', { p_comite: comiteId }, { get: true }),
+		// Um projeto em votação fecha a sala (só divisão da questão e votação nominal).
+		supabase.from('documento').select('id').eq('comite_id', comiteId).eq('status', 'em_votacao').limit(1)
 	]);
-	for (const r of [estado, lista, delegacoes, regras, podePresidir]) if (r.error) throw r.error;
+	for (const r of [estado, lista, delegacoes, regras, podePresidir, emVotacao]) if (r.error) throw r.error;
 
 	const sessao = estado.data?.sessao ?? null;
 	return {
@@ -60,7 +63,8 @@ export async function carregarSessao(comiteId: string) {
 		delegacoes: delegacoes.data ?? [],
 		votacao: sessao?.votacoes[0] ?? null, // a mais recente da sessão
 		regras: regras.data as Regras,
-		podePresidir: podePresidir.data ?? false
+		podePresidir: podePresidir.data ?? false,
+		salaFechada: (emVotacao.data?.length ?? 0) > 0
 	};
 }
 
@@ -106,8 +110,10 @@ export const PONTOS = {
 export type TipoPonto = keyof typeof PONTOS;
 
 /** Os pontos e moções em ordem em cada fase (o banco confere de novo). */
-export function pontosEmOrdem(fase: string, etapa: string | null | undefined): TipoPonto[] {
+export function pontosEmOrdem(fase: string, etapa: string | null | undefined, salaFechada = false): TipoPonto[] {
 	const pontos: TipoPonto[] = ['ponto_duvida', 'ponto_ordem', 'privilegio_pessoal'];
+	// Durante a votação de um projeto, só a divisão da questão e a votação nominal.
+	if (salaFechada) return [...pontos, 'divisao_questao', 'votacao_nominal'];
 	if (fase === 'plenaria') return [...pontos, ...(etapa === 'topico' ? ['topico_no_topo' as const] : []), 'adiamento_sessao'];
 	if (fase === 'debate') return [...pontos, 'informal_informal', 'adiamento_debate', 'adiamento_sessao', 'voto_desconfianca'];
 	return pontos;

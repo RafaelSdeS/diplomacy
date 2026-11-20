@@ -53,8 +53,8 @@ test('preparação: sessão aberta, todas presentes e um projeto aprovado pela m
 	const projeto = await redator.rpc('criar_documento', {
 		p_bloco: bloco.data!,
 		p_tipo: 'projeto',
-		p_titulo: TITULO,
-		p_topico: 1
+		p_titulo: TITULO
+		// Sem tópico: um tópico só tem uma resolução aprovada, e o teste roda várias vezes.
 	});
 	expect(projeto.error).toBeNull();
 	for (const [tipo, texto] of [

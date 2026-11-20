@@ -125,6 +125,78 @@ const delegacoesTreino = verificar(
 );
 const delegacaoDoTreino = new Map(delegacoesTreino.map((d) => [d.nome, d.id]));
 
+// Comitês nos formatos especiais (passo 16): a OEA histórica, com tecnologia restrita
+// (sem aparelhos nas sessões; a mesa opera o app), Cuba suspensa e uma observadora; e o
+// Conselho Europeu, que decide por unanimidade.
+const ESPECIAIS = [
+	{
+		sigla: 'OEA-T',
+		nome: 'Organização dos Estados Americanos (teste)',
+		nome_oficial: 'A Organização dos Estados Americanos',
+		tecnologia_restrita: true,
+		regras: {},
+		delegacoes: [
+			['Argentina', 'Argentine Republic', 'ar', 'membro'],
+			['Brasil', 'Federative Republic of Brazil', 'br', 'membro'],
+			['Chile', 'Republic of Chile', 'cl', 'membro'],
+			['Estados Unidos', 'United States of America', 'us', 'membro'],
+			['México', 'United Mexican States', 'mx', 'membro'],
+			['Cuba', 'Republic of Cuba', 'cu', 'suspensa'],
+			['Espanha', 'Kingdom of Spain', 'es', 'observadora']
+		]
+	},
+	{
+		sigla: 'CE-T',
+		nome: 'Conselho Europeu (teste)',
+		nome_oficial: 'O Conselho Europeu',
+		tecnologia_restrita: false,
+		regras: { votacao_substantiva: 'unanimidade' },
+		delegacoes: [
+			['Alemanha', 'Federal Republic of Germany', 'de', 'membro'],
+			['França', 'French Republic', 'fr', 'membro'],
+			['Itália', 'Italian Republic', 'it', 'membro'],
+			['Espanha', 'Kingdom of Spain', 'es', 'membro'],
+			['Portugal', 'Portuguese Republic', 'pt', 'membro']
+		]
+	}
+] as const;
+const delegacaoDoEspecial = new Map<string, Map<string, string>>();
+const comiteEspecial = new Map<string, string>();
+for (const especial of ESPECIAIS) {
+	const c = verificar(
+		await db
+			.from('comite')
+			.upsert(
+				{
+					evento_id: evento.id,
+					sigla: especial.sigla,
+					nome: especial.nome,
+					nome_oficial: especial.nome_oficial,
+					idioma: 'pt',
+					tecnologia_restrita: especial.tecnologia_restrita,
+					regras: especial.regras,
+					topicos: ['A crise dos mísseis (cenário de teste)', 'Cooperação regional (cenário de teste)']
+				},
+				{ onConflict: 'evento_id,sigla' }
+			)
+			.select()
+			.single(),
+		especial.sigla
+	);
+	comiteEspecial.set(especial.sigla, c.id);
+	const ds = verificar(
+		await db
+			.from('delegacao')
+			.upsert(
+				especial.delegacoes.map(([nome, nome_oficial, bandeira, situacao]) => ({ comite_id: c.id, nome, nome_oficial, bandeira, situacao })),
+				{ onConflict: 'comite_id,nome' }
+			)
+			.select(),
+		`delegações de ${especial.sigla}`
+	);
+	delegacaoDoEspecial.set(especial.sigla, new Map(ds.map((d) => [d.nome, d.id])));
+}
+
 // Os veículos da press de cada comitê (nomes de veículos reais, só o nome).
 verificar(
 	await db
@@ -142,7 +214,7 @@ verificar(
 
 // Contas: um delegado por delegação, um segundo delegado dos EUA (delegação com
 // dois), uma conta por papel e uma conta sem convite (tela "sem acesso").
-type Conta = { email: string; nome: string; papel?: string; delegacao?: string; treino?: boolean };
+type Conta = { email: string; nome: string; papel?: string; delegacao?: string; treino?: boolean; especial?: string };
 const contas: Conta[] = [
 	...DELEGACOES.map(([nome], i) => {
 		const n = String(i + 1).padStart(2, '0');
@@ -160,7 +232,10 @@ const contas: Conta[] = [
 		return { email: `treino${n}@exemplo.test`, nome: `Treino ${n}`, papel: 'delegado', delegacao: nome, treino: true };
 	}),
 	{ email: 'mesa-treino@exemplo.test', nome: 'Mesa do Treino', papel: 'mesa', treino: true },
-	{ email: 'crise-treino@exemplo.test', nome: 'Crise do Treino', papel: 'crise', treino: true }
+	{ email: 'crise-treino@exemplo.test', nome: 'Crise do Treino', papel: 'crise', treino: true },
+	// A OEA de teste, com tecnologia restrita: a mesa e um delegado.
+	{ email: 'mesa-oea@exemplo.test', nome: 'Mesa da OEA', papel: 'mesa', especial: 'OEA-T' },
+	{ email: 'oea-brasil@exemplo.test', nome: 'Delegado da OEA', papel: 'delegado', delegacao: 'Brasil', especial: 'OEA-T' }
 ];
 
 verificar(
@@ -171,8 +246,11 @@ verificar(
 				email: c.email,
 				evento_id: evento.id,
 				papel: c.papel,
-				comite_id: c.papel === 'secretaria' ? null : c.treino ? treino.id : comite.id,
-				delegacao_id: c.delegacao ? (c.treino ? delegacaoDoTreino : delegacaoPorNome).get(c.delegacao) : null
+				comite_id:
+					c.papel === 'secretaria' ? null : c.especial ? comiteEspecial.get(c.especial)! : c.treino ? treino.id : comite.id,
+				delegacao_id: c.delegacao
+					? (c.especial ? delegacaoDoEspecial.get(c.especial)! : c.treino ? delegacaoDoTreino : delegacaoPorNome).get(c.delegacao)
+					: null
 			})),
 		{ onConflict: 'email,evento_id,papel,comite_id', ignoreDuplicates: true }
 	),

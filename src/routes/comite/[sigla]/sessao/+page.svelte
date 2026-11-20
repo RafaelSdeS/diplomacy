@@ -14,7 +14,7 @@
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import Bandeira from '#lib/ui/Bandeira.svelte';
 	import Cronometro from '#lib/ui/Cronometro.svelte';
-	import { escolhasPermitidas, ESCOLHAS, ETAPAS, FASES, listaAtiva, presidenciaEmVigor, textoResultado, type Escolha } from '#lib/votacao.ts';
+	import { assinaturasDesconfianca, escolhasPermitidas, ESCOLHAS, ETAPAS, FASES, listaAtiva, presidenciaEmVigor, textoResultado, type Escolha } from '#lib/votacao.ts';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -39,11 +39,18 @@
 	const meusPontos = $derived(pontos.filter((p) => p.delegacao?.id === eu?.delegacao_id));
 	const emDiscussao = $derived(pontos.find((p) => p.status === 'em_discussao'));
 	const lista = $derived(listaAtiva(data.lista, emDiscussao?.id, data.fase));
-	const tiposEmOrdem = $derived(pontosEmOrdem(data.fase, data.estado?.etapa_plenaria));
+	const tiposEmOrdem = $derived(pontosEmOrdem(data.fase, data.estado?.etapa_plenaria, data.salaFechada));
 	const minhaSituacao = $derived(data.delegacoes.find((d) => d.id === eu?.delegacao_id)?.situacao);
 	const minhaPresenca = $derived(sessao?.presenca.find((p) => p.delegacao_id === eu?.delegacao_id)?.situacao);
 	const meuVoto = $derived(data.votacao?.votos.find((v) => v.delegacao_id === eu?.delegacao_id)?.escolha);
-	const posso = $derived(data.votacao ? escolhasPermitidas(data.votacao.tipo, minhaSituacao, minhaPresenca) : []);
+	// Tecnologia restrita: durante a sessão, a mesa opera o app; o delegado acompanha.
+	const restrita = $derived(!!data.comite.tecnologia_restrita && !!data.estado);
+	const posso = $derived(
+		data.votacao && !restrita ? escolhasPermitidas(data.votacao.tipo, minhaSituacao, minhaPresenca) : []
+	);
+	const desconfiancas = $derived(
+		(data.estado?.sessao?.pontos ?? []).filter((p) => p.tipo === 'voto_desconfianca' && p.status === 'aberto')
+	);
 	const topicoAtual = $derived(data.estado?.topico_atual ? data.comite.topicos[data.estado.topico_atual - 1] : null);
 
 	// Se o tipo escolhido sai de ordem (a fase mudou), volta ao ponto de dúvida.
@@ -108,11 +115,33 @@
 		<p class="sucesso" role="status">{mensagem}</p>
 	{/if}
 
+	{#if restrita}
+		<p class="telegrama" role="note">Tecnologia restrita: durante a sessão, a mesa registra as falas e os votos.</p>
+	{/if}
+
 	<div class="cartoes">
+		{#each desconfiancas as p (p.id)}
+			{@const assinou = p.assinaturas.some((a) => a.delegacao_id === eu?.delegacao_id)}
+			<article class="cartao" aria-labelledby={`c-desconfianca-${p.id}`}>
+				<h2 id={`c-desconfianca-${p.id}`}>Pedido de não-confiança</h2>
+				<p>
+					{p.delegacao?.nome} · {p.assinaturas.length} de {assinaturasDesconfianca(data.regras.assinaturas_desconfianca_fracao, data.delegacoes)}
+					assinaturas para ir a voto
+				</p>
+				{#if eu && !restrita && !assinou}
+					<button class="botao" type="button" onclick={() => executar(supabase.rpc('assinar_mocao', { p_ponto: p.id }))}
+						>Assinar o pedido</button
+					>
+				{:else if assinou}
+					<p class="suave">Sua delegação assinou.</p>
+				{/if}
+			</article>
+		{/each}
 		{#if data.votacao}
 			<article class="cartao cartao--destaque" aria-labelledby="c-votacao">
 				<h2 id="c-votacao">{data.votacao.aberta ? 'Votação aberta' : 'Última votação'}</h2>
 				<p class="destaque">{data.votacao.objeto}</p>
+				{#if data.votacao.aberta && data.votacao.nominal}<p><strong>Votação nominal:</strong> a mesa chama as delegações em ordem alfabética.</p>{/if}
 				{#if !data.votacao.aberta}
 					<p>{textoResultado(data.votacao)}</p>
 				{:else if meuVoto}
@@ -160,7 +189,7 @@
 			</article>
 		{/if}
 
-		{#if emDiscussao && eu}
+		{#if emDiscussao && eu && !restrita}
 			<article class="cartao" aria-labelledby="c-inscricao">
 				<h2 id="c-inscricao">Lista especial aberta</h2>
 				<p>{descreverPonto(emDiscussao)}. Até 2 discursos a favor e 2 contra.</p>
@@ -171,7 +200,7 @@
 			</article>
 		{/if}
 
-		{#if eu && data.fase !== 'plenaria'}
+		{#if eu && !restrita && data.fase !== 'plenaria'}
 			<article class="cartao" aria-labelledby="c-placa">
 				<h2 id="c-placa">Sua placa</h2>
 				{#if posicao >= 0}
@@ -205,7 +234,7 @@
 		{/if}
 	</div>
 
-	{#if eu}
+	{#if eu && !restrita}
 		<section aria-labelledby="t-ponto">
 			<h2 id="t-ponto">Ponto ou moção</h2>
 			<form class="formulario" onsubmit={enviarPonto}>

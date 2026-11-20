@@ -115,7 +115,7 @@
 
 	{#if votacao}
 		<aside class="telao-fila telao-votacao" aria-label="Votação">
-			<p class="rotulo">Votação · {votacao.objeto}</p>
+			<p class="rotulo">{votacao.nominal ? "Votação nominal" : "Votação"} · {votacao.objeto}</p>
 			<GradeVotos delegacoes={votantes} votos={votacao.votos} />
 		</aside>
 	{:else}

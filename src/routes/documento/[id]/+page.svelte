@@ -125,6 +125,24 @@
 		);
 	}
 
+	const ACOES_EMENDA: Record<string, string> = { acrescentar: 'Acrescenta', suprimir: 'Suprime', modificar: 'Modifica' };
+	let emendaAcao = $state('acrescentar');
+	let emendaClausula = $state('');
+	let emendaTexto = $state('');
+	async function proporEmenda(evento: SubmitEvent) {
+		evento.preventDefault();
+		const ok = await executar(
+			supabase.rpc('propor_emenda', {
+				p_documento: d.id,
+				p_acao: emendaAcao,
+				p_clausula: emendaAcao === 'acrescentar' ? (null as unknown as string) : emendaClausula,
+				p_texto: emendaAcao === 'suprimir' ? (null as unknown as string) : emendaTexto
+			}),
+			'Emenda proposta. Ela precisa de mais assinaturas para ir a voto.'
+		);
+		if (ok) emendaTexto = '';
+	}
+
 	async function salvarTexto() {
 		await executar(
 			supabase.rpc('editar_clausula', { p_clausula: clausula!.id, p_texto: edicao, p_versao: versaoEditada }),
@@ -525,6 +543,69 @@
 		<button class="botao botao--secundario" type="button" disabled={!paraTrazer.length} onclick={trazer}>
 			Trazer {paraTrazer.length || ''} cláusulas para este documento
 		</button>
+	</section>
+{/if}
+
+{#if d.tipo !== 'working_paper' && (d.status === 'aprovado_mesa' || data.emendas.length)}
+	<section class="cartao" aria-labelledby="t-emendas">
+		<h2 id="t-emendas">Emendas</h2>
+		<p class="suave">
+			Cada emenda acrescenta, suprime ou modifica uma parte do projeto e precisa de {data.regras.assinaturas_emenda}
+			signatários para ir a voto. Aprovada, entra no projeto.
+		</p>
+		<ul class="lista">
+			{#each data.emendas as e (e.id)}
+				{@const assinou = e.assinaturas.some((a) => a.delegacao_id === eu?.delegacao_id)}
+				<li>
+					<span>
+						{ACOES_EMENDA[e.acao]}{e.clausula_id ? `: "${data.clausulas.find((c) => c.id === e.clausula_id)?.texto ?? 'cláusula removida'}"` : ''}{e.texto
+							? ` → "${e.texto}"`
+							: ''}
+						<span class="detalhe">
+							{e.delegacao?.nome} · {e.assinaturas.length} de {data.regras.assinaturas_emenda} assinaturas
+							{#if e.status !== 'proposta'}· <span class="selo {e.status === 'aprovada' ? 'selo--ok' : 'selo--erro'}">{e.status === 'aprovada' ? 'Aprovada' : 'Rejeitada'}</span>{/if}
+						</span>
+					</span>
+					{#if eu && e.status === 'proposta' && !assinou}
+						<button
+							class="botao botao--secundario botao--pequeno"
+							type="button"
+							aria-label={`Assinar a emenda de ${e.delegacao?.nome}`}
+							onclick={() => executar(supabase.rpc('assinar_emenda', { p_emenda: e.id }), 'Emenda assinada.')}>Assinar</button
+						>
+					{/if}
+				</li>
+			{:else}
+				<li class="suave">Nenhuma emenda ainda.</li>
+			{/each}
+		</ul>
+		{#if eu && d.status === 'aprovado_mesa'}
+			<form class="formulario" aria-label="Nova emenda" onsubmit={proporEmenda}>
+				<label class="campo">
+					A emenda
+					<select bind:value={emendaAcao}>
+						<option value="acrescentar">Acrescenta uma operativa</option>
+						<option value="modificar">Modifica uma cláusula</option>
+						<option value="suprimir">Suprime uma cláusula</option>
+					</select>
+				</label>
+				{#if emendaAcao !== 'acrescentar'}
+					<label class="campo">
+						Cláusula
+						<select required bind:value={emendaClausula}>
+							{#each data.clausulas.filter((c) => c.tipo !== 'texto') as c (c.id)}<option value={c.id}>{c.texto}</option>{/each}
+						</select>
+					</label>
+				{/if}
+				{#if emendaAcao !== 'suprimir'}
+					<label class="campo">
+						Texto da emenda
+						<textarea required rows="3" maxlength="2000" bind:value={emendaTexto}></textarea>
+					</label>
+				{/if}
+				<button class="botao botao--secundario">Propor emenda</button>
+			</form>
+		{/if}
 	</section>
 {/if}
 

@@ -6,7 +6,7 @@ select plan(10);
 -- Cenário: C1 com 6 membros (d1..d6); a1..a6 delegados; a7 mesa. Bloco de d1 a d5.
 insert into public.evento (id, nome, ano) values ('00000000-0000-0000-0000-0000000000e1', 'Evento 1', 2027);
 insert into public.comite (id, evento_id, sigla, nome, nome_oficial, topicos) values
-	('00000000-0000-0000-0000-0000000000c1', '00000000-0000-0000-0000-0000000000e1', 'C1', 'C1', 'O Comitê 1', array['T1']);
+	('00000000-0000-0000-0000-0000000000c1', '00000000-0000-0000-0000-0000000000e1', 'C1', 'C1', 'O Comitê 1', array['T1', 'T2']);
 insert into public.delegacao (id, comite_id, nome, nome_oficial)
 select ('00000000-0000-0000-0000-0000000000d' || n)::uuid, '00000000-0000-0000-0000-0000000000c1', 'D' || n, 'Delegação ' || n
 from generate_series(1, 6) as n;
@@ -34,10 +34,10 @@ grant all on ids to authenticated;
 create function pg_temp.id(p_nome text) returns uuid language sql as $$ select id from ids where nome = p_nome $$;
 
 -- Um projeto com 5 signatários, enviado e aprovado pela mesa.
-create function pg_temp.projeto(p_nome text) returns void language plpgsql as $$
+create function pg_temp.projeto(p_nome text, p_topico int default 1) returns void language plpgsql as $$
 begin
 	perform pg_temp.entrar(1);
-	insert into ids values (p_nome, public.criar_documento(pg_temp.id('bloco'), 'projeto', p_nome, 1));
+	insert into ids values (p_nome, public.criar_documento(pg_temp.id('bloco'), 'projeto', p_nome, p_topico));
 	perform public.adicionar_clausula(pg_temp.id(p_nome), 'operativa', 'Decide');
 	for n in 1..5 loop
 		perform pg_temp.entrar(n);
@@ -74,7 +74,7 @@ insert into ids values ('v1', public.abrir_votacao_projeto(pg_temp.id('P1')));
 select results_eq($$select status from public.documento where id = pg_temp.id('P1')$$, array['em_votacao'], 'o projeto entra em votação');
 select results_eq($$select tipo, objeto from public.votacao where id = pg_temp.id('v1')$$,
 	$$values ('substantiva', 'Projeto de resolução 1: P1')$$, 'a votação é substantiva e tem o nome do projeto');
-select throws_ok($$select public.abrir_votacao_projeto(pg_temp.id('P1'))$$, 'P0001', null, 'o mesmo projeto não vai a voto duas vezes');
+select throws_ok($$select public.abrir_votacao_projeto(pg_temp.id('P1'))$$, '23505', null, 'o mesmo projeto não vai a voto duas vezes');
 
 select pg_temp.entrar(1); select public.votar(pg_temp.id('v1'), 'a_favor');
 select pg_temp.entrar(2); select public.votar(pg_temp.id('v1'), 'a_favor');
@@ -87,7 +87,7 @@ select results_eq($$select status from public.documento where id = pg_temp.id('P
 	'aprovado na votação, o projeto vira resolução');
 
 -- Sessão encerrada no meio da votação: o projeto volta a esperar a mesa.
-select pg_temp.projeto('P2');
+select pg_temp.projeto('P2', 2);
 select pg_temp.entrar(7);
 select public.abrir_votacao_projeto(pg_temp.id('P2'));
 select public.encerrar_sessao('00000000-0000-0000-0000-0000000000c1');

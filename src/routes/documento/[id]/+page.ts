@@ -50,7 +50,16 @@ export const load: PageLoad = async ({ params, depends }) => {
 	for (const r of [clausulas, propostas, comentarios, rodadas, assinaturas, reaberturas, redator, regras, outros])
 		if (r.error) throw r.error;
 
+	// Emendas: só para o projeto aprovado pela mesa (e o histórico das votadas).
+	const emendas = await supabase
+		.from('emenda')
+		.select('id, acao, texto, status, clausula_id, delegacao(nome), assinaturas:emenda_assinatura(delegacao_id)')
+		.eq('documento_id', d.id)
+		.order('criada_em');
+	if (emendas.error) throw emendas.error;
+
 	return {
+		emendas: emendas.data,
 		documento: d,
 		comite: d.bloco!.comite!,
 		clausulas: clausulas.data!,

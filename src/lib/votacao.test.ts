@@ -1,13 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-	escolhasPermitidas,
-	escreverEsboco,
-	lerEsboco,
-	listaAtiva,
-	presidenciaEmVigor,
-	proximoDaLista,
-	textoResultado
-} from './votacao.ts';
+import { assinaturasDesconfianca, escolhasPermitidas, escreverEsboco, lerEsboco, listaAtiva, presidenciaEmVigor, proximoDaLista, textoResultado } from './votacao.ts';
 
 describe('escolhasPermitidas', () => {
 	it('questão procedimental: só a favor ou contra, e observadora vota', () => {
@@ -73,5 +65,15 @@ describe('esboço da agenda', () => {
 	it('escreverEsboco volta ao texto', () => {
 		const itens = lerEsboco('A\n  A.1\n    A.1.a');
 		expect(lerEsboco(escreverEsboco(itens))).toEqual(itens);
+	});
+});
+
+describe('assinaturas da não-confiança', () => {
+	it('pede 1/5 das delegações previstas, arredondado para cima, sem as suspensas', () => {
+		const comite = (n: number, suspensas = 0) =>
+			Array.from({ length: n }, (_, i) => ({ situacao: i < suspensas ? 'suspensa' : 'membro' }));
+		expect(assinaturasDesconfianca([1, 5], comite(15))).toBe(3);
+		expect(assinaturasDesconfianca([1, 5], comite(16))).toBe(4);
+		expect(assinaturasDesconfianca([1, 5], comite(16, 1))).toBe(3);
 	});
 });
