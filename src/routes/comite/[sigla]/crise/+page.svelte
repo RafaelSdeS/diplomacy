@@ -55,7 +55,12 @@
 
 <p class="rotulo">
 	Comitê · {data.comite.sigla}
-	<AoVivo comiteId={data.comite.id} tabelas={TABELAS_CRISE} dependencia="app:crise" />
+	<AoVivo
+		comiteId={data.comite.id}
+		canais={eu?.delegacao_id ? [`delegacao:${eu.delegacao_id}`] : []}
+		tabelas={TABELAS_CRISE}
+		dependencia="app:crise"
+	/>
 </p>
 <h1>Crise</h1>
 

@@ -103,7 +103,13 @@
 
 <p class="rotulo">
 	Equipe de crise · {data.comite.sigla}
-	<AoVivo comiteId={data.comite.id} tabelas={TABELAS_CRISE} dependencia="app:crise" bind:diferenca />
+	<AoVivo
+		comiteId={data.comite.id}
+		canais={[`crise:${data.comite.id}`]}
+		tabelas={TABELAS_CRISE}
+		dependencia="app:crise"
+		bind:diferenca
+	/>
 </p>
 <h1>Fila da crise</h1>
 

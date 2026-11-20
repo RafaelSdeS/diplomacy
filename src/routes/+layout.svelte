@@ -54,8 +54,9 @@
 
 	// Avisos chegam na hora para quem está no app.
 	$effect(() => {
-		if (!data.usuario) return;
-		return assinarAvisos(() => invalidate('app:avisos'));
+		const eventos = [...new Set(data.participacoes.map((p) => p.evento_id).filter((e) => e !== null))];
+		if (!data.usuario || !eventos.length) return;
+		return assinarAvisos(eventos, () => invalidate('app:avisos'));
 	});
 
 	async function sair() {

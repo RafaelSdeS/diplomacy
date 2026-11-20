@@ -1,22 +1,10 @@
+import type { RealtimeChannel } from '@supabase/supabase-js';
 import { supabase } from './supabase.ts';
 
-// Todas as assinaturas de tempo real ficam aqui. No passo 13 elas viram
-// Broadcast sem mexer nas telas. Cada função devolve o "cancelar assinatura".
-// Cada assinatura tem um canal com nome próprio: o realtime-js reaproveita um canal
-// pelo nome, e a saída do anterior (ao trocar de tela) termina depois.
-
-/** Avisos novos ou removidos (a RLS decide quem recebe o quê). */
-export function assinarAvisos(aoMudar: () => void): () => void {
-	const canal = supabase
-		.channel(`avisos:${crypto.randomUUID()}`)
-		.on('postgres_changes', { event: '*', schema: 'public', table: 'aviso' }, aoMudar)
-		// Quando a assinatura fica pronta, recarrega uma vez: o que mudou entre a
-		// leitura da tela e a assinatura não se perde.
-		.subscribe((status) => status === 'SUBSCRIBED' && aoMudar());
-	return () => {
-		void supabase.removeChannel(canal);
-	};
-}
+// Todo o tempo real passa por aqui (passo 13: Broadcast em canais privados). O banco
+// manda um aviso curto, "mudou", com o nome da tabela e sem os dados da linha; a tela
+// recarrega pela API, com a RLS de sempre. Quem pode entrar em cada canal está em
+// public.pode_ouvir. Cada função devolve o "cancelar assinatura".
 
 /** O que muda ao vivo numa sessão do comitê. */
 export const TABELAS_SESSAO = [
@@ -29,71 +17,98 @@ export const TABELAS_SESSAO = [
 	'voto',
 	'documento'
 ];
-/** O que muda ao vivo na crise do comitê (a RLS decide quem recebe cada nota). */
+/** O que muda ao vivo na crise do comitê. */
 export const TABELAS_CRISE = ['nota_crise', 'atualizacao_comite'];
 /** Blocos e documentos do comitê. */
 export const TABELAS_BLOCOS = ['bloco_membro', 'documento'];
 
-/**
- * Mudanças nas tabelas de um comitê, filtradas pelo comitê. `aoConectar` diz se a
- * conexão está de pé (a tela mostra "Ao vivo" ou "Conectando").
- */
-export function assinarComite(
-	comiteId: string,
-	tabelas: string[],
-	aoMudar: () => void,
-	aoConectar: (ok: boolean) => void
-): () => void {
-	return assinar(
-		`comite:${comiteId}`,
-		tabelas.map((table) => ({ table, filter: `comite_id=eq.${comiteId}` })),
-		aoMudar,
-		aoConectar
-	);
-}
+type Ouvinte = { tabelas: Set<string> | null; aoMudar: () => void; aoConectar: (ok: boolean) => void };
+type Canal = { ouvintes: Set<Ouvinte>; conectado: boolean; canal?: RealtimeChannel; saida?: ReturnType<typeof setTimeout> };
 
-/** Mudanças em tabelas de todo o evento, sem filtro (a RLS decide quem recebe o quê). */
-export function assinarEvento(tabelas: string[], aoMudar: () => void, aoConectar: (ok: boolean) => void) {
-	return assinar(
-		'evento',
-		tabelas.map((table) => ({ table })),
-		aoMudar,
-		aoConectar
-	);
-}
+// Um canal por tópico, dividido entre as telas: o realtime-js reaproveita o canal
+// pelo nome. Quando a última tela sai, o canal fica mais um pouco, para a próxima tela
+// do mesmo comitê; a saída de um canal termina antes de um novo com o mesmo nome.
+const canais = new Map<string, Canal>();
+const saindo = new Map<string, Promise<unknown>>();
+const ESPERA_SAIDA_MS = 5_000;
 
-/** Tudo o que muda num documento: o próprio documento, cláusulas, propostas, comentários... */
-export function assinarDocumento(documentoId: string, aoMudar: () => void, aoConectar: (ok: boolean) => void) {
-	const filter = `documento_id=eq.${documentoId}`;
-	return assinar(
-		`documento:${documentoId}`,
-		[
-			{ table: 'documento', filter: `id=eq.${documentoId}` },
-			...['clausula', 'proposta_alteracao', 'comentario', 'assinatura', 'rodada'].map((table) => ({ table, filter }))
-		],
-		aoMudar,
-		aoConectar
-	);
-}
-
-function assinar(
-	nome: string,
-	entradas: { table: string; filter?: string }[],
-	aoMudar: () => void,
-	aoConectar: (ok: boolean) => void
-): () => void {
-	const canal = supabase.channel(`${nome}:${crypto.randomUUID()}`);
-	for (const { table, filter } of entradas) {
-		canal.on('postgres_changes', { event: '*', schema: 'public', table, filter }, aoMudar);
+function ouvir(topico: string, ouvinte: Ouvinte): () => void {
+	let c = canais.get(topico);
+	if (!c) {
+		const novo: Canal = { ouvintes: new Set(), conectado: false };
+		canais.set(topico, novo);
+		void (async () => {
+			await saindo.get(topico);
+			if (canais.get(topico) !== novo) return;
+			novo.canal = supabase
+				.channel(topico, { config: { private: true } })
+				.on('broadcast', { event: 'mudou' }, ({ payload }) => {
+					for (const o of novo.ouvintes) if (!o.tabelas || o.tabelas.has(payload?.tabela)) o.aoMudar();
+				})
+				// Ao entrar (e ao voltar depois de uma queda), recarrega: o que mudou enquanto
+				// a tela estava sem canal não se perde.
+				.subscribe((status) => {
+					novo.conectado = status === 'SUBSCRIBED';
+					for (const o of novo.ouvintes) {
+						o.aoConectar(novo.conectado);
+						if (novo.conectado) o.aoMudar();
+					}
+				});
+		})();
+		c = novo;
 	}
-	// Quando a assinatura fica pronta, recarrega uma vez: o que mudou entre a leitura
-	// da tela e a assinatura não se perde. (Não escute as mensagens 'system': com várias
-	// assinaturas ao mesmo tempo, isso fez o tempo real parar de entregar mudanças.)
-	canal.subscribe((status) => {
-		aoConectar(status === 'SUBSCRIBED');
-		if (status === 'SUBSCRIBED') aoMudar();
-	});
+	const canal = c;
+	clearTimeout(canal.saida);
+	canal.ouvintes.add(ouvinte);
+	if (canal.conectado) {
+		ouvinte.aoConectar(true);
+		ouvinte.aoMudar();
+	}
 	return () => {
-		void supabase.removeChannel(canal);
+		canal.ouvintes.delete(ouvinte);
+		if (canal.ouvintes.size) return;
+		canal.saida = setTimeout(() => {
+			canais.delete(topico);
+			if (canal.canal) {
+				const saida = supabase.removeChannel(canal.canal);
+				saindo.set(topico, saida);
+				void saida.finally(() => saindo.get(topico) === saida && saindo.delete(topico));
+			}
+		}, ESPERA_SAIDA_MS);
 	};
+}
+
+/**
+ * Ouve vários canais de uma vez. `aoConectar` diz se todos estão de pé (a tela mostra
+ * "Ao vivo" ou "Conectando"). Sem `tabelas`, qualquer mudança no canal conta.
+ */
+export function assinar(
+	topicos: string[],
+	tabelas: string[] | null,
+	aoMudar: () => void,
+	aoConectar: (ok: boolean) => void = () => {}
+): () => void {
+	const filtro = tabelas ? new Set(tabelas) : null;
+	const conectados = new Set<string>();
+	const cancelar = topicos.map((topico) =>
+		ouvir(topico, {
+			tabelas: filtro,
+			aoMudar,
+			aoConectar: (ok) => {
+				if (ok) conectados.add(topico);
+				else conectados.delete(topico);
+				aoConectar(conectados.size === topicos.length);
+			}
+		})
+	);
+	return () => cancelar.forEach((c) => c());
+}
+
+/** Avisos novos ou removidos nos eventos da pessoa. */
+export function assinarAvisos(eventos: string[], aoMudar: () => void): () => void {
+	return assinar(
+		eventos.map((e) => `evento:${e}`),
+		['aviso'],
+		aoMudar
+	);
 }

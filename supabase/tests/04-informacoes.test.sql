@@ -175,8 +175,8 @@ select throws_ok(
 	'23514', null, 'o fim do item vem depois do início'
 );
 select ok(
-	exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and tablename = 'aviso'),
-	'os avisos chegam pelo tempo real'
+	exists (select 1 from pg_trigger where tgrelid = 'public.aviso'::regclass and tgname = 'transmitir'),
+	'os avisos chegam pelo tempo real (Broadcast, passo 13)'
 );
 
 select * from finish();

@@ -14,7 +14,7 @@
 
 <p class="rotulo">
 	Press · Simulação
-	<AoVivo tabelas={['noticia']} dependencia="app:press" />
+	<AoVivo eventoId={data.participacoes[0]?.evento_id} tabelas={['noticia']} dependencia="app:press" />
 </p>
 <h1>Capa</h1>
 
