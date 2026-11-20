@@ -116,6 +116,8 @@ Para parar o Supabase local: `npx supabase stop`. Depois de criar uma migração
 2. Baixe o artefato `capturas`.
 3. Coloque o conteúdo em `tests/capturas/` e faça o commit.
 
+**Publicar:** o passo a passo do Supabase na nuvem, do Cloudflare Pages e do login com Google está em [docs/publicar.md](docs/publicar.md).
+
 ## Privacidade
 
 Este repositório é público e não guarda dados pessoais. O piloto usa só dados fictícios. No evento, a organização do UFRGSMUN é a controladora dos dados, e o app segue a LGPD: coleta mínima, aviso de privacidade, direitos do titular e exclusão dos dados no prazo combinado.
