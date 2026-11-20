@@ -69,14 +69,24 @@ A Agora do delegado ganha um cartão "nova resposta de crise".
 
 ## Testes
 
+Arquivos: `supabase/tests/08-crise.test.sql` e `tests/08-crise.spec.ts`.
+
 - [ ] pgTAP: **a delegação A não lê a nota da delegação B.** Este é o teste de privacidade principal.
+- [ ] pgTAP: a mesa e a press não leem notas de crise.
 - [ ] pgTAP: o limite de notas pendentes é respeitado, inclusive com dois envios simultâneos.
 - [ ] pgTAP: com duas pessoas assumindo a mesma nota, só uma consegue.
 - [ ] pgTAP: enviar a mesma nota duas vezes cria uma só.
-- [ ] Ponta a ponta: um script insere 30 notas de 15 delegações em poucos segundos; o contador e a ordem da fila ficam certos.
+- [ ] pgTAP: só a equipe de crise do comitê responde notas e publica atualizações.
+- [ ] pgTAP: uma atualização ligada a dois comitês aparece para os dois e não para um terceiro.
+- [ ] pgTAP: `posicao_na_fila` dá a posição certa.
+- [ ] Ponta a ponta: um script insere 30 notas de 15 delegações em poucos segundos; o contador, a nota mais antiga e a ordem da fila ficam certos.
+- [ ] Ponta a ponta: a resposta chega ao celular do delegado sem recarregar.
+- [ ] Ponta a ponta: no notebook, a fila e a nota aberta ficam lado a lado; no celular, um toque na lista abre a nota.
+- [ ] Aparência: capturas de referência da fila da crise com 30 notas.
 
 ## Pronto quando
 
+- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
 - [ ] 15 delegações escrevendo ao mesmo tempo não quebram a fila nem duplicam notas.
 - [ ] O teste de privacidade passa no CI.
 - [ ] O delegado vê a posição da própria nota na fila.

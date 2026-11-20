@@ -83,15 +83,22 @@ Funções `security definer` e `stable`, usadas pelas regras de acesso para evit
 - o comitê `CSNU-T`, com as 15 delegações do CSNU de 2026;
 - contas fictícias com e-mails `@exemplo.test`: `delegado01` a `delegado15` (uma delegação com dois delegados), `mesa01`, `crise01`, `press01` e `secretaria01`.
 
-## Testes (pgTAP)
+## Testes
 
-- [ ] Um delegado vê o próprio comitê e as delegações dele.
-- [ ] Um delegado não vê as participações de outro comitê.
-- [ ] Um usuário anônimo não vê nada.
-- [ ] Um delegado não consegue criar uma participação.
+Arquivos: `supabase/tests/00-rls-em-todas-as-tabelas.test.sql` e `supabase/tests/02-permissoes.test.sql`.
+
+- [ ] **Teste geral:** falha se qualquer tabela do esquema `public` estiver sem RLS ou sem nenhuma regra. Vale para todos os passos seguintes.
+- [ ] pgTAP: um delegado vê o próprio comitê e as delegações dele.
+- [ ] pgTAP: um delegado não vê as participações de outro comitê.
+- [ ] pgTAP: um usuário anônimo não vê nada.
+- [ ] pgTAP: um delegado não consegue criar nem alterar uma participação.
+- [ ] pgTAP: não dá para cadastrar um delegado sem delegação.
+- [ ] pgTAP: `tem_papel` e `minha_delegacao` dão a resposta certa para cada conta fictícia.
+- [ ] CI: `supabase db reset` e o seed rodam do zero sem erro, duas vezes seguidas.
+- [ ] CI: os tipos gerados são iguais aos versionados.
 
 ## Pronto quando
 
+- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
 - [ ] `supabase db reset` seguido de `npm run seed` monta tudo do zero.
 - [ ] Os tipos do banco foram gerados.
-- [ ] Os testes do banco passam no CI.

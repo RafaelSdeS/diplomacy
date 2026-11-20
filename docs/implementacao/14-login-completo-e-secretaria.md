@@ -40,12 +40,20 @@
 
 ## Testes
 
-- [ ] pgTAP: crachá revogado não entra; tentativas acima do limite são bloqueadas.
-- [ ] Ponta a ponta: login pelo QR de um crachá impresso, no celular.
+Arquivos: `supabase/tests/14-credenciais.test.sql`, `supabase/functions/entrar-com-cracha/index.test.ts`, `src/lib/secretaria/importar.test.ts` e `tests/14-login-e-secretaria.spec.ts`.
+
+- [ ] Deno (Edge Function): código válido entra; código inválido, revogado ou além do limite de tentativas é recusado; a resposta nunca diz se o código existe.
+- [ ] pgTAP: só a secretaria cria, revoga e lê credenciais, e o banco guarda só o hash, nunca o código.
+- [ ] Vitest: a importação do CSV mapeia as colunas, ignora linhas vazias e aponta e-mails repetidos ou inválidos.
+- [ ] Ponta a ponta: login pelo link do crachá, no celular.
+- [ ] Ponta a ponta: login com o código da secretaria.
 - [ ] Ponta a ponta: importação de um CSV fictício com 150 linhas.
+- [ ] Ponta a ponta: `/verificar/[codigo]` mostra só nome, evento e função, e um código inexistente mostra "não encontrado".
+- [ ] Manual: login pelo QR de um crachá impresso num Android e num iPhone, e chegada do e-mail com link e código.
 
 ## Pronto quando
 
+- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
 - [ ] Um delegado entra escaneando o crachá impresso.
 - [ ] Um crachá revogado não entra.
 - [ ] 150 certificados saem numa única impressão.

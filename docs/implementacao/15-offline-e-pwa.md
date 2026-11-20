@@ -31,12 +31,18 @@
 
 ## Testes
 
-- [ ] Ponta a ponta: modo avião no meio da sessão, uma nota escrita offline chega ao reconectar, uma vez só.
+Arquivos: `src/lib/caixa-de-saida.test.ts` e `tests/15-offline.spec.ts`.
+
+- [ ] Vitest (com `fake-indexeddb`): um item que falhou fica guardado, é reenviado quando a rede volta e só sai da caixa depois de confirmado.
+- [ ] Vitest: dois reenvios do mesmo item não geram dois envios ao mesmo tempo.
+- [ ] Ponta a ponta: com a rede desligada no meio da sessão (`context.setOffline`), uma nota escrita offline chega ao reconectar, uma vez só.
 - [ ] Ponta a ponta: o app abre sem rede depois do primeiro acesso.
-- [ ] Teste manual em Android e iPhone reais.
+- [ ] Ponta a ponta: uma nova versão do app substitui a antiga no cache.
+- [ ] Manual: modo avião num Android e num iPhone reais, e notificação push num Android e num iPhone com o app na tela inicial.
 
 ## Pronto quando
 
+- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
 - [ ] Nada escrito sem conexão se perde nem se duplica.
 - [ ] O app abre sem internet.
 - [ ] O consumo de dados de um dia está medido e documentado.

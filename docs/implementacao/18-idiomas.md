@@ -14,10 +14,16 @@
 
 ## Testes
 
-- [ ] Uma checagem no CI encontra textos fixos fora dos arquivos de mensagens.
-- [ ] Ponta a ponta: um fluxo completo de um comitê em inglês.
+Arquivos: `scripts/textos-fixos.ts` e `tests/18-idiomas.spec.ts`.
+
+- [ ] CI: uma checagem encontra textos fixos fora dos arquivos de mensagens.
+- [ ] CI: toda chave de mensagem existe nos dois idiomas.
+- [ ] Ponta a ponta: os testes de ponta a ponta dos passos anteriores rodam também em inglês.
+- [ ] Ponta a ponta: um projeto de resolução impresso num comitê em inglês sai com a linha do comitê e os verbos em inglês.
+- [ ] Ponta a ponta: datas e horas aparecem no formato de cada idioma.
 
 ## Pronto quando
 
+- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
 - [ ] Um comitê em inglês funciona inteiro em inglês, inclusive os documentos impressos.
 - [ ] Nenhum texto fixo sobrou nas telas.

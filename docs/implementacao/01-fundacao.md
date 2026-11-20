@@ -22,7 +22,10 @@
 
 ### Layout responsivo
 
-- [ ] Variáveis de cor, espaçamento e tipografia em `src/app.css`, com tema claro e escuro.
+- [ ] Variáveis de cor, espaçamento e tipografia em `src/app.css`, com tema claro e escuro, seguindo a seção "Aparência" do índice: base clara, azul-marinho, dourado discreto, linhas finas, serifa nos títulos e cara de oficial (cabeçalho timbrado e selos no estilo carimbo).
+- [ ] Fonte Source Serif 4 reduzida aos caracteres latinos e servida pelo próprio app; a interface usa a fonte do sistema.
+- [ ] Ícones Lucide, importando só os usados.
+- [ ] Página `/estilo`, só no ambiente de desenvolvimento, com cores, tipos e componentes base. Ela serve de referência visual e de base para os testes de aparência.
 - [ ] Faixas de tela:
 
   | Largura | Layout |
@@ -41,6 +44,8 @@
 - [ ] `@axe-core/playwright` para checar acessibilidade em cada rota.
 - [ ] GitHub Actions a cada push: instalar, checar tipos, Vitest, build, checar o tamanho do build e rodar Playwright contra o build.
 - [ ] A partir do passo 02, rodar também os testes do banco (`supabase test db`) no CI.
+- [ ] Script `npm run testar`, que roda localmente tudo o que o CI roda.
+- [ ] Regra de proteção na `main`: entra só por pull request e com o CI verde. Cada passo é feito numa branch `passo-NN`.
 
 ### Deploy
 
@@ -52,8 +57,22 @@
 - **Sem framework de CSS:** variáveis CSS e estilos por componente do Svelte bastam e não pesam no celular.
 - **Sem biblioteca de componentes:** os componentes base são poucos e simples.
 
+## Testes
+
+Arquivo: `tests/01-fundacao.spec.ts`.
+
+- [ ] Ponta a ponta: a página inicial abre nas três telas (celular, notebook e telão).
+- [ ] Ponta a ponta: a navegação fica embaixo no celular, na lateral no notebook e não aparece no telão.
+- [ ] Ponta a ponta: com o zoom em 200%, nada fica cortado nem sobreposto.
+- [ ] Aparência: capturas de referência da página `/estilo` nos temas claro e escuro e nas três telas.
+- [ ] Acessibilidade: axe sem erros na página inicial e em `/estilo`, nos dois temas.
+- [ ] Tamanho: o CI falha se a primeira abertura passar de 300 KB, contando a fonte.
+- [ ] CI: checagem de tipos, Vitest e build passam.
+- [ ] Manual: a página publicada abre num Android e num iPhone reais.
+
 ## Pronto quando
 
+- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
 - [ ] Uma página inicial está no ar em `*.pages.dev`.
 - [ ] O CI passa.
 - [ ] A navegação muda de lugar entre celular (embaixo) e notebook (lateral).

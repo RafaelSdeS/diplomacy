@@ -38,8 +38,19 @@
 - [ ] Medir a latência das atualizações e os erros (`too_many_connections`, `too_many_joins`).
 - [ ] Rodar contra o projeto de teste no plano Pro, nunca contra a produção com dados reais.
 
+## Testes
+
+Arquivos: `supabase/tests/13-canais.test.sql`, `tests/13-tempo-real.spec.ts` e `scripts/carga.ts`.
+
+- [ ] pgTAP: as regras de `realtime.messages` só deixam entrar no canal `crise:<id>` quem é da crise daquele comitê, e no `delegacao:<id>` quem é daquela delegação.
+- [ ] Ponta a ponta: todos os testes de tempo real dos passos 04 a 11 continuam passando com Broadcast.
+- [ ] Ponta a ponta: um delegado de outro comitê não recebe as mensagens do canal de um comitê (dois navegadores).
+- [ ] Ponta a ponta: ao derrubar e restaurar a rede, o app busca o que perdeu.
+- [ ] Carga: 300 clientes simulados sem erros, com atualizações em menos de 1 segundo.
+
 ## Pronto quando
 
+- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
 - [ ] 300 clientes simulados rodam sem erros.
 - [ ] As atualizações chegam em menos de 1 segundo, que é a meta.
 - [ ] Os testes de privacidade continuam passando com Broadcast.

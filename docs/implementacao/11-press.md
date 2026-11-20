@@ -56,13 +56,20 @@ create table registro (id bigint generated always as identity, pessoa_id uuid, a
 
 ## Testes
 
-- [ ] pgTAP: a press de um veículo não publica em outro.
-- [ ] pgTAP: notícia oculta some para todos, menos para a mesa da press.
-- [ ] Vitest: a checagem de palavrões encontra variações com e sem acento.
+Arquivos: `supabase/tests/11-press.test.sql`, `src/lib/press/palavroes.test.ts` e `tests/11-press.spec.ts`.
+
+- [ ] pgTAP: a press de um veículo não publica em outro, e delegados não publicam.
+- [ ] pgTAP: notícia oculta some para todos, menos para a mesa da press, e a ocultação fica em `registro`.
+- [ ] pgTAP: com a revisão ligada, a notícia `aguardando` não aparece para o público.
+- [ ] pgTAP: qualquer participante denuncia, e só a mesa da press lê as denúncias.
+- [ ] pgTAP: ao publicar, cada delegação citada recebe um aviso.
+- [ ] Vitest: a checagem de palavrões encontra variações com e sem acento nas três línguas, sem acusar palavras comuns parecidas.
+- [ ] Ponta a ponta: uma matéria publicada no celular aparece na capa e no feed do veículo.
 - [ ] Ponta a ponta: uma notícia urgente aparece no telão do comitê.
 
 ## Pronto quando
 
+- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
 - [ ] A press do comitê de teste publica do celular, e a matéria chega à capa e ao telão.
 - [ ] A delegação citada é avisada.
 - [ ] Ocultar uma matéria fica registrado.

@@ -81,11 +81,23 @@ O tempo real usa `clausula`, `proposta_alteracao` e `comentario`, filtrados por 
 
 ## Testes
 
-- [ ] Vitest: numeração, pontuação, linha do comitê e signatários.
-- [ ] pgTAP: quem não é redator não altera o texto; cláusula acordada não muda; conflito de versão é detectado; documento enviado fica travado.
-- [ ] Ponta a ponta: uma proposta aceita pelo redator aparece para todo o bloco.
+Arquivos: `supabase/tests/09-editor.test.sql`, `src/lib/regras/formatacao.test.ts` e `tests/09-editor.spec.ts`.
+
+- [ ] Vitest: numeração, pontuação, linha do comitê em português e em inglês, e signatários com o nome oficial.
+- [ ] Vitest: os verbos sugeridos aparecem a partir das primeiras letras.
+- [ ] pgTAP: quem não é redator não altera o texto, mas propõe alterações.
+- [ ] pgTAP: quem não é do bloco não vê o documento enquanto ele é rascunho.
+- [ ] pgTAP: cláusula acordada não muda, e reabrir exige o número mínimo de pedidos.
+- [ ] pgTAP: conflito de versão é detectado.
+- [ ] pgTAP: não abre rodada além de `max_rodadas`, e documento enviado fica travado.
+- [ ] pgTAP: na fusão, cada cláusula guarda a origem.
+- [ ] Ponta a ponta: uma proposta aceita pelo redator aparece para todo o bloco sem recarregar.
+- [ ] Ponta a ponta: a barra de progresso e a cláusula em foco atualizam para todos.
+- [ ] Ponta a ponta: o fluxo completo funciona no celular e no notebook.
+- [ ] Aparência: capturas de referência do documento aberto no celular e no notebook.
 
 ## Pronto quando
 
+- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
 - [ ] Um bloco de teste escreve um working paper por subtópico, junta os papers num projeto e envia à mesa.
 - [ ] Tudo funciona no celular e no notebook.

@@ -37,14 +37,23 @@
 - [ ] A mesa opera tudo num aparelho: registra pedidos de fala, conta votos nas placas e redige os documentos.
 - [ ] O telão continua funcionando.
 
-## Testes (pgTAP)
+## Testes
 
-- [ ] CSNU: 9 a favor com um voto contra de membro permanente reprova; 9 a favor com abstenção de membro permanente aprova.
-- [ ] Conselho Europeu: uma ausência impede a aprovação.
-- [ ] Votação nominal: quem passou a vez não consegue se abster.
-- [ ] Divisão da questão: o projeto é rejeitado quando todas as operativas caem.
-- [ ] Projeto sem 1/5 de assinaturas não pode ser enviado.
+Arquivos: `supabase/tests/16-procedimento.test.sql` e `tests/16-procedimento.spec.ts`.
+
+- [ ] pgTAP, CSNU: 9 a favor com um voto contra de membro permanente reprova; 9 a favor com abstenção de membro permanente aprova; 8 a favor reprova.
+- [ ] pgTAP, CSNU: a delegação marcada como parte na disputa não consegue votar a favor nem contra.
+- [ ] pgTAP, Conselho Europeu: uma ausência ou um voto contra impede a aprovação.
+- [ ] pgTAP, votação nominal: quem passou a vez não consegue se abster, e ninguém passa duas vezes.
+- [ ] pgTAP, divisão da questão: só operativas; o projeto é rejeitado quando todas as operativas caem.
+- [ ] pgTAP: projeto sem 1/5 de assinaturas não pode ser enviado, nem emenda sem 3 assinaturas.
+- [ ] pgTAP: só uma resolução aprovada por tópico.
+- [ ] pgTAP: o adiamento do debate e a não-confiança seguem as maiorias do guia.
+- [ ] pgTAP: com tecnologia restrita, os delegados não conseguem escrever nada durante a sessão.
+- [ ] Ponta a ponta: uma votação nominal completa, do painel da mesa ao telão.
+- [ ] Ponta a ponta: no modo com tecnologia restrita, a mesa registra falas e votos, e o telão acompanha.
 
 ## Pronto quando
 
+- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
 - [ ] Comitês de teste no formato do CSNU, do Conselho Europeu e da OEA rodam com as suas regras especiais.

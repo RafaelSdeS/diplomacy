@@ -46,16 +46,22 @@ A **base** é o quórum da sessão, como diz o guia. Falta confirmar com a organ
 
 O seed grava as regras do UFRGSMUN 2026 como padrão do evento e o ajuste do CSNU no comitê de teste: `votacao_substantiva = csnu`, com EUA, Rússia, Reino Unido, França e China como membros permanentes.
 
-## Testes (pgTAP)
+## Testes
+
+Arquivos: `supabase/tests/05-regras.test.sql`, `src/lib/regras/regras.test.ts` e `tests/05-regras.spec.ts`.
 
 Os exemplos do próprio guia viram casos de teste:
 
-- [ ] `maioria_simples(20) = 11` e `maioria_simples(41) = 21`.
-- [ ] `dois_tercos(10) = 7` e `dois_tercos(21) = 14`.
-- [ ] `quorum` de um comitê com 15 delegações previstas é 5.
-- [ ] O ajuste do comitê vence o padrão do evento em `regras()`.
+- [ ] pgTAP: `maioria_simples(20) = 11` e `maioria_simples(41) = 21`.
+- [ ] pgTAP: `dois_tercos(10) = 7` e `dois_tercos(21) = 14`.
+- [ ] pgTAP: o `quorum` de um comitê com 15 delegações previstas é 5.
+- [ ] pgTAP: em `regras()`, o ajuste do comitê vence o padrão do evento, e uma chave que o comitê não define vem do padrão.
+- [ ] pgTAP: só a secretaria altera as regras.
+- [ ] Vitest: cada regra vira um texto legível, como "Informal-informal: até 45 minutos por sessão".
+- [ ] Ponta a ponta: a tela de regras do comitê de teste mostra a regra do CSNU.
 
 ## Pronto quando
 
+- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
 - [ ] Os testes com os exemplos do guia passam.
 - [ ] O comitê de teste mostra suas regras, com a regra do CSNU, no celular e no notebook.

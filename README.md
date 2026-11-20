@@ -32,6 +32,7 @@ As regras de procedimento vêm do Guia de Regras do UFRGSMUN e são configuráve
 - Um app só, que se adapta ao celular (delegados), ao notebook (mesa, crise, press) e ao projetor (telão).
 - Leve e econômico em dados móveis; plano B em papel.
 - Acessível (WCAG 2.2 AA) e privado por padrão (LGPD).
+- Aparência leve, profissional, diplomática, limpa e com cara de oficial: base clara, azul-marinho, dourado discreto, serifa nos títulos e selos no estilo carimbo.
 
 ## Stack
 
@@ -48,7 +49,9 @@ Detalhes e justificativas na seção 16 do plano.
 
 ## Plano de implementação
 
-O app é construído em 19 passos, cada um com o seu plano: o que construir, banco, telas para celular e notebook, testes e quando está pronto. O índice, as convenções de código e a definição de pronto estão em [docs/implementacao/](docs/implementacao/README.md).
+O app é construído em 19 passos, cada um com o seu plano: o que construir, banco, telas para celular e notebook, testes e quando está pronto. O índice, as convenções de código, a definição de pronto, a estratégia de testes e a aparência do app estão em [docs/implementacao/](docs/implementacao/README.md).
+
+Cada passo traz os testes que provam que ele funciona. Um passo só termina quando esses testes, e os de todos os passos anteriores, passam no CI.
 
 | Passo | Entrega |
 |---|---|

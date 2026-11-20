@@ -96,12 +96,25 @@ O telão usa a API de tela cheia e o Wake Lock, para a tela não apagar. Ele rod
 
 ## Testes
 
-- [ ] pgTAP: um delegado de uma delegação que não preside não consegue dar a palavra.
+Arquivos: `supabase/tests/06-sessao.test.sql`, `src/lib/sessao/cronometro.test.ts` e `tests/06-sessao.spec.ts`.
+
+- [ ] pgTAP: um delegado de uma delegação que não preside não consegue dar a palavra nem mexer no cronômetro.
+- [ ] pgTAP: o delegado da delegação que preside consegue, e a mesa sempre consegue.
+- [ ] pgTAP: na primeira sessão, quem preside é o bureau.
+- [ ] pgTAP: só a mesa sorteia o rodízio; `passar_presidencia` segue a ordem sorteada e depois a lista de espera.
 - [ ] pgTAP: o informal-informal não passa de 45 minutos.
-- [ ] Ponta a ponta: um pedido de fala aparece no painel da presidência em menos de 1 segundo.
-- [ ] Ponta a ponta: dois navegadores mostram o mesmo tempo no cronômetro, com diferença máxima de 1 segundo.
+- [ ] pgTAP: a chamada calcula o quórum certo.
+- [ ] Vitest: o tempo restante do cronômetro com pausa, retomada, segundos somados e diferença de relógio do aparelho.
+- [ ] Vitest: o aviso começa quando faltam 10 segundos.
+- [ ] Ponta a ponta: um pedido de fala aparece no painel da presidência em menos de 1 segundo (dois navegadores).
+- [ ] Ponta a ponta: dois navegadores mostram o mesmo tempo, com diferença máxima de 1 segundo.
+- [ ] Ponta a ponta: os atalhos de teclado do painel funcionam.
+- [ ] Ponta a ponta: o telão em 1920 × 1080 mostra orador, bandeira e cronômetro sem rolagem.
+- [ ] Aparência: capturas de referência do painel da presidência e do telão.
+- [ ] Manual: o telão num projetor de verdade, lido do fundo da sala.
 
 ## Pronto quando
 
+- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
 - [ ] Uma sessão de teste roda com chamada, sorteio do rodízio, falas cronometradas, pontos, moções e telão.
 - [ ] O telão é legível em 1920 × 1080, e o painel funciona com 360 px e com 1366 px.

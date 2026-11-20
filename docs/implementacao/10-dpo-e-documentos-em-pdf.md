@@ -32,12 +32,19 @@ Em `src/lib/impressao/`, com HTML e CSS de impressão (`@page` A4 e fontes locai
 
 ## Testes
 
-- [ ] Ponta a ponta: a página de impressão do DPO tem cabeçalho, duas colunas e referências.
-- [ ] Conferência manual: o PDF sai igual no Chrome, no Firefox e no Safari.
-- [ ] pgTAP: o DPO fica fechado até a mesa liberar; uma carta privada só aparece para remetente e destinatários.
+Arquivos: `supabase/tests/10-documentos.test.sql`, `src/lib/impressao/impressao.test.ts` e `tests/10-impressao.spec.ts`.
+
+- [ ] pgTAP: o DPO fica fechado para as outras delegações até a mesa liberar.
+- [ ] pgTAP: uma carta privada só aparece para o remetente e os destinatários.
+- [ ] pgTAP: só a mesa muda a situação de um DPO.
+- [ ] Vitest: os modelos montam o cabeçalho, as referências numeradas e a assinatura a partir dos dados.
+- [ ] Ponta a ponta: a página de impressão do DPO tem cabeçalho, duas colunas e referências; a do projeto tem a linha do comitê e os signatários.
+- [ ] Aparência: o PDF gerado pelo Playwright (`page.pdf()`, no Chromium) é comparado com uma imagem de referência, para pegar mudanças de layout sem querer.
+- [ ] Manual: o PDF sai igual no Chrome, no Firefox e no Safari.
 
 ## Pronto quando
 
+- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
 - [ ] Um DPO do comitê de teste sai no padrão dos DPOs do UNOCT.
 - [ ] Um projeto de resolução e uma carta saem no formato combinado.
 - [ ] Escrever o DPO funciona no celular e no notebook.

@@ -53,11 +53,19 @@ create table convite (
 
 ## Testes
 
-- [ ] Ponta a ponta: login com e-mail e senha no ambiente local e redirecionamentos.
+Arquivos: `supabase/tests/03-convites.test.sql` e `tests/03-login.spec.ts`.
+
 - [ ] pgTAP: só a secretaria lê e escreve convites.
-- [ ] pgTAP: o gatilho cria a participação certa a partir do convite.
+- [ ] pgTAP: o gatilho cria a `pessoa` e a participação certa a partir do convite, inclusive quando há dois convites para o mesmo e-mail.
+- [ ] Ponta a ponta: login e logout com e-mail e senha.
+- [ ] Ponta a ponta: sem sessão, qualquer rota leva a `/entrar`; sem participação, leva a `/sem-acesso`.
+- [ ] Ponta a ponta: cada uma das cinco funções vê só o próprio menu, no celular e no notebook.
+- [ ] Ponta a ponta: um delegado que digita a URL de uma tela da mesa não vê os dados dela.
+- [ ] Acessibilidade: axe sem erros em `/entrar`, e o formulário funciona só com o teclado.
+- [ ] Manual: login com Google no ambiente publicado.
 
 ## Pronto quando
 
+- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
 - [ ] Cada conta fictícia entra e vê só o menu da sua função, no celular e no notebook.
 - [ ] Uma pessoa sem convite cai em `/sem-acesso`.

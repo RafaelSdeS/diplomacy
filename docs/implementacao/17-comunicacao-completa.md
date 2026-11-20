@@ -25,11 +25,19 @@
 
 ## Testes
 
-- [ ] pgTAP: com a leitura de bilhetes desligada, a mesa não lê os bilhetes.
+Arquivos: `supabase/tests/17-mensagens.test.sql`, `src/lib/press/imagem.test.ts` e `tests/17-comunicacao.spec.ts`.
+
+- [ ] pgTAP: um bilhete só aparece para as duas delegações; com a leitura desligada a mesa não lê, e com ela ligada lê.
+- [ ] pgTAP: com bilhetes bloqueados no comitê, ninguém envia.
+- [ ] pgTAP: o canal da mesa com a crise não aparece para delegados.
+- [ ] Vitest: a imagem para story sai com 1080 × 1920 e a de post com 1080 × 1080, sempre com o selo de simulação.
 - [ ] Ponta a ponta: um bilhete escrito offline chega uma vez só.
-- [ ] Ponta a ponta: a imagem de uma matéria é gerada com o tamanho certo para story (1080 × 1920).
+- [ ] Ponta a ponta: um pedido de entrevista aceito aparece para os dois lados.
+- [ ] Ponta a ponta: a edição do dia reúne as matérias publicadas no dia.
+- [ ] Manual: compartilhar a imagem no Instagram pelo botão nativo, num Android e num iPhone.
 
 ## Pronto quando
 
+- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
 - [ ] As delegações trocam bilhetes, e as regras da mesa são respeitadas.
 - [ ] A press faz entrevistas, coletiva, edição do dia e imagens para as redes pelo app.

@@ -50,12 +50,20 @@ alter table pessoa add column bio text, add column foto_path text;
 
 ## Testes
 
-- [ ] Ponta a ponta: a secretaria publica um aviso e ele aparece na hora para um delegado, nas três telas.
-- [ ] Ponta a ponta: a Agora destaca o item do cronograma que está acontecendo (com o relógio do teste controlado).
+Arquivos: `supabase/tests/04-informacoes.test.sql`, `src/lib/ui/reduzir-imagem.test.ts` e `tests/04-agora.spec.ts`.
+
 - [ ] pgTAP: um aviso de um comitê não aparece para quem é de outro comitê.
+- [ ] pgTAP: só a secretaria publica avisos gerais e mexe no cronograma; a mesa publica avisos só do próprio comitê.
+- [ ] pgTAP: cada pessoa altera só a própria foto no Storage.
+- [ ] Vitest: a redução de imagem entrega no máximo 512 px.
+- [ ] Ponta a ponta: a secretaria publica um aviso, e ele aparece para um delegado sem recarregar, nas três telas.
+- [ ] Ponta a ponta: a Agora destaca o item do cronograma que está acontecendo (relógio controlado).
+- [ ] Ponta a ponta: a página do comitê lista as 15 delegações com bandeira e nome.
+- [ ] Acessibilidade: axe sem erros na Agora, no cronograma, nos avisos, no perfil e no comitê.
 
 ## Pronto quando
 
+- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
 - [ ] A Agora mostra a sessão atual, o próximo item e os avisos.
 - [ ] Um aviso novo chega sem recarregar a página.
 - [ ] As telas funcionam com 360 px e com 1366 px.

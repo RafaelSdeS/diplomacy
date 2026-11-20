@@ -69,12 +69,21 @@ create table voto (
 
 ## Testes
 
+Arquivos: `supabase/tests/07-agenda-e-votacao.test.sql` e `tests/07-agenda-e-votacao.spec.ts`.
+
 - [ ] pgTAP: a mesma delegação não vota duas vezes.
-- [ ] pgTAP: abstenção em questão procedimental é recusada; observadora não vota em questão substantiva.
+- [ ] pgTAP: abstenção em questão procedimental é recusada.
+- [ ] pgTAP: observadora não vota em questão substantiva, e suspensa não vota.
+- [ ] pgTAP: delegação ausente não vota, e votação encerrada não aceita voto.
+- [ ] pgTAP: só a mesa registra votos de placa.
 - [ ] pgTAP: `resultado()` com os exemplos de maioria do guia; empate reprova.
+- [ ] pgTAP: quando a moção de tópico no topo é rejeitada, o outro tópico entra.
+- [ ] Ponta a ponta: uma delegação monta uma proposta em árvore, e no notebook as propostas aparecem lado a lado.
 - [ ] Ponta a ponta: um voto dado no celular aparece no telão.
+- [ ] Acessibilidade: os botões de voto e a grade do telão passam no axe e mostram ícone e texto além da cor.
 
 ## Pronto quando
 
+- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
 - [ ] O comitê de teste escolhe o tópico, aprova a pauta e vê o andamento de cada ponto.
 - [ ] Os resultados batem com as regras, e o voto nunca é indicado só pela cor.

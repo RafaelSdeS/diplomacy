@@ -6,6 +6,7 @@
 
 ## Qualidade
 
+- [ ] Todos os testes automáticos dos passos 01 a 11 passam no CI.
 - [ ] Testes de ponta a ponta do fluxo completo nas três telas: agenda, debate, crise, resolução votada e press.
 - [ ] axe em todas as rotas principais e navegação completa pelo teclado no notebook da mesa.
 - [ ] Teste manual com leitor de tela: TalkBack no Android e VoiceOver no iPhone.
@@ -41,6 +42,7 @@ Depois da sessão, um questionário curto por função: delegado, mesa, crise e 
 
 Os critérios de aceite do piloto estão cumpridos:
 
+- [ ] Todos os testes automáticos dos passos 01 a 12 passam no CI.
 - [ ] Uma sessão inteira acontece sem papel, do debate da agenda à resolução votada.
 - [ ] Nenhuma nota de crise se perde, e o teste de privacidade passa.
 - [ ] Tudo funciona num celular de 360 px, num notebook de 1366 × 768 e no projetor.

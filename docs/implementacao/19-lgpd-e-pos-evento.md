@@ -30,11 +30,18 @@
 
 ## Testes
 
-- [ ] pgTAP: depois de `apagar_dados_pessoais`, não sobra e-mail nem nome de pessoa; os documentos públicos continuam.
+Arquivos: `supabase/tests/19-lgpd.test.sql` e `tests/19-lgpd.spec.ts`.
+
+- [ ] pgTAP: depois de `apagar_dados_pessoais`, não sobra e-mail, conta nem nome de pessoa, e os documentos públicos e os certificados continuam.
+- [ ] pgTAP: as ações sensíveis ficam em `registro`, e só a secretaria lê o registro.
+- [ ] pgTAP: a exportação de uma pessoa traz só os dados dela.
 - [ ] Ponta a ponta: uma pessoa baixa os próprios dados e pede a exclusão.
+- [ ] Ponta a ponta: o arquivo da edição tem todos os PDFs e o JSON esperados.
+- [ ] Manual: revisão do aviso de privacidade com a organização.
 
 ## Pronto quando
 
+- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
 - [ ] Os direitos do titular funcionam pelo app.
 - [ ] A exclusão no prazo foi testada com dados fictícios.
 - [ ] O arquivo da edição é gerado e entregue.
