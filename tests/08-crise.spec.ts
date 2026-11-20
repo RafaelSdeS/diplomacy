@@ -77,7 +77,7 @@ test('30 notas de 15 delegações chegam em poucos segundos, e o limite vale mes
 	await page.goto(CRISE);
 	await expect(page.getByText('Pendentes: 30')).toBeVisible();
 	// A fila começa pela mais antiga: a primeira delegação que enviou.
-	const fila = page.getByRole('region', { name: 'Notas' }).getByRole('listitem');
+	const fila = page.getByRole('region', { name: 'Notas', exact: true }).getByRole('listitem');
 	await expect(fila.first()).toContainText(`Ação de ${DELEGACOES[0][0]}`);
 	await expect(fila.nth(29)).toContainText(`Ação de ${DELEGACOES[14][0]}`);
 });
@@ -102,7 +102,7 @@ test('a resposta da crise chega ao celular do delegado sem recarregar', async ({
 
 	const crise = await abrir(browser, CONTAS.crise, CRISE);
 	await crise.getByLabel('Delegação').selectOption({ label: 'EUA' });
-	await crise.getByRole('region', { name: 'Notas' }).getByRole('button', { name: /Ação de EUA/ }).first().click();
+	await crise.getByRole('region', { name: 'Notas', exact: true }).getByRole('button', { name: /Ação de EUA/ }).first().click();
 	const aberta = crise.getByRole('region', { name: 'Nota aberta' });
 	await aberta.getByRole('button', { name: 'Assumir esta nota' }).click();
 	await expect(crise.getByRole('status')).toHaveText('Nota assumida.');
@@ -122,16 +122,16 @@ test('no notebook, a fila e a nota aberta ficam lado a lado; no celular, um toqu
 }) => {
 	await entrar(page, CONTAS.crise);
 	await page.goto(CRISE);
-	await page.getByRole('region', { name: 'Notas' }).getByRole('button', { name: /Ação de Rússia/ }).first().click();
+	await page.getByRole('region', { name: 'Notas', exact: true }).getByRole('button', { name: /Ação de Rússia/ }).first().click();
 	const [fila, aberta] = await Promise.all([
-		page.getByRole('region', { name: 'Notas' }).boundingBox(),
+		page.getByRole('region', { name: 'Notas', exact: true }).boundingBox(),
 		page.getByRole('region', { name: 'Nota aberta' }).boundingBox()
 	]);
 	expect(aberta!.x).toBeGreaterThan(fila!.x + fila!.width - 1);
 	expect(Math.abs(aberta!.y - fila!.y)).toBeLessThan(5);
 
 	const celular = await abrir(browser, CONTAS.crise, CRISE, { width: 360, height: 740 });
-	await celular.getByRole('region', { name: 'Notas' }).getByRole('button', { name: /Ação de China/ }).first().click();
+	await celular.getByRole('region', { name: 'Notas', exact: true }).getByRole('button', { name: /Ação de China/ }).first().click();
 	const notaAberta = celular.getByRole('region', { name: 'Nota aberta' });
 	await expect(notaAberta).toContainText('A delegação de China mobiliza a sua marinha.');
 	await expect(notaAberta).toBeInViewport();
@@ -143,7 +143,7 @@ test('várias notas parecidas são respondidas de uma vez', async ({ page }) => 
 	await page.goto(CRISE);
 	await page.getByLabel('Delegação').selectOption({ label: 'França' });
 	await page.getByLabel('Só as que esperam').check();
-	const caixas = page.getByRole('region', { name: 'Notas' }).getByRole('checkbox', { name: /^Selecionar: Ação de França/ });
+	const caixas = page.getByRole('region', { name: 'Notas', exact: true }).getByRole('checkbox', { name: /^Selecionar: Ação de França/ });
 	await expect(caixas).toHaveCount(2);
 	await caixas.nth(0).check();
 	await caixas.nth(1).check();
@@ -151,7 +151,7 @@ test('várias notas parecidas são respondidas de uma vez', async ({ page }) => 
 	await page.getByRole('group', { name: 'Respostas prontas' }).getByRole('button', { name: 'Rejeitada' }).click();
 	await page.getByRole('button', { name: 'Rejeitar' }).click();
 	await expect(page.getByRole('status')).toHaveText('2 notas respondidas.');
-	await expect(page.getByRole('region', { name: 'Notas' })).toContainText('Nenhuma nota.');
+	await expect(page.getByRole('region', { name: 'Notas', exact: true })).toContainText('Nenhuma nota.');
 });
 
 test('uma atualização de crise chega ao delegado e vira plantão no telão', async ({ page, browser }) => {
@@ -183,7 +183,7 @@ for (const tema of ['light', 'dark'] as const) {
 		await entrar(page, CONTAS.crise);
 		await page.goto(CRISE);
 		await expect(page.getByRole('heading', { level: 1, name: 'Fila da crise' })).toBeVisible();
-		await page.getByRole('region', { name: 'Notas' }).getByRole('button').first().click();
+		await page.getByRole('region', { name: 'Notas', exact: true }).getByRole('button').first().click();
 		await semErrosDeAcessibilidade(page);
 	});
 }

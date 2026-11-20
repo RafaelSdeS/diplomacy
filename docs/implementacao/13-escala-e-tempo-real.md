@@ -8,6 +8,8 @@
 
 ### Broadcast no lugar de Postgres Changes
 
+> **Visto no piloto (passo 08):** com três fluxos ao vivo em paralelo nos testes, o tempo real local passou do limite de 100 mensagens por segundo (`MessagePerSecondRateLimitReached`, o mesmo limite do plano gratuito) e descartou mensagens: um aviso não chegou. No evento, isso vira regra: Broadcast com menos mensagens por mudança, e uma ressincronização da tela quando a conexão volta ou depois de um descarte. Por isso o CI roda os testes de ponta a ponta em um processo só.
+
 - [ ] Gatilhos nas tabelas ao vivo chamam `realtime.broadcast_changes()` e publicam em canais privados:
 
   | Canal | O que passa |

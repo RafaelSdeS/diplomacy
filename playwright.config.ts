@@ -13,6 +13,10 @@ const telas = {
 export default defineConfig({
 	testDir: 'tests',
 	fullyParallel: true,
+	// No CI, um processo só: os fluxos ao vivo (sessão, crise, avisos) juntos passam do
+	// limite do tempo real local (100 mensagens por segundo, o mesmo do plano gratuito),
+	// e o servidor descarta mensagens. A capacidade tem teste próprio (passo 13).
+	workers: ci ? 1 : undefined,
 	forbidOnly: ci,
 	retries: ci ? 1 : 0,
 	reporter: ci ? [['github'], ['html', { open: 'never' }]] : 'list',

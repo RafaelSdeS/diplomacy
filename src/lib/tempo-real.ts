@@ -12,7 +12,6 @@ export function assinarAvisos(aoMudar: () => void): () => void {
 		.on('postgres_changes', { event: '*', schema: 'public', table: 'aviso' }, aoMudar)
 		// Quando a assinatura fica pronta, recarrega uma vez: o que mudou entre a
 		// leitura da tela e a assinatura não se perde.
-		.on('system', {}, aoMudar)
 		.subscribe((status) => status === 'SUBSCRIBED' && aoMudar());
 	return () => {
 		void supabase.removeChannel(canal);
@@ -39,9 +38,9 @@ export function assinarComite(
 	for (const table of tabelas) {
 		canal.on('postgres_changes', { event: '*', schema: 'public', table, filter }, aoMudar);
 	}
-	// Quando a assinatura fica pronta (e o Postgres confirma), recarrega uma vez: o
-	// que mudou entre a leitura da tela e a assinatura não se perde.
-	canal.on('system', {}, aoMudar);
+	// Quando a assinatura fica pronta, recarrega uma vez: o que mudou entre a leitura
+	// da tela e a assinatura não se perde. (Não escute as mensagens 'system': com várias
+	// assinaturas ao mesmo tempo, isso fez o tempo real parar de entregar mudanças.)
 	canal.subscribe((status) => {
 		aoConectar(status === 'SUBSCRIBED');
 		if (status === 'SUBSCRIBED') aoMudar();
