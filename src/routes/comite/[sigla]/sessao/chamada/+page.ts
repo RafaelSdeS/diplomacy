@@ -20,8 +20,8 @@ export const load: PageLoad = async ({ parent, depends }) => {
 			.select('ordem, vezes, delegacao(id, nome, bandeira)')
 			.eq('comite_id', comite.id)
 			.order('ordem'),
-		supabase.rpc('quorum', { p_comite: comite.id }),
-		supabase.rpc('regras', { p_comite: comite.id })
+		supabase.rpc('quorum', { p_comite: comite.id }, { get: true }),
+		supabase.rpc('regras', { p_comite: comite.id }, { get: true })
 	]);
 	if (regras.error) throw regras.error;
 	if (delegacoes.error) throw delegacoes.error;

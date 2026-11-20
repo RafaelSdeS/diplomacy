@@ -1477,7 +1477,7 @@ isOneToOne: false
 { Args: { "p_sessao": string }; Returns: number
                            },
 "propor_alteracao":
-{ Args: { "p_clausula": string,"p_texto": string }; Returns: undefined
+{ Args: { "p_clausula": string,"p_id"?: string,"p_texto": string }; Returns: undefined
                            },
 "publicar_atualizacao":
 { Args: { "p_comites": (string)[],"p_texto": string }; Returns: string

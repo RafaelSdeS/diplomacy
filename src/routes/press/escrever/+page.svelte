@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { caixa, mensagemDoEnvio } from '#lib/caixa.ts';
 	import { paragrafos } from '#lib/impressao.ts';
 	import { reduzirImagem } from '#lib/imagem.ts';
 	import { palavroes } from '#lib/palavroes.ts';
@@ -22,6 +23,7 @@
 	let arquivos = $state<FileList | undefined>();
 	let descricao = $state('');
 	let erro = $state('');
+	let aviso = $state('');
 	let enviando = $state(false);
 
 	const veiculo = $derived(data.veiculos.find((v) => v.id === veiculoId) ?? data.veiculos[0]);
@@ -37,34 +39,45 @@
 
 	async function publicar(evento: SubmitEvent) {
 		evento.preventDefault();
-		erro = '';
+		erro = aviso = '';
 		enviando = true;
 		try {
-			let caminho: string | null = null;
+			// Pela caixa de saída (com a imagem já reduzida): sem internet, a matéria fica no
+			// aparelho e é publicada sozinha depois.
 			const arquivo = arquivos?.[0];
-			if (arquivo) {
-				const imagem = await reduzirImagem(arquivo, 1280);
-				caminho = `${veiculo.id}/${id}.${imagem.type === 'image/webp' ? 'webp' : 'jpg'}`;
-				const envio = await supabase.storage
-					.from('press')
-					.upload(caminho, imagem, { contentType: imagem.type, upsert: true });
-				if (envio.error) throw envio.error;
-			}
-			const { error } = await supabase.rpc('publicar_noticia', {
-				p_id: id,
-				p_veiculo: veiculo.id,
-				p_tipo: tipo,
-				p_titulo: titulo,
-				p_texto: texto,
-				p_linha_fina: linhaFina,
-				p_imagem_path: caminho ?? undefined,
-				p_imagem_descricao: descricao,
-				p_data_simulacao: dataSimulacao || undefined,
-				p_citadas: citadas
+			const imagem = arquivo ? await reduzirImagem(arquivo, 1280) : null;
+			const caminho = imagem ? `${veiculo.id}/${id}.${imagem.type === 'image/webp' ? 'webp' : 'jpg'}` : null;
+			const resultado = await caixa.enviar({
+				id,
+				rpc: 'publicar_noticia',
+				args: {
+					p_id: id,
+					p_veiculo: veiculo.id,
+					p_tipo: tipo,
+					p_titulo: titulo,
+					p_texto: texto,
+					p_linha_fina: linhaFina,
+					p_imagem_path: caminho ?? undefined,
+					p_imagem_descricao: descricao,
+					p_data_simulacao: dataSimulacao || undefined,
+					p_citadas: citadas
+				},
+				imagem: imagem && caminho ? { bucket: 'press', caminho, blob: imagem } : undefined,
+				rotulo: `Matéria: ${titulo}`
 			});
-			if (error) throw error;
+			const envio = mensagemDoEnvio(resultado, '');
+			if (envio.erro) {
+				erro = envio.erro;
+				return;
+			}
 			const publicada = id;
 			id = crypto.randomUUID();
+			if (resultado === 'guardado') {
+				aviso = envio.mensagem;
+				titulo = linhaFina = texto = descricao = '';
+				citadas = [];
+				return;
+			}
 			await goto(`/press/${veiculo.comite?.sigla}?n=${publicada}`);
 		} catch (e) {
 			erro = mensagemDeErro(e as { code?: string; message?: string });
@@ -139,6 +152,9 @@
 		{/if}
 		{#if erro}
 			<p class="erro" role="alert">{erro}</p>
+		{/if}
+		{#if aviso}
+			<p class="sucesso" role="status">{aviso}</p>
 		{/if}
 		<button class="botao" disabled={enviando}>{enviando ? 'Publicando…' : 'Publicar'}</button>
 	</form>

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { esquecerConta } from '#lib/conta.ts';
 	import { untrack } from 'svelte';
 	import { invalidate } from '$app/navigation';
 	import { reduzirImagem } from '#lib/imagem.ts';
@@ -28,6 +29,7 @@
 			return;
 		}
 		mensagem = 'Perfil salvo.';
+		esquecerConta();
 		await invalidate('app:sessao'); // o nome do cabeçalho
 	}
 

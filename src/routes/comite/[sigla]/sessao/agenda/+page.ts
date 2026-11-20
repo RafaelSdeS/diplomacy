@@ -13,7 +13,7 @@ export const load: PageLoad = async ({ parent, depends }) => {
 			.order('adotada', { ascending: false })
 			.order('criado_em')
 			.order('ordem', { referencedTable: 'pontos' }),
-		supabase.rpc('pode_presidir', { p_comite: comite.id })
+		supabase.rpc('pode_presidir', { p_comite: comite.id }, { get: true })
 	]);
 	if (estado.error) throw estado.error;
 	if (propostas.error) throw propostas.error;

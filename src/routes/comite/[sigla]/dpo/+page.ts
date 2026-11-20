@@ -13,7 +13,7 @@ export const load: PageLoad = async ({ parent, depends }) => {
 			.select('id, topico, texto, referencias, status, comentario_mesa, enviado_em, delegacao(id, nome, bandeira)')
 			.eq('comite_id', comite.id)
 			.order('topico'),
-		supabase.rpc('regras', { p_comite: comite.id })
+		supabase.rpc('regras', { p_comite: comite.id }, { get: true })
 	]);
 	if (dpos.error) throw dpos.error;
 	if (regras.error) throw regras.error;

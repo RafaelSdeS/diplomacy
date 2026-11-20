@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { tick } from 'svelte';
 	import { invalidate } from '$app/navigation';
+	import { caixa, mensagemDoEnvio } from '#lib/caixa.ts';
 	import { formatarDocumento, nomeDoDocumento, STATUS_DOCUMENTO } from '#lib/formatacao.ts';
 	import { mensagemDeErro } from '#lib/sessao.ts';
 	import { supabase } from '#lib/supabase.ts';
@@ -132,14 +133,21 @@
 		versaoEditada = 0; // recarrega a versão nova (ou a de quem salvou antes)
 	}
 
-	function propor(evento: SubmitEvent) {
+	// Pela caixa de saída: sem internet, a proposta fica no aparelho e vai sozinha depois.
+	async function propor(evento: SubmitEvent) {
 		evento.preventDefault();
-		const id = clausula!.id;
-		void enviarLimpando(
-			{ ler: () => proposta, escrever: (v) => (proposta = v) },
-			(texto) => supabase.rpc('propor_alteracao', { p_clausula: id, p_texto: texto }),
-			'Proposta enviada ao redator.'
-		);
+		const texto = proposta;
+		const idProposta = crypto.randomUUID();
+		proposta = '';
+		const resultado = await caixa.enviar({
+			id: idProposta,
+			rpc: 'propor_alteracao',
+			args: { p_clausula: clausula!.id, p_texto: texto, p_id: idProposta },
+			rotulo: 'Proposta de alteração'
+		});
+		({ erro, mensagem } = mensagemDoEnvio(resultado, 'Proposta enviada ao redator.'));
+		if (erro && !proposta) proposta = texto;
+		await invalidate('app:documento');
 	}
 
 	function comentar(evento: SubmitEvent) {

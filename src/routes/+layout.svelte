@@ -11,6 +11,8 @@
 	import Megaphone from '@lucide/svelte/icons/megaphone';
 	import Newspaper from '@lucide/svelte/icons/newspaper';
 	import Users from '@lucide/svelte/icons/users';
+	import { caixa } from '#lib/caixa.ts';
+	import { esquecerConta } from '#lib/conta.ts';
 	import { supabase, type Papel } from '#lib/supabase.ts';
 	import { assinarAvisos } from '#lib/tempo-real.ts';
 	import type { LayoutProps } from './$types';
@@ -53,14 +55,48 @@
 	const atual = (href: string) => (href !== marcado ? undefined : href === page.url.pathname ? 'page' : 'true');
 
 	// Avisos chegam na hora para quem está no app.
+	// Os efeitos dependem de textos e booleanos: o `data` novo de cada troca de tela não
+	// pode reassinar os canais nem disparar recargas.
+	const eventos = $derived(
+		[...new Set(data.participacoes.map((p) => p.evento_id).filter((e) => e !== null))].sort().join(',')
+	);
+	const logado = $derived(!!data.usuario);
 	$effect(() => {
-		const eventos = [...new Set(data.participacoes.map((p) => p.evento_id).filter((e) => e !== null))];
-		if (!data.usuario || !eventos.length) return;
-		return assinarAvisos(eventos, () => invalidate('app:avisos'));
+		if (!logado || !eventos) return;
+		return assinarAvisos(eventos.split(','), () => invalidate('app:avisos'));
+	});
+
+	// Conexão e caixa de saída: reenvia ao voltar a rede, ao voltar o app para a frente
+	// e ao abrir o app.
+	let online = $state(true);
+	let pendentes = $state(0);
+	$effect(() => {
+		if (!logado) return;
+		const contar = async () => void (pendentes = (await caixa.pendentes()).length);
+		const reenviar = () => {
+			online = navigator.onLine;
+			if (online) void caixa.reenviar();
+		};
+		const aoVoltar = () => document.visibilityState === 'visible' && reenviar();
+		const parar = caixa.ouvir(() => void contar());
+		addEventListener('online', reenviar);
+		addEventListener('offline', reenviar);
+		document.addEventListener('visibilitychange', aoVoltar);
+		void contar();
+		reenviar();
+		return () => {
+			parar();
+			removeEventListener('online', reenviar);
+			removeEventListener('offline', reenviar);
+			document.removeEventListener('visibilitychange', aoVoltar);
+		};
 	});
 
 	async function sair() {
+		// Os dados lidos ficam no aparelho para abrir sem internet; quem sai leva os seus.
+		await caches?.delete('dados').catch(() => {});
 		await supabase.auth.signOut();
+		esquecerConta();
 		await goto('/entrar', { invalidateAll: true });
 	}
 </script>
@@ -80,6 +116,8 @@
 			</a>
 			{#if data.usuario}
 				<div class="conta">
+					{#if !online}<span class="selo selo--alerta">Sem conexão</span>{/if}
+					{#if pendentes}<span class="selo selo--info" role="status">{pendentes} para enviar</span>{/if}
 					<span class="conta-nome">{data.nome}</span>
 					{#if comMenu}
 						<a

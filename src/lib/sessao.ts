@@ -46,8 +46,8 @@ export async function carregarSessao(comiteId: string) {
 			.eq('comite_id', comiteId)
 			.order('ordem'),
 		supabase.from('delegacao').select('id, nome, bandeira, situacao').eq('comite_id', comiteId).order('nome'),
-		supabase.rpc('regras', { p_comite: comiteId }),
-		supabase.rpc('pode_presidir', { p_comite: comiteId })
+		supabase.rpc('regras', { p_comite: comiteId }, { get: true }),
+		supabase.rpc('pode_presidir', { p_comite: comiteId }, { get: true })
 	]);
 	for (const r of [estado, lista, delegacoes, regras, podePresidir]) if (r.error) throw r.error;
 

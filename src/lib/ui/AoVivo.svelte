@@ -33,12 +33,38 @@
 	onMount(() => {
 		void medirRelogio().then((d) => (diferenca = d));
 	});
+	// O efeito depende só desta chave de texto: um objeto `data` novo a cada recarga não
+	// pode reassinar o canal (isso recarregava a tela em laço).
+	const chave = $derived(JSON.stringify([documentoId ?? '', comiteId ?? '', eventoId ?? '', canais, tabelas, dependencia]));
+
 	$effect(() => {
-		const aoMudar = () => invalidate(dependencia);
+		const [documento, comite, evento, extras, tabs, dep] = JSON.parse(chave) as [
+			string,
+			string,
+			string,
+			string[],
+			string[],
+			`${string}:${string}`
+		];
+		// Vários avisos juntos (uma ação mexe em mais de uma tabela) viram uma recarga só.
+		// Sem internet, a tela fica com o que tem; quando a conexão volta, recarrega.
+		let espera: ReturnType<typeof setTimeout> | undefined;
+		const aoMudar = () => {
+			clearTimeout(espera);
+			espera = setTimeout(() => navigator.onLine && invalidate(dep), 100);
+		};
 		const aoConectar = (ok: boolean) => (conectado = ok);
-		if (documentoId) return assinar([`documento:${documentoId}`], null, aoMudar, aoConectar);
-		if (comiteId) return assinar([`comite:${comiteId}`, ...canais], tabelas, aoMudar, aoConectar);
-		if (eventoId) return assinar([`evento:${eventoId}`], tabelas, aoMudar, aoConectar);
+		const cancelar = documento
+			? assinar([`documento:${documento}`], null, aoMudar, aoConectar)
+			: comite
+				? assinar([`comite:${comite}`, ...extras], tabs, aoMudar, aoConectar)
+				: evento
+					? assinar([`evento:${evento}`], tabs, aoMudar, aoConectar)
+					: () => {};
+		return () => {
+			clearTimeout(espera);
+			cancelar();
+		};
 	});
 </script>
 

@@ -5,8 +5,8 @@ import type { PageLoad } from './$types';
 export const load: PageLoad = async ({ parent }) => {
 	const { comite } = await parent();
 	const [regras, quorum, previstas] = await Promise.all([
-		supabase.rpc('regras', { p_comite: comite.id }),
-		supabase.rpc('quorum', { p_comite: comite.id }),
+		supabase.rpc('regras', { p_comite: comite.id }, { get: true }),
+		supabase.rpc('quorum', { p_comite: comite.id }, { get: true }),
 		supabase
 			.from('delegacao')
 			.select('id', { count: 'exact', head: true })

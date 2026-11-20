@@ -36,8 +36,8 @@ export const load: PageLoad = async ({ params, depends }) => {
 		supabase.from('rodada').select('numero, inicio, fim').eq('documento_id', d.id).order('numero'),
 		supabase.from('assinatura').select('delegacao(id, nome, nome_oficial)').eq('documento_id', d.id),
 		supabase.from('pedido_reabertura').select('clausula_id, delegacao_id'),
-		supabase.rpc('sou_redator', { p_bloco: d.bloco!.id }),
-		supabase.rpc('regras', { p_comite: d.comite_id }),
+		supabase.rpc('sou_redator', { p_bloco: d.bloco!.id }, { get: true }),
+		supabase.rpc('regras', { p_comite: d.comite_id }, { get: true }),
 		// Para a fusão: os outros documentos do comitê que a pessoa vê, com as cláusulas.
 		supabase
 			.from('documento')

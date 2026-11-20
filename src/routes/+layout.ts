@@ -1,4 +1,5 @@
 import { redirect } from '@sveltejs/kit';
+import { carregarConta } from '#lib/conta.ts';
 import { supabase } from '#lib/supabase.ts';
 import type { LayoutLoad } from './$types';
 
@@ -23,14 +24,7 @@ export const load: LayoutLoad = async ({ url, depends }) => {
 	}
 	if (url.pathname === '/entrar') redirect(307, '/');
 
-	const [resposta, pessoa] = await Promise.all([
-		supabase.from('minhas_participacoes').select('*'),
-		supabase.from('pessoa').select('nome').eq('id', session.user.id).maybeSingle()
-	]);
-	if (resposta.error) throw resposta.error;
-	if (pessoa.error) throw pessoa.error;
-	const participacoes = resposta.data;
-	const nome = pessoa.data?.nome ?? session.user.email ?? '';
+	const { participacoes, nome } = await carregarConta(session.user);
 
 	// Conta sem convite não entra no app; quem tem convite não fica preso em /sem-acesso.
 	if (participacoes.length === 0 && !publica && url.pathname !== '/sem-acesso') redirect(307, '/sem-acesso');

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { invalidate } from '$app/navigation';
+	import { caixa, mensagemDoEnvio } from '#lib/caixa.ts';
 	import { formatarEspera, minutosDesde, SELO_NOTA, STATUS_NOTA, type StatusNota } from '#lib/crise.ts';
 	import { formatarQuando } from '#lib/cronograma.ts';
 	import { mensagemDeErro } from '#lib/sessao.ts';
@@ -30,19 +31,16 @@
 		evento.preventDefault();
 		erro = mensagem = '';
 		enviando = true;
-		const { error } = await supabase.rpc('enviar_nota', {
-			p_id: id,
-			p_comite: data.comite.id,
-			p_tipo: tipo,
-			p_titulo: titulo,
-			p_texto: texto
+		// Pela caixa de saída: sem internet, a nota fica no aparelho e vai sozinha depois.
+		const resultado = await caixa.enviar({
+			id,
+			rpc: 'enviar_nota',
+			args: { p_id: id, p_comite: data.comite.id, p_tipo: tipo, p_titulo: titulo, p_texto: texto },
+			rotulo: `${tipo === 'nota' ? 'Nota' : 'Diretiva'}: ${titulo}`
 		});
 		enviando = false;
-		if (error) {
-			erro = mensagemDeErro(error, 'Não foi possível enviar. Confira a conexão e tente de novo: a nota não será duplicada.');
-			return;
-		}
-		mensagem = `${tipo === 'nota' ? 'Nota' : 'Diretiva'} enviada à crise.`;
+		({ erro, mensagem } = mensagemDoEnvio(resultado, `${tipo === 'nota' ? 'Nota' : 'Diretiva'} enviada à crise.`));
+		if (erro) return;
 		titulo = texto = '';
 		id = crypto.randomUUID();
 		await invalidate('app:crise');

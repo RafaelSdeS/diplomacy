@@ -159,7 +159,8 @@ const contas: Conta[] = [
 		const n = String(i + 1).padStart(2, '0');
 		return { email: `treino${n}@exemplo.test`, nome: `Treino ${n}`, papel: 'delegado', delegacao: nome, treino: true };
 	}),
-	{ email: 'mesa-treino@exemplo.test', nome: 'Mesa do Treino', papel: 'mesa', treino: true }
+	{ email: 'mesa-treino@exemplo.test', nome: 'Mesa do Treino', papel: 'mesa', treino: true },
+	{ email: 'crise-treino@exemplo.test', nome: 'Crise do Treino', papel: 'crise', treino: true }
 ];
 
 verificar(

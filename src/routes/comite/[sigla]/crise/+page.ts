@@ -14,7 +14,7 @@ export const load: PageLoad = async ({ parent, depends }) => {
 			.eq('comite_id', comite.id)
 			.order('criado_em', { ascending: false }),
 		supabase.from('atualizacao_comite').select('atualizacao:atualizacao_crise(id, texto, publicada_em)').eq('comite_id', comite.id),
-		supabase.rpc('regras', { p_comite: comite.id })
+		supabase.rpc('regras', { p_comite: comite.id }, { get: true })
 	]);
 	if (notas.error) throw notas.error;
 	if (atualizacoes.error) throw atualizacoes.error;
@@ -25,7 +25,7 @@ export const load: PageLoad = async ({ parent, depends }) => {
 	await Promise.all(
 		notas.data
 			.filter((n) => esperando(n.status))
-			.map(async (n) => posicoes.set(n.id, (await supabase.rpc('posicao_na_fila', { p_id: n.id })).data ?? null))
+			.map(async (n) => posicoes.set(n.id, (await supabase.rpc('posicao_na_fila', { p_id: n.id }, { get: true })).data ?? null))
 	);
 
 	return {
