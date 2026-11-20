@@ -60,7 +60,7 @@ Arquivos: `supabase/tests/13-canais.test.sql`, `tests/13-tempo-real.spec.ts` e `
 
 ## Pronto quando
 
-- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
+- [x] Os testes acima passam no CI, junto com os de todos os passos anteriores.
 - [ ] 300 clientes simulados rodam sem erros.
 - [ ] As atualizações chegam em menos de 1 segundo, que é a meta.
-- [ ] Os testes de privacidade continuam passando com Broadcast.
+- [x] Os testes de privacidade continuam passando com Broadcast.

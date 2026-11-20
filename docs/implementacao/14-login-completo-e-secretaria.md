@@ -62,7 +62,7 @@ Arquivos: `supabase/tests/14-credenciais.test.sql`, `src/lib/importar.test.ts` e
 
 ## Pronto quando
 
-- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
+- [x] Os testes acima passam no CI, junto com os de todos os passos anteriores.
 - [ ] Um delegado entra escaneando o crachá impresso.
 - [x] Um crachá revogado não entra.
 - [x] 150 certificados saem numa única impressão.
