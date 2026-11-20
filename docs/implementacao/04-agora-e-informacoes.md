@@ -59,6 +59,8 @@ Arquivos: `supabase/tests/04-informacoes.test.sql` (22 testes), `src/lib/cronogr
 - [x] Ponta a ponta: a página do comitê lista as 15 delegações com bandeira e nome, a mesa e os tópicos.
 - [x] Ponta a ponta: o perfil salva a minibiografia e envia a foto.
 - [x] Acessibilidade: axe sem erros na Agora, no comitê, no cronograma, nos avisos e no perfil, nos dois temas, para delegado e secretaria.
+- [x] Reflow: nenhuma tela com login rola na horizontal com 320 px. Este teste pegou dois vazamentos reais, corrigidos no CSS: a navegação de baixo (agora os itens dividem a largura e o rótulo encurta) e o campo de foto do perfil.
+- [x] WCAG 2.4.11: no celular, o que é rolado até a tela não fica atrás da navegação fixa (`scroll-padding-bottom`). O CI pegou isso antes do teste: com as fontes do runner, o botão "Salvar perfil" ficava atrás da navegação.
 
 O relógio dos testes fica no passado (as datas do evento de teste no seed são de 2026): congelado depois do vencimento da sessão, o login seria renovado o tempo todo e cairia.
 

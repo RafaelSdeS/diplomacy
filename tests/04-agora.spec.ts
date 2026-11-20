@@ -128,6 +128,48 @@ test('o perfil salva a minibiografia e envia a foto', async ({ page }, info) => 
 	await expect(page.getByRole('img', { name: 'Sua foto' })).toBeVisible();
 });
 
+test.describe('zoom de 200% nas telas com login', () => {
+	// Reflow da WCAG: com 320 px, nada pode exigir rolagem horizontal (no modo
+	// celular, um vazamento também faz a página encolher e desalinha os toques).
+	test.use({ viewport: { width: 320, height: 640 } });
+
+	for (const [conta, rotas] of [
+		[CONTAS.delegado, ['/', '/comite/CSNU-T', '/cronograma', '/avisos', '/perfil']],
+		[CONTAS.secretaria, ['/cronograma', '/avisos', '/secretaria/participantes']]
+	] as const) {
+		test(`não rola na horizontal (${conta})`, async ({ page }, info) => {
+			test.skip(info.project.name !== 'celular', 'basta rodar uma vez');
+			await entrar(page, conta);
+			for (const rota of rotas) {
+				await page.goto(rota);
+				await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+				const sobra = await page.evaluate(
+					() => document.documentElement.scrollWidth - document.documentElement.clientWidth
+				);
+				expect(sobra, rota).toBeLessThanOrEqual(0);
+			}
+		});
+	}
+});
+
+test.describe('celular com tela baixa', () => {
+	test.use({ viewport: { width: 360, height: 420 } });
+
+	// WCAG 2.4.11: o que é rolado até a tela (para clicar ou receber foco) não pode
+	// ficar escondido atrás da navegação fixa.
+	test('o botão rolado até a tela não fica atrás da navegação fixa', async ({ page }, info) => {
+		test.skip(info.project.name !== 'celular', 'a navegação fica fixa embaixo só no celular');
+		await entrar(page, CONTAS.delegado);
+		await page.goto('/perfil');
+		const botao = page.getByRole('button', { name: 'Salvar perfil' });
+		await botao.scrollIntoViewIfNeeded();
+
+		const nav = await page.getByRole('navigation', { name: 'Principal' }).boundingBox();
+		const caixa = await botao.boundingBox();
+		expect(caixa!.y + caixa!.height).toBeLessThanOrEqual(nav!.y);
+	});
+});
+
 for (const tema of ['light', 'dark'] as const) {
 	test(`as telas do passo 04 não têm erros de acessibilidade (tema ${tema})`, async ({ page }) => {
 		await page.emulateMedia({ colorScheme: tema });
