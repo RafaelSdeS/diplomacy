@@ -22,7 +22,7 @@ test('sem login, qualquer tela leva a /entrar', async ({ page }) => {
 
 test('entra e sai com e-mail e senha', async ({ page }) => {
 	await entrar(page, CONTAS.delegado);
-	await expect(page.getByRole('heading', { level: 1, name: 'Início' })).toBeVisible();
+	await expect(page.getByRole('heading', { level: 1, name: 'Agora' })).toBeVisible();
 
 	await page.getByRole('button', { name: 'Sair' }).click();
 	await expect(page).toHaveURL(/\/entrar$/);
@@ -52,7 +52,7 @@ test('o formulário de entrar funciona só com o teclado', async ({ page }) => {
 	await expect(page.getByLabel('Senha')).toBeFocused();
 	await page.keyboard.type(SENHA);
 	await page.keyboard.press('Enter');
-	await expect(page.getByRole('heading', { level: 1, name: 'Início' })).toBeVisible();
+	await expect(page.getByRole('heading', { level: 1, name: 'Agora' })).toBeVisible();
 });
 
 test('conta sem convite cai em /sem-acesso, sem menu', async ({ page }) => {
@@ -63,11 +63,11 @@ test('conta sem convite cai em /sem-acesso, sem menu', async ({ page }) => {
 });
 
 const MENUS = {
-	delegado: ['Início'],
-	mesa: ['Início'],
-	crise: ['Início'],
-	press: ['Início'],
-	secretaria: ['Início', 'Participantes']
+	delegado: ['Agora', 'Comitê', 'Cronograma', 'Avisos'],
+	mesa: ['Agora', 'Comitê', 'Cronograma', 'Avisos'],
+	crise: ['Agora', 'Comitê', 'Cronograma', 'Avisos'],
+	press: ['Agora', 'Comitê', 'Cronograma', 'Avisos'],
+	secretaria: ['Agora', 'Cronograma', 'Avisos', 'Participantes']
 } as const;
 
 for (const [papel, itens] of Object.entries(MENUS)) {

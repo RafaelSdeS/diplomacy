@@ -1,8 +1,17 @@
 import adapter from '@sveltejs/adapter-static';
 import { sveltekit } from '@sveltejs/kit/vite';
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
+	// Testes de unidade: só funções puras de src/lib (as telas ficam com o Playwright).
+	test: {
+		include: ['src/**/*.test.ts']
+	},
+	build: {
+		// As 271 bandeiras viram arquivos próprios, baixados só quando aparecem;
+		// embutidas, iriam todas juntas no JavaScript.
+		assetsInlineLimit: (arquivo) => (arquivo.includes('flag-icons') ? false : undefined)
+	},
 	plugins: [
 		sveltekit({
 			compilerOptions: {

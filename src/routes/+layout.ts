@@ -18,16 +18,22 @@ export const load: LayoutLoad = async ({ url, depends }) => {
 
 	if (!session) {
 		if (!publica) redirect(307, '/entrar');
-		return { usuario: null, participacoes: [] };
+		return { usuario: null, nome: null, participacoes: [] };
 	}
 	if (url.pathname === '/entrar') redirect(307, '/');
 
-	const { data: participacoes, error } = await supabase.from('minhas_participacoes').select('*');
-	if (error) throw error;
+	const [resposta, pessoa] = await Promise.all([
+		supabase.from('minhas_participacoes').select('*'),
+		supabase.from('pessoa').select('nome').eq('id', session.user.id).maybeSingle()
+	]);
+	if (resposta.error) throw resposta.error;
+	if (pessoa.error) throw pessoa.error;
+	const participacoes = resposta.data;
+	const nome = pessoa.data?.nome ?? session.user.email ?? '';
 
 	// Conta sem convite não entra no app; quem tem convite não fica preso em /sem-acesso.
 	if (participacoes.length === 0 && !publica && url.pathname !== '/sem-acesso') redirect(307, '/sem-acesso');
 	if (participacoes.length > 0 && url.pathname === '/sem-acesso') redirect(307, '/');
 
-	return { usuario: session.user, participacoes };
+	return { usuario: session.user, nome, participacoes };
 };

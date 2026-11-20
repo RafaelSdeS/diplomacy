@@ -2,7 +2,7 @@
 
 App web tudo em um para simulações da ONU (MUNs), começando pelo [UFRGSMUN](https://www.ufrgs.br/ufrgsmun/). Funciona no celular e no computador, sem instalar nada.
 
-> **Status:** passo 03 de 19, login e papéis. Os passos 01 e 02 estão prontos.
+> **Status:** passo 04 de 19, tela "Agora", perfis, cronograma e avisos. Os passos 01 a 03 estão prontos.
 
 ## O problema
 
@@ -101,7 +101,7 @@ cp .env.example .env # valores do Supabase local
 npm run db:iniciar   # Supabase local (banco, autenticação e API)
 npm run seed         # dados fictícios: contas @exemplo.test, senha "senha-de-teste"
 npm run dev          # app em http://localhost:5173
-npm run testar       # tipos, banco, build, tamanho e testes de ponta a ponta
+npm run testar       # tipos, unidade, banco, build, tamanho e ponta a ponta
 ```
 
 Contas do seed para entrar: `delegado01@exemplo.test` a `delegado16`, `mesa01`, `crise01`, `press01`, `secretaria01` e `semconvite` (sem convite), todas `@exemplo.test` com a senha `senha-de-teste`. Não há cadastro livre: as contas são criadas pelo seed ou pelo administrador, e os convites da secretaria definem o papel.

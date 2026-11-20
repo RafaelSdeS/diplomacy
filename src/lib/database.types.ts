@@ -23,16 +23,48 @@ export type Database = {
           }
         },"public": {
           Tables: {
-            "comite": {
+            "aviso": {
                   Row: {
-                    "crise_ligada": boolean,"evento_id": string,"id": string,"idioma": string,"nome": string,"nome_oficial": string,"regras": NonNullable<Json>,"sigla": string,"tecnologia_restrita": boolean
+                    "autor_id": string | null,"comite_id": string | null,"criado_em": string,"evento_id": string,"id": string,"texto": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "crise_ligada"?: boolean,"evento_id": string,"id"?: string,"idioma"?: string,"nome": string,"nome_oficial": string,"regras"?: NonNullable<Json>,"sigla": string,"tecnologia_restrita"?: boolean
+                    "autor_id"?: string | null,"comite_id"?: string | null,"criado_em"?: string,"evento_id": string,"id"?: string,"texto": string
                   }
                   Update: {
-                    "crise_ligada"?: boolean,"evento_id"?: string,"id"?: string,"idioma"?: string,"nome"?: string,"nome_oficial"?: string,"regras"?: NonNullable<Json>,"sigla"?: string,"tecnologia_restrita"?: boolean
+                    "autor_id"?: string | null,"comite_id"?: string | null,"criado_em"?: string,"evento_id"?: string,"id"?: string,"texto"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "aviso_autor_id_fkey"
+      columns: ["autor_id"]
+isOneToOne: false
+      referencedRelation: "pessoa"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "aviso_comite_id_evento_id_fkey"
+      columns: ["comite_id","evento_id"]
+isOneToOne: false
+      referencedRelation: "comite"
+      referencedColumns: ["id","evento_id"]
+    },{
+      foreignKeyName: "aviso_evento_id_fkey"
+      columns: ["evento_id"]
+isOneToOne: false
+      referencedRelation: "evento"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"comite": {
+                  Row: {
+                    "crise_ligada": boolean,"evento_id": string,"guia_url": string | null,"id": string,"idioma": string,"nome": string,"nome_oficial": string,"regras": NonNullable<Json>,"sigla": string,"tecnologia_restrita": boolean,"topicos": (string)[]
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "crise_ligada"?: boolean,"evento_id": string,"guia_url"?: string | null,"id"?: string,"idioma"?: string,"nome": string,"nome_oficial": string,"regras"?: NonNullable<Json>,"sigla": string,"tecnologia_restrita"?: boolean,"topicos"?: (string)[]
+                  }
+                  Update: {
+                    "crise_ligada"?: boolean,"evento_id"?: string,"guia_url"?: string | null,"id"?: string,"idioma"?: string,"nome"?: string,"nome_oficial"?: string,"regras"?: NonNullable<Json>,"sigla"?: string,"tecnologia_restrita"?: boolean,"topicos"?: (string)[]
                   }
                   Relationships: [
                     {
@@ -69,6 +101,32 @@ isOneToOne: false
       referencedColumns: ["id","comite_id"]
     },{
       foreignKeyName: "convite_evento_id_fkey"
+      columns: ["evento_id"]
+isOneToOne: false
+      referencedRelation: "evento"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"cronograma_item": {
+                  Row: {
+                    "comite_id": string | null,"evento_id": string,"fim": string,"id": string,"inicio": string,"local": string | null,"titulo": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "comite_id"?: string | null,"evento_id": string,"fim": string,"id"?: string,"inicio": string,"local"?: string | null,"titulo": string
+                  }
+                  Update: {
+                    "comite_id"?: string | null,"evento_id"?: string,"fim"?: string,"id"?: string,"inicio"?: string,"local"?: string | null,"titulo"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "cronograma_item_comite_id_evento_id_fkey"
+      columns: ["comite_id","evento_id"]
+isOneToOne: false
+      referencedRelation: "comite"
+      referencedColumns: ["id","evento_id"]
+    },{
+      foreignKeyName: "cronograma_item_evento_id_fkey"
       columns: ["evento_id"]
 isOneToOne: false
       referencedRelation: "evento"
@@ -149,14 +207,14 @@ isOneToOne: false
                   ]
                 },"pessoa": {
                   Row: {
-                    "id": string,"nome": string
+                    "avisos_vistos_em": string | null,"bio": string | null,"foto_path": string | null,"id": string,"nome": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "id": string,"nome": string
+                    "avisos_vistos_em"?: string | null,"bio"?: string | null,"foto_path"?: string | null,"id": string,"nome": string
                   }
                   Update: {
-                    "id"?: string,"nome"?: string
+                    "avisos_vistos_em"?: string | null,"bio"?: string | null,"foto_path"?: string | null,"id"?: string,"nome"?: string
                   }
                   Relationships: [
                     
@@ -205,8 +263,14 @@ isOneToOne: false
 "evento_do_comite":
 { Args: { "p_comite": string }; Returns: string
                            },
+"marcar_avisos_vistos":
+{ Args: Record<PropertyKey, never>; Returns: undefined
+                           },
 "minha_delegacao":
 { Args: { "p_comite": string }; Returns: string
+                           },
+"participa_do_comite":
+{ Args: { "p_comite": string }; Returns: boolean
                            },
 "pode_ver_pessoa":
 { Args: { "p_pessoa": string }; Returns: boolean

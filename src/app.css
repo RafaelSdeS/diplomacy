@@ -374,7 +374,8 @@ main {
 }
 
 .campo input,
-.campo select {
+.campo select,
+.campo textarea {
 	min-height: 2.75rem;
 	padding: 0.5rem 0.75rem;
 	border: 1px solid var(--cor-texto-suave);
@@ -383,6 +384,19 @@ main {
 	color: var(--cor-texto);
 	font: inherit;
 	font-weight: 400;
+}
+
+.campo textarea {
+	min-height: 6rem;
+	resize: vertical;
+}
+
+.sucesso {
+	margin: 0;
+	padding: 0.5rem 0.75rem;
+	border-radius: var(--raio);
+	background: var(--cor-ok-fundo);
+	color: var(--cor-ok);
 }
 
 .erro {
@@ -418,6 +432,86 @@ main {
 	display: block;
 	font-size: 0.9rem;
 	color: var(--cor-texto-suave);
+}
+
+/* Item que está acontecendo agora (cronograma). */
+.lista li[aria-current='time'] {
+	padding-left: 0.75rem;
+	border-left: 3px solid var(--cor-marinho);
+	background: var(--cor-marinho-suave);
+}
+
+.hora {
+	font-variant-numeric: tabular-nums;
+	font-weight: 600;
+	margin-right: 0.35rem;
+}
+
+/* Cartões da tela "Agora": uma coluna no celular, duas no notebook. */
+
+.cartoes {
+	display: grid;
+	gap: 1rem;
+}
+
+.cartoes .cartao {
+	max-width: none;
+}
+
+@media (min-width: 1024px) {
+	.cartoes {
+		grid-template-columns: 1fr 1fr;
+	}
+}
+
+.cartao h2 {
+	margin: 0 0 0.75rem;
+	padding: 0;
+	border: 0;
+	font-family: var(--fonte-ui);
+	font-size: 0.95rem;
+	font-variant-caps: all-small-caps;
+	letter-spacing: 0.08em;
+	color: var(--cor-texto-suave);
+}
+
+.destaque {
+	margin: 0 0 0.25rem;
+	font-family: var(--fonte-titulo);
+	font-size: 1.2rem;
+	font-weight: 600;
+	color: var(--cor-marinho);
+}
+
+/* Bandeira ao lado do nome do país (decorativa). */
+.bandeira {
+	flex: none;
+	width: 1.5rem;
+	height: auto;
+	border: 1px solid var(--cor-linha);
+	border-radius: 2px;
+	vertical-align: -0.2em;
+}
+
+.com-bandeira {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.grade {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+	gap: 0 1.5rem;
+	max-width: none;
+}
+
+.foto {
+	width: 6rem;
+	height: 6rem;
+	border: var(--linha);
+	border-radius: 50%;
+	object-fit: cover;
 }
 
 .cartao {
@@ -463,6 +557,15 @@ main {
 .selo--erro {
 	color: var(--cor-erro);
 	background: var(--cor-erro-fundo);
+}
+
+.selo--info {
+	color: var(--cor-marinho);
+	background: var(--cor-marinho-suave);
+}
+
+.capitalizar::first-letter {
+	text-transform: uppercase;
 }
 
 /* Carimbo: para documentos e situações formais. Usar com moderação. */

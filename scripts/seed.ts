@@ -72,7 +72,12 @@ const comite = verificar(
 				nome: 'Conselho de Segurança (teste)',
 				nome_oficial: 'O Conselho de Segurança',
 				idioma: 'pt',
-				crise_ligada: true
+				crise_ligada: true,
+				topicos: [
+					'Crime organizado transnacional, narcotráfico e instabilidade política: desafios na América Latina',
+					'Conflito no Iêmen: ataques no Mar Vermelho e no Golfo de Áden'
+				],
+				guia_url: 'https://www.ufrgs.br/ufrgsmun/'
 			},
 			{ onConflict: 'evento_id,sigla' }
 		)
@@ -138,6 +143,52 @@ for (const conta of contas) {
 		user_metadata: { nome: conta.nome }
 	});
 	if (error) throw new Error(`conta ${conta.email}: ${error.message}`);
+}
+
+// Cronograma de dois dias fictícios do evento (horário de Brasília). As datas ficam
+// no passado de propósito: os testes congelam o relógio nelas, e um relógio antes
+// do vencimento da sessão não força a renovação do login.
+const geral = null;
+const csnu = comite.id;
+const CRONOGRAMA: [string, string, string, string, string | null][] = [
+	['Credenciamento', 'Saguão', '2026-11-10T08:30', '2026-11-10T09:30', geral],
+	['Cerimônia de abertura', 'Salão de Atos', '2026-11-10T09:30', '2026-11-10T10:30', geral],
+	['Sessão 1', 'Sala 204', '2026-11-10T10:30', '2026-11-10T12:30', csnu],
+	['Almoço', 'Restaurante Universitário', '2026-11-10T12:30', '2026-11-10T14:00', geral],
+	['Sessão 2', 'Sala 204', '2026-11-10T14:00', '2026-11-10T17:30', csnu],
+	['Sessão 3', 'Sala 204', '2026-11-11T09:00', '2026-11-11T12:00', csnu]
+];
+verificar(
+	await db.from('cronograma_item').upsert(
+		CRONOGRAMA.map(([titulo, local, inicio, fim, comite_id]) => ({
+			evento_id: evento.id,
+			comite_id,
+			titulo,
+			local,
+			inicio: `${inicio}-03:00`,
+			fim: `${fim}-03:00`
+		})),
+		{ onConflict: 'evento_id,comite_id,inicio,titulo', ignoreDuplicates: true }
+	),
+	'cronograma'
+);
+
+// Um aviso de boas-vindas da secretaria, só na primeira vez.
+const avisos = await db.from('aviso').select('id', { count: 'exact', head: true }).eq('evento_id', evento.id);
+if (avisos.error) throw new Error(`avisos: ${avisos.error.message}`);
+if (!avisos.count) {
+	const secretaria = verificar(
+		await db.from('pessoa').select('id').eq('nome', 'Secretaria 01').single(),
+		'secretaria'
+	);
+	verificar(
+		await db.from('aviso').insert({
+			evento_id: evento.id,
+			texto: 'Bem-vindos ao UFRGSMUN Teste! O credenciamento começa às 8h30, no saguão.',
+			autor_id: secretaria.id
+		}),
+		'aviso'
+	);
 }
 
 console.log(

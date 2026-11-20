@@ -41,6 +41,8 @@ jobs:
 
       - name: Checagem de tipos
         run: npm run check
+      - name: Testes de unidade
+        run: npm run test:unit
       - run: npm run build
       - name: Tamanho da primeira abertura
         run: npm run tamanho

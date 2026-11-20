@@ -1,17 +1,10 @@
 <script lang="ts">
 	import { invalidate } from '$app/navigation';
+	import { PAPEIS } from '#lib/papeis.ts';
 	import { supabase, type Papel } from '#lib/supabase.ts';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
-
-	const PAPEIS: { valor: Papel; rotulo: string }[] = [
-		{ valor: 'delegado', rotulo: 'Delegado' },
-		{ valor: 'mesa', rotulo: 'Mesa' },
-		{ valor: 'crise', rotulo: 'Crise' },
-		{ valor: 'press', rotulo: 'Press' },
-		{ valor: 'secretaria', rotulo: 'Secretaria' }
-	];
 
 	let email = $state('');
 	let papel = $state<Papel>('delegado');

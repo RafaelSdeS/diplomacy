@@ -63,9 +63,9 @@ select results_eq(
 	'o delegado vê as delegações do evento'
 );
 select results_eq(
-	'select pessoa_id from public.participacao',
-	$$ values ('00000000-0000-0000-0000-0000000000a1'::uuid) $$,
-	'o delegado vê só a própria participação'
+	'select pessoa_id from public.participacao order by pessoa_id',
+	$$ values ('00000000-0000-0000-0000-0000000000a1'::uuid), ('00000000-0000-0000-0000-0000000000a3'::uuid) $$,
+	'o delegado vê as participações do próprio comitê (desde o passo 04) e não as de outro'
 );
 select results_eq(
 	'select nome from public.pessoa order by nome',

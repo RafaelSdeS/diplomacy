@@ -6,68 +6,65 @@
 
 ## Vitest
 
-Este passo tem o primeiro teste de unidade (redução de imagem), então o Vitest entra aqui: instalar, criar o script `npm run test:unit` e incluí-lo no `npm run testar` e no CI.
+- [x] Primeiro passo com testes de unidade: Vitest configurado no próprio `vite.config.ts` (precisa do plugin do SvelteKit para achar o `$app/tsconfig`), `npm run test:unit` no `npm run testar` e no CI.
 
 ## Banco
 
-```sql
-create table cronograma_item (
-  id uuid primary key default gen_random_uuid(),
-  evento_id uuid not null references evento,
-  comite_id uuid references comite,          -- nulo = vale para todos
-  titulo text not null,
-  local text,
-  inicio timestamptz not null,
-  fim timestamptz not null
-);
+Migração `supabase/migrations/20261121090000_informacoes.sql`:
 
-create table aviso (
-  id uuid primary key default gen_random_uuid(),
-  evento_id uuid not null references evento,
-  comite_id uuid references comite,          -- nulo = para todos
-  texto text not null,
-  autor_id uuid references pessoa,
-  criado_em timestamptz not null default now()
-);
-
-alter table pessoa add column bio text, add column foto_path text;
-```
-
-- Leitura: participantes do evento, ou do comitê quando `comite_id` estiver preenchido.
-- Escrita: secretaria (avisos gerais e cronograma) e mesa (avisos do próprio comitê).
-- `aviso` entra na publicação `supabase_realtime`.
+- [x] `comite` ganha `topicos` e `guia_url` (só `https://`).
+- [x] `pessoa` ganha `bio` (até 500 caracteres), `foto_path` e `avisos_vistos_em`.
+- [x] `cronograma_item`: geral (sem comitê) ou de um comitê, com fim depois do início. Participantes veem o geral e o do próprio comitê; só a secretaria cria, altera e remove.
+- [x] `aviso`: geral (só a secretaria) ou de um comitê (secretaria ou mesa dele). Ninguém publica em nome de outra pessoa; a secretaria e o autor removem. Está na publicação de tempo real.
+- [x] `marcar_avisos_vistos()`: marca os avisos como vistos com o relógio do servidor (o do aparelho pode estar adiantado e esconder avisos novos).
+- [x] Cada pessoa edita o próprio perfil.
+- [x] Mudança na regra do passo 02: quem está num comitê vê as participações dele (quem é da mesa, quem representa cada delegação), como no evento real. Função nova `participa_do_comite`.
+- [x] Bucket `fotos` no Storage: privado, até 200 KB, WebP ou JPEG. Cada pessoa envia e troca só a própria foto (`<id>/foto`); só quem pode ver a pessoa vê a foto.
+- [x] O Supabase local agora sobe também o tempo real e o storage (`npm run db:iniciar`).
 
 ## Telas
 
 | Rota | Celular | Notebook |
 |---|---|---|
-| `/` Agora | Cartões empilhados, o mais importante primeiro | Cartões em duas colunas |
-| `/cronograma` | Lista do dia com o item atual destacado | Lista por dia, com os dias lado a lado |
-| `/avisos` | Lista, com os não lidos marcados | Igual, mais largo |
-| `/comite/[sigla]` | Tema, tópicos, mesa, delegações com bandeira e guias | Mesmo conteúdo em duas colunas |
-| `/perfil` | Nome, foto, minibiografia, função e comitê | Igual |
+| `/` Agora | Cartões empilhados: acontecendo agora, depois, avisos (com os novos) e "você" | Cartões em duas colunas |
+| `/cronograma` | Lista do dia com o item atual destacado (`aria-current="time"` e selo "Agora") | Igual, mais largo |
+| `/avisos` | Lista com os novos marcados; formulário para quem pode publicar | Igual |
+| `/comite/[sigla]` | Tópicos, guia, mesa e delegações com bandeira | Delegações em grade |
+| `/perfil` | Participação, foto, nome e minibiografia | Igual |
 
-- **Agora** neste passo: sessão atual (sala e horário, a partir do cronograma), próximo item e avisos não lidos. Os passos seguintes adicionam seus próprios cartões: posição na fila de fala, resposta de crise, situação do DPO e plantão da press.
-- **Bandeiras:** `flag-icons`, carregando só o SVG de cada país usado.
-- **Fotos:** reduzidas no aparelho antes do envio (até 512 px, WebP), no bucket `fotos` do Storage. Cada pessoa só altera a própria foto.
-- **Guias:** links para o Drive. O PDF não é carregado junto com a tela.
+- **Agora:** o relógio da tela anda sozinho, então o cartão "Acontecendo agora" vira na hora certa. Todos os horários aparecem no fuso do evento, qualquer que seja o do aparelho.
+- **Menu:** Agora, Comitê (para quem tem comitê), Cronograma e Avisos, mais Participantes para a secretaria. O perfil fica no cabeçalho.
+- **Avisos ao vivo:** o layout assina os avisos pelo tempo real (`src/lib/tempo-real.ts`, o único lugar com assinaturas, que vira Broadcast no passo 13).
+- **Bandeiras:** `flag-icons` (MIT). Cada SVG vira um arquivo próprio no build, sem embutir no JavaScript (`assetsInlineLimit` no `vite.config.ts`), e só é baixado quando aparece.
+- **Fotos:** reduzidas no aparelho antes do envio (até 512 px; WebP, ou JPEG nos navegadores que não geram WebP).
+- **Guias:** link para fora; o PDF não é carregado com a tela.
+
+## Tamanho
+
+- [x] `scripts/tamanho.js` agora mede só a primeira abertura, a partir do manifesto do Vite: `index.html`, as entradas do SvelteKit, o layout raiz e a tela `/entrar`, com tudo o que importam (JS, CSS e a fonte). Somar o build inteiro deixou de fazer sentido com as 271 bandeiras. Hoje: 127 KB de 300 KB.
 
 ## Testes
 
-Arquivos: `supabase/tests/04-informacoes.test.sql`, `src/lib/ui/reduzir-imagem.test.ts` e `tests/04-agora.spec.ts`.
+Arquivos: `supabase/tests/04-informacoes.test.sql` (22 testes), `src/lib/cronograma.test.ts`, `src/lib/imagem.test.ts` (12 testes de unidade) e `tests/04-agora.spec.ts`.
 
-- [ ] pgTAP: um aviso de um comitê não aparece para quem é de outro comitê.
-- [ ] pgTAP: só a secretaria publica avisos gerais e mexe no cronograma; a mesa publica avisos só do próprio comitê.
-- [ ] pgTAP: cada pessoa altera só a própria foto no Storage.
-- [ ] Vitest: a redução de imagem entrega no máximo 512 px.
-- [ ] Ponta a ponta: a secretaria publica um aviso, e ele aparece para um delegado sem recarregar, nas três telas.
-- [ ] Ponta a ponta: a Agora destaca o item do cronograma que está acontecendo (relógio controlado).
-- [ ] Ponta a ponta: a página do comitê lista as 15 delegações com bandeira e nome.
-- [ ] Acessibilidade: axe sem erros na Agora, no cronograma, nos avisos, no perfil e no comitê.
+- [x] pgTAP: um aviso de um comitê não aparece para quem é de outro comitê; o cronograma também.
+- [x] pgTAP: só a secretaria mexe no cronograma e publica avisos gerais; a mesa publica avisos só do próprio comitê; ninguém publica em nome de outra pessoa.
+- [x] pgTAP: cada pessoa edita só o próprio perfil e envia só a própria foto; quem é de outro evento não vê a foto.
+- [x] pgTAP: `marcar_avisos_vistos` e a publicação de tempo real dos avisos.
+- [x] Vitest: o que está acontecendo (começo incluído, fim excluído), o próximo item, o agrupamento por dia no fuso do evento e o formato das horas.
+- [x] Vitest: a redução de imagem entrega no máximo 512 px, sem aumentar as pequenas.
+- [x] Ponta a ponta: um aviso da secretaria chega ao delegado sem recarregar, e some quando é removido.
+- [x] Ponta a ponta: a Agora mostra o item atual, o próximo e a participação (relógio congelado no dia do evento de teste).
+- [x] Ponta a ponta: o cronograma agrupa por dia e destaca o item atual; a secretaria adiciona e remove um item.
+- [x] Ponta a ponta: a página do comitê lista as 15 delegações com bandeira e nome, a mesa e os tópicos.
+- [x] Ponta a ponta: o perfil salva a minibiografia e envia a foto.
+- [x] Acessibilidade: axe sem erros na Agora, no comitê, no cronograma, nos avisos e no perfil, nos dois temas, para delegado e secretaria.
+
+O relógio dos testes fica no passado (as datas do evento de teste no seed são de 2026): congelado depois do vencimento da sessão, o login seria renovado o tempo todo e cairia.
 
 ## Pronto quando
 
 - [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
-- [ ] A Agora mostra a sessão atual, o próximo item e os avisos.
-- [ ] Um aviso novo chega sem recarregar a página.
-- [ ] As telas funcionam com 360 px e com 1366 px.
+- [x] A Agora mostra a sessão atual, o próximo item e os avisos.
+- [x] Um aviso novo chega sem recarregar a página.
+- [x] As telas funcionam com 360 px e com 1366 px.
