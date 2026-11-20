@@ -269,6 +269,7 @@
 		<a class="botao botao--secundario" href={`/comite/${data.comite.sigla}/sessao/chamada`}>Chamada e rodízio</a>
 	{/if}
 	<a class="botao botao--secundario" href={`/comite/${data.comite.sigla}/sessao/agenda`}>Agenda</a>
+	<a class="botao botao--secundario" href={`/comite/${data.comite.sigla}/blocos`}>Blocos e documentos</a>
 	{#if data.comite.crise_ligada && eu}
 		<a class="botao botao--secundario" href={`/comite/${data.comite.sigla}/crise`}>Notas de crise</a>
 	{/if}

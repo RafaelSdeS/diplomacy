@@ -22,6 +22,8 @@ export function assinarAvisos(aoMudar: () => void): () => void {
 export const TABELAS_SESSAO = ['estado_sessao', 'pedido_fala', 'ponto_mocao', 'presenca', 'lista_oradores', 'votacao', 'voto'];
 /** O que muda ao vivo na crise do comitê (a RLS decide quem recebe cada nota). */
 export const TABELAS_CRISE = ['nota_crise', 'atualizacao_comite'];
+/** Blocos e documentos do comitê. */
+export const TABELAS_BLOCOS = ['bloco_membro', 'documento'];
 
 /**
  * Mudanças nas tabelas de um comitê, filtradas pelo comitê. `aoConectar` diz se a
@@ -33,9 +35,36 @@ export function assinarComite(
 	aoMudar: () => void,
 	aoConectar: (ok: boolean) => void
 ): () => void {
-	const filter = `comite_id=eq.${comiteId}`;
-	const canal = supabase.channel(`comite:${comiteId}:${crypto.randomUUID()}`);
-	for (const table of tabelas) {
+	return assinar(
+		`comite:${comiteId}`,
+		tabelas.map((table) => ({ table, filter: `comite_id=eq.${comiteId}` })),
+		aoMudar,
+		aoConectar
+	);
+}
+
+/** Tudo o que muda num documento: o próprio documento, cláusulas, propostas, comentários... */
+export function assinarDocumento(documentoId: string, aoMudar: () => void, aoConectar: (ok: boolean) => void) {
+	const filter = `documento_id=eq.${documentoId}`;
+	return assinar(
+		`documento:${documentoId}`,
+		[
+			{ table: 'documento', filter: `id=eq.${documentoId}` },
+			...['clausula', 'proposta_alteracao', 'comentario', 'assinatura', 'rodada'].map((table) => ({ table, filter }))
+		],
+		aoMudar,
+		aoConectar
+	);
+}
+
+function assinar(
+	nome: string,
+	entradas: { table: string; filter: string }[],
+	aoMudar: () => void,
+	aoConectar: (ok: boolean) => void
+): () => void {
+	const canal = supabase.channel(`${nome}:${crypto.randomUUID()}`);
+	for (const { table, filter } of entradas) {
 		canal.on('postgres_changes', { event: '*', schema: 'public', table, filter }, aoMudar);
 	}
 	// Quando a assinatura fica pronta, recarrega uma vez: o que mudou entre a leitura

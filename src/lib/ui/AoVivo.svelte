@@ -2,12 +2,14 @@
 	import { onMount } from 'svelte';
 	import { invalidate } from '$app/navigation';
 	import { medirRelogio } from '#lib/sessao.ts';
-	import { assinarComite, TABELAS_SESSAO } from '#lib/tempo-real.ts';
+	import { assinarComite, assinarDocumento, TABELAS_SESSAO } from '#lib/tempo-real.ts';
 
 	// Liga uma tela do comitê ao tempo real e mede o relógio do servidor. Cada
 	// mudança nas tabelas recarrega os dados que dependem de `dependencia`.
+	// Com `documentoId`, acompanha um documento em vez das tabelas do comitê.
 	type Props = {
 		comiteId: string;
+		documentoId?: string;
 		tabelas?: string[];
 		dependencia?: `${string}:${string}`;
 		diferenca?: number;
@@ -15,6 +17,7 @@
 	};
 	let {
 		comiteId,
+		documentoId,
 		tabelas = TABELAS_SESSAO,
 		dependencia = 'app:sessao-ao-vivo',
 		diferenca = $bindable(0),
@@ -24,14 +27,13 @@
 	onMount(() => {
 		void medirRelogio().then((d) => (diferenca = d));
 	});
-	$effect(() =>
-		assinarComite(
-			comiteId,
-			tabelas,
-			() => invalidate(dependencia),
-			(ok) => (conectado = ok)
-		)
-	);
+	$effect(() => {
+		const aoMudar = () => invalidate(dependencia);
+		const aoConectar = (ok: boolean) => (conectado = ok);
+		return documentoId
+			? assinarDocumento(documentoId, aoMudar, aoConectar)
+			: assinarComite(comiteId, tabelas, aoMudar, aoConectar);
+	});
 </script>
 
 <span class="selo {conectado ? 'selo--ok' : 'selo--alerta'}" data-ao-vivo={conectado ? 'sim' : 'nao'}>

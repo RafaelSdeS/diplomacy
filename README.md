@@ -2,7 +2,7 @@
 
 App web tudo em um para simulações da ONU (MUNs), começando pelo [UFRGSMUN](https://www.ufrgs.br/ufrgsmun/). Funciona no celular e no computador, sem instalar nada.
 
-> **Status:** passo 08 de 19, crise. Os passos 01 a 07 estão prontos, e o piloto está publicado.
+> **Status:** passo 09 de 19, editor de resoluções. Os passos 01 a 08 estão prontos, e o piloto está publicado.
 
 ## O problema
 

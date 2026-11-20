@@ -36,7 +36,7 @@ Migração `supabase/migrations/20261125090000_crise.sql`.
 | Agora | Cartão "Respostas da crise" com as últimas respostas às notas da delegação |
 
 - [x] "Crise" no menu para a equipe de crise. Os delegados chegam pela tela da sessão ("Notas de crise") e pelo cartão da Agora.
-- [ ] **Resolução de crise:** o botão que cria um documento `resolucao_crise` ligado à atualização fica para o passo 09, com o editor.
+- [x] **Resolução de crise:** feita no passo 09. Um bloco cria, na tela de blocos, um documento do tipo resolução de crise ligado a uma atualização e o escreve no editor.
 - [ ] Com tecnologia restrita (OEA), os delegados não escrevem notas pelo app. Fica para o passo 16.
 
 ## Testes
@@ -61,7 +61,7 @@ Arquivos: `supabase/tests/08-crise.test.sql` (21 testes), `src/lib/crise.test.ts
 
 ## Pronto quando
 
-- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
+- [x] Os testes acima passam no CI, junto com os de todos os passos anteriores.
 - [x] 15 delegações escrevendo ao mesmo tempo não quebram a fila nem duplicam notas.
 - [x] O teste de privacidade passa.
 - [x] O delegado vê a posição da própria nota na fila.

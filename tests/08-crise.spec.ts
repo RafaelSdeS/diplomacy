@@ -94,9 +94,27 @@ test('aparência da fila da crise com 30 notas', async ({ page }) => {
 });
 
 test('a resposta da crise chega ao celular do delegado sem recarregar', async ({ browser }) => {
+	// Independente do teste anterior (numa nova tentativa, a fila pode ter sido limpa):
+	// garante uma nota dos EUA esperando resposta.
+	const cliente = await clienteComo(CONTAS.delegado);
+	const { count } = await cliente
+		.from('nota_crise')
+		.select('id', { count: 'exact', head: true })
+		.eq('comite_id', comiteId)
+		.eq('status', 'pendente');
+	if (!count) {
+		await cliente.rpc('enviar_nota', {
+			p_id: crypto.randomUUID(),
+			p_comite: comiteId,
+			p_tipo: 'diretiva',
+			p_titulo: 'Ação de EUA',
+			p_texto: 'A delegação de EUA mobiliza a sua marinha.'
+		});
+	}
+
 	const eua = await abrir(browser, CONTAS.delegado, NOTAS, { width: 360, height: 740 });
 	const minhas = eua.getByRole('region', { name: /^Notas de EUA/ });
-	await expect(minhas.getByText('1ª na fila')).toBeVisible();
+	await expect(minhas.getByText(/ª na fila$/).first()).toBeVisible();
 	const aprovadas = minhas.getByText('Aprovada', { exact: true });
 	const antes = await aprovadas.count(); // uma execução anterior pode ter deixado notas aprovadas
 

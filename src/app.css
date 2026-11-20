@@ -1194,3 +1194,106 @@ kbd {
 	font-size: clamp(1.1rem, 1.8vw, 2.25rem);
 	font-weight: 600;
 }
+
+/* Editor de resoluções (passo 09) */
+
+.editor {
+	display: grid;
+	gap: 1rem;
+	margin-bottom: 1.5rem;
+}
+
+.editor .cartao {
+	max-width: none;
+	min-width: 0;
+}
+
+@media (min-width: 1024px) {
+	.editor {
+		grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+		align-items: start;
+	}
+}
+
+.cabecalho-documento,
+.progresso {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5rem 1rem;
+	margin-bottom: 0.75rem;
+}
+
+.progresso progress {
+	flex: 1;
+	max-width: 20rem;
+	height: 0.6rem;
+	accent-color: var(--cor-marinho);
+}
+
+.lista-clausulas li {
+	flex-wrap: nowrap;
+}
+
+.lista-clausulas li.subitem {
+	padding-left: 1.5rem;
+}
+
+.lista-clausulas li.em-foco {
+	border-left: 3px solid var(--cor-alerta);
+	padding-left: 0.5rem;
+}
+
+.lista-clausulas li[aria-current='true'] {
+	background: var(--cor-marinho-suave);
+}
+
+.clausula {
+	display: grid;
+	gap: 0.15rem;
+	width: 100%;
+	min-height: 2.75rem;
+	padding: 0.35rem 0;
+	border: 0;
+	background: none;
+	color: inherit;
+	font: inherit;
+	text-align: left;
+	cursor: pointer;
+}
+
+.texto-clausula {
+	white-space: pre-wrap;
+}
+
+/* O documento formatado, com cara de papel oficial. */
+.folha {
+	max-width: 46rem;
+	padding: 2rem 2.25rem;
+	font-family: var(--fonte-titulo);
+	line-height: 1.6;
+}
+
+.folha .preambular {
+	font-style: italic;
+}
+
+.folha .linha-do-comite {
+	font-weight: 600;
+}
+
+.folha .subitem-doc {
+	padding-left: 2rem;
+}
+
+.folha .signatarios {
+	margin-top: 1.5rem;
+	font-family: var(--fonte-ui);
+	font-size: 0.9rem;
+}
+
+.documento-pronto summary {
+	margin: 1rem 0;
+	cursor: pointer;
+	font-weight: 600;
+}
