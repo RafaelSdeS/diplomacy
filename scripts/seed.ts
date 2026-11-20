@@ -1,7 +1,9 @@
 // Dados fictícios para desenvolver e testar: o evento "UFRGSMUN Teste", o comitê
 // CSNU-T com as 15 delegações do CSNU de 2026 e contas @exemplo.test.
-// Pode rodar várias vezes sem duplicar nada. Só roda no Supabase local, a menos
-// que SEED_PERMITIR_REMOTO=1 (para um projeto de teste, nunca o de produção).
+// Usa o fluxo real: cria os convites e depois as contas; o gatilho nova_conta
+// cria a pessoa e as participações. Pode rodar várias vezes sem duplicar nada.
+// Só roda no Supabase local, a menos que SEED_PERMITIR_REMOTO=1 (para um projeto
+// de teste, nunca o de produção).
 import { execFileSync } from 'node:child_process';
 import { createClient } from '@supabase/supabase-js';
 
@@ -91,8 +93,9 @@ const delegacoes = verificar(
 );
 const delegacaoPorNome = new Map(delegacoes.map((d) => [d.nome, d.id]));
 
-// Contas: um delegado por delegação, mais um segundo delegado dos EUA (delegação com dois).
-type Conta = { email: string; nome: string; papel: string; delegacao?: string };
+// Contas: um delegado por delegação, um segundo delegado dos EUA (delegação com
+// dois), uma conta por papel e uma conta sem convite (tela "sem acesso").
+type Conta = { email: string; nome: string; papel?: string; delegacao?: string };
 const contas: Conta[] = [
 	...DELEGACOES.map(([nome], i) => {
 		const n = String(i + 1).padStart(2, '0');
@@ -102,48 +105,40 @@ const contas: Conta[] = [
 	{ email: 'mesa01@exemplo.test', nome: 'Mesa 01', papel: 'mesa' },
 	{ email: 'crise01@exemplo.test', nome: 'Crise 01', papel: 'crise' },
 	{ email: 'press01@exemplo.test', nome: 'Press 01', papel: 'press' },
-	{ email: 'secretaria01@exemplo.test', nome: 'Secretaria 01', papel: 'secretaria' }
+	{ email: 'secretaria01@exemplo.test', nome: 'Secretaria 01', papel: 'secretaria' },
+	{ email: 'semconvite@exemplo.test', nome: 'Sem Convite' }
 ];
 
-const lista = await db.auth.admin.listUsers({ perPage: 1000 });
-if (lista.error) throw new Error(`usuários: ${lista.error.message}`);
-const idPorEmail = new Map(lista.data.users.map((u) => [u.email, u.id]));
-
-for (const conta of contas) {
-	if (idPorEmail.has(conta.email)) continue;
-	const { data, error } = await db.auth.admin.createUser({
-		email: conta.email,
-		password: SENHA,
-		email_confirm: true
-	});
-	if (error) throw new Error(`conta ${conta.email}: ${error.message}`);
-	idPorEmail.set(conta.email, data.user.id);
-}
-
 verificar(
-	await db
-		.from('pessoa')
-		.upsert(contas.map((c) => ({ id: idPorEmail.get(c.email), nome: c.nome })))
-		.select('id'),
-	'pessoas'
-);
-
-verificar(
-	await db
-		.from('participacao')
-		.upsert(
-			contas.map((c) => ({
-				pessoa_id: idPorEmail.get(c.email),
+	await db.from('convite').upsert(
+		contas
+			.filter((c) => c.papel)
+			.map((c) => ({
+				email: c.email,
 				evento_id: evento.id,
 				papel: c.papel,
 				comite_id: c.papel === 'secretaria' ? null : comite.id,
 				delegacao_id: c.delegacao ? delegacaoPorNome.get(c.delegacao) : null
 			})),
-			{ onConflict: 'pessoa_id,evento_id,papel,comite_id' }
-		)
-		.select('id'),
-	'participações'
+		{ onConflict: 'email,evento_id,papel,comite_id', ignoreDuplicates: true }
+	),
+	'convites'
 );
+
+const lista = await db.auth.admin.listUsers({ perPage: 1000 });
+if (lista.error) throw new Error(`usuários: ${lista.error.message}`);
+const existentes = new Set(lista.data.users.map((u) => u.email));
+
+for (const conta of contas) {
+	if (existentes.has(conta.email)) continue;
+	const { error } = await db.auth.admin.createUser({
+		email: conta.email,
+		password: SENHA,
+		email_confirm: true,
+		user_metadata: { nome: conta.nome }
+	});
+	if (error) throw new Error(`conta ${conta.email}: ${error.message}`);
+}
 
 console.log(
 	`Seed pronto: ${delegacoes.length} delegações e ${contas.length} contas @exemplo.test (senha "${SENHA}") em ${url}.`

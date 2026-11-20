@@ -43,6 +43,38 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"convite": {
+                  Row: {
+                    "comite_id": string | null,"criado_em": string,"delegacao_id": string | null,"email": string,"evento_id": string,"id": string,"papel": Database["public"]['Enums']["papel"]
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "comite_id"?: string | null,"criado_em"?: string,"delegacao_id"?: string | null,"email": string,"evento_id": string,"id"?: string,"papel": Database["public"]['Enums']["papel"]
+                  }
+                  Update: {
+                    "comite_id"?: string | null,"criado_em"?: string,"delegacao_id"?: string | null,"email"?: string,"evento_id"?: string,"id"?: string,"papel"?: Database["public"]['Enums']["papel"]
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "convite_comite_id_evento_id_fkey"
+      columns: ["comite_id","evento_id"]
+isOneToOne: false
+      referencedRelation: "comite"
+      referencedColumns: ["id","evento_id"]
+    },{
+      foreignKeyName: "convite_delegacao_id_comite_id_fkey"
+      columns: ["delegacao_id","comite_id"]
+isOneToOne: false
+      referencedRelation: "delegacao"
+      referencedColumns: ["id","comite_id"]
+    },{
+      foreignKeyName: "convite_evento_id_fkey"
+      columns: ["evento_id"]
+isOneToOne: false
+      referencedRelation: "evento"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"delegacao": {
                   Row: {
                     "bandeira": string | null,"comite_id": string,"id": string,"nome": string,"nome_oficial": string,"situacao": Database["public"]['Enums']["situacao_delegacao"]
@@ -132,10 +164,39 @@ isOneToOne: false
                 }
           }
           Views: {
-            [_ in never]: never
+            "minhas_participacoes": {
+                  Row: {
+                    "comite_id": string | null,"comite_nome": string | null,"comite_sigla": string | null,"delegacao_bandeira": string | null,"delegacao_id": string | null,"delegacao_nome": string | null,"evento_id": string,"evento_nome": string,"id": string,"papel": Database["public"]['Enums']["papel"]
+                  }
+                  ComputedFields: never
+                  Relationships: [
+                    {
+      foreignKeyName: "participacao_comite_id_evento_id_fkey"
+      columns: ["comite_id","evento_id"]
+isOneToOne: false
+      referencedRelation: "comite"
+      referencedColumns: ["id","evento_id"]
+    },{
+      foreignKeyName: "participacao_delegacao_id_comite_id_fkey"
+      columns: ["delegacao_id","comite_id"]
+isOneToOne: false
+      referencedRelation: "delegacao"
+      referencedColumns: ["id","comite_id"]
+    },{
+      foreignKeyName: "participacao_evento_id_fkey"
+      columns: ["evento_id"]
+isOneToOne: false
+      referencedRelation: "evento"
+      referencedColumns: ["id"]
+    }
+                  ]
+                }
           }
           Functions: {
-            "eh_participante":
+            "aplicar_convites":
+{ Args: { "p_email": string,"p_usuario": string }; Returns: undefined
+                           },
+"eh_participante":
 { Args: { "p_evento": string }; Returns: boolean
                            },
 "eh_secretaria":

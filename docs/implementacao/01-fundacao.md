@@ -35,7 +35,7 @@
 - [x] Playwright com três projetos de tela, todos no Chromium: celular (360 × 740), notebook (1366 × 768) e telão (1920 × 1080).
 - [x] `@axe-core/playwright` para checar acessibilidade.
 - [x] `scripts/tamanho.js`: soma o build com gzip e falha acima de 300 KB.
-- [x] GitHub Actions (`.github/workflows/ci.yml`) no contêiner oficial do Playwright: instalar, checar tipos, build, tamanho e testes de ponta a ponta.
+- [x] GitHub Actions (`.github/workflows/ci.yml`): instalar, checar tipos, build, tamanho e testes de ponta a ponta. Desde o passo 03 é um job só em `ubuntu-24.04`, com o Supabase local.
 - [x] Capturas de referência geradas só no CI, para não variar de máquina para máquina: rodar o workflow manualmente com "atualizar capturas", baixar o artefato `capturas` e fazer o commit em `tests/capturas/`.
 - [x] `npm run testar` roda localmente o mesmo que o CI.
 - Sem regra de proteção nem pull request: há uma pessoa só no projeto, então o trabalho vai direto para a `main` e o CI roda a cada push.

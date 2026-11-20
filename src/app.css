@@ -168,9 +168,30 @@ a {
 
 .timbre {
 	grid-area: timbre;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
 	padding: 0.75rem 1rem;
 	border-top: 3px solid var(--cor-marinho);
 	border-bottom: var(--linha);
+}
+
+.conta {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+}
+
+.conta-nome {
+	font-size: 0.9rem;
+	color: var(--cor-texto-suave);
+}
+
+@media (max-width: 639px) {
+	.conta-nome {
+		display: none;
+	}
 }
 
 .marca {
@@ -199,6 +220,11 @@ main {
 	grid-area: conteudo;
 	min-width: 0;
 	padding: 1.5rem 1rem calc(var(--altura-nav) + 1.5rem + env(safe-area-inset-bottom));
+}
+
+/* Sem menu (antes de entrar, ou sem convite): o conteúdo ocupa tudo. */
+.app--sem-menu main {
+	padding-bottom: 1.5rem;
 }
 
 /* Celular e tablet: navegação fixa embaixo. */
@@ -282,6 +308,11 @@ main {
 	main {
 		padding: 2rem 2.5rem;
 	}
+
+	.app--sem-menu {
+		grid-template-columns: 1fr;
+		grid-template-areas: 'timbre' 'conteudo';
+	}
 }
 
 /* Componentes base: classes simples; componente Svelte só quando houver comportamento. */
@@ -313,6 +344,80 @@ main {
 
 .botao--secundario:hover {
 	background: var(--cor-marinho-suave);
+}
+
+.botao--pequeno {
+	min-height: 2.25rem;
+	padding: 0.25rem 0.8rem;
+	font-size: 0.9rem;
+}
+
+.botao:disabled {
+	opacity: 0.6;
+	cursor: progress;
+}
+
+/* Formulários */
+
+.formulario {
+	display: grid;
+	gap: 1rem;
+	max-width: 24rem;
+	margin-bottom: 1.5rem;
+}
+
+.campo {
+	display: grid;
+	gap: 0.35rem;
+	font-size: 0.95rem;
+	font-weight: 600;
+}
+
+.campo input,
+.campo select {
+	min-height: 2.75rem;
+	padding: 0.5rem 0.75rem;
+	border: 1px solid var(--cor-texto-suave);
+	border-radius: var(--raio);
+	background: var(--cor-fundo);
+	color: var(--cor-texto);
+	font: inherit;
+	font-weight: 400;
+}
+
+.erro {
+	margin: 0;
+	padding: 0.5rem 0.75rem;
+	border-radius: var(--raio);
+	background: var(--cor-erro-fundo);
+	color: var(--cor-erro);
+}
+
+/* Listas de registros, legíveis no celular e no notebook. */
+
+.lista {
+	max-width: 48rem;
+	margin: 0 0 1.5rem;
+	padding: 0;
+	list-style: none;
+	border-top: var(--linha);
+}
+
+.lista li {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem 1rem;
+	padding: 0.75rem 0;
+	border-bottom: var(--linha);
+	overflow-wrap: anywhere;
+}
+
+.lista .detalhe {
+	display: block;
+	font-size: 0.9rem;
+	color: var(--cor-texto-suave);
 }
 
 .cartao {

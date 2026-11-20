@@ -19,6 +19,7 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"tamanho": "node scripts/tamanho.js",
 		"db:iniciar": "supabase start -x studio,imgproxy,edge-runtime,logflare,vector,postgres-meta,mailpit,realtime,storage-api,supavisor",
+		"db:resetar": "supabase db reset",
 		"db:tipos": "supabase gen types typescript --local > src/lib/database.types.ts",
 		"seed": "node scripts/seed.ts",
 		"test:db": "supabase test db",

@@ -19,17 +19,12 @@ insert into public.delegacao (id, comite_id, nome, nome_oficial) values
 	('00000000-0000-0000-0000-0000000000d2', '00000000-0000-0000-0000-0000000000c2', 'França', 'French Republic'),
 	('00000000-0000-0000-0000-0000000000d3', '00000000-0000-0000-0000-0000000000c3', 'Chile', 'Republic of Chile');
 
-insert into auth.users (id, email) values
-	('00000000-0000-0000-0000-0000000000a1', 'delegado1@exemplo.test'),
-	('00000000-0000-0000-0000-0000000000a2', 'delegado2@exemplo.test'),
-	('00000000-0000-0000-0000-0000000000a3', 'mesa1@exemplo.test'),
-	('00000000-0000-0000-0000-0000000000a4', 'secretaria@exemplo.test');
-
-insert into public.pessoa (id, nome) values
-	('00000000-0000-0000-0000-0000000000a1', 'Delegado 1'),
-	('00000000-0000-0000-0000-0000000000a2', 'Delegado 2'),
-	('00000000-0000-0000-0000-0000000000a3', 'Mesa 1'),
-	('00000000-0000-0000-0000-0000000000a4', 'Secretaria');
+-- A pessoa é criada pelo gatilho nova_conta (passo 03), com o nome do cadastro.
+insert into auth.users (id, email, raw_user_meta_data) values
+	('00000000-0000-0000-0000-0000000000a1', 'delegado1@exemplo.test', '{"nome": "Delegado 1"}'),
+	('00000000-0000-0000-0000-0000000000a2', 'delegado2@exemplo.test', '{"nome": "Delegado 2"}'),
+	('00000000-0000-0000-0000-0000000000a3', 'mesa1@exemplo.test', '{"nome": "Mesa 1"}'),
+	('00000000-0000-0000-0000-0000000000a4', 'secretaria@exemplo.test', '{"nome": "Secretaria"}');
 
 insert into public.participacao (pessoa_id, evento_id, papel, comite_id, delegacao_id) values
 	('00000000-0000-0000-0000-0000000000a1', '00000000-0000-0000-0000-0000000000e1', 'delegado', '00000000-0000-0000-0000-0000000000c1', '00000000-0000-0000-0000-0000000000d1'),

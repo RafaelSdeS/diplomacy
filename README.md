@@ -2,7 +2,7 @@
 
 App web tudo em um para simulações da ONU (MUNs), começando pelo [UFRGSMUN](https://www.ufrgs.br/ufrgsmun/). Funciona no celular e no computador, sem instalar nada.
 
-> **Status:** passo 02 de 19, banco, permissões e dados fictícios. O passo 01 está pronto.
+> **Status:** passo 03 de 19, login e papéis. Os passos 01 e 02 estão prontos.
 
 ## O problema
 
@@ -97,13 +97,16 @@ Também requer Docker, para o Supabase local.
 ```sh
 npm install
 npx playwright install chromium
+cp .env.example .env # valores do Supabase local
 npm run db:iniciar   # Supabase local (banco, autenticação e API)
-npm run seed         # dados fictícios: 20 contas @exemplo.test, senha "senha-de-teste"
+npm run seed         # dados fictícios: contas @exemplo.test, senha "senha-de-teste"
 npm run dev          # app em http://localhost:5173
 npm run testar       # tipos, banco, build, tamanho e testes de ponta a ponta
 ```
 
-Para parar o Supabase local: `npx supabase stop`. Depois de mudar o banco, rode `npm run db:tipos` para atualizar os tipos.
+Contas do seed para entrar: `delegado01@exemplo.test` a `delegado16`, `mesa01`, `crise01`, `press01`, `secretaria01` e `semconvite` (sem convite), todas `@exemplo.test` com a senha `senha-de-teste`. Não há cadastro livre: as contas são criadas pelo seed ou pelo administrador, e os convites da secretaria definem o papel.
+
+Para parar o Supabase local: `npx supabase stop`. Depois de criar uma migração, rode `npm run db:resetar` (recria o banco), `npm run seed` e `npm run db:tipos`.
 
 **Capturas de referência:** os testes de aparência comparam telas com capturas geradas no CI, sempre no mesmo contêiner. No seu computador eles são pulados. Para gerar ou atualizar as capturas:
 
