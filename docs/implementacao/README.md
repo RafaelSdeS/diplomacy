@@ -2,7 +2,7 @@
 
 Ordem dos passos para construir o app. Os passos 01 a 12 formam o **piloto**: planos gratuitos, poucos usuários e dados fictícios. Os passos 13 a 19 levam o app à **escala do evento**.
 
-Cada passo só começa quando os passos de que ele depende estão prontos.
+Cada passo só começa quando os passos de que ele depende estão prontos. As regras de procedimento que o app segue estão resumidas em [regras-de-procedimento.md](../regras-de-procedimento.md).
 
 | Passo | Entrega | Depende de |
 |---|---|---|
@@ -11,9 +11,9 @@ Cada passo só começa quando os passos de que ele depende estão prontos.
 | [02](02-banco-e-permissoes.md) | Banco base, papéis, regras de acesso e dados fictícios | 01 |
 | [03](03-login-e-papeis.md) | Login (Google, e-mail e senha) e navegação por função | 02 |
 | [04](04-agora-e-informacoes.md) | Tela "Agora", perfis, comitê, cronograma e avisos | 03 |
-| [05](05-regras-de-procedimento.md) | Regras do Guia de Regras como configuração | 02 |
+| [05](05-regras-de-procedimento.md) | Regras de procedimento como configuração | 02 |
 | [06](06-sessao-e-telao.md) | Sessão: chamada, presidência, pedidos de fala, cronômetro e telão | 04, 05 |
-| [07](07-agenda-e-votacao.md) | Agenda e votação com resultado automático | 06 |
+| [07](07-agenda-e-votacao.md) | Plenária de abertura, agenda e votação com resultado automático | 06 |
 | [08](08-crise.md) | Notas de crise, fila da equipe e atualizações | 06 |
 | [09](09-editor-de-resolucoes.md) | Blocos, cláusulas, redator, rodadas e projeto de resolução | 07 |
 | [10](10-dpo-e-documentos-em-pdf.md) | DPO, cartas e modelos de impressão | 09 |
@@ -140,7 +140,7 @@ Leve, profissional, diplomática, limpa e com cara de oficial. A referência é 
   - rótulos curtos em versalete;
   - selos de situação no estilo carimbo ("APROVADA", "CONFIDENCIAL"), usados com moderação.
 
-- **Cores:** fundo branco e cinzas muito claros, texto grafite e uma cor de destaque azul-marinho. Um dourado discreto aparece só em destaques especiais, como a presidência e os prêmios. As bandeiras são o único elemento muito colorido.
+- **Cores:** fundo branco e cinzas muito claros, texto grafite e uma cor de destaque azul-marinho. Um dourado discreto aparece só em destaques especiais, como a presidência (o UFRGSMUN não tem premiação). As bandeiras são o único elemento muito colorido.
 - **Cores de situação:** verde, vermelho e âmbar só para situação (voto, prazo, fila), sempre com ícone e texto.
 - **Tipografia:** títulos e documentos com serifa (Source Serif 4, um único arquivo `woff2` reduzido aos caracteres latinos, servido pelo próprio app e contado no limite de 300 KB). A interface usa a fonte do sistema, que não precisa ser baixada.
 - **Espaço e linhas:** bastante espaço em branco, linhas finas de 1 px em vez de sombras e cantos levemente arredondados (4 a 8 px).

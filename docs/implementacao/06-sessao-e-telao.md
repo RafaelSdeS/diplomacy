@@ -4,6 +4,8 @@
 **Depende de:** 04 e 05
 **Objetivo:** conduzir uma sessão pelo app, com chamada, quórum, presidência em rodízio, pedidos de fala, cronômetro, pontos e moções, e mostrar tudo no telão.
 
+> **Atualização:** pelas regras do UNOCT, o sorteio da presidência inclui todas as delegações que não são observadoras (sem voluntárias), cada delegação preside no máximo 2 sessões, e o bureau preside a plenária de abertura e a fase de ação (não as "sessões de votação"). O formal-formal só existe na plenária, e a lista de pontos e moções muda. Os ajustes estão no começo do [passo 07](07-agenda-e-votacao.md).
+
 ## Banco
 
 Migração `supabase/migrations/20261123090000_sessao.sql`. O desenho inicial mudou em alguns pontos, todos para fechar brechas ou simplificar:

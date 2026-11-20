@@ -17,8 +17,8 @@
 ## Sessão de teste
 
 - [ ] Roteiro de 1h30 a 2h com um cenário fictício:
-  1. chamada e debate da agenda;
-  2. debate com rodízio da presidência;
+  1. chamada, plenária de abertura (briefing, discursos de abertura e moção do tópico no topo) e agenda informal;
+  2. debate formal-informal com rodízio da presidência;
   3. uma atualização de crise;
   4. um working paper que vira projeto de resolução;
   5. votação;
@@ -26,6 +26,7 @@
 - [ ] Contas fictícias para cada pessoa do grupo, entregues na hora.
 - [ ] Plano B em papel à mão, com um combinado claro de quando usá-lo.
 - [ ] Um notebook com projetor rodando o telão.
+- [ ] Usar o formato do **mock** do UFRGSMUN: no primeiro dia, o evento já tem um horário de "simulação de treino e regras", com um cenário fictício. É o melhor momento para ensinar o app a todo mundo. O seed ganha um comitê de treino com um cenário fictício próprio, para ensaiar exatamente esse momento.
 
 ## Métricas
 

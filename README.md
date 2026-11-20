@@ -23,7 +23,7 @@ Hoje uma simulação roda sobre ferramentas soltas: inscrição no Google Forms,
 | Press | Uma por comitê, cada uma de um veículo. Publica na hora, sem aprovação; o app leva a matéria ao telão, avisa as delegações citadas e prepara a imagem para as redes. |
 | Secretaria | Importação das inscrições, crachás, check-in, certificados e o arquivo da edição. |
 
-As regras de procedimento vêm do Guia de Regras do UFRGSMUN e são configuráveis por comitê (CSNU com veto, Conselho Europeu por unanimidade, OEA histórica com tecnologia restrita).
+As regras de procedimento seguem as Rules of Procedure do UNOCT 2026, que valem para todos os comitês, completadas pelo Guia de Regras do UFRGSMUN, e são configuráveis por comitê (CSNU com veto, Conselho Europeu por unanimidade, OEA histórica com tecnologia restrita). Resumo em [docs/regras-de-procedimento.md](docs/regras-de-procedimento.md).
 
 ## Princípios
 
@@ -60,9 +60,9 @@ Cada passo traz os testes que provam que ele funciona. Um passo só termina quan
 | [02](docs/implementacao/02-banco-e-permissoes.md) | Banco base, papéis, regras de acesso e dados fictícios |
 | [03](docs/implementacao/03-login-e-papeis.md) | Login e navegação por função |
 | [04](docs/implementacao/04-agora-e-informacoes.md) | Tela "Agora", perfis, comitê, cronograma e avisos |
-| [05](docs/implementacao/05-regras-de-procedimento.md) | Regras do Guia de Regras como configuração |
+| [05](docs/implementacao/05-regras-de-procedimento.md) | Regras de procedimento como configuração |
 | [06](docs/implementacao/06-sessao-e-telao.md) | Sessão e telão |
-| [07](docs/implementacao/07-agenda-e-votacao.md) | Agenda e votação |
+| [07](docs/implementacao/07-agenda-e-votacao.md) | Plenária de abertura, agenda e votação |
 | [08](docs/implementacao/08-crise.md) | Crise |
 | [09](docs/implementacao/09-editor-de-resolucoes.md) | Editor de resoluções |
 | [10](docs/implementacao/10-dpo-e-documentos-em-pdf.md) | DPO, cartas e documentos em PDF |

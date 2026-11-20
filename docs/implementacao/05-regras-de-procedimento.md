@@ -4,6 +4,8 @@
 **Depende de:** 02
 **Objetivo:** transformar o Guia de Regras do UFRGSMUN em configuração, com os cálculos feitos no banco.
 
+> **Atualização:** as regras do UNOCT, que valem para todos os comitês, trocam a fração de assinaturas do projeto por um mínimo de 5 signatários e acrescentam o limite de sessões por presidência, as assinaturas da não-confiança e o quórum de votação. Os ajustes estão no começo do [passo 07](07-agenda-e-votacao.md), e o resumo das regras em [regras-de-procedimento.md](../regras-de-procedimento.md).
+
 ## Formato
 
 Valem, nesta ordem (a última vence): os padrões do Guia de Regras, gravados na migração (`regras_do_guia()`), o padrão do evento (`evento.regras_padrao`) e os ajustes de cada comitê (`comite.regras`). Assim toda chave sempre tem valor, e o evento e o comitê só guardam o que muda.

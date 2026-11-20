@@ -23,7 +23,7 @@
 
 ## Pós-evento
 
-- [ ] **Arquivo da edição:** exportação num ZIP com os PDFs (agenda aprovada, resoluções, resoluções de crise, edições da press e premiados), as regras usadas e um JSON com os dados públicos. É entregue à organização.
+- [ ] **Arquivo da edição:** exportação num ZIP com os PDFs (agenda aprovada, resoluções, resoluções de crise e edições da press), as regras usadas e um JSON com os dados públicos. É entregue à organização.
 - [ ] **Pesquisa de satisfação** no app, separada por função.
 - [ ] **Modelos para a próxima edição:** comitês, regras e roteiros de crise copiados para um novo evento.
 - [ ] **Infraestrutura:** backup final e volta do Supabase para o plano gratuito.

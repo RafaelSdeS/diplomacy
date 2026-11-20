@@ -4,6 +4,8 @@
 **Depende de:** 06
 **Objetivo:** a press de cada comitê publica na hora, sem aprovação, com plantão no telão e moderação só se precisar.
 
+As redes da press são separadas das institucionais: `@press.ufrgsmun` para a press e `@ufrgsmun` para o evento. A coletiva de imprensa acontece no fim do terceiro dia.
+
 ## Banco
 
 ```sql

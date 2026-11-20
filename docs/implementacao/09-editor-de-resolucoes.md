@@ -61,6 +61,11 @@ create table termometro (clausula_id uuid, delegacao_id uuid, opcao text check (
 - Rodadas: abrir uma rodada exige que a anterior tenha terminado e respeita `max_rodadas`. Depois da última, o documento só pode ser enviado à mesa.
 - Documento `enviado` fica travado. Daí em diante, mudanças só por emenda (passo 16).
 
+## Working papers e projetos (regras do UNOCT)
+
+- **Working paper** é informal: sem signatários e sem formato fixo. Além de cláusulas, aceita blocos de texto livre e links (notícias, resoluções anteriores, mídia). Observadoras também escrevem. Ele só pode ser mencionado no comitê depois de aprovado pela mesa: status `aprovado_mesa`, e só então fica visível para o comitê inteiro.
+- **Projeto de resolução** só pode ser enviado com no mínimo `assinaturas_projeto_min` signatários (5). No envio, os signatários escolhem a aprovação por consenso ou por votação (`documento.aprovacao`). O que vem depois da aprovação da mesa (leitura, consenso, emendas e votação) é a fase de ação, no passo 16.
+
 ## Formatação (TypeScript, funções puras)
 
 - Cláusulas numeradas pela ordem; preambulares terminam com ponto e vírgula; a última operativa termina com ponto, como nos documentos do UNOCT.
@@ -90,6 +95,8 @@ Arquivos: `supabase/tests/09-editor.test.sql`, `src/lib/regras/formatacao.test.t
 - [ ] pgTAP: cláusula acordada não muda, e reabrir exige o número mínimo de pedidos.
 - [ ] pgTAP: conflito de versão é detectado.
 - [ ] pgTAP: não abre rodada além de `max_rodadas`, e documento enviado fica travado.
+- [ ] pgTAP: working paper só fica visível ao comitê depois de aprovado pela mesa; observadora escreve working paper.
+- [ ] pgTAP: projeto com menos de 5 signatários não é enviado.
 - [ ] pgTAP: na fusão, cada cláusula guarda a origem.
 - [ ] Ponta a ponta: uma proposta aceita pelo redator aparece para todo o bloco sem recarregar.
 - [ ] Ponta a ponta: a barra de progresso e a cláusula em foco atualizam para todos.
