@@ -70,6 +70,6 @@ Os exemplos do próprio guia viram casos de teste:
 
 ## Pronto quando
 
-- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
+- [x] Os testes acima passam no CI, junto com os de todos os passos anteriores: 86 do banco, 17 de unidade e 110 de ponta a ponta.
 - [x] Os testes com os exemplos do guia passam.
 - [x] O comitê de teste mostra suas regras, com a regra do CSNU, no celular e no notebook.

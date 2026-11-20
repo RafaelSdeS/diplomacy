@@ -63,10 +63,10 @@ test('conta sem convite cai em /sem-acesso, sem menu', async ({ page }) => {
 });
 
 const MENUS = {
-	delegado: ['Agora', 'Comitê', 'Cronograma', 'Avisos'],
-	mesa: ['Agora', 'Comitê', 'Cronograma', 'Avisos'],
-	crise: ['Agora', 'Comitê', 'Cronograma', 'Avisos'],
-	press: ['Agora', 'Comitê', 'Cronograma', 'Avisos'],
+	delegado: ['Agora', 'Sessão', 'Comitê', 'Cronograma', 'Avisos'],
+	mesa: ['Agora', 'Sessão', 'Comitê', 'Cronograma', 'Avisos'],
+	crise: ['Agora', 'Sessão', 'Comitê', 'Cronograma', 'Avisos'],
+	press: ['Agora', 'Sessão', 'Comitê', 'Cronograma', 'Avisos'],
 	secretaria: ['Agora', 'Cronograma', 'Avisos', 'Participantes']
 } as const;
 

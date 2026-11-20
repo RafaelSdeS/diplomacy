@@ -235,6 +235,10 @@ main {
 	padding: 1.5rem 1rem calc(var(--altura-nav) + 1.5rem + env(safe-area-inset-bottom));
 }
 
+main.main-telao {
+	padding: 0;
+}
+
 /* Sem menu (antes de entrar, ou sem convite): o conteúdo ocupa tudo. */
 .app--sem-menu main {
 	padding-bottom: 1.5rem;
@@ -673,4 +677,291 @@ dialog h3 {
 		transition: none !important;
 		animation: none !important;
 	}
+}
+
+/* Sessão (passo 06) */
+
+.botao--grande {
+	min-height: 3.5rem;
+	padding: 0.75rem 1.5rem;
+	font-size: 1.1rem;
+}
+
+.acoes {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5rem;
+	margin: 0.75rem 0;
+}
+
+.atalhos {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	margin-top: 1.5rem;
+}
+
+kbd {
+	padding: 0.05rem 0.35rem;
+	border: var(--linha);
+	border-radius: 4px;
+	font-family: var(--fonte-mono);
+	font-size: 0.85em;
+}
+
+.campo--curto input {
+	max-width: 8rem;
+}
+
+.opcao {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	min-height: 2.75rem; /* alvo de toque */
+	margin-right: 1rem;
+}
+
+.presenca,
+.voluntarias {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	min-width: 0;
+}
+
+.presenca legend {
+	float: left; /* nome e opções na mesma linha quando cabem */
+	min-width: 12rem;
+	margin-right: 1rem;
+	padding: 0.6rem 0;
+	font-weight: 600;
+}
+
+.voluntarias {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+}
+
+.voluntarias legend {
+	margin-bottom: 0.5rem;
+	font-weight: 600;
+}
+
+.quorum {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5rem 1rem;
+	font-weight: 600;
+}
+
+/* Painel da presidência: fila, cronômetro e pontos lado a lado no notebook. */
+.painel {
+	display: grid;
+	gap: 1rem;
+}
+
+.painel .cartao {
+	max-width: none;
+}
+
+@media (min-width: 1024px) {
+	.painel {
+		grid-template-columns: 1fr 1.3fr 1fr;
+		align-items: start;
+	}
+}
+
+.cronometro {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0.25rem 1rem;
+	margin: 0.5rem 0;
+}
+
+.cronometro-tempo {
+	font-family: var(--fonte-mono);
+	font-size: 2.5rem;
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+	line-height: 1;
+}
+
+.cronometro--grande .cronometro-tempo {
+	font-size: 4.5rem;
+}
+
+.cronometro-fase {
+	font-weight: 600;
+}
+
+.cronometro--aviso .cronometro-tempo,
+.cronometro--aviso .cronometro-fase {
+	color: var(--cor-alerta);
+}
+
+.cronometro--esgotado .cronometro-tempo,
+.cronometro--esgotado .cronometro-fase {
+	color: var(--cor-erro);
+}
+
+.cronometro--pausado .cronometro-tempo {
+	color: var(--cor-texto-suave);
+}
+
+/* Placa em tela cheia, para mostrar à presidência. */
+.placa {
+	width: 100vw;
+	max-width: none;
+	height: 100dvh;
+	max-height: none;
+	margin: 0;
+	padding: 2rem 1rem;
+	border: 0;
+	background: var(--cor-fundo);
+	color: var(--cor-texto);
+	text-align: center;
+}
+
+.placa[open] {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 1.5rem;
+}
+
+.placa .bandeira {
+	width: min(70vw, 50dvh);
+}
+
+.placa p {
+	margin: 0;
+	font-family: var(--fonte-titulo);
+	font-size: clamp(2rem, 9vw, 5rem);
+	font-weight: 600;
+}
+
+/* Telão: projetor 1920 × 1080, lido do fundo da sala. Sempre azul-marinho e branco. */
+.telao {
+	--cor-fundo: #1b365d;
+	--cor-texto: #ffffff;
+	--cor-texto-suave: #d5deea;
+	--cor-linha: #4a6386;
+	--cor-alerta: #ffd479;
+	--cor-erro: #ffb4ab;
+	--cor-ok: #b6e3c4;
+	--cor-ok-fundo: #133a26;
+	--cor-alerta-fundo: #3d2e0a;
+
+	display: grid;
+	grid-template-columns: 1fr minmax(18rem, 26vw);
+	grid-template-rows: auto 1fr;
+	grid-template-areas: 'topo topo' 'orador fila';
+	gap: 2vh 3vw;
+	height: 100dvh;
+	padding: 4vh 4vw;
+	overflow: hidden;
+	background: var(--cor-fundo);
+	color: var(--cor-texto);
+	cursor: default;
+}
+
+.telao .rotulo {
+	color: var(--cor-texto-suave);
+}
+
+.telao-topo {
+	grid-area: topo;
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 2rem;
+	padding-bottom: 2vh;
+	border-bottom: 1px solid var(--cor-linha);
+}
+
+.telao-comite {
+	margin: 0;
+	font-size: clamp(1rem, 1.6vw, 2rem);
+	color: var(--cor-texto-suave);
+}
+
+.telao-sessao {
+	margin: 0.25rem 0 0;
+	padding: 0;
+	border: 0;
+	font-size: clamp(1.5rem, 2.6vw, 3.25rem);
+	color: var(--cor-texto);
+}
+
+.telao-presidencia {
+	display: grid;
+	justify-items: end;
+	gap: 0.35rem;
+	font-size: clamp(1rem, 1.6vw, 2rem);
+	text-align: right;
+}
+
+.telao-orador {
+	grid-area: orador;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: flex-start;
+	gap: 2vh;
+	min-height: 0;
+}
+
+.telao-orador .bandeira {
+	width: min(22vw, 30vh);
+	border-color: var(--cor-linha);
+}
+
+.telao-nome {
+	margin: 0;
+	font-family: var(--fonte-titulo);
+	font-size: clamp(2.5rem, 6vw, 7.5rem);
+	font-weight: 600;
+	line-height: 1.05;
+}
+
+.telao-nome--vazio {
+	color: var(--cor-texto-suave);
+}
+
+.telao .cronometro-tempo {
+	font-size: clamp(4rem, 11vw, 13rem);
+}
+
+.telao .cronometro-fase {
+	font-size: clamp(1.25rem, 2.2vw, 2.75rem);
+}
+
+.telao-fila {
+	grid-area: fila;
+	align-self: center;
+	font-size: clamp(1.1rem, 1.9vw, 2.25rem);
+}
+
+.telao-fila ol {
+	margin: 0;
+	padding-left: 1.5em;
+}
+
+.telao-fila li {
+	padding: 0.4em 0;
+	border-bottom: 1px solid var(--cor-linha);
+}
+
+.telao-fila .bandeira {
+	width: 1.6em;
+}
+
+.telao-vazio {
+	list-style: none;
+	margin-left: -1.5em;
+	color: var(--cor-texto-suave);
 }
