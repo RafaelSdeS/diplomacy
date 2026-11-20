@@ -51,3 +51,26 @@ jobs:
         with:
           name: relatorio-playwright
           path: playwright-report/
+
+  banco:
+    # Fora do contêiner: o Supabase local precisa do Docker do próprio runner.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+      - name: Supabase local (aplica as migrações do zero)
+        run: npm run db:iniciar
+      - name: Dados fictícios, duas vezes (o seed pode ser repetido)
+        run: npm run seed && npm run seed
+      - name: Testes do banco
+        run: npm run test:db
+      - name: Tipos do banco em dia
+        run: |
+          npx supabase gen types typescript --local > /tmp/tipos.ts
+          diff -u src/lib/database.types.ts /tmp/tipos.ts

@@ -18,8 +18,12 @@
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"tamanho": "node scripts/tamanho.js",
+		"db:iniciar": "supabase start -x studio,imgproxy,edge-runtime,logflare,vector,postgres-meta,mailpit,realtime,storage-api,supavisor",
+		"db:tipos": "supabase gen types typescript --local > src/lib/database.types.ts",
+		"seed": "node scripts/seed.ts",
+		"test:db": "supabase test db",
 		"test:e2e": "playwright test",
-		"testar": "npm run check && npm run build && npm run tamanho && npm run test:e2e"
+		"testar": "npm run check && npm run test:db && npm run build && npm run tamanho && npm run test:e2e"
 	},
 	"devDependencies": {
 		"@axe-core/playwright": "^4.14.0",
@@ -28,6 +32,7 @@
 		"@sveltejs/kit": "^3.4.0",
 		"@sveltejs/vite-plugin-svelte": "^7.3.1",
 		"@types/node": "^24.19.2",
+		"supabase": "^3.2.0",
 		"svelte": "^5.59.0",
 		"svelte-check": "^4.7.8",
 		"typescript": "^6.0.3",
@@ -35,6 +40,7 @@
 	},
 	"dependencies": {
 		"@fontsource/source-serif-4": "^5.3.1",
-		"@lucide/svelte": "^1.77.0"
+		"@lucide/svelte": "^1.77.0",
+		"@supabase/supabase-js": "^2.119.2"
 	}
 }

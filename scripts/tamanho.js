@@ -10,7 +10,7 @@ const PASTA = 'build';
 const TIPOS = new Set(['.html', '.js', '.css', '.woff2', '.svg']);
 
 let total = 0;
-for (const nome of readdirSync(PASTA, { recursive: true })) {
+for (const nome of readdirSync(PASTA, { recursive: true, encoding: 'utf8' })) {
 	const caminho = join(PASTA, nome);
 	if (statSync(caminho).isFile() && TIPOS.has(extname(caminho))) {
 		total += gzipSync(readFileSync(caminho)).length;

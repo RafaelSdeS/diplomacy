@@ -2,7 +2,7 @@
 
 App web tudo em um para simulações da ONU (MUNs), começando pelo [UFRGSMUN](https://www.ufrgs.br/ufrgsmun/). Funciona no celular e no computador, sem instalar nada.
 
-> **Status:** passo 01 de 19, a fundação do projeto.
+> **Status:** passo 02 de 19, banco, permissões e dados fictícios. O passo 01 está pronto.
 
 ## O problema
 
@@ -92,12 +92,18 @@ As fases do projeto (validação, piloto, evento e crescimento) e o calendário 
 
 Requer Node 24 (`nvm install 24 && nvm use`).
 
+Também requer Docker, para o Supabase local.
+
 ```sh
 npm install
 npx playwright install chromium
-npm run dev       # app em http://localhost:5173
-npm run testar    # tipos, build, tamanho e testes de ponta a ponta
+npm run db:iniciar   # Supabase local (banco, autenticação e API)
+npm run seed         # dados fictícios: 20 contas @exemplo.test, senha "senha-de-teste"
+npm run dev          # app em http://localhost:5173
+npm run testar       # tipos, banco, build, tamanho e testes de ponta a ponta
 ```
+
+Para parar o Supabase local: `npx supabase stop`. Depois de mudar o banco, rode `npm run db:tipos` para atualizar os tipos.
 
 **Capturas de referência:** os testes de aparência comparam telas com capturas geradas no CI, sempre no mesmo contêiner. No seu computador eles são pulados. Para gerar ou atualizar as capturas:
 
