@@ -80,6 +80,6 @@ Arquivos: `supabase/tests/03-convites.test.sql` (15 testes) e `tests/03-login.sp
 
 ## Pronto quando
 
-- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
+- [x] Os testes acima passam no CI, junto com os de todos os passos anteriores: 44 testes do banco e 74 de ponta a ponta.
 - [x] Cada conta fictícia entra e vê só o menu da sua função, no celular e no notebook.
 - [x] Uma pessoa sem convite cai em `/sem-acesso`.
