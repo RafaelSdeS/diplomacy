@@ -41,11 +41,11 @@ Migração `supabase/migrations/20261123090000_sessao.sql`. O desenho inicial mu
 | Tela | Celular | Notebook |
 |---|---|---|
 | Delegado `/comite/[sigla]/sessao` | Orador com bandeira, tempo, fila, botão grande "Levantar placa" com a posição na fila, placa em tela cheia, ponto ou moção e a resposta da presidência | Cartões em duas colunas |
-| Presidência `/comite/[sigla]/presidencia` | Uma coluna | Fila à esquerda, orador e cronômetro ao centro, pontos e moções à direita; atalhos de teclado (Espaço pausa ou retoma, Enter dá a palavra ao próximo) que não valem dentro de campos e botões |
-| Mesa `/comite/[sigla]/chamada` | Abrir e encerrar sessão, chamada com três opções por delegação (ausente, presente, presente e votando) e o quórum calculado, sorteio do rodízio | Igual |
+| Presidência `/comite/[sigla]/sessao/presidencia` | Uma coluna | Fila à esquerda, orador e cronômetro ao centro, pontos e moções à direita; atalhos de teclado (Espaço pausa ou retoma, Enter dá a palavra ao próximo) que não valem dentro de campos e botões |
+| Mesa `/comite/[sigla]/sessao/chamada` | Abrir e encerrar sessão, chamada com três opções por delegação (ausente, presente, presente e votando) e o quórum calculado, sorteio do rodízio | Igual |
 | Telão `/telao/[sigla]` | Não se aplica | 1920 × 1080, azul-marinho e branco: sessão e forma de debate, presidência, orador com bandeira grande, cronômetro grande e os próximos da fila; a pauta entra no passo 07 |
 
-- [x] O menu ganhou "Sessão" para quem tem comitê. O item mais específico que contém a tela atual fica marcado.
+- [x] O menu ganhou "Sessão" para quem tem comitê. A presidência e a chamada ficam sob `/sessao/`, e o item mais específico que contém a tela atual fica marcado (a primeira captura do painel mostrou "Comitê" marcado quando as rotas eram irmãs).
 - [x] O telão roda sem cabeçalho nem menu e não tem botões: um clique (ou a tecla F) põe em tela cheia, e o Wake Lock não deixa a tela apagar.
 
 ## Testes

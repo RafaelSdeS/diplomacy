@@ -136,7 +136,7 @@ test.describe('zoom de 200% nas telas com login', () => {
 	for (const [conta, rotas] of [
 		[CONTAS.delegado, ['/', '/comite/CSNU-T', '/comite/CSNU-T/regras', '/cronograma', '/avisos', '/perfil']],
 		[CONTAS.secretaria, ['/cronograma', '/avisos', '/secretaria/participantes']],
-		[CONTAS.mesa, ['/comite/CSNU-T/sessao', '/comite/CSNU-T/presidencia', '/comite/CSNU-T/chamada']]
+		[CONTAS.mesa, ['/comite/CSNU-T/sessao', '/comite/CSNU-T/sessao/presidencia', '/comite/CSNU-T/sessao/chamada']]
 	] as const) {
 		test(`não rola na horizontal (${conta})`, async ({ page }, info) => {
 			test.skip(info.project.name !== 'celular', 'basta rodar uma vez');

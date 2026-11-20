@@ -3,8 +3,8 @@ import AxeBuilder from '@axe-core/playwright';
 import { CONTAS, entrar } from './ajuda.ts';
 
 const SESSAO = '/comite/CSNU-T/sessao';
-const PRESIDENCIA = '/comite/CSNU-T/presidencia';
-const CHAMADA = '/comite/CSNU-T/chamada';
+const PRESIDENCIA = '/comite/CSNU-T/sessao/presidencia';
+const CHAMADA = '/comite/CSNU-T/sessao/chamada';
 const TELAO = '/telao/CSNU-T';
 const EUA = CONTAS.delegado; // delegado01
 const RUSSIA = 'delegado02@exemplo.test';
@@ -82,6 +82,10 @@ test('um pedido de fala chega ao painel da presidência em menos de 1 segundo', 
 	await aoVivo(page);
 	const fila = page.getByRole('region', { name: 'Pedidos de fala' });
 	await expect(fila).toContainText('Nenhuma placa levantada');
+	// O painel é uma subtela da sessão: o menu marca "Sessão".
+	await expect(
+		page.getByRole('navigation', { name: 'Principal' }).getByRole('link', { name: 'Sessão' })
+	).toHaveAttribute('aria-current', 'true');
 
 	const russia = await abrir(browser, RUSSIA, SESSAO);
 	await russia.getByRole('button', { name: 'Levantar placa' }).click();

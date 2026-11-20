@@ -162,10 +162,10 @@
 
 <nav class="atalhos" aria-label="Telas da sessão">
 	{#if data.podePresidir}
-		<a class="botao" href={`/comite/${data.comite.sigla}/presidencia`}>Painel da presidência</a>
+		<a class="botao" href={`/comite/${data.comite.sigla}/sessao/presidencia`}>Painel da presidência</a>
 	{/if}
 	{#if ehMesa}
-		<a class="botao botao--secundario" href={`/comite/${data.comite.sigla}/chamada`}>Chamada e rodízio</a>
+		<a class="botao botao--secundario" href={`/comite/${data.comite.sigla}/sessao/chamada`}>Chamada e rodízio</a>
 	{/if}
 	<a class="botao botao--secundario" href={`/telao/${data.comite.sigla}`}>Telão</a>
 </nav>
