@@ -66,6 +66,19 @@ Também funciona como projeto do **Cloudflare Pages**. Nesse caso, use Build out
 
 Teste: entre com a conta da secretaria do passo 1.5.
 
+## 2b. Dados de demonstração (opcional)
+
+O projeto na nuvem começa vazio: o seed só roda no Supabase local. Para testar o app publicado sem dados pessoais, `supabase/demonstracao.sql` cria o comitê de teste CSNU-T no evento UFRGSMUN 2027, com as 15 delegações e as regras do CSNU:
+
+```sh
+npx supabase db query --remote --file supabase/demonstracao.sql
+```
+
+Depois, para testar com várias pessoas:
+
+1. Crie as contas de teste no painel (**Authentication → Users → Add user**, com **Auto Confirm User**). Muitos provedores de e-mail aceitam variações do mesmo endereço, como `voce+eua@gmail.com`.
+2. Entre como secretaria e convide cada conta em **Participantes**: papel, comitê e, para delegados, a delegação. Convide a si mesmo como mesa do CSNU-T para ver "Sessão" e "Comitê" no menu.
+
 ## 3. Login com Google (opcional no piloto)
 
 1. Em [console.cloud.google.com](https://console.cloud.google.com), crie um projeto (por exemplo, "UFRGSMUN piloto").
@@ -86,6 +99,8 @@ O piloto não envia e-mails. O link e o código por e-mail do passo 14 vão prec
 
 ## Depois de publicar
 
+- [x] Supabase na nuvem com as migrações, o cadastro livre desligado e a conta da secretaria.
+- [x] App publicado no Cloudflare, apontando para o Supabase na nuvem.
 - [ ] Abrir o app num celular Android e num iPhone de verdade (testes manuais dos passos 01 a 06).
 - [ ] Rodar o telão num projetor e ler do fundo da sala (passo 06).
 - [ ] Marcar nos planos dos passos 01 a 03 os itens que dependiam das contas.

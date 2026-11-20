@@ -12,7 +12,7 @@ Veio do passo 01, porque aqui o banco passa a ser usado.
 - [x] Ambiente local com Docker: `npm run db:iniciar` sobe só banco, autenticação, API e gateway. Para ter também o Studio, use `npx supabase start`.
 - [x] `npm run db:tipos` gera `src/lib/database.types.ts`.
 - [x] CI: job `banco` sobe o Supabase do zero, roda o seed duas vezes, os testes do banco e confere os tipos.
-- [ ] Projeto gratuito na nuvem, região São Paulo, ligado com `supabase link`. Precisa da sua conta e só é necessário no deploy.
+- [x] Projeto gratuito na nuvem, região São Paulo, ligado com `supabase link`, com as migrações aplicadas por `supabase db push --remote`.
 
 ## Banco
 
