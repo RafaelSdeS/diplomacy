@@ -26,6 +26,8 @@
 	{/if}
 	<p><a href={`/comite/${data.comite.sigla}/regras`}>Regras de procedimento</a></p>
 	<p><a href={`/comite/${data.comite.sigla}/blocos`}>Blocos e documentos</a></p>
+	<p><a href={`/comite/${data.comite.sigla}/dpo`}>DPO (documento de posição oficial)</a></p>
+	<p><a href={`/comite/${data.comite.sigla}/cartas`}>Cartas diplomáticas</a></p>
 </section>
 
 <section aria-labelledby="t-mesa">

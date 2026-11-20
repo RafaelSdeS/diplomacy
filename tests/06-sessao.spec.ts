@@ -313,7 +313,10 @@ test.describe('telão em 1920 × 1080', () => {
 		await page.goto(TELAO);
 		await aoVivo(page);
 		await expect(page.getByRole('region', { name: 'Com a palavra' })).toContainText(outra);
-		await expect(page).toHaveScreenshot('telao.png', { mask: [page.locator('.cronometro')] });
+		// A presidência do rodízio depende de quantas vezes o fluxo já rodou: fica de fora.
+		await expect(page).toHaveScreenshot('telao.png', {
+			mask: [page.locator('.cronometro'), page.locator('.telao-presidencia span:not(.rotulo)')]
+		});
 	});
 });
 
@@ -323,7 +326,11 @@ test('aparência do painel da presidência', async ({ page }) => {
 	await page.goto(PRESIDENCIA);
 	await aoVivo(page);
 	await expect(page.getByRole('region', { name: 'Com a palavra' })).toContainText(outra);
-	await expect(page).toHaveScreenshot('presidencia.png', { fullPage: true, mask: [page.locator('.cronometro')] });
+	// Quem preside muda com o rodízio: o nome da conta e o subtítulo ficam de fora.
+	await expect(page).toHaveScreenshot('presidencia.png', {
+		fullPage: true,
+		mask: [page.locator('.cronometro'), page.locator('.conta-nome'), page.locator('main > p.suave').first()]
+	});
 });
 
 for (const tema of ['light', 'dark'] as const) {

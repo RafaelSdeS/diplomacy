@@ -534,4 +534,5 @@
 		{/each}
 		{#if formatado.signatarios}<p class="signatarios">{formatado.signatarios}</p>{/if}
 	</article>
+	<p><a href={`/imprimir/documento/${d.id}`}>Imprimir ou salvar como PDF</a></p>
 </details>

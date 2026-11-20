@@ -87,6 +87,7 @@ test('aparência da fila da crise com 30 notas', async ({ page }) => {
 	await entrar(page, CONTAS.crise);
 	await page.goto(CRISE);
 	await expect(page.getByText('Pendentes: 30')).toBeVisible();
+	await expect(page.locator('[data-ao-vivo="sim"]')).toBeVisible({ timeout: 10_000 });
 	await expect(page).toHaveScreenshot('fila.png', {
 		fullPage: true,
 		mask: [page.locator('.idade'), page.locator('.contador-crise')]

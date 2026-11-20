@@ -38,8 +38,8 @@
 	]);
 	const itens = $derived(telas.filter((t) => !t.papeis || t.papeis.some((p) => papeis.has(p))));
 	const comMenu = $derived(data.participacoes.length > 0);
-	// O telão ocupa a tela inteira, sem cabeçalho nem menu.
-	const telao = $derived(page.url.pathname.startsWith('/telao/'));
+	// O telão e as páginas de impressão ocupam a tela inteira, sem cabeçalho nem menu.
+	const semMoldura = $derived(/^\/(telao|imprimir)\//.test(page.url.pathname));
 	// O item do menu mais específico que contém a tela atual: "page" se é a própria
 	// tela; "true" numa subtela (as regras do comitê ficam sob "Comitê").
 	const marcado = $derived(
@@ -62,8 +62,8 @@
 	}
 </script>
 
-{#if telao}
-	<main id="conteudo" class="main-telao">
+{#if semMoldura}
+	<main id="conteudo" class="main-sem-moldura">
 		{@render children()}
 	</main>
 {:else}

@@ -235,7 +235,7 @@ main {
 	padding: 1.5rem 1rem calc(var(--altura-nav) + 1.5rem + env(safe-area-inset-bottom));
 }
 
-main.main-telao {
+main.main-sem-moldura {
 	padding: 0;
 }
 
@@ -1296,4 +1296,157 @@ kbd {
 	margin: 1rem 0;
 	cursor: pointer;
 	font-weight: 600;
+}
+
+/* Impressão (passo 10): folha A4 com o formato dos documentos do UNOCT. A folha é
+   sempre clara, como papel, nos dois temas. */
+
+@page {
+	size: A4;
+	margin: 18mm 16mm;
+}
+
+.impressao {
+	display: grid;
+	justify-items: center;
+	gap: 1rem;
+	padding: 1rem;
+}
+
+.a4 {
+	width: 210mm;
+	max-width: 100%;
+	min-height: 297mm;
+	padding: 18mm 16mm;
+	border: 1px solid #d9dee5;
+	background: #ffffff;
+	color: #1f2933;
+	font-family: var(--fonte-titulo);
+	line-height: 1.55;
+}
+
+.a4 h1,
+.a4 h2 {
+	color: #1b365d;
+	border: 0;
+}
+
+.a4 .rotulo {
+	color: #52606d;
+}
+
+.dpo-cabecalho {
+	display: grid;
+	justify-items: center;
+	gap: 0.25rem;
+	text-align: center;
+}
+
+.dpo-cabecalho .bandeira {
+	width: 28mm;
+}
+
+.dpo-cabecalho h1 {
+	margin: 0.25rem 0 0;
+	font-size: 1.6rem;
+}
+
+.dpo-titulo {
+	margin: 0;
+	font-variant-caps: all-small-caps;
+	letter-spacing: 0.08em;
+}
+
+.faixa {
+	margin: 1rem 0;
+	padding: 0.4rem 0.8rem;
+	background: #1b365d;
+	color: #ffffff;
+	font-weight: 600;
+	print-color-adjust: exact;
+	-webkit-print-color-adjust: exact;
+}
+
+.dpo-texto {
+	column-count: 2;
+	column-gap: 8mm;
+	text-align: justify;
+	hyphens: auto;
+}
+
+.dpo-texto p {
+	margin: 0 0 0.75rem;
+	break-inside: avoid-column;
+}
+
+.referencias {
+	margin-top: 1rem;
+	font-size: 0.85rem;
+}
+
+.referencias h2 {
+	font-size: 1rem;
+}
+
+.assinatura {
+	margin-top: 2rem;
+	text-align: right;
+	font-style: italic;
+}
+
+.resolucao .preambular {
+	font-style: italic;
+}
+
+.resolucao .linha-do-comite {
+	font-weight: 600;
+}
+
+.resolucao .subitem-doc {
+	padding-left: 2rem;
+}
+
+.carta-cabecalho {
+	margin-bottom: 1.5rem;
+	padding-bottom: 0.5rem;
+	border-bottom: 1px solid #d9dee5;
+}
+
+.carta-remetente {
+	margin: 0;
+	font-size: 1.3rem;
+	font-weight: 600;
+	color: #1b365d;
+}
+
+@media (max-width: 640px) {
+	.a4 {
+		min-height: 0;
+		padding: 1.25rem;
+	}
+
+	.dpo-texto {
+		column-count: 1;
+	}
+}
+
+@media print {
+	.nao-imprimir {
+		display: none !important;
+	}
+
+	body {
+		background: #ffffff;
+	}
+
+	.impressao {
+		padding: 0;
+	}
+
+	.a4 {
+		width: auto;
+		min-height: 0;
+		padding: 0;
+		border: 0;
+	}
 }

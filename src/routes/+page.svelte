@@ -4,6 +4,7 @@
 	import Bandeira from '#lib/ui/Bandeira.svelte';
 	import { FASES } from '#lib/votacao.ts';
 	import { SELO_NOTA, STATUS_NOTA, type StatusNota } from '#lib/crise.ts';
+	import { STATUS_DPO } from '#lib/impressao.ts';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -87,6 +88,25 @@
 			<p>
 				<a href={`/comite/${data.participacoes.find((p) => p.comite_id === data.respostasCrise[0].comite_id)?.comite_sigla}/crise`}
 					>Ver as notas de crise</a
+				>
+			</p>
+		</article>
+	{/if}
+
+	{#if data.dpos.length}
+		<article class="cartao" aria-labelledby="c-dpo">
+			<h2 id="c-dpo">Seus DPOs</h2>
+			<ul class="lista">
+				{#each data.dpos as dpo (dpo.id)}
+					<li>
+						<span>Tópico {dpo.topico}</span>
+						<span class="selo {STATUS_DPO[dpo.status].selo}">{STATUS_DPO[dpo.status].rotulo}</span>
+					</li>
+				{/each}
+			</ul>
+			<p>
+				<a href={`/comite/${data.participacoes.find((p) => p.comite_id === data.dpos[0].comite_id)?.comite_sigla}/dpo`}
+					>Abrir os DPOs</a
 				>
 			</p>
 		</article>

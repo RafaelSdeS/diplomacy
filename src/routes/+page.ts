@@ -8,7 +8,7 @@ export const load: PageLoad = async ({ parent, depends }) => {
 
 	const delegacoes = participacoes.filter((p) => p.papel === 'delegado' && p.delegacao_id).map((p) => p.delegacao_id!);
 
-	const [cronograma, avisos, pessoa, comitesAoVivo, respostasCrise] = await Promise.all([
+	const [cronograma, avisos, pessoa, comitesAoVivo, respostasCrise, dpos] = await Promise.all([
 		supabase.from('cronograma_item').select('id, titulo, local, inicio, fim, comite_id').order('inicio'),
 		supabase.from('aviso').select('id, texto, criado_em').order('criado_em', { ascending: false }).limit(20),
 		supabase.from('pessoa').select('avisos_vistos_em').eq('id', usuario!.id).single(),
@@ -21,8 +21,11 @@ export const load: PageLoad = async ({ parent, depends }) => {
 			.in('delegacao_id', delegacoes)
 			.not('resposta', 'is', null)
 			.order('respondida_em', { ascending: false })
-			.limit(3)
+			.limit(3),
+		// Os DPOs da delegação da pessoa, um por tópico.
+		supabase.from('dpo').select('id, topico, status, comite_id').in('delegacao_id', delegacoes).order('topico')
 	]);
+	if (dpos.error) throw dpos.error;
 	if (comitesAoVivo.error) throw comitesAoVivo.error;
 	if (respostasCrise.error) throw respostasCrise.error;
 	if (cronograma.error) throw cronograma.error;
@@ -34,6 +37,7 @@ export const load: PageLoad = async ({ parent, depends }) => {
 		avisos: avisos.data,
 		avisosVistosEm: pessoa.data.avisos_vistos_em,
 		comitesAoVivo: comitesAoVivo.data,
-		respostasCrise: respostasCrise.data
+		respostasCrise: respostasCrise.data,
+		dpos: dpos.data
 	};
 };

@@ -179,6 +179,76 @@ isOneToOne: false
       referencedColumns: ["id","comite_id"]
     }
                   ]
+                },"carta": {
+                  Row: {
+                    "autor_id": string | null,"comite_id": string,"corpo": string,"enviada_em": string,"id": string,"publica": boolean,"remetente_bloco_id": string | null,"remetente_delegacao_id": string | null,"titulo": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "autor_id"?: string | null,"comite_id": string,"corpo": string,"enviada_em"?: string,"id"?: string,"publica"?: boolean,"remetente_bloco_id"?: string | null,"remetente_delegacao_id"?: string | null,"titulo": string
+                  }
+                  Update: {
+                    "autor_id"?: string | null,"comite_id"?: string,"corpo"?: string,"enviada_em"?: string,"id"?: string,"publica"?: boolean,"remetente_bloco_id"?: string | null,"remetente_delegacao_id"?: string | null,"titulo"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "carta_autor_id_fkey"
+      columns: ["autor_id"]
+isOneToOne: false
+      referencedRelation: "pessoa"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "carta_comite_id_fkey"
+      columns: ["comite_id"]
+isOneToOne: false
+      referencedRelation: "comite"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "carta_remetente_bloco_id_comite_id_fkey"
+      columns: ["remetente_bloco_id","comite_id"]
+isOneToOne: false
+      referencedRelation: "bloco"
+      referencedColumns: ["id","comite_id"]
+    },{
+      foreignKeyName: "carta_remetente_delegacao_id_comite_id_fkey"
+      columns: ["remetente_delegacao_id","comite_id"]
+isOneToOne: false
+      referencedRelation: "delegacao"
+      referencedColumns: ["id","comite_id"]
+    }
+                  ]
+                },"carta_destinatario": {
+                  Row: {
+                    "bloco_id": string | null,"carta_id": string,"comite_id": string,"delegacao_id": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "bloco_id"?: string | null,"carta_id": string,"comite_id": string,"delegacao_id"?: string | null
+                  }
+                  Update: {
+                    "bloco_id"?: string | null,"carta_id"?: string,"comite_id"?: string,"delegacao_id"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "carta_destinatario_bloco_id_comite_id_fkey"
+      columns: ["bloco_id","comite_id"]
+isOneToOne: false
+      referencedRelation: "bloco"
+      referencedColumns: ["id","comite_id"]
+    },{
+      foreignKeyName: "carta_destinatario_carta_id_comite_id_fkey"
+      columns: ["carta_id","comite_id"]
+isOneToOne: false
+      referencedRelation: "carta"
+      referencedColumns: ["id","comite_id"]
+    },{
+      foreignKeyName: "carta_destinatario_delegacao_id_comite_id_fkey"
+      columns: ["delegacao_id","comite_id"]
+isOneToOne: false
+      referencedRelation: "delegacao"
+      referencedColumns: ["id","comite_id"]
+    }
+                  ]
                 },"clausula": {
                   Row: {
                     "atualizado_em": string,"comite_id": string,"documento_id": string,"id": string,"ordem": number,"origem_id": string | null,"pai_id": string | null,"status": string,"texto": string,"tipo": string,"versao": number
@@ -377,6 +447,26 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "ponto_pauta"
       referencedColumns: ["id"]
+    }
+                  ]
+                },"dpo": {
+                  Row: {
+                    "atualizado_em": string,"comentario_mesa": string | null,"comite_id": string,"delegacao_id": string,"enviado_em": string | null,"id": string,"referencias": (string)[],"status": string,"texto": string,"topico": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "atualizado_em"?: string,"comentario_mesa"?: string | null,"comite_id": string,"delegacao_id": string,"enviado_em"?: string | null,"id"?: string,"referencias"?: (string)[],"status"?: string,"texto"?: string,"topico": number
+                  }
+                  Update: {
+                    "atualizado_em"?: string,"comentario_mesa"?: string | null,"comite_id"?: string,"delegacao_id"?: string,"enviado_em"?: string | null,"id"?: string,"referencias"?: (string)[],"status"?: string,"texto"?: string,"topico"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "dpo_delegacao_id_comite_id_fkey"
+      columns: ["delegacao_id","comite_id"]
+isOneToOne: false
+      referencedRelation: "delegacao"
+      referencedColumns: ["id","comite_id"]
     }
                   ]
                 },"estado_sessao": {
@@ -927,6 +1017,9 @@ isOneToOne: false
 "assumir_presidencia":
 { Args: { "p_assumir": boolean,"p_comite": string }; Returns: undefined
                            },
+"avaliar_dpo":
+{ Args: { "p_comentario"?: string,"p_dpo": string,"p_status": string }; Returns: undefined
+                           },
 "avancar_plenaria":
 { Args: { "p_comite": string }; Returns: undefined
                            },
@@ -969,8 +1062,14 @@ isOneToOne: false
 "entrar_bloco":
 { Args: { "p_bloco": string }; Returns: undefined
                            },
+"enviar_carta":
+{ Args: { "p_bloco_remetente"?: string,"p_blocos_destinatarios"?: (string)[],"p_comite": string,"p_corpo": string,"p_destinatarios"?: (string)[],"p_publica": boolean,"p_titulo": string }; Returns: string
+                           },
 "enviar_documento":
 { Args: { "p_aprovacao"?: string,"p_documento": string }; Returns: undefined
+                           },
+"enviar_dpo":
+{ Args: { "p_dpo": string }; Returns: undefined
                            },
 "enviar_nota":
 { Args: { "p_comite": string,"p_id": string,"p_texto": string,"p_tipo": string,"p_titulo": string }; Returns: undefined
@@ -1076,8 +1175,14 @@ isOneToOne: false
 "pode_presidir":
 { Args: { "p_comite": string }; Returns: boolean
                            },
+"pode_ver_carta":
+{ Args: { "p_carta": string }; Returns: boolean
+                           },
 "pode_ver_documento":
 { Args: { "p_documento": string }; Returns: boolean
+                           },
+"pode_ver_dpo":
+{ Args: { "p_dpo": string }; Returns: boolean
                            },
 "pode_ver_pessoa":
 { Args: { "p_pessoa": string }; Returns: boolean
@@ -1134,6 +1239,9 @@ isOneToOne: false
                            },
 "sair_bloco":
 { Args: { "p_bloco": string }; Returns: undefined
+                           },
+"salvar_dpo":
+{ Args: { "p_comite": string,"p_referencias": (string)[],"p_texto": string,"p_topico": number }; Returns: string
                            },
 "salvar_proposta_agenda":
 { Args: { "p_comite": string,"p_itens": Json,"p_topico": number }; Returns: string
