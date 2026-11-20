@@ -68,8 +68,8 @@ Arquivo: `tests/01-fundacao.spec.ts`.
 
 ## Pronto quando
 
-- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
-- [ ] Uma página inicial está no ar em `*.pages.dev`.
-- [ ] A navegação muda de lugar entre celular (embaixo) e notebook (lateral).
-- [ ] O axe não encontra erros.
-- [ ] A primeira abertura tem menos de 300 KB.
+- [x] Os testes acima passam no CI, junto com os de todos os passos anteriores: 32 testes, nenhum falhando.
+- [ ] Uma página inicial está no ar em `*.pages.dev`. Depende de ligar o repositório ao Cloudflare Pages.
+- [x] A navegação muda de lugar entre celular (embaixo) e notebook (lateral).
+- [x] O axe não encontra erros.
+- [x] A primeira abertura tem menos de 300 KB: o build inteiro tem 69,3 KB com gzip.
