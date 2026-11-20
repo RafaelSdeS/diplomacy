@@ -82,6 +82,6 @@ Arquivos: `supabase/tests/00-rls-em-todas-as-tabelas.test.sql` (2 testes) e `sup
 
 ## Pronto quando
 
-- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
+- [x] Os testes acima passam no CI, junto com os de todos os passos anteriores: 29 testes do banco e 32 de ponta a ponta.
 - [x] `npm run db:iniciar` seguido de `npm run seed` monta tudo do zero.
 - [x] Os tipos do banco foram gerados.
