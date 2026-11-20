@@ -373,6 +373,64 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"coletiva": {
+                  Row: {
+                    "aberta": boolean,"criada_em": string,"evento_id": string,"id": string,"titulo": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "aberta"?: boolean,"criada_em"?: string,"evento_id": string,"id"?: string,"titulo": string
+                  }
+                  Update: {
+                    "aberta"?: boolean,"criada_em"?: string,"evento_id"?: string,"id"?: string,"titulo"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "coletiva_evento_id_fkey"
+      columns: ["evento_id"]
+isOneToOne: false
+      referencedRelation: "evento"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"coletiva_pergunta": {
+                  Row: {
+                    "autor_id": string | null,"coletiva_id": string,"comite_id": string,"criada_em": string,"delegacao_id": string,"id": string,"pergunta": string,"veiculo_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "autor_id"?: string | null,"coletiva_id": string,"comite_id": string,"criada_em"?: string,"delegacao_id": string,"id"?: string,"pergunta": string,"veiculo_id": string
+                  }
+                  Update: {
+                    "autor_id"?: string | null,"coletiva_id"?: string,"comite_id"?: string,"criada_em"?: string,"delegacao_id"?: string,"id"?: string,"pergunta"?: string,"veiculo_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "coletiva_pergunta_autor_id_fkey"
+      columns: ["autor_id"]
+isOneToOne: false
+      referencedRelation: "pessoa"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "coletiva_pergunta_coletiva_id_fkey"
+      columns: ["coletiva_id"]
+isOneToOne: false
+      referencedRelation: "coletiva"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "coletiva_pergunta_delegacao_id_comite_id_fkey"
+      columns: ["delegacao_id","comite_id"]
+isOneToOne: false
+      referencedRelation: "delegacao"
+      referencedColumns: ["id","comite_id"]
+    },{
+      foreignKeyName: "coletiva_pergunta_veiculo_id_comite_id_fkey"
+      columns: ["veiculo_id","comite_id"]
+isOneToOne: false
+      referencedRelation: "veiculo"
+      referencedColumns: ["id","comite_id"]
+    }
+                  ]
                 },"comentario": {
                   Row: {
                     "autor_id": string | null,"clausula_id": string,"comite_id": string,"criado_em": string,"delegacao_id": string | null,"documento_id": string,"estacionado": boolean,"id": string,"texto": string
@@ -549,6 +607,38 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"denuncia_mensagem": {
+                  Row: {
+                    "autor_id": string | null,"comite_id": string,"criado_em": string,"id": string,"mensagem_id": string,"motivo": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "autor_id"?: string | null,"comite_id": string,"criado_em"?: string,"id"?: string,"mensagem_id": string,"motivo": string
+                  }
+                  Update: {
+                    "autor_id"?: string | null,"comite_id"?: string,"criado_em"?: string,"id"?: string,"mensagem_id"?: string,"motivo"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "denuncia_mensagem_autor_id_fkey"
+      columns: ["autor_id"]
+isOneToOne: false
+      referencedRelation: "pessoa"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "denuncia_mensagem_comite_id_fkey"
+      columns: ["comite_id"]
+isOneToOne: false
+      referencedRelation: "comite"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "denuncia_mensagem_mensagem_id_fkey"
+      columns: ["mensagem_id"]
+isOneToOne: false
+      referencedRelation: "mensagem"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"documento": {
                   Row: {
                     "aprovacao": string | null,"atualizacao_crise_id": string | null,"bloco_id": string,"clausula_em_foco_id": string | null,"comite_id": string,"criado_em": string,"enviado_em": string | null,"id": string,"max_rodadas": number,"numero": number | null,"ponto_pauta_id": string | null,"status": string,"tipo": string,"titulo": string,"topico": number | null,"votacao_nominal": boolean,"exigir_topico_livre": undefined | null
@@ -665,6 +755,38 @@ isOneToOne: false
       referencedColumns: ["id","comite_id"]
     }
                   ]
+                },"entrevista": {
+                  Row: {
+                    "autor_id": string | null,"comite_id": string,"criada_em": string,"delegacao_id": string,"horario": string | null,"id": string,"status": string,"tema": string,"veiculo_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "autor_id"?: string | null,"comite_id": string,"criada_em"?: string,"delegacao_id": string,"horario"?: string | null,"id"?: string,"status"?: string,"tema": string,"veiculo_id": string
+                  }
+                  Update: {
+                    "autor_id"?: string | null,"comite_id"?: string,"criada_em"?: string,"delegacao_id"?: string,"horario"?: string | null,"id"?: string,"status"?: string,"tema"?: string,"veiculo_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "entrevista_autor_id_fkey"
+      columns: ["autor_id"]
+isOneToOne: false
+      referencedRelation: "pessoa"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "entrevista_delegacao_id_comite_id_fkey"
+      columns: ["delegacao_id","comite_id"]
+isOneToOne: false
+      referencedRelation: "delegacao"
+      referencedColumns: ["id","comite_id"]
+    },{
+      foreignKeyName: "entrevista_veiculo_id_comite_id_fkey"
+      columns: ["veiculo_id","comite_id"]
+isOneToOne: false
+      referencedRelation: "veiculo"
+      referencedColumns: ["id","comite_id"]
+    }
+                  ]
                 },"estado_sessao": {
                   Row: {
                     "atualizado_em": string,"comite_id": string,"cronometro_duracao_seg": number | null,"cronometro_inicio": string | null,"cronometro_pausado_restante_seg": number | null,"etapa_plenaria": string,"fase": Database["public"]['Enums']["fase_comite"],"forma": Database["public"]['Enums']["forma_debate"],"mesa_assumiu": boolean,"orador_delegacao_id": string | null,"ordem_topicos": (number)[] | null,"sessao_id": string | null,"tempo_fala_seg": number,"topico_atual": number | null
@@ -741,6 +863,44 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "ponto_mocao"
       referencedColumns: ["id"]
+    }
+                  ]
+                },"mensagem": {
+                  Row: {
+                    "autor_id": string | null,"comite_id": string,"criado_em": string,"crise_comite_id": string | null,"de_delegacao_id": string | null,"id": string,"oculta": boolean,"para_delegacao_id": string | null,"texto": string,"tipo": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "autor_id"?: string | null,"comite_id": string,"criado_em"?: string,"crise_comite_id"?: never,"de_delegacao_id"?: string | null,"id": string,"oculta"?: boolean,"para_delegacao_id"?: string | null,"texto": string,"tipo": string
+                  }
+                  Update: {
+                    "autor_id"?: string | null,"comite_id"?: string,"criado_em"?: string,"crise_comite_id"?: never,"de_delegacao_id"?: string | null,"id"?: string,"oculta"?: boolean,"para_delegacao_id"?: string | null,"texto"?: string,"tipo"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "mensagem_autor_id_fkey"
+      columns: ["autor_id"]
+isOneToOne: false
+      referencedRelation: "pessoa"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "mensagem_comite_id_fkey"
+      columns: ["comite_id"]
+isOneToOne: false
+      referencedRelation: "comite"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "mensagem_de_delegacao_id_comite_id_fkey"
+      columns: ["de_delegacao_id","comite_id"]
+isOneToOne: false
+      referencedRelation: "delegacao"
+      referencedColumns: ["id","comite_id"]
+    },{
+      foreignKeyName: "mensagem_para_delegacao_id_comite_id_fkey"
+      columns: ["para_delegacao_id","comite_id"]
+isOneToOne: false
+      referencedRelation: "delegacao"
+      referencedColumns: ["id","comite_id"]
     }
                   ]
                 },"nota_crise": {
@@ -1301,7 +1461,10 @@ isOneToOne: false
                 }
           }
           Functions: {
-            "abrir_lista_especial":
+            "abrir_coletiva":
+{ Args: { "p_evento": string,"p_titulo": string }; Returns: string
+                           },
+"abrir_lista_especial":
 { Args: { "p_ponto": string }; Returns: undefined
                            },
 "abrir_rodada":
@@ -1397,8 +1560,14 @@ isOneToOne: false
 "dar_palavra":
 { Args: { "p_comite": string,"p_delegacao": string,"p_seg"?: number }; Returns: undefined
                            },
+"definir_bilhetes":
+{ Args: { "p_bloqueados": boolean,"p_comite": string,"p_mesa_le": boolean }; Returns: undefined
+                           },
 "definir_redator":
 { Args: { "p_bloco": string,"p_delegacao": string,"p_redator": boolean }; Returns: undefined
+                           },
+"denunciar_mensagem":
+{ Args: { "p_mensagem": string,"p_motivo": string }; Returns: undefined
                            },
 "denunciar_noticia":
 { Args: { "p_motivo": string,"p_noticia": string }; Returns: undefined
@@ -1408,6 +1577,9 @@ isOneToOne: false
                            },
 "editar_clausula":
 { Args: { "p_clausula": string,"p_texto": string,"p_versao": number }; Returns: number
+                           },
+"eh_diretoria_press":
+{ Args: { "p_evento": string }; Returns: boolean
                            },
 "eh_participante":
 { Args: { "p_evento": string }; Returns: boolean
@@ -1425,6 +1597,9 @@ isOneToOne: false
 { Args: { "p_emails"?: (string)[],"p_evento": string }; Returns: {
               "codigo": string,"email": string,"nome": string
             }[]
+                           },
+"encerrar_coletiva":
+{ Args: { "p_coletiva": string }; Returns: undefined
                            },
 "encerrar_sessao":
 { Args: { "p_comite": string }; Returns: undefined
@@ -1448,6 +1623,9 @@ isOneToOne: false
                            },
 "enviar_dpo":
 { Args: { "p_dpo": string }; Returns: undefined
+                           },
+"enviar_mensagem":
+{ Args: { "p_comite": string,"p_id": string,"p_para"?: string,"p_texto": string,"p_tipo": string }; Returns: undefined
                            },
 "enviar_nota":
 { Args: { "p_comite": string,"p_id": string,"p_texto": string,"p_tipo": string,"p_titulo": string }; Returns: undefined
@@ -1584,6 +1762,9 @@ isOneToOne: false
 "nome_do_convidado":
 { Args: { "p_email": string,"p_evento": string }; Returns: string
                            },
+"ocultar_mensagem":
+{ Args: { "p_mensagem": string,"p_motivo": string }; Returns: undefined
+                           },
 "ocultar_noticia":
 { Args: { "p_motivo": string,"p_noticia": string }; Returns: undefined
                            },
@@ -1599,8 +1780,14 @@ isOneToOne: false
 "pausar":
 { Args: { "p_comite": string }; Returns: undefined
                            },
+"pedir_entrevista":
+{ Args: { "p_delegacao": string,"p_tema": string }; Returns: string
+                           },
 "pedir_reabertura":
 { Args: { "p_clausula": string }; Returns: undefined
+                           },
+"perguntar_na_coletiva":
+{ Args: { "p_coletiva": string,"p_delegacao": string,"p_pergunta": string }; Returns: undefined
                            },
 "pode_ouvir":
 { Args: { "p_topico": string }; Returns: boolean
@@ -1616,6 +1803,9 @@ isOneToOne: false
                            },
 "pode_ver_dpo":
 { Args: { "p_dpo": string }; Returns: boolean
+                           },
+"pode_ver_mensagem":
+{ Args: { "p_mensagem": string }; Returns: boolean
                            },
 "pode_ver_noticia":
 { Args: { "p_noticia": string }; Returns: boolean
@@ -1670,6 +1860,9 @@ isOneToOne: false
                            },
 "remover_clausula":
 { Args: { "p_clausula": string }; Returns: undefined
+                           },
+"responder_entrevista":
+{ Args: { "p_aceitar": boolean,"p_entrevista": string,"p_horario"?: string }; Returns: undefined
                            },
 "responder_notas":
 { Args: { "p_ids": (string)[],"p_resposta": string,"p_status": Database["public"]['Enums']["status_nota"] }; Returns: undefined
@@ -1750,7 +1943,7 @@ isOneToOne: false
                            }
           }
           Enums: {
-            "escolha_voto": "a_favor"|"contra"|"abstencao","fase_comite": "plenaria"|"debate"|"acao"|"encerrado","forma_debate": "formal_formal"|"formal_informal"|"informal_informal","papel": "delegado"|"mesa"|"crise"|"press"|"secretaria","situacao_delegacao": "membro"|"observadora"|"suspensa","situacao_presenca": "presente"|"presente_e_votando","status_nota": "pendente"|"em_analise"|"aprovada"|"rejeitada"|"pede_ajuste"
+            "escolha_voto": "a_favor"|"contra"|"abstencao","fase_comite": "plenaria"|"debate"|"acao"|"encerrado","forma_debate": "formal_formal"|"formal_informal"|"informal_informal","papel": "delegado"|"mesa"|"crise"|"press"|"secretaria"|"diretoria_press","situacao_delegacao": "membro"|"observadora"|"suspensa","situacao_presenca": "presente"|"presente_e_votando","status_nota": "pendente"|"em_analise"|"aprovada"|"rejeitada"|"pede_ajuste"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -1870,7 +2063,7 @@ export const Constants = {
           }
         },"public": {
           Enums: {
-            "escolha_voto": ["a_favor", "contra", "abstencao"],"fase_comite": ["plenaria", "debate", "acao", "encerrado"],"forma_debate": ["formal_formal", "formal_informal", "informal_informal"],"papel": ["delegado", "mesa", "crise", "press", "secretaria"],"situacao_delegacao": ["membro", "observadora", "suspensa"],"situacao_presenca": ["presente", "presente_e_votando"],"status_nota": ["pendente", "em_analise", "aprovada", "rejeitada", "pede_ajuste"]
+            "escolha_voto": ["a_favor", "contra", "abstencao"],"fase_comite": ["plenaria", "debate", "acao", "encerrado"],"forma_debate": ["formal_formal", "formal_informal", "informal_informal"],"papel": ["delegado", "mesa", "crise", "press", "secretaria", "diretoria_press"],"situacao_delegacao": ["membro", "observadora", "suspensa"],"situacao_presenca": ["presente", "presente_e_votando"],"status_nota": ["pendente", "em_analise", "aprovada", "rejeitada", "pede_ajuste"]
           }
         }
 } as const

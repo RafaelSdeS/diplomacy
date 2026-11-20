@@ -1693,3 +1693,24 @@ kbd {
 		min-height: 250mm;
 	}
 }
+
+/* Edição do dia da press (passo 17) */
+
+.edicao-cabecalho {
+	margin-bottom: 1.5rem;
+	padding-bottom: 0.75rem;
+	border-bottom: 3px double #1b365d;
+	text-align: center;
+}
+
+.edicao-cabecalho h1 {
+	margin: 0.25rem 0;
+	font-size: 2.4rem;
+}
+
+.edicao-materia {
+	break-inside: avoid;
+	margin-bottom: 1.25rem;
+	padding-bottom: 1rem;
+	border-bottom: 1px solid #d9dee5;
+}

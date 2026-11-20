@@ -1,0 +1,39 @@
+import { error } from '@sveltejs/kit';
+import { supabase } from '#lib/supabase.ts';
+import type { PageLoad } from './$types';
+
+export const load: PageLoad = async ({ parent, depends }) => {
+	depends('app:coletiva');
+	const { participacoes } = await parent();
+	const evento = participacoes[0]?.evento_id;
+	if (!evento) error(403, 'Sem acesso.');
+	const coletiva = await supabase
+		.from('coletiva')
+		.select('id, titulo, aberta, criada_em')
+		.eq('evento_id', evento)
+		.order('criada_em', { ascending: false })
+		.limit(1)
+		.maybeSingle();
+	if (coletiva.error) throw coletiva.error;
+	const comitesPress = participacoes.filter((p) => p.papel === 'press' && p.comite_id).map((p) => p.comite_id!);
+	const [perguntas, delegacoes] = await Promise.all([
+		coletiva.data
+			? supabase
+					.from('coletiva_pergunta')
+					.select('id, pergunta, veiculo(nome), delegacao(nome)')
+					.eq('coletiva_id', coletiva.data.id)
+					.order('criada_em')
+			: Promise.resolve({ data: [], error: null }),
+		supabase.from('delegacao').select('id, nome').in('comite_id', comitesPress).neq('situacao', 'suspensa').order('nome')
+	]);
+	if (perguntas.error) throw perguntas.error;
+	if (delegacoes.error) throw delegacoes.error;
+	return {
+		evento,
+		coletiva: coletiva.data,
+		perguntas: perguntas.data ?? [],
+		delegacoes: delegacoes.data,
+		diretoria: participacoes.some((p) => p.papel === 'diretoria_press' || p.papel === 'secretaria'),
+		souPress: comitesPress.length > 0
+	};
+};

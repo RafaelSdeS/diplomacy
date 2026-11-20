@@ -112,6 +112,7 @@
 	/>
 </p>
 <h1>Fila da crise</h1>
+<p><a href={`/comite/${data.comite.sigla}/mensagens`}>Canal interno com a mesa</a></p>
 
 {#if !ehCrise}
 	<p class="suave">Só a equipe de crise do comitê vê esta fila.</p>

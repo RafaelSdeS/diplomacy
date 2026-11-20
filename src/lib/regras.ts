@@ -14,6 +14,7 @@ export type Regras = {
 	reabrir_clausula_min_delegacoes: number;
 	dpos_publicos: boolean;
 	mesa_le_bilhetes: boolean;
+	bilhetes_bloqueados?: boolean;
 	press_revisao: boolean;
 };
 
@@ -65,7 +66,15 @@ export function regrasLegiveis(r: Regras): RegraLegivel[] {
 		{ grupo: 'Documentos', rotulo: 'Reabrir cláusula acordada', texto: `pedido de ${plural(r.reabrir_clausula_min_delegacoes, 'delegação', 'delegações')}` },
 		{ grupo: 'Documentos', rotulo: 'DPOs', texto: r.dpos_publicos ? 'públicos para o comitê' : 'só a mesa lê' },
 		{ grupo: 'Comunicação', rotulo: 'Notas de crise pendentes', texto: `até ${plural(r.limite_notas_pendentes, 'nota', 'notas')} por delegação` },
-		{ grupo: 'Comunicação', rotulo: 'Bilhetes', texto: r.mesa_le_bilhetes ? 'a mesa pode ler' : 'só quem envia e quem recebe leem' },
+		{
+			grupo: 'Comunicação',
+			rotulo: 'Bilhetes',
+			texto: r.bilhetes_bloqueados
+				? 'bloqueados pela mesa'
+				: r.mesa_le_bilhetes
+					? 'a mesa pode ler'
+					: 'só quem envia e quem recebe leem'
+		},
 		{ grupo: 'Comunicação', rotulo: 'Press', texto: r.press_revisao ? 'notícias revisadas pela Diretoria da Press' : 'publica sem revisão prévia' }
 	];
 }

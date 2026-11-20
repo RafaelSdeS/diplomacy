@@ -1,0 +1,116 @@
+<script lang="ts">
+	import { invalidate } from '$app/navigation';
+	import { mensagemDeErro } from '#lib/sessao.ts';
+	import { supabase } from '#lib/supabase.ts';
+	import AoVivo from '#lib/ui/AoVivo.svelte';
+	import type { PageProps } from './$types';
+
+	let { data }: PageProps = $props();
+	let titulo = $state('Coletiva de imprensa');
+	let delegacao = $state('');
+	let pergunta = $state('');
+	let erro = $state('');
+	let mensagem = $state('');
+
+	async function executar(acao: PromiseLike<{ error: { code?: string; message?: string } | null }>, ok: string) {
+		erro = mensagem = '';
+		const { error } = await acao;
+		if (error) erro = mensagemDeErro(error);
+		else mensagem = ok;
+		await invalidate('app:coletiva');
+		return !error;
+	}
+
+	// A pauta agrupada por veículo.
+	// (Sem Object.groupBy: iPhones com iOS anterior ao 17.4 não têm.)
+	const porVeiculo = $derived.by(() => {
+		const grupos = new Map<string, typeof data.perguntas>();
+		for (const p of data.perguntas) grupos.set(p.veiculo?.nome ?? '', [...(grupos.get(p.veiculo?.nome ?? '') ?? []), p]);
+		return [...grupos];
+	});
+</script>
+
+<svelte:head>
+	<title>Coletiva · Press · UFRGSMUN</title>
+</svelte:head>
+
+<p class="rotulo">
+	Press · Simulação
+	<AoVivo eventoId={data.evento} tabelas={['coletiva', 'coletiva_pergunta']} dependencia="app:coletiva" />
+</p>
+<h1>Coletiva de imprensa</h1>
+<p class="suave">
+	Cada jornalista escolhe até 4 delegações do próprio comitê, com uma pergunta para cada. Depois da coletiva, a
+	resposta vira matéria.
+</p>
+
+{#if erro}
+	<p class="erro" role="alert">{erro}</p>
+{/if}
+{#if mensagem}
+	<p class="sucesso" role="status">{mensagem}</p>
+{/if}
+
+{#if data.diretoria}
+	<form
+		class="formulario"
+		aria-label="Abrir coletiva"
+		onsubmit={(e) => {
+			e.preventDefault();
+			void executar(supabase.rpc('abrir_coletiva', { p_evento: data.evento, p_titulo: titulo }), 'Coletiva aberta.');
+		}}
+	>
+		<label class="campo">
+			Título da coletiva
+			<input required maxlength="200" bind:value={titulo} />
+		</label>
+		<button class="botao">Abrir uma coletiva</button>
+		{#if data.coletiva?.aberta}
+			<button
+				class="botao botao--secundario"
+				type="button"
+				onclick={() => executar(supabase.rpc('encerrar_coletiva', { p_coletiva: data.coletiva!.id }), 'Coletiva encerrada.')}
+				>Encerrar a coletiva</button
+			>
+		{/if}
+	</form>
+{/if}
+
+{#if data.coletiva}
+	<section aria-labelledby="t-pauta">
+		<h2 id="t-pauta">{data.coletiva.titulo} {data.coletiva.aberta ? '' : '(encerrada)'}</h2>
+		{#if data.souPress && data.coletiva.aberta}
+			<form
+				class="formulario"
+				aria-label="Nova pergunta"
+				onsubmit={async (e) => {
+					e.preventDefault();
+					if (await executar(supabase.rpc('perguntar_na_coletiva', { p_coletiva: data.coletiva!.id, p_delegacao: delegacao, p_pergunta: pergunta }), 'Pergunta na pauta.'))
+						pergunta = '';
+				}}
+			>
+				<label class="campo">
+					Delegação
+					<select required bind:value={delegacao}>
+						{#each data.delegacoes as d (d.id)}<option value={d.id}>{d.nome}</option>{/each}
+					</select>
+				</label>
+				<label class="campo">
+					Pergunta
+					<input required maxlength="300" bind:value={pergunta} />
+				</label>
+				<button class="botao">Pôr na pauta</button>
+			</form>
+		{/if}
+		{#each porVeiculo as [veiculo, perguntas] (veiculo)}
+			<h3>{veiculo}</h3>
+			<ol class="lista">
+				{#each perguntas as p (p.id)}<li><span><strong>{p.delegacao?.nome}:</strong> {p.pergunta}</span></li>{/each}
+			</ol>
+		{:else}
+			<p class="suave">Nenhuma pergunta na pauta ainda.</p>
+		{/each}
+	</section>
+{:else}
+	<p class="suave">Nenhuma coletiva aberta.</p>
+{/if}

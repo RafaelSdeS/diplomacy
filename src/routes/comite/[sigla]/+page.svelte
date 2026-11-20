@@ -28,6 +28,7 @@
 	<p><a href={`/comite/${data.comite.sigla}/blocos`}>Blocos e documentos</a></p>
 	<p><a href={`/comite/${data.comite.sigla}/dpo`}>DPO (documento de posição oficial)</a></p>
 	<p><a href={`/comite/${data.comite.sigla}/cartas`}>Cartas diplomáticas</a></p>
+	<p><a href={`/comite/${data.comite.sigla}/mensagens`}>Mensagens (bilhetes e conversa com a mesa)</a></p>
 </section>
 
 <section aria-labelledby="t-mesa">

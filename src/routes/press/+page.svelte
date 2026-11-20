@@ -18,6 +18,11 @@
 </p>
 <h1>Capa</h1>
 
+<p class="acoes">
+	<a class="botao botao--secundario" href="/press/coletiva">Coletiva de imprensa</a>
+	{#if data.minhaPress.length}<a class="botao botao--secundario" href="/press/entrevistas">Entrevistas</a>{/if}
+</p>
+
 {#if data.minhaPress.length}
 	<p class="acoes">
 		<a class="botao" href="/press/escrever">Escrever matéria</a>

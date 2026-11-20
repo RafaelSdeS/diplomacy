@@ -79,5 +79,5 @@ Arquivos: `supabase/tests/16-procedimento.test.sql` e `tests/16-procedimento.spe
 
 ## Pronto quando
 
-- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
+- [x] Os testes acima passam no CI, junto com os de todos os passos anteriores.
 - [x] Comitês de teste no formato do CSNU, do Conselho Europeu e da OEA rodam com as suas regras especiais.

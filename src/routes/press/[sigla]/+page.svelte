@@ -2,6 +2,7 @@
 	import { invalidate } from '$app/navigation';
 	import { formatarQuando } from '#lib/cronograma.ts';
 	import { paragrafos } from '#lib/impressao.ts';
+	import { gerarImagem, HASHTAGS, type Formato } from '#lib/imagem-redes.ts';
 	import { TIPOS_NOTICIA } from '#lib/press.ts';
 	import { mensagemDeErro } from '#lib/sessao.ts';
 	import { supabase } from '#lib/supabase.ts';
@@ -12,7 +13,7 @@
 	const agora = new Date();
 
 	const souPress = $derived(data.participacoes.some((p) => p.papel === 'press' && p.comite_id === data.comite.id));
-	const modero = $derived(data.participacoes.some((p) => p.papel === 'secretaria'));
+	const modero = $derived(data.participacoes.some((p) => p.papel === 'secretaria' || p.papel === 'diretoria_press'));
 	const noticia = $derived(data.noticias.find((n) => n.id === data.aberta));
 	const denunciasDaAberta = $derived(data.denuncias.filter((d) => d.noticia_id === data.aberta));
 
@@ -36,6 +37,24 @@
 		await invalidate('app:press');
 	}
 
+	// Imagem para as redes: no celular, o botão de compartilhar do sistema; no notebook, o download.
+	let legenda = $state('');
+	async function compartilhar(formato: Formato) {
+		if (!noticia) return;
+		legenda = `${noticia.titulo} ${HASHTAGS}`;
+		const png = await gerarImagem(formato, { veiculo: data.veiculo.nome, titulo: noticia.titulo, linhaFina: noticia.linha_fina });
+		const arquivo = new File([png], `${data.veiculo.nome}-${formato}.png`.replace(/\s+/g, '-'), { type: 'image/png' });
+		if (navigator.canShare?.({ files: [arquivo] })) {
+			await navigator.share({ files: [arquivo], text: legenda }).catch(() => {});
+			return;
+		}
+		const link = document.createElement('a');
+		link.href = URL.createObjectURL(arquivo);
+		link.download = arquivo.name;
+		link.click();
+		setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+	}
+
 	const dataDaSimulacao = (d: string) =>
 		new Date(`${d}T12:00:00`).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
 </script>
@@ -50,7 +69,12 @@
 </p>
 <h1>{data.veiculo.nome}</h1>
 {#if data.veiculo.linha_editorial}<p class="suave">{data.veiculo.linha_editorial}</p>{/if}
-{#if souPress}<p><a class="botao" href="/press/escrever">Escrever matéria</a></p>{/if}
+{#if souPress || modero}
+	<p class="acoes">
+		{#if souPress}<a class="botao" href="/press/escrever">Escrever matéria</a>{/if}
+		<a class="botao botao--secundario" href={`/imprimir/edicao/${data.comite.sigla}`}>Edição do dia</a>
+	</p>
+{/if}
 
 {#if erro}
 	<p class="erro" role="alert">{erro}</p>
@@ -77,6 +101,13 @@
 			<p class="detalhe">
 				{noticia.autor?.nome ? `Por ${noticia.autor.nome} · ` : ''}{formatarQuando(noticia.publicada_em, agora)}
 			</p>
+			{#if souPress && noticia.status === 'publicada'}
+				<div class="acoes">
+					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => compartilhar('post')}>Imagem para post</button>
+					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => compartilhar('story')}>Imagem para story</button>
+				</div>
+				{#if legenda}<p class="detalhe">Legenda: {legenda}</p>{/if}
+			{/if}
 			{#if noticia.motivo_ocultacao}
 				<p class="telegrama" role="note" aria-label="Motivo da ocultação">{noticia.motivo_ocultacao}</p>
 			{/if}

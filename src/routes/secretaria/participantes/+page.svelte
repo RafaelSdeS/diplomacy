@@ -32,7 +32,7 @@
 			email: email.trim().toLowerCase(),
 			evento_id: data.evento,
 			papel,
-			comite_id: papel === 'secretaria' ? null : comite,
+			comite_id: papel === 'secretaria' || papel === 'diretoria_press' ? null : comite,
 			delegacao_id: papel === 'delegado' ? delegacao : null
 		});
 		enviando = false;
@@ -90,7 +90,7 @@
 				{/each}
 			</select>
 		</label>
-		{#if papel !== 'secretaria'}
+		{#if papel !== 'secretaria' && papel !== 'diretoria_press'}
 			<label class="campo">
 				Comitê
 				<select required bind:value={comite} onchange={() => (delegacao = '')}>

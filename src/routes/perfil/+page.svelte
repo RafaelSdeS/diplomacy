@@ -105,4 +105,20 @@
 		{/if}
 		<button class="botao">Salvar perfil</button>
 	</form>
+
+{#if data.recortes.length}
+	<section aria-labelledby="t-recortes">
+		<h2 id="t-recortes">Recortes da sua delegação</h2>
+		<ul class="lista">
+			{#each data.recortes as n (n.id)}
+				<li>
+					<span>
+						<a href={`/press/${n.veiculo?.comite?.sigla}?n=${n.id}`}>{n.titulo}</a>
+						<span class="detalhe">{n.veiculo?.nome}</span>
+					</span>
+				</li>
+			{/each}
+		</ul>
+	</section>
+{/if}
 </section>

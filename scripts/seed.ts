@@ -225,6 +225,7 @@ const contas: Conta[] = [
 	{ email: 'crise01@exemplo.test', nome: 'Crise 01', papel: 'crise' },
 	{ email: 'press01@exemplo.test', nome: 'Press 01', papel: 'press' },
 	{ email: 'secretaria01@exemplo.test', nome: 'Secretaria 01', papel: 'secretaria' },
+	{ email: 'diretoria-press@exemplo.test', nome: 'Diretoria da Press', papel: 'diretoria_press' },
 	{ email: 'semconvite@exemplo.test', nome: 'Sem Convite' },
 	// O comitê de treino: uma conta por delegação e uma da mesa.
 	...DELEGACOES_TREINO.map(([nome], i) => {
@@ -247,7 +248,7 @@ verificar(
 				evento_id: evento.id,
 				papel: c.papel,
 				comite_id:
-					c.papel === 'secretaria' ? null : c.especial ? comiteEspecial.get(c.especial)! : c.treino ? treino.id : comite.id,
+					c.papel === 'secretaria' || c.papel === 'diretoria_press' ? null : c.especial ? comiteEspecial.get(c.especial)! : c.treino ? treino.id : comite.id,
 				delegacao_id: c.delegacao
 					? (c.especial ? delegacaoDoEspecial.get(c.especial)! : c.treino ? delegacaoDoTreino : delegacaoPorNome).get(c.delegacao)
 					: null
