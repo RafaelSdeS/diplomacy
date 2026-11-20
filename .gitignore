@@ -1,0 +1,15 @@
+# Segredos: nunca versionar
+.env
+.env.*
+!.env.example
+
+# Dados reais de inscritos ou de comitês (LGPD): nunca versionar
+dados-reais/
+
+# Dependências e builds (a partir da fase 0)
+node_modules/
+.svelte-kit/
+build/
+supabase/.temp/
+
+.DS_Store

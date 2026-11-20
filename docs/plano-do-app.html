@@ -1,0 +1,809 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>App para simulações da ONU — ideia e plano</title>
+<style>
+  @page {
+    size: A4;
+    margin: 20mm 18mm 22mm 18mm;
+    @bottom-left { content: "App para simulações da ONU · ideia e plano"; font: 8pt "Noto Sans", sans-serif; color: #7a8594; }
+    @bottom-right { content: counter(page) " / " counter(pages); font: 8pt "Noto Sans", sans-serif; color: #7a8594; }
+  }
+  :root { --ink: #1b2430; --quiet: #5d6878; --line: #d5dbe3; --accent: #1f4e79; --tint: #eaf0f6; --warn: #8a5a00; --warn-tint: #fdf5e4; }
+  * { box-sizing: border-box; }
+  body { font: 10pt/1.55 "Noto Sans", "DejaVu Sans", sans-serif; color: var(--ink); margin: 0; background: #fff; }
+  h1, h2, h3 { font-family: "Noto Serif", "DejaVu Serif", serif; color: var(--accent); line-height: 1.25; break-after: avoid; }
+  h1 { font-size: 24pt; margin: 6pt 0 4pt; }
+  h2 { font-size: 15pt; margin: 22pt 0 6pt; padding-bottom: 3pt; border-bottom: 1.5px solid var(--accent); }
+  h3 { font-size: 11.5pt; margin: 14pt 0 4pt; color: var(--ink); }
+  p { margin: 0 0 7pt; }
+  ul, ol { margin: 0 0 8pt; padding-left: 16pt; }
+  li { margin-bottom: 2.5pt; }
+  a { color: var(--accent); text-decoration: none; }
+  code, pre { font-family: "DejaVu Sans Mono", monospace; font-size: 8.5pt; }
+  pre { background: #f5f7fa; border: 1px solid var(--line); border-radius: 6px; padding: 9pt 11pt; line-height: 1.45; break-inside: avoid; white-space: pre-wrap; }
+  table { width: 100%; border-collapse: collapse; margin: 6pt 0 10pt; font-size: 9pt; break-inside: avoid; }
+  th { background: var(--tint); color: var(--accent); text-align: left; font-weight: 600; }
+  th, td { border: 1px solid var(--line); padding: 5pt 7pt; vertical-align: top; }
+  tr { break-inside: avoid; }
+  table.long { break-inside: auto; }
+  h3 + p.small { break-after: avoid; }
+  figure { margin: 10pt 0 12pt; break-inside: avoid; }
+  figure svg { width: 100%; height: auto; display: block; }
+  figcaption { font-size: 8.5pt; color: var(--quiet); margin-top: 4pt; }
+  .kicker { font-size: 9pt; letter-spacing: .08em; text-transform: uppercase; color: var(--quiet); margin-top: 0; }
+  .subtitle { font-size: 12pt; color: var(--quiet); margin: 0 0 4pt; }
+  .meta { font-size: 9pt; color: var(--quiet); margin-bottom: 16pt; }
+  .summary { background: var(--tint); border-left: 4px solid var(--accent); padding: 10pt 14pt; border-radius: 0 6px 6px 0; break-inside: avoid; }
+  .summary p:last-child { margin-bottom: 0; }
+  .note { background: var(--warn-tint); border-left: 4px solid var(--warn); padding: 8pt 12pt; border-radius: 0 6px 6px 0; break-inside: avoid; margin: 8pt 0 10pt; }
+  .lead { font-size: 10.5pt; break-after: avoid; break-inside: avoid; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 14pt; break-inside: avoid; }
+  .pills { display: flex; flex-wrap: wrap; align-items: center; gap: 4pt; margin: 6pt 0 10pt; font-size: 8.5pt; break-inside: avoid; }
+  .pill { border: 1px solid var(--accent); color: var(--accent); border-radius: 999px; padding: 2pt 8pt; background: #fff; }
+  .pill.on { background: var(--accent); color: #fff; }
+  .arrow { color: var(--quiet); }
+  .phone { width: 210pt; border: 2px solid #2b3542; border-radius: 18pt; padding: 12pt 10pt; background: #fbfcfd; break-inside: avoid; font-size: 8.5pt; }
+  .phone .bar { font-weight: 700; font-size: 12pt; color: var(--accent); margin-bottom: 6pt; font-family: "Noto Serif", serif; }
+  .card { background: #fff; border: 1px solid var(--line); border-radius: 8pt; padding: 6pt 8pt; margin-bottom: 5pt; }
+  .card.main { border-color: var(--accent); background: var(--tint); }
+  .card b { color: var(--ink); }
+  .muted { color: var(--quiet); }
+  .tasks { list-style: none; padding-left: 0; }
+  .tasks li::before { content: "☐  "; color: var(--accent); }
+  .sources { font-size: 8.5pt; }
+  .sources li { word-break: break-all; }
+  .desk { border: 1.5px solid #2b3542; border-radius: 10pt; padding: 8pt; background: #fbfcfd; font-size: 8.5pt; break-inside: avoid; }
+  .desk-top { display: flex; justify-content: space-between; align-items: center; gap: 6pt; margin-bottom: 6pt; }
+  .badge { border-radius: 999px; padding: 1pt 6pt; font-size: 7.5pt; white-space: nowrap; }
+  .badge.warn { background: #fde8e6; color: #a1260d; border: 1px solid #e3a59b; }
+  .desk-row { border: 1px solid var(--line); border-radius: 6pt; padding: 4pt 6pt; margin-bottom: 4pt; background: #fff; }
+  .desk-row.mine { border-color: var(--accent); background: var(--tint); }
+  .desk-row .muted { float: right; }
+  .tag { display: inline-block; font-size: 7pt; border: 1px solid var(--quiet); color: var(--quiet); border-radius: 4pt; padding: 0 4pt; margin-right: 4pt; }
+  .tag.on { border-color: var(--accent); color: #fff; background: var(--accent); }
+  .small { font-size: 8pt; margin-top: 4pt; }
+</style>
+</head>
+<body>
+
+<p class="kicker">Proposta de produto · rascunho para discussão</p>
+<h1>App tudo em um para simulações da ONU</h1>
+<p class="subtitle">Ideia, diferenciais e plano de implementação, com piloto pensado para o UFRGSMUN</p>
+<p class="meta">20 de novembro de 2026</p>
+
+<div class="summary">
+  <p><b>Resumo.</b> Hoje uma simulação como o UFRGSMUN roda sobre ferramentas soltas: inscrição no Google Forms, guias no Drive, avisos e negociações no WhatsApp e notas de crise em papel. A proposta é um único app web, sem instalação, para delegados, mesa, equipe de crise, imprensa e secretaria. Na edição de 2026 foram 6 comitês, 147 delegações e 6 press.</p>
+  <p>O app não tenta substituir o WhatsApp nem o Drive. Ele faz o que essas ferramentas não fazem: conhece a função de cada pessoa, as regras do comitê e o andamento da simulação. Os problemas centrais que resolve são a <b>crise</b> (notas e diretivas), a <b>escrita coletiva de resoluções</b> e os <b>debates e revisões que não chegam ao fim</b>.</p>
+  <p>A press de cada comitê, cada uma de um veículo diferente, ganha sua página de notícias no app: as matérias publicadas durante as sessões aparecem no telão, avisam as delegações citadas, voltam ao debate e seguem para Instagram, X e WhatsApp com um toque.</p>
+  <p>O plano: validar com a equipe do UFRGSMUN, testar um piloto gratuito com poucos usuários e depois levar o app à próxima edição, daqui a cerca de um ano. Outros eventos podem vir depois, mas o foco é o UFRGSMUN.</p>
+</div>
+
+<h2>1. O problema</h2>
+<p>Observações feitas a partir da participação no UFRGSMUN:</p>
+<ul>
+  <li><b>Informação espalhada.</b> Cronograma, guias, DPO, avisos e contatos ficam no site, no Instagram, no Drive e no WhatsApp.</li>
+  <li><b>Crise lenta e frágil.</b> Notas e diretivas circulam em papel, formulários ou conversas privadas. A equipe de crise perde notas e não enxerga o conjunto.</li>
+  <li><b>Revisões que não acabam e debates que não chegam a lugar nenhum.</b> É a principal queixa: o tempo passa e o comitê não decide.</li>
+  <li><b>Documentos coletivos caóticos.</b> Muitas pessoas editam o mesmo documento ao mesmo tempo e perdem o foco. As conversas se espalham por vários lugares e não avançam.</li>
+  <li><b>Notícias longe do debate.</b> A press publica no Instagram, no X e no WhatsApp, e as notícias se misturam com todo o resto dessas redes.</li>
+  <li><b>Trabalho manual da secretaria.</b> Distribuição de países, presença e certificados são feitos à mão.</li>
+  <li><b>Pouca imersão.</b> As ferramentas atuais não têm cara de diplomacia.</li>
+  <li><b>Nada fica de uma edição para outra.</b> O secretariado novo começa do zero todo ano.</li>
+</ul>
+<h3>O tamanho do piloto: UFRGSMUN 2026</h3>
+<table>
+  <tr><th style="width:36%">Comitê</th><th style="width:11%">Delegações</th><th style="width:10%">Idioma</th><th style="width:18%">Press</th><th>Observação</th></tr>
+  <tr><td>CSNU · Conselho de Segurança das Nações Unidas</td><td>15</td><td>português</td><td>The New York Times*</td><td>Veto dos membros permanentes</td></tr>
+  <tr><td>ARF · Fórum Regional da ASEAN</td><td>24</td><td>português</td><td>Asia News Network</td><td></td></tr>
+  <tr><td>OEA · Organização dos Estados Americanos</td><td>26</td><td>português</td><td>Clarín</td><td>Histórico (1962 e 1965), sem notebooks nas sessões</td></tr>
+  <tr><td>CEUE · Conselho Europeu</td><td>27</td><td>português</td><td>El País</td><td></td></tr>
+  <tr><td>ACEG-UA · Assembleia da União Africana</td><td>27</td><td>português</td><td>Al-Ahram</td><td></td></tr>
+  <tr><td>UNOCT · Escritório de Contraterrorismo da ONU</td><td>28</td><td>inglês</td><td>Al Jazeera</td><td></td></tr>
+  <tr><td><b>Total</b></td><td><b>147</b></td><td></td><td><b>6 veículos</b></td><td></td></tr>
+</table>
+<p class="muted small">Contagem feita a partir das artes dos comitês no <a href="https://www.ufrgs.br/ufrgsmun/xxiiiedicao/">site da edição de 2026</a>. A press também forma um comitê próprio, a Imprensa Internacional. *A arte da press liga o New York Times à AGNU, mas o comitê listado é o CSNU.</p>
+<p>São cerca de 150 delegações e 6 press, mais mesas e equipe de crise. No pico, isso dá pelo menos 150 a 200 celulares conectados ao mesmo tempo, e é para esse número que o app precisa ser pensado.</p>
+<h3>Como são os documentos hoje: a pasta do UNOCT 2026</h3>
+<p>A pasta do UNOCT tem a proposta de agenda aprovada, 13 DPOs, working papers e projetos de resolução dos dois tópicos, uma resolução de crise, duas cartas diplomáticas e o guia de vocabulário dos comitês em inglês. Não existe um formato oficial, então o app adota o do UNOCT como modelo único para todos os comitês, em português ou inglês.</p>
+<table class="long">
+  <thead><tr><th style="width:15%">Documento</th><th style="width:43%">Como é hoje</th><th>Como fica no app</th></tr></thead>
+  <tr><td>Agenda</td><td>Proposta numerada ("Agenda Proposal 7") em árvore: tópico, subtópicos e pontos.</td><td>Propostas montadas nesse formato, comparadas lado a lado e votadas. A aprovada vira a pauta (seção 11).</td></tr>
+  <tr><td>DPO</td><td>PDF de 2 páginas feito por cada delegado: nome oficial do país, brasão, comitê, faixa com o tópico, duas colunas, referências numeradas e assinatura da delegação.</td><td>O delegado escreve só o texto e as referências. Cabeçalho, brasão, colunas e assinatura saem prontos.</td></tr>
+  <tr><td>Working paper</td><td>Um .docx por subtópico (A.1, A.3), com cláusulas misturadas a anotações soltas e, às vezes, sem signatários.</td><td>Ligado ao subtópico, com anotações separadas das cláusulas e signatários com um toque.</td></tr>
+  <tr><td>Projeto de resolução</td><td>Junta working papers: preambulares, a linha com o nome do comitê, operativas com subitens e "Signatories:" com os nomes oficiais.</td><td>Fusão de working papers por cláusula, com linha do comitê e nomes oficiais preenchidos sozinhos.</td></tr>
+  <tr><td>Resolução de crise</td><td>Mesmo formato, escrita em resposta a um ataque fictício na crise do tópico B.</td><td>Ligada à atualização de crise que a motivou (seção 7).</td></tr>
+  <tr><td>Cartas</td><td>Cartas entre delegações e blocos, como Portugal aos Estados do Sahel e a Aliança dos Estados do Sahel à União Europeia.</td><td>Tipo "carta diplomática": remetente, destinatários, pública ou privada, com cabeçalho oficial.</td></tr>
+  <tr><td>Guia de vocabulário</td><td>Frases de debate e de presidência, moções, pontos e listas de verbos para cláusulas.</td><td>Moções e pontos com esses nomes, verbos sugeridos no editor e frases de apoio para quem preside.</td></tr>
+  <tr><td>Versões</td><td>Arquivos com nomes como "CORRECT", "(2)" e "Google Drive".</td><td>Um documento só, com histórico de versões e nome automático.</td></tr>
+</table>
+
+<h2>2. O que já existe</h2>
+<p class="lead">Existem ferramentas para simulações, mas quase todas em inglês e pensadas para conferências internacionais. Nenhuma é feita para o circuito brasileiro com foco em crise e escrita de resoluções.</p>
+<table>
+  <tr><th style="width:24%">Ferramenta</th><th style="width:44%">O que faz</th><th>Limite para o nosso caso</th></tr>
+  <tr><td>MyMUN / MUN Command</td><td>Gestão da conferência, ferramentas para a mesa, votações ao vivo e chat.</td><td>Em inglês e genérico. Eventos brasileiros aparecem lá só como cadastro.</td></tr>
+  <tr><td>Wisemee Conference App</td><td>Login individual, chat da conferência, moções e lista de oradores.</td><td>Em inglês, pensado para conferências internacionais.</td></tr>
+  <tr><td>Muncoordinated</td><td>Ferramenta web do comitê: lista de oradores, arquivos e emendas.</td><td>Cobre só o comitê, não o evento nem a crise.</td></tr>
+  <tr><td>MUNify (Deutsche MUN)</td><td>Conjunto de ferramentas de código aberto para organizar conferências.</td><td>Feito para a realidade alemã. Pode servir de base.</td></tr>
+  <tr><td>Software de crise (Kennesaw State, DEUS, NYUMUNC)</td><td>Diretivas, notícias e mensagens para comitês de crise.</td><td>Projetos acadêmicos ou feitos sob medida, sem produto disponível.</td></tr>
+</table>
+<p>No próprio UFRGSMUN, a inscrição é feita pelo Google Forms e os guias ficam no Drive, segundo o site do evento. É contra essa combinação que o app vai ser comparado.</p>
+
+<h2>3. Por que não só WhatsApp + Drive</h2>
+<p class="lead">Para avisos, cronograma e arquivos, WhatsApp + Drive já basta, e o app não compete nisso. Ele ganha onde essas ferramentas falham por natureza: elas não sabem quem é delegado, mesa ou equipe de crise, nem quais são as regras do comitê.</p>
+<table class="long">
+  <thead><tr><th style="width:26%">Situação</th><th style="width:37%">Hoje (WhatsApp + Drive)</th><th>Com o app</th></tr></thead>
+  <tr><td>40 notas de crise em 10 minutos</td><td>Conversas privadas no celular de três pessoas. Notas esquecidas, ninguém sabe quem respondeu.</td><td>Fila única com situação de cada nota, responsável e tempo de espera.</td></tr>
+  <tr><td>"O que o Ministro da Defesa já fez em segredo?"</td><td>Está na cabeça de alguém da equipe.</td><td>Ficha do personagem montada com as notas aprovadas.</td></tr>
+  <tr><td>Atualização de crise para três comitês</td><td>Enviar em três grupos e alguém lê em voz alta.</td><td>Um envio aparece nos celulares e no telão de cada sala.</td></tr>
+  <tr><td>Votação no Conselho de Segurança, com veto</td><td>Contagem manual ou enquete que não sabe quem tem veto.</td><td>Votação por delegação com as regras do comitê e resultado no telão.</td></tr>
+  <tr><td>Escrever uma resolução em bloco</td><td>Google Docs aberto para todos, discussão no WhatsApp.</td><td>Editor por cláusulas, com redator, conversa por cláusula e progresso visível.</td></tr>
+  <tr><td>Notícia da press durante o debate</td><td>Postada no Instagram, X ou WhatsApp. Quem está no comitê pode não ver a tempo, e nada avisa as delegações citadas.</td><td>Publicada no app, aparece no telão, avisa as citadas e vai para as redes com um toque.</td></tr>
+  <tr><td>Bilhetes entre delegados</td><td>Papel ou WhatsApp pessoal, fora do personagem.</td><td>Mensagens entre personagens, com regras da mesa.</td></tr>
+  <tr><td>Privacidade</td><td>Número pessoal exposto a dezenas de desconhecidos, inclusive menores de idade.</td><td>Ninguém vê o número de ninguém.</td></tr>
+  <tr><td>Presença e certificados</td><td>Planilha e certificados editados um a um.</td><td>Check-in por QR code e certificado gerado com a presença registrada.</td></tr>
+  <tr><td>Próxima edição</td><td>O secretariado novo começa do zero.</td><td>Comitês, regras e roteiros de crise ficam salvos como modelo.</td></tr>
+</table>
+
+<h2>4. Princípios do produto</h2>
+<ol>
+  <li><b>Competir só onde WhatsApp e Drive não alcançam</b> e conviver com eles no resto.</li>
+  <li><b>Toda conversa tem um lugar:</b> uma cláusula, um bloco ou uma nota de crise. Nenhuma fica solta.</li>
+  <li><b>Cada função vê só o que precisa</b> naquele momento.</li>
+  <li><b>Atrito zero:</b> entrar sem senha nem loja de aplicativos, pelo QR code do crachá, por um link no e-mail, por código ou com a conta Google.</li>
+  <li><b>Funcionar com internet ruim</b> e ter um plano B em papel. A simulação não pode parar por causa do app.</li>
+  <li><b>Imersão:</b> o app deve parecer o mundo da diplomacia, não uma planilha.</li>
+  <li><b>Acessível:</b> funciona com leitor de tela, para quem tem daltonismo ou baixa visão, e o telão é legível do fundo da sala.</li>
+  <li><b>Privado por padrão:</b> coleta só o necessário e segue a LGPD.</li>
+  <li><b>Celular e computador:</b> o mesmo app se adapta a qualquer tela. Delegados usam mais o celular; mesa, crise e press, o notebook; o telão, o projetor.</li>
+</ol>
+
+<h2>5. Quem usa e para quê</h2>
+<table>
+  <tr><th style="width:22%">Função</th><th>O que faz no app</th></tr>
+  <tr><td>Delegado</td><td>Vê a tela "Agora", envia o DPO, escreve resoluções no bloco, manda notas de crise, pede a palavra levantando a placa digital e vota. Quando é a vez da sua delegação, preside a sessão.</td></tr>
+  <tr><td>Mesa (bureau)</td><td>Conduz o comitê: faz a chamada, organiza o rodízio da presidência, preside a primeira sessão e as de votação, aprova documentos, conduz votações e avalia DPOs e delegados.</td></tr>
+  <tr><td>Equipe de crise</td><td>Atende a fila de notas, mantém as fichas dos personagens e a linha do tempo, publica atualizações para um ou vários comitês.</td></tr>
+  <tr><td>Imprensa (press)</td><td>Uma por comitê, cada uma de um veículo diferente (The New York Times, El País, Al Jazeera...). Cobre a sessão, entrevista delegados e publica matérias na hora. A Diretoria da Press cuida das contas da press nas redes.</td></tr>
+  <tr><td>Secretaria e organização</td><td>Importa inscrições, distribui países, gera crachás, faz check-in, envia avisos, emite certificados e define prêmios.</td></tr>
+</table>
+
+<h2>6. Módulos</h2>
+<h3>Evento e informações</h3>
+<ul>
+  <li>Cronograma com destaque para o que acontece agora e o que vem depois, com aviso quando algo muda.</li>
+  <li>Avisos da organização com notificação no celular.</li>
+  <li>Mapa das salas, perguntas frequentes e contatos.</li>
+</ul>
+<h3>Pessoas e perfis</h3>
+<ul>
+  <li>Delegados (país ou personagem, comitê, escola ou delegação), mesa, secretariado, equipe de crise e imprensa.</li>
+  <li>Foto, minibiografia e a função de cada um no evento.</li>
+</ul>
+<h3>Comitês</h3>
+<ul>
+  <li>Página de cada comitê com tema, mesa, delegações, guia de estudos e documentos.</li>
+  <li>Idioma do comitê (português ou inglês), que define o idioma da interface e dos modelos de documento. Em 2026, o UNOCT foi em inglês.</li>
+</ul>
+<h3>Documentos</h3>
+<ul>
+  <li>Guias de regras e de estudos, enviados ao app ou como link para o Drive.</li>
+  <li><b>DPO:</b> envio com prazo, comentários da mesa e situação (enviado, aprovado, pede ajustes).</li>
+  <li>Propostas de agenda, working papers, projetos de resolução, resoluções de crise, emendas e diretivas públicas (ver seções 10 e 11).</li>
+  <li><b>Cartas diplomáticas</b> entre delegações e blocos, públicas ou privadas.</li>
+</ul>
+<h3>Sessão: agenda, presidência e tempo</h3>
+<ul>
+  <li><b>Agenda:</b> antes dos debates em si, os delegados discutem e votam a agenda, ou seja, o que será discutido. A agenda aprovada vira o roteiro do comitê (ver seção 11).</li>
+  <li><b>Painel da presidência:</b> quem preside (uma delegação em rodízio, ou o bureau nas sessões em que o guia exige) controla pedidos de fala, cronômetro, cessão de tempo, pontos e moções com um toque. A presidência passa para a próxima delegação com um toque (ver seção 12).</li>
+  <li>Chamada ("presente" ou "presente e votando").</li>
+  <li>Moções com objetivo e tempo, como caucus moderado e não moderado (ver seção 11).</li>
+  <li>Votações por delegação, incluindo o veto no Conselho de Segurança.</li>
+  <li><b>Modo telão:</b> tudo isso aparece no projetor da sala.</li>
+</ul>
+<h3>Crise, imprensa, secretaria e pós-evento</h3>
+<ul>
+  <li>Crise: ver seção 7.</li>
+  <li>Imprensa: ver seção 8.</li>
+  <li>Secretaria: importação da planilha do Google Forms, distribuição de países e comitês, crachás com QR code, check-in e certificados.</li>
+  <li>Pós-evento: avaliação dos delegados pela mesa, prêmios, certificados para baixar e histórico de cada delegado.</li>
+</ul>
+<h3>Depois do evento</h3>
+<ul>
+  <li><b>Arquivo da edição</b> entregue à organização: agenda aprovada, resoluções, resoluções de crise, edições da press, lista de premiados e as regras usadas, em PDF e num arquivo de dados.</li>
+  <li><b>Pesquisa de satisfação</b> curta dentro do app, separada por função: delegado, mesa, crise e press.</li>
+  <li><b>Exclusão dos dados pessoais</b> no prazo combinado com a organização (ver LGPD na seção 16). Os documentos públicos ficam com o nome das delegações, não das pessoas.</li>
+  <li><b>Modelos para a próxima edição:</b> comitês, regras e roteiros de crise ficam salvos.</li>
+</ul>
+
+<h2>7. Crise: o coração do app</h2>
+<p class="lead">A central da equipe de crise é o recurso que mais tira trabalho da organização e que nenhuma ferramenta comum oferece. Qualquer comitê pode ter crise: o módulo é ligado por comitê, a qualquer momento do evento.</p>
+<figure>
+<svg viewBox="0 0 760 280" role="img" aria-label="Toda nota passa pela fila e sempre volta com resposta" font-family="Noto Sans, DejaVu Sans, sans-serif" font-size="12">
+  <defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#5b6b7f"/></marker></defs>
+  <text x="24" y="24" font-size="14" font-weight="600" fill="#1b2430">Toda nota passa pela fila e sempre volta com resposta</text>
+  <g fill="none" stroke="#5b6b7f" stroke-width="1.25">
+    <path d="M665 70 V52 H100 V82" marker-end="url(#a1)"/>
+    <path d="M180 110 H210" marker-end="url(#a1)"/>
+    <path d="M370 110 H400" marker-end="url(#a1)"/>
+    <path d="M560 110 H603" marker-end="url(#a1)"/>
+    <path d="M665 150 V202" marker-end="url(#a1)"/>
+    <path d="M585 230 H550" marker-end="url(#a1)"/>
+    <path d="M390 230 H355" marker-end="url(#a1)"/>
+  </g>
+  <text x="382" y="46" text-anchor="middle" font-size="11" fill="#5d6878">resposta ao delegado, com cara de telegrama, em todos os casos</text>
+  <rect x="20" y="82" width="160" height="56" rx="8" fill="#fff" stroke="#5b6b7f" stroke-width="1.25"/>
+  <text x="100" y="106" text-anchor="middle" fill="#1b2430">Delegado escreve</text><text x="100" y="122" text-anchor="middle" fill="#1b2430">nota ou diretiva</text>
+  <rect x="210" y="82" width="160" height="56" rx="8" fill="#eaf0f6" stroke="#1f4e79" stroke-width="2"/>
+  <text x="290" y="106" text-anchor="middle" font-weight="600" fill="#1b2430">Entra na fila da</text><text x="290" y="122" text-anchor="middle" font-weight="600" fill="#1b2430">crise como pendente</text>
+  <rect x="400" y="82" width="160" height="56" rx="8" fill="#fff" stroke="#5b6b7f" stroke-width="1.25"/>
+  <text x="480" y="106" text-anchor="middle" fill="#1b2430">Um membro da</text><text x="480" y="122" text-anchor="middle" fill="#1b2430">equipe assume</text>
+  <polygon points="603,110 665,70 727,110 665,150" fill="#fff" stroke="#5b6b7f" stroke-width="1.25"/>
+  <text x="665" y="106" text-anchor="middle" fill="#1b2430">Decisão</text><text x="665" y="122" text-anchor="middle" fill="#1b2430">da equipe</text>
+  <text x="673" y="182" font-size="11" fill="#5d6878">aprovada</text>
+  <rect x="585" y="202" width="160" height="56" rx="8" fill="#fff" stroke="#5b6b7f" stroke-width="1.25"/>
+  <text x="665" y="226" text-anchor="middle" fill="#1b2430">Atualiza a ficha</text><text x="665" y="242" text-anchor="middle" fill="#1b2430">e a linha do tempo</text>
+  <rect x="390" y="202" width="160" height="56" rx="8" fill="#fff" stroke="#5b6b7f" stroke-width="1.25"/>
+  <text x="470" y="226" text-anchor="middle" fill="#1b2430">Equipe publica</text><text x="470" y="242" text-anchor="middle" fill="#1b2430">atualização de crise</text>
+  <rect x="195" y="202" width="160" height="56" rx="8" fill="#fff" stroke="#5b6b7f" stroke-width="1.25"/>
+  <text x="275" y="226" text-anchor="middle" fill="#1b2430">Aparece nos celulares</text><text x="275" y="242" text-anchor="middle" fill="#1b2430">e no telão das salas</text>
+</svg>
+<figcaption>Fluxo de uma nota de crise. Notas rejeitadas ou com pedido de ajuste recebem só a resposta; as aprovadas também mudam o estado da simulação.</figcaption>
+</figure>
+<ul>
+  <li><b>Fila única</b> com a situação de cada nota (pendente, em análise, respondida), quem está cuidando e há quanto tempo espera.</li>
+  <li><b>Divisão de tarefas</b> entre os membros da equipe e respostas prontas para os casos comuns.</li>
+  <li><b>Ficha de cada personagem</b> com o que ele já fez, montada automaticamente pelas notas aprovadas.</li>
+  <li><b>Linha do tempo</b> do que já aconteceu na simulação.</li>
+  <li><b>Atualizações</b> para um ou vários comitês ao mesmo tempo (crise conjunta), inclusive agendadas.</li>
+  <li><b>Notas escritas sem internet</b> são enviadas quando a conexão volta.</li>
+</ul>
+<h3>Pior caso: todo mundo escrevendo ao mesmo tempo</h3>
+<p>O painel precisa continuar claro quando as 15 a 28 delegações de um comitê mandam notas no mesmo minuto, ou quando uma crise conjunta junta vários comitês.</p>
+<div class="two">
+  <div>
+    <ul>
+      <li><b>Um número no topo:</b> quantas notas estão pendentes e há quanto tempo espera a mais antiga. Ele fica vermelho quando passa do limite combinado, por exemplo 5 minutos.</li>
+      <li><b>Assumir antes de responder:</b> a nota aberta por alguém sai da fila dos outros. Duas pessoas nunca respondem a mesma nota.</li>
+      <li><b>Ordem de chegada,</b> com filtro por delegação ou personagem.</li>
+      <li><b>Limite de notas pendentes por delegação</b> (por exemplo, duas), definido pela equipe. Evita enxurrada e faz o delegado escolher o que importa.</li>
+      <li><b>O delegado vê a própria posição:</b> "sua nota é a 6ª da fila". Ninguém reenvia a nota nem levanta para perguntar.</li>
+      <li><b>Respostas rápidas e em grupo:</b> modelos prontos e a mesma resposta para várias notas parecidas.</li>
+    </ul>
+  </div>
+  <div>
+    <div class="desk">
+      <div class="desk-top"><b>Fila da crise · CSNU</b><span class="badge warn">12 pendentes · mais antiga: 6 min</span></div>
+      <div class="desk-row"><span class="tag">pendente</span><b>EUA</b> · Diretiva: escoltar navios no Mar Vermelho<span class="muted">6 min</span></div>
+      <div class="desk-row"><span class="tag">pendente</span><b>Irã</b> · Nota: negar em público o apoio aos houthis<span class="muted">5 min</span></div>
+      <div class="desk-row mine"><span class="tag on">com você</span><b>Arábia Saudita</b> · Diretiva: reforçar a fronteira<span class="muted">3 min</span></div>
+      <div class="desk-row"><span class="tag">pendente</span><b>Colômbia</b> · Nota: pedir cooperação contra o narcotráfico<span class="muted">1 min</span></div>
+      <div class="muted">+ 8 na fila</div>
+    </div>
+    <p class="muted small">Exemplo ilustrativo com os tópicos do CSNU de 2026.</p>
+  </div>
+</div>
+<p>Para o servidor, 150 notas de uma vez é pouco: cada nota é uma linha pequena no banco. O desafio é a tela da equipe, não a infraestrutura.</p>
+<p><b>Resolução de crise.</b> Uma atualização de crise pode levar o comitê a escrever uma resolução de crise, como aconteceu no UNOCT em 2026. No app, ela nasce ligada à atualização que a motivou e usa o mesmo editor das outras resoluções.</p>
+
+<h2>8. Imprensa (press): notícias ao longo dos debates</h2>
+<p class="lead">Cada comitê tem a sua press, e cada press representa um veículo diferente, como The New York Times, El País ou Al Jazeera no UFRGSMUN 2026. Ela cobre o comitê e publica notícias durante as sessões. No app, cada veículo tem sua página, a press publica na hora, sem aprovação prévia, e as notícias voltam a influenciar o debate. Instagram, X e WhatsApp continuam: o app só leva a notícia até eles com um toque.</p>
+<figure>
+<svg viewBox="0 0 760 280" role="img" aria-label="A press publica na hora e a notícia volta ao debate" font-family="Noto Sans, DejaVu Sans, sans-serif" font-size="12">
+  <defs><marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#5b6b7f"/></marker></defs>
+  <text x="24" y="24" font-size="14" font-weight="600" fill="#1b2430">A press publica na hora e a notícia volta ao debate</text>
+  <g fill="none" stroke="#5b6b7f" stroke-width="1.25">
+    <path d="M180 110 H210" marker-end="url(#a3)"/>
+    <path d="M370 110 H400" marker-end="url(#a3)"/>
+    <path d="M560 110 H585" marker-end="url(#a3)"/>
+    <path d="M480 138 V202" marker-end="url(#a3)"/>
+    <path d="M400 230 H355" marker-end="url(#a3)"/>
+    <path d="M275 202 V138" marker-end="url(#a3)"/>
+    <path d="M100 202 V138" marker-end="url(#a3)" stroke-dasharray="5 4"/>
+  </g>
+  <text x="283" y="175" font-size="11" fill="#5d6878">vira nova matéria</text>
+  <text x="665" y="156" text-anchor="middle" font-size="11" fill="#5d6878">com selo de simulação</text>
+  <text x="108" y="175" font-size="11" fill="#5d6878">vazamentos</text>
+  <rect x="20" y="82" width="160" height="56" rx="8" fill="#fff" stroke="#5b6b7f" stroke-width="1.25"/>
+  <text x="100" y="106" text-anchor="middle" fill="#1b2430">Press do comitê</text><text x="100" y="122" text-anchor="middle" fill="#1b2430">cobre a sessão</text>
+  <rect x="210" y="82" width="160" height="56" rx="8" fill="#fff" stroke="#5b6b7f" stroke-width="1.25"/>
+  <text x="290" y="106" text-anchor="middle" fill="#1b2430">Escreve a matéria e</text><text x="290" y="122" text-anchor="middle" fill="#1b2430">marca quem é citado</text>
+  <rect x="400" y="82" width="160" height="56" rx="8" fill="#eaf0f6" stroke="#1f4e79" stroke-width="2"/>
+  <text x="480" y="106" text-anchor="middle" font-weight="600" fill="#1b2430">Publica na hora</text><text x="480" y="122" text-anchor="middle" font-weight="600" fill="#1b2430">na página do veículo</text>
+  <rect x="585" y="82" width="160" height="56" rx="8" fill="#fff" stroke="#5b6b7f" stroke-width="1.25"/>
+  <text x="665" y="106" text-anchor="middle" fill="#1b2430">Compartilha no</text><text x="665" y="122" text-anchor="middle" fill="#1b2430">Instagram, X, WhatsApp</text>
+  <rect x="400" y="202" width="160" height="56" rx="8" fill="#fff" stroke="#5b6b7f" stroke-width="1.25"/>
+  <text x="480" y="226" text-anchor="middle" fill="#1b2430">Plantão no telão e</text><text x="480" y="242" text-anchor="middle" fill="#1b2430">aviso aos citados</text>
+  <rect x="195" y="202" width="160" height="56" rx="8" fill="#fff" stroke="#5b6b7f" stroke-width="1.25"/>
+  <text x="275" y="226" text-anchor="middle" fill="#1b2430">Delegados reagem no</text><text x="275" y="242" text-anchor="middle" fill="#1b2430">debate ou respondem</text>
+  <rect x="20" y="202" width="160" height="56" rx="8" fill="#f7f9fb" stroke="#5b6b7f" stroke-width="1.25" stroke-dasharray="5 4"/>
+  <text x="100" y="226" text-anchor="middle" fill="#1b2430">Equipe de crise</text><text x="100" y="242" text-anchor="middle" fill="#1b2430">manda vazamentos</text>
+</svg>
+<figcaption>Fluxo de uma notícia. A press publica sem aprovação prévia; a equipe de crise pode mandar vazamentos, e a reação dos delegados vira pauta para novas matérias.</figcaption>
+</figure>
+<ul>
+  <li><b>Uma press por comitê, um veículo por press.</b> Cada comitê tem sua press, de um veículo diferente, com a linha editorial dele. Em 2026: The New York Times, Asia News Network, Clarín, El País, Al-Ahram e Al Jazeera. A press acompanha o mesmo comitê durante o evento inteiro e também forma um comitê próprio, a Imprensa Internacional.</li>
+  <li><b>Página do veículo.</b> Cada veículo tem sua página com as matérias do seu comitê. A capa do portal junta as manchetes de todos os veículos.</li>
+  <li><b>Mesmo fato, vários olhares.</b> Numa crise conjunta, o app mostra lado a lado como cada veículo noticiou o mesmo acontecimento.</li>
+  <li><b>Data da simulação.</b> Em comitês históricos, como a OEA de 1962, as matérias saem com a data do mundo simulado.</li>
+  <li><b>Redação no app.</b> Matéria com título, linha fina, texto e foto, nos formatos nota urgente, reportagem, entrevista, opinião e charge. As delegações marcadas como citadas recebem um aviso.</li>
+  <li><b>Publicação livre e na hora.</b> Como já acontece hoje, a press publica o que quiser, sem aprovação prévia, e responde pelo que publica. A única regra firme é o decoro: nada de xingamentos nem palavrões. O Guia de Regras prevê correção das notícias pela Diretoria da Press; no app, essa revisão é uma opção por comitê, desligada por padrão.</li>
+  <li><b>Aviso antes de publicar.</b> Se o texto tiver palavrão ou xingamento de uma lista simples (português, inglês e espanhol), o app avisa a press antes de publicar. Não bloqueia: a decisão continua com ela.</li>
+  <li><b>Moderação só se precisar.</b> O bureau pode ocultar uma matéria que passe do limite, registrando o motivo. Qualquer pessoa pode denunciar uma matéria.</li>
+  <li><b>Instagram, X e WhatsApp continuam, pelas contas da press.</b> Segundo o guia, a press tem contas próprias, separadas da conta institucional do UFRGSMUN, e usa hashtags definidas pela organização. O app gera imagem e legenda prontas no formato de cada rede, com o nome do veículo, o selo de simulação e um link de volta. A Diretoria da Press, que cuida dessas contas, posta com um toque.</li>
+  <li><b>Postagem automática fica para depois.</b> Publicar direto pelas APIs do Instagram e do X exige conta comercial e aprovação das plataformas, e a API do X tem limites e custos.</li>
+  <li><b>Plantão.</b> Notícias urgentes aparecem no telão e nos celulares do comitê.</li>
+  <li><b>Entrevistas e coletivas.</b> O jornalista pede a entrevista pelo app e o delegado aceita e marca um horário, por exemplo no caucus não moderado. A coletiva é conjunta, com 3 a 4 entrevistados por comitê e uma pergunta para cada, e vira matéria depois.</li>
+  <li><b>Ligação com a crise.</b> A equipe de crise pode passar vazamentos e pautas à imprensa ou publicar por um veículo fictício. Uma matéria também pode disparar uma nova crise.</li>
+  <li><b>Reação dos delegados.</b> Nota oficial da delegação comentando uma matéria e citação de notícias nos discursos. Não é um "direito de resposta": o guia não prevê isso nos debates.</li>
+  <li><b>Edição do dia.</b> Como prevê o guia, cada jornal tem uma edição breve no fim de cada dia, e há uma edição especial no último dia. O app monta essas edições em PDF a partir das matérias publicadas.</li>
+  <li><b>Avaliação.</b> Matérias publicadas, leituras e citações ajudam a definir os prêmios da press.</li>
+</ul>
+<div class="note"><b>Cuidado:</b> notícias compartilhadas fora do app saem com o selo "Simulação · UFRGSMUN", para não serem confundidas com notícias reais. Como os veículos são reais, eles aparecem só pelo nome, em tipografia de jornal, sem logotipo nem identidade visual da emissora.</div>
+
+<h2>9. Mensagens</h2>
+<p class="lead">O app tem mensagens, mas só as ligadas à simulação. Conversa livre continua no WhatsApp.</p>
+<div class="two">
+  <div>
+    <h3>Entra</h3>
+    <ul>
+      <li><b>Delegado e equipe de crise:</b> notas com fila de atendimento.</li>
+      <li><b>Delegado e delegado:</b> bilhetes em personagem. A mesa decide se pode ler ou bloquear.</li>
+      <li><b>Delegado e mesa:</b> dúvidas e pedidos.</li>
+      <li><b>Jornalista e delegado:</b> pedidos de entrevista.</li>
+      <li><b>Organização para todos:</b> avisos de mão única.</li>
+      <li><b>Canal interno de cada comitê</b> entre a mesa e a equipe de crise.</li>
+    </ul>
+  </div>
+  <div>
+    <h3>Fica de fora</h3>
+    <ul>
+      <li><b>Grupo geral livre:</b> ninguém vai trocar o WhatsApp por ele.</li>
+      <li><b>Conversa pessoal fora do personagem:</b> alguém teria que moderar, o que é pior com menores de idade.</li>
+    </ul>
+  </div>
+</div>
+
+<h2>10. Editor de resoluções</h2>
+<p class="lead">O Google Docs é uma página em branco: todos editam tudo, a discussão vai para o WhatsApp e ninguém decide. O app usa um editor feito para resoluções.</p>
+<ul>
+  <li><b>Feito para escrever na hora.</b> As resoluções nascem durante as sessões, depois do debate da agenda. O editor abre rápido no celular e no notebook, com modelos de cláusula prontos em português e inglês.</li>
+  <li><b>Blocos.</b> Um bloco reúne as delegações aliadas, o documento e a conversa delas. Pode ter nome próprio, como a Aliança dos Estados do Sahel.</li>
+  <li><b>Working paper por subtópico.</b> Cada working paper nasce ligado a um subtópico da agenda (A.1, A.3...) e recebe o nome sozinho.</li>
+  <li><b>Anotações separadas das cláusulas.</b> Ideias soltas ficam nas notas do bloco, não no meio do texto oficial.</li>
+  <li><b>Nomes oficiais automáticos.</b> A linha do comitê ("The United Nations Office of Counter-Terrorism:") e os signatários com o nome oficial de cada delegação ("Federal Republic of Germany") são preenchidos pelo app.</li>
+  <li><b>Documento dividido em cláusulas.</b> Preambulares e operativas são blocos separados e numerados, com a formatação oficial aplicada sozinha e sugestão dos verbos de abertura do guia de vocabulário do evento. O corretor ortográfico segue o idioma do comitê.</li>
+  <li><b>Redator (<i>penholder</i>).</b> Como no Conselho de Segurança: uma ou duas delegações "seguram a caneta". As demais propõem alterações e o redator aceita ou recusa. Ninguém apaga o trabalho do outro.</li>
+  <li><b>Cada cláusula tem a própria conversa.</b> Comentários e propostas ficam presos a ela.</li>
+  <li><b>Situação e progresso.</b> Cada cláusula está proposta, em discussão ou acordada, e o bloco vê "7 de 11 cláusulas acordadas".</li>
+  <li><b>Cláusula em foco.</b> O redator marca a cláusula em debate e ela fica destacada para todos. Assuntos fora do foco vão para um "estacionamento".</li>
+  <li><b>Termômetro.</b> Num impasse, uma enquete de 60 segundos: manter, alterar ou remover.</li>
+  <li><b>Ligação com o cronômetro.</b> "Faltam 5 min do caucus e 4 cláusulas estão sem acordo."</li>
+  <li><b>Fusão de documentos.</b> Dois blocos juntam working papers escolhendo cláusulas, sem perder a autoria.</li>
+  <li><b>Congelamento.</b> Enviado à mesa, o texto trava. Depois, só emendas formais (amigáveis ou não) que apontam para a cláusula.</li>
+</ul>
+<p>Ciclo de vida de um documento:</p>
+<div class="pills">
+  <span class="pill">Rascunho no bloco</span><span class="arrow">→</span>
+  <span class="pill">Enviado à mesa (texto travado)</span><span class="arrow">→</span>
+  <span class="pill">Emendas</span><span class="arrow">→</span>
+  <span class="pill">Votação</span><span class="arrow">→</span>
+  <span class="pill on">Aprovada · PDF oficial</span>
+</div>
+<p><b>Vantagem técnica:</b> cada cláusula é uma linha no banco e só o redator edita o texto. Não é preciso construir edição simultânea no estilo Google Docs, que é a parte mais difícil de programar.</p>
+
+<h2>11. Debates e revisões que chegam ao fim</h2>
+<p class="lead">O que mais trava a simulação são revisões que não acabam e debates que não chegam a lugar nenhum. O app começa pela agenda, que vira o roteiro do comitê, e segue três regras: todo debate tem objetivo e prazo, toda revisão tem rodadas com fim e todo impasse termina em voto.</p>
+<h3>Primeiro, a agenda</h3>
+<ul>
+  <li><b>O que se decide:</b> antes dos debates em si, os delegados discutem e votam a agenda, ou seja, o que será discutido: qual tópico entra primeiro e quais pontos dele vão ao debate.</li>
+  <li><b>Propostas de agenda:</b> hoje são documentos numerados com tópico, subtópicos e pontos. No app, cada proposta é montada nesse formato de árvore, e as propostas aparecem lado a lado para comparação.</li>
+  <li><b>Debate e votação da agenda,</b> com lista de oradores própria e votação com um toque.</li>
+  <li><b>A agenda vira o roteiro:</b> a pauta aprovada fica fixa no topo do telão e das telas. Cada caucus e cada cláusula de resolução apontam para um ponto da pauta.</li>
+  <li><b>Progresso por ponto:</b> o telão mostra quais pontos já foram debatidos, quais já têm cláusula acordada e quais faltam. O que fugir da pauta vai para o "estacionamento".</li>
+</ul>
+<div class="pills">
+  <span class="pill">Propostas de pontos</span><span class="arrow">→</span>
+  <span class="pill">Debate da agenda</span><span class="arrow">→</span>
+  <span class="pill">Votação</span><span class="arrow">→</span>
+  <span class="pill on">Pauta aprovada guia caucus e cláusulas</span>
+</div>
+<h3>Todo debate tem objetivo e prazo</h3>
+<ul>
+  <li><b>Moção com objetivo.</b> Cada caucus é aberto com um ponto da pauta, uma frase de objetivo ("definir a posição sobre sanções") e um tempo. O telão mostra os três.</li>
+  <li><b>Resultado registrado.</b> No fim do caucus, a presidência registra em uma linha o que foi acordado e o que ficou pendente. Esses registros viram a ata da sessão automaticamente.</li>
+  <li><b>Prorrogação só por voto,</b> com um limite de prorrogações definido pela mesa.</li>
+  <li><b>Termômetro antes de debater.</b> Uma enquete rápida mostra onde cada delegação está, e o debate se concentra onde há divergência de verdade.</li>
+</ul>
+<h3>Toda revisão tem rodadas com fim</h3>
+<ul>
+  <li><b>Rodadas com prazo,</b> por exemplo de 10 minutos. Durante a rodada, as delegações propõem mudanças nas cláusulas; no fim, o redator consolida.</li>
+  <li><b>Cláusula acordada fica travada.</b> Reabrir exige o pedido de um número mínimo de delegações, definido pela mesa.</li>
+  <li><b>Número máximo de rodadas.</b> Depois da última, o documento vai para a mesa como está.</li>
+  <li><b>Impasse vira voto.</b> O que não teve acordo não trava o documento: vira emenda formal, e o comitê decide votando.</li>
+</ul>
+<div class="pills">
+  <span class="pill">Rodada 1 com prazo</span><span class="arrow">→</span>
+  <span class="pill">Redator consolida</span><span class="arrow">→</span>
+  <span class="pill">Rodada 2</span><span class="arrow">→</span>
+  <span class="pill">Sem acordo? Vira emenda</span><span class="arrow">→</span>
+  <span class="pill on">Votação decide</span>
+</div>
+<h3>A presidência no controle</h3>
+<ul>
+  <li><b>Painel da presidência:</b> lista de oradores, cronômetro com aviso visual, fila de pontos e moções e votação, tudo com um toque.</li>
+  <li><b>Tempo justo:</b> pausar e devolver o tempo depois de uma interrupção, ou somar alguns segundos, como prevê o guia de vocabulário.</li>
+  <li><b>Cessão de tempo</b> para pontos de informação, para outra delegação ou para a mesa.</li>
+  <li><b>Moções e pontos com os nomes das regras:</b> adiamento do debate, tópico no topo da agenda, suspensão da sessão, divisão da questão (votar cláusula por cláusula), votação nominal, não-confiança, ponto de ordem, ponto de dúvida e ponto de privilégio pessoal.</li>
+  <li><b>Presidência em rodízio:</b> a delegação da vez recebe o painel, e o bureau assume nas sessões em que o guia manda (ver seção 12).</li>
+  <li><b>Todos veem o tempo:</b> o delegado vê na tela quanto falta para a sua fala e para o fim do caucus.</li>
+</ul>
+
+<h2>12. Regras de procedimento do UFRGSMUN</h2>
+<p class="lead">O Guia de Regras do UFRGSMUN 2026, baseado no Modelo Brasileiro de Regras de Procedimento, define como cada sessão funciona. O app transforma essas regras em configuração: um padrão para o evento e ajustes por comitê, sem nada fixo no código.</p>
+<h3>O que o guia muda no plano</h3>
+<ul>
+  <li><b>Quem preside a sessão é uma delegação, não a mesa.</b> As delegações que querem presidir entram num sorteio que define a ordem, uma por sessão (no máximo duas), com lista de espera. O bureau preside a primeira sessão e as de votação. No app, a delegação da vez recebe o painel da presidência e continua podendo discursar como país.</li>
+  <li><b>Moção de não-confiança:</b> pedido assinado por 1/5 das delegações e votação por maioria simples. Se aprovada, a presidência passa para a próxima delegação. Tudo pelo app.</li>
+  <li><b>Pedir a palavra é levantar a placa.</b> No fluxo normal, quem quer falar levanta a placa no fim de cada discurso, e a presidência escolhe. A placa digital vira um pedido de fala que aparece para a presidência; a escolha continua sendo dela.</li>
+  <li><b>Aviso de 10 segundos:</b> o guia recomenda uma batida discreta na mesa quando faltam 10 segundos. O cronômetro dá esse aviso na tela.</li>
+  <li><b>Não há direito de resposta.</b> Ofensas e inverdades são tratadas no próprio debate.</li>
+</ul>
+<h3>Regras gerais que viram configuração</h3>
+<table class="long">
+  <thead><tr><th style="width:26%">Regra</th><th>Padrão do UFRGSMUN 2026</th></tr></thead>
+  <tr><td>Quórum</td><td>1/3 das delegações previstas, arredondado para cima, fixo no evento. Chamada no início de cada sessão. Votações substantivas exigem a maioria simples das delegações previstas presente.</td></tr>
+  <tr><td>Maioria simples</td><td>O primeiro número inteiro acima da metade do quórum da sessão. Empate reprova.</td></tr>
+  <tr><td>Maioria de dois terços</td><td>Dois terços do quórum da sessão, arredondados para cima.</td></tr>
+  <tr><td>Formas de debate</td><td>Formal-formal só na plenária de abertura, conduzido pelo bureau. Formal-informal é o fluxo normal, com placas. Informal-informal precisa de consenso ou maioria simples e dura no máximo 45 minutos seguidos por sessão.</td></tr>
+  <tr><td>Tópico no topo da agenda</td><td>Primeira moção da primeira sessão. Até 2 discursos a favor e 2 contra; maioria simples. Se for rejeitada, o outro tópico entra.</td></tr>
+  <tr><td>Adiamento do debate</td><td>Dois terços. Se houver objeção, 2 discursos a favor e 2 contra e nova votação com metade dos votos.</td></tr>
+  <tr><td>Adiamento da sessão</td><td>Sem debate; maioria simples, quando o bureau disser que está em ordem.</td></tr>
+  <tr><td>Pontos</td><td>Ordem (nunca interrompe um discurso), dúvida e privilégio pessoal.</td></tr>
+  <tr><td>Documento de trabalho</td><td>Formato livre, aprovado pelo bureau, sem signatários obrigatórios.</td></tr>
+  <tr><td>Projeto de resolução</td><td>Assinaturas de 1/5 das delegações e aprovação do bureau. Uma resolução por tópico; aprovação por consenso ou por maioria simples.</td></tr>
+  <tr><td>Emenda</td><td>Pelo menos 3 assinaturas. Todas são discutidas juntas e votadas na ordem definida pelo bureau.</td></tr>
+  <tr><td>Votação</td><td>Por placas. Questões procedimentais: só a favor ou contra, e observadores votam. Questões substantivas: com abstenção. Votação nominal em ordem alfabética, com uma chance de passar a vez.</td></tr>
+  <tr><td>Divisão da questão</td><td>Só cláusulas operativas. 2 a favor e 2 contra; maioria simples. Aprovada, abre 5 minutos de informal-informal para as propostas, votadas da mais à menos substancial.</td></tr>
+</table>
+<h3>Regras especiais por comitê</h3>
+<ul>
+  <li><b>CSNU:</b> questões substantivas exigem 9 votos a favor e nenhum voto contra de membro permanente (EUA, Rússia, Reino Unido, França e China). A parte envolvida numa disputa deve se abster nos casos do Capítulo VI e do artigo 52.</li>
+  <li><b>Conselho Europeu:</b> questões substantivas exigem unanimidade de todas as delegações previstas. Os representantes são tratados como Chefes de Estado.</li>
+  <li><b>OEA (histórica):</b> datas de congelamento em novembro de 1962 e junho de 1965. Tem 5 observadores sem voto na resolução final (Canadá, Espanha, França, Reino Unido e União Soviética), e Cuba está suspensa. Durante as sessões, <b>notebooks e aparelhos são proibidos</b>: os bilhetes são em papel, a mesa redige os documentos num equipamento próprio e o celular só pode ser usado com discrição, para consultas.</li>
+  <li><b>Imprensa Internacional:</b> dois núcleos, um escrito (um jornal por comitê) e um audiovisual (fotos e vídeos). Contas próprias no X e no Instagram, coletiva conjunta, edição breve de cada jornal no fim do dia, edição especial no último dia e um telejornal na cerimônia de encerramento.</li>
+</ul>
+<h3>Como o app trata isso</h3>
+<ul>
+  <li><b>Situação de cada delegação:</b> membro, observadora ou suspensa. O app sabe quem pode votar em quê.</li>
+  <li><b>Cada votação tem um tipo e uma regra:</b> procedimental ou substantiva; maioria simples, dois terços, regra do CSNU ou unanimidade. O app calcula o resultado e mostra no telão.</li>
+  <li><b>Modo com tecnologia restrita</b>, como na OEA de 2026: os delegados ficam sem as funções interativas durante as sessões. A mesa opera tudo num aparelho só (pedidos de fala, votos contados nas placas, redação dos documentos), os bilhetes ficam no papel e o telão continua funcionando.</li>
+  <li><b>Regras salvas por edição:</b> as de 2026 viram o padrão de 2027, e a organização ajusta só o que mudar.</li>
+</ul>
+
+<h2>13. Bandeiras, brasões e documentos oficiais</h2>
+<h3>Onde aparecem</h3>
+<ul>
+  <li>No perfil, no crachá, na lista de oradores e no telão.</li>
+  <li><b>Placa digital:</b> com um toque, o celular mostra a bandeira em tela cheia para pedir a palavra ou votar. A placa de papel continua como plano B.</li>
+  <li><b>Painel de votação no telão,</b> no estilo da Assembleia Geral: uma grade de bandeiras que acendem em verde, vermelho ou amarelo.</li>
+</ul>
+<h3>De onde vêm as imagens</h3>
+<ul>
+  <li>Bandeiras de países: biblioteca <code>flag-icons</code> (SVG, licença MIT).</li>
+  <li>Brasões: Wikimedia Commons. A maioria é de domínio público, mas cada arquivo precisa ser conferido.</li>
+  <li>Comitês históricos ou fictícios e personagens: a mesa envia a imagem, como a bandeira da União Soviética na OEA de 1962. Sem imagem, o app gera um escudo com as iniciais e cores.</li>
+  <li>Veículos de imprensa: o nome em tipografia de jornal, sem o logotipo da emissora.</li>
+</ul>
+<h3>Documentos em PDF</h3>
+<ul>
+  <li>Cabeçalho do evento e código no padrão da ONU com o prefixo do evento, por exemplo <code>UFRGSMUN/CSNU/RES/3 (2026)</code>. Data, comitê, patrocinadores com bandeiras e cláusulas formatadas.</li>
+  <li>A resolução aprovada sai com o resultado da votação e a assinatura da mesa.</li>
+  <li>Diretivas privadas com carimbo <b>CONFIDENCIAL</b>, respostas da crise como telegrama e notícias com cara de jornal.</li>
+  <li>Crachá com nome, comitê, bandeira e QR code, no lugar do crachá atual, que tem só nome e comitê.</li>
+  <li><b>DPO no padrão que os delegados já usam:</b> nome oficial do país e brasão no topo, comitê, faixa com o tópico, texto em duas colunas, referências numeradas e assinatura da delegação. O delegado escreve só o texto e as referências. O mesmo modelo vale para todos os comitês.</li>
+  <li>Cartas diplomáticas com o cabeçalho do remetente.</li>
+  <li>Certificados do pós-evento, que o UFRGSMUN já emite.</li>
+  <li><b>QR code de verificação</b> em cada documento, levando a uma página pública que prova a autenticidade. Útil para certificados de horas complementares.</li>
+</ul>
+<div class="note"><b>Cuidado:</b> não usar o emblema da ONU, cujo uso é restrito pela própria organização. A cara de oficial vem da formatação e da identidade visual do evento.</div>
+
+<h2>14. Por que as pessoas vão querer usar</h2>
+<p class="lead">Ninguém usa um app porque ele "organiza". As pessoas usam porque ele ajuda a ganhar, faz sentir que estão dentro da simulação ou dá algo para mostrar depois.</p>
+<div class="two">
+  <div>
+    <h3>Ajudar a ganhar</h3>
+    <ul>
+      <li>DPOs de todas as delegações abertos para busca, se a mesa permitir: aliados encontrados em minutos.</li>
+      <li>Posição na lista de oradores e rascunho do discurso com cronômetro.</li>
+      <li>Notas de crise escritas mesmo sem internet.</li>
+    </ul>
+    <h3>Imersão</h3>
+    <ul><li>Telegramas urgentes, plantões de notícias, carimbos de confidencial, placas e painel de votação.</li></ul>
+    <h3>Algo para mostrar depois</h3>
+    <ul>
+      <li><b>Passaporte diplomático:</b> cada simulação vira um carimbo e cada prêmio uma condecoração, valendo entre eventos diferentes.</li>
+      <li><b>Recortes de jornal:</b> as matérias que citam o delegado ficam guardadas no passaporte.</li>
+      <li><b>Retrospectiva</b> no estilo Spotify Wrapped, pronta como story do Instagram com a marca do evento: divulgação de graça.</li>
+    </ul>
+  </div>
+  <div>
+    <h3>Tela "Agora"</h3>
+    <p>Mostra só o que importa para a pessoa naquele minuto. O resto fica a um toque.</p>
+    <div class="phone">
+      <div class="bar">Agora</div>
+      <div class="card main"><b>Conselho de Segurança</b><br><span class="muted">Sala 204 · Sessão 3 até 16h00</span></div>
+      <div class="card"><b>Você é o 4º</b> na lista de oradores</div>
+      <div class="card"><b>1 resposta de crise</b> nova</div>
+      <div class="card"><b>DPO aprovado</b> pela mesa</div>
+      <div class="card muted">Depois: almoço às 12h30</div>
+    </div>
+    <p class="muted" style="font-size:8pt;margin-top:4pt">Exemplo ilustrativo.</p>
+  </div>
+</div>
+<p>Também conta: poucas notificações (só as importantes), cada função vendo só suas telas, abertura em 2 segundos e botões grandes. Para a organização, o argumento é que o evento passa a parecer grande, o que atrai delegados para a próxima edição.</p>
+
+<h2>15. Estratégia de adoção</h2>
+<ul>
+  <li><b>Convencer o secretariado, não o delegado.</b> O delegado usa o que a organização mandar. O argumento é "menos trabalho para a crise e para a secretaria".</li>
+  <li><b>Conviver com o WhatsApp.</b> O grupo de avisos continua e o app manda links para ele. Os guias continuam no Drive e o app aponta para eles. A press continua nas redes, com o bureau postando a partir do app.</li>
+  <li><b>Atrito zero.</b> O app importa a planilha de inscrições do Google Forms e gera crachás com QR code. O delegado entra como seu país pelo QR do crachá ou pelo link que chega no e-mail da inscrição. Se perder os dois, usa um código ou a conta Google.</li>
+  <li><b>Configurar junto</b> com a organização nas primeiras edições.</li>
+  <li><b>Plano B em papel.</b> Se a internet cair, a equipe imprime a fila de notas.</li>
+  <li><b>O telão faz a divulgação.</b> Organizadores de outras simulações veem o app funcionando e querem usar.</li>
+</ul>
+
+<h2>16. Arquitetura</h2>
+<p class="lead">Um único web app leve, com telas diferentes para cada função, sobre um backend gerenciado e sem servidor próprio. O piloto usa só planos gratuitos e as opções mais simples, com poucos usuários de teste. O que só faz diferença na escala do evento fica para depois, com o caminho de troca já definido.</p>
+<figure>
+<svg viewBox="0 0 760 350" role="img" aria-label="Arquitetura do app" font-family="Noto Sans, DejaVu Sans, sans-serif" font-size="12">
+  <defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#5b6b7f"/></marker></defs>
+  <text x="24" y="24" font-size="14" font-weight="600" fill="#1b2430">Piloto: um app estático e um backend gratuito, sem servidor próprio</text>
+  <text x="24" y="58" font-size="11" fill="#5d6878">QUEM USA</text>
+  <rect x="24" y="70" width="190" height="52" rx="8" fill="#fff" stroke="#5b6b7f" stroke-width="1.25"/>
+  <text x="119" y="92" text-anchor="middle" font-weight="600" fill="#1b2430">Celular do delegado</text><text x="119" y="109" text-anchor="middle" font-size="11" fill="#5d6878">PWA, login sem senha</text>
+  <rect x="24" y="138" width="190" height="52" rx="8" fill="#fff" stroke="#5b6b7f" stroke-width="1.25"/>
+  <text x="119" y="160" text-anchor="middle" font-weight="600" fill="#1b2430">Painéis da equipe</text><text x="119" y="177" text-anchor="middle" font-size="11" fill="#5d6878">mesa, crise e secretaria</text>
+  <rect x="24" y="206" width="190" height="52" rx="8" fill="#fff" stroke="#5b6b7f" stroke-width="1.25"/>
+  <text x="119" y="228" text-anchor="middle" font-weight="600" fill="#1b2430">Telão da sala</text><text x="119" y="245" text-anchor="middle" font-size="11" fill="#5d6878">modo apresentação</text>
+  <g fill="none" stroke="#5b6b7f" stroke-width="1.25">
+    <path d="M214 96 L280 144" marker-end="url(#a2)"/>
+    <path d="M214 164 H280" marker-end="url(#a2)"/>
+    <path d="M214 232 L280 184" marker-end="url(#a2)"/>
+    <path d="M460 164 H526" marker-start="url(#a2)" marker-end="url(#a2)"/>
+    <path d="M370 204 V250" marker-end="url(#a2)"/>
+  </g>
+  <rect x="280" y="124" width="180" height="80" rx="8" fill="#eaf0f6" stroke="#1f4e79" stroke-width="2"/>
+  <text x="370" y="152" text-anchor="middle" font-weight="600" fill="#1b2430">App web (SvelteKit)</text>
+  <text x="370" y="170" text-anchor="middle" font-size="11" fill="#5d6878">SPA estática, telas por função</text>
+  <text x="370" y="186" text-anchor="middle" font-size="11" fill="#5d6878">Cloudflare Pages (grátis)</text>
+  <rect x="280" y="250" width="180" height="48" rx="8" fill="#f7f9fb" stroke="#5b6b7f" stroke-width="1.25" stroke-dasharray="5 4"/>
+  <text x="370" y="270" text-anchor="middle" font-weight="600" fill="#1b2430">Edge Functions</text><text x="370" y="287" text-anchor="middle" font-size="11" fill="#5d6878">só depois do piloto</text>
+  <rect x="526" y="52" width="210" height="276" rx="10" fill="#f7f9fb" stroke="#5b6b7f" stroke-width="1.25" stroke-dasharray="5 4"/>
+  <text x="542" y="76" font-weight="600" fill="#1f4e79">Supabase</text>
+  <rect x="542" y="88" width="178" height="46" rx="8" fill="#fff" stroke="#5b6b7f" stroke-width="1.25"/>
+  <text x="631" y="107" text-anchor="middle" font-weight="600" fill="#1b2430">Auth</text><text x="631" y="123" text-anchor="middle" font-size="11" fill="#5d6878">Google, e-mail e senha</text>
+  <rect x="542" y="146" width="178" height="46" rx="8" fill="#fff" stroke="#5b6b7f" stroke-width="1.25"/>
+  <text x="631" y="165" text-anchor="middle" font-weight="600" fill="#1b2430">Postgres + RLS</text><text x="631" y="181" text-anchor="middle" font-size="11" fill="#5d6878">dados e permissões</text>
+  <rect x="542" y="204" width="178" height="46" rx="8" fill="#fff" stroke="#5b6b7f" stroke-width="1.25"/>
+  <text x="631" y="223" text-anchor="middle" font-weight="600" fill="#1b2430">Realtime</text><text x="631" y="239" text-anchor="middle" font-size="11" fill="#5d6878">fila, sessões, votos</text>
+  <rect x="542" y="262" width="178" height="46" rx="8" fill="#fff" stroke="#5b6b7f" stroke-width="1.25"/>
+  <text x="631" y="281" text-anchor="middle" font-weight="600" fill="#1b2430">Storage</text><text x="631" y="297" text-anchor="middle" font-size="11" fill="#5d6878">guias, DPOs, bandeiras</text>
+</svg>
+<figcaption>Arquitetura do piloto, toda em planos gratuitos. As atualizações em tempo real chegam direto do Supabase aos aparelhos. O que muda no evento completo está na tabela abaixo.</figcaption>
+</figure>
+<table class="long">
+  <thead><tr><th style="width:16%">Peça</th><th style="width:42%">Piloto (grátis, poucos usuários de teste)</th><th>Evento completo (depois)</th></tr></thead>
+  <tr><td>Interface</td><td>SvelteKit em modo SPA (<code>adapter-static</code>). Escolhido no lugar do Next.js por mandar bem menos JavaScript para o celular. Layout responsivo para celular, notebook e telão.</td><td>Igual, mais o cache completo como PWA.</td></tr>
+  <tr><td>Hospedagem</td><td>Cloudflare Pages gratuito, com endereço <code>.pages.dev</code>. Não há servidor de aplicação: o app é estático e conversa direto com o Supabase.</td><td>Igual, com domínio próprio se o evento quiser.</td></tr>
+  <tr><td>Backend</td><td>Supabase gratuito, na região de São Paulo. O projeto gratuito pausa depois de cerca de uma semana sem uso: basta reativar antes de cada rodada de testes.</td><td>Supabase Pro (cerca de US$ 25) só no mês do evento. O gratuito aceita 200 conexões simultâneas, e o evento passa disso.</td></tr>
+  <tr><td>Tempo real</td><td>Postgres Changes, o jeito mais simples de configurar e suficiente para poucos usuários. O cronômetro guarda só início e duração; cada aparelho calcula o tempo.</td><td>Broadcast a partir do banco, em canais privados por comitê, como o Supabase recomenda para escala.</td></tr>
+  <tr><td>Login</td><td>Conta Google e e-mail com senha. Nenhum dos dois precisa enviar e-mail.</td><td>Mais link e código por e-mail (com um SMTP gratuito, como o Brevo), QR do crachá e código da secretaria, via Edge Function.</td></tr>
+  <tr><td>Sem conexão</td><td>Reenvio simples. Cada nota nasce com um ID único, então reenviar nunca duplica.</td><td>Caixa de saída no aparelho, cache completo e retomada ao reconectar.</td></tr>
+  <tr><td>Notificações</td><td>Só dentro do app e no telão.</td><td>Web Push como bônus. No iPhone, só funciona com o app na tela inicial.</td></tr>
+  <tr><td>Regras e segurança</td><td>Regras no banco (um voto por delegação, limite de notas pendentes, cláusula travada) e um teste automático que garante que uma delegação não lê a nota de crise de outra.</td><td>Testes para todas as regras de acesso e um teste de carga com cerca de 300 clientes simulados.</td></tr>
+  <tr><td>Acessibilidade</td><td>WCAG 2.2 nível AA desde o começo, que sai mais barato do que corrigir depois.</td><td>Igual, mais um teste com pessoas que usam leitor de tela.</td></tr>
+  <tr><td>PDFs</td><td>"Salvar como PDF" do navegador, a partir de modelos HTML.</td><td>Igual; Typst se o resultado variar entre navegadores.</td></tr>
+  <tr><td>Idiomas</td><td>Só português.</td><td>Português e inglês, com Paraglide.</td></tr>
+  <tr><td>Dados</td><td>Dados fictícios criados por script. Nenhum dado real de delegado.</td><td>Importação da planilha de inscrições do Google Forms.</td></tr>
+  <tr><td>Bandeiras</td><td colspan="2"><code>flag-icons</code> (SVG, licença MIT).</td></tr>
+  <tr><td>Custo</td><td>Zero.</td><td>Cerca de US$ 25 por edição, mais o domínio, se houver.</td></tr>
+</table>
+<h3>Celular e computador</h3>
+<p>É um app só, no mesmo endereço, com um layout que se adapta à tela. Não existe versão separada para computador.</p>
+<table>
+  <thead><tr><th style="width:24%">Tela</th><th style="width:28%">Quem usa mais</th><th>Como se adapta</th></tr></thead>
+  <tr><td>Celular (a partir de 360 px)</td><td>Delegados e press</td><td>Uma coluna, navegação embaixo, botões grandes e placa digital em tela cheia.</td></tr>
+  <tr><td>Notebook e tablet</td><td>Mesa, crise, press e secretaria</td><td>Duas ou três colunas: a fila da crise ao lado da nota aberta, as cláusulas ao lado da conversa e o painel da presidência com atalhos de teclado.</td></tr>
+  <tr><td>Projetor (16:9)</td><td>Telão da sala</td><td>Tela cheia, letras grandes, sem rolagem e sem botões.</td></tr>
+</table>
+<p>Cada tela é testada num celular pequeno, num notebook (1366 × 768) e no projetor (1920 × 1080).</p>
+<h3>Leve e econômico em dados</h3>
+<p>A internet do local costuma existir, mas pode ser ruim, e muitos delegados usam a internet móvel. Por isso, no evento completo (o piloto já segue a meta de tamanho):</p>
+<ul>
+  <li><b>Meta de tamanho:</b> primeira abertura com menos de 300 KB. Depois disso, o app abre do cache, sem baixar de novo.</li>
+  <li><b>Cache no celular:</b> a interface, o cronograma, os perfis e os guias já abertos ficam salvos no aparelho.</li>
+  <li><b>Só o que muda trafega:</b> o tempo real manda só a alteração (uma nota nova, um orador a mais), e cada celular escuta só o canal do seu comitê.</li>
+  <li><b>Imagens pequenas:</b> bandeiras em SVG de poucos KB, fotos reduzidas no envio e nenhum vídeo automático.</li>
+  <li><b>Guias em PDF só quando pedidos,</b> nunca no carregamento.</li>
+  <li><b>Sem conexão:</b> notas, bilhetes e matérias ficam numa caixa de saída e são enviados quando a internet volta. Ao reconectar, o app busca só o que perdeu.</li>
+</ul>
+<h3>Acessibilidade</h3>
+<ul>
+  <li><b>Cor nunca sozinha:</b> votos e situações sempre com ícone e texto além da cor, por causa do daltonismo.</li>
+  <li><b>Contraste alto e letra que aumenta</b> junto com a configuração de tamanho do celular.</li>
+  <li><b>Leitores de tela:</b> botões com nome, ordem lógica e HTML semântico, testados com TalkBack e VoiceOver.</li>
+  <li><b>Telão legível do fundo da sala:</b> letras grandes, poucos elementos e alto contraste.</li>
+  <li><b>Avisos que não dependem de um sentido só:</b> o aviso de tempo aparece na tela e não depende só de som ou só de cor.</li>
+  <li><b>Alvos de toque grandes</b> e tudo operável pelo teclado no notebook da mesa.</li>
+</ul>
+<h3>Privacidade e LGPD</h3>
+<ul>
+  <li><b>Papéis:</b> a organização do UFRGSMUN é a controladora dos dados, e o app trata os dados em nome dela. Os detalhes ficam para combinar com a organização.</li>
+  <li><b>Dados mínimos:</b> nome, e-mail, comitê, delegação e função. Nada de telefone ou endereço; CPF só se o certificado exigir.</li>
+  <li><b>Aviso de privacidade</b> na inscrição: o que é coletado, para quê, por quanto tempo e quem vê cada coisa, inclusive se a mesa pode ler bilhetes.</li>
+  <li><b>Direitos do titular no próprio app:</b> ver, corrigir e pedir a exclusão dos próprios dados.</li>
+  <li><b>Prazo de exclusão:</b> os dados pessoais são apagados no prazo combinado depois do evento. Ficam só os certificados e os documentos públicos, com o nome das delegações.</li>
+  <li><b>Segurança:</b> regras de acesso por função no banco, dados guardados no Brasil (região São Paulo) e registro de quem ocultou, respondeu ou alterou o quê.</li>
+  <li><b>Menores de idade:</b> se houver no futuro, consentimento dos responsáveis, como exige a LGPD.</li>
+  <li><b>No piloto:</b> só dados fictícios, então nenhum dado pessoal real é tratado.</li>
+</ul>
+<h3>Modelo de dados</h3>
+<pre>evento ─&lt; comite (idioma, crise ligada, tecnologia restrita)
+evento ── regras_padrao;  comite ── regras (ajustes)   ← vêm do Guia de Regras
+comite ─&lt; delegacao (nome, nome oficial, membro | observadora | suspensa)
+comite ─&lt; rodizio_presidencia (sessao, delegacao)
+pessoa ─&lt; participacao (evento, papel, comite, delegacao)   ← define as permissões
+comite ─&lt; ponto_pauta (pai, texto, ordem, status)   ← tópico › subtópico › ponto
+evento ─&lt; cronograma_item, aviso
+comite ─&lt; bloco ─&lt; documento (tipo, status, ponto_pauta)
+   tipo: dpo | proposta_agenda | working_paper | projeto
+         resolucao_crise | emenda | diretiva | carta
+documento ─&lt; clausula (tipo, ordem, texto, status, ponto_pauta) ─&lt; proposta, comentario
+documento ─&lt; assinatura
+comite ─&lt; mensagem (nota_crise | bilhete | mesa, de, para, status, resposta)
+atualizacao_crise &gt;─&lt; comite          (crise conjunta)
+comite ── estado_sessao (presidência, pedidos de fala, moção, cronômetro)
+comite ─&lt; votacao (procedimental | substantiva, regra) ─&lt; voto
+comite ── veiculo (El País, Al Jazeera…) ─&lt; noticia (tipo, status) ─&lt; citacao (delegacao)
+evento ─&lt; checkin, avaliacao, certificado</pre>
+<p>A <b>delegação</b> é a unidade do jogo: voto, placa, fila de notas e limite de notas pendentes são dela. A maioria tem um delegado e algumas têm dois, então o número de delegados por delegação é livre. A situação da delegação (membro, observadora ou suspensa) define em que ela pode votar.</p>
+<p>A tabela <code>participacao</code> resolve o controle de acesso. A mesma pessoa pode ser delegada em 2026 e mesa em 2027, e as regras do banco liberam só o que cada função pode ver. Notas de crise privadas que vazam estragam a simulação, então essa parte precisa estar certa desde o início.</p>
+<p><b>Decisões deliberadas:</b> sem app nativo (ninguém baixa um app para um evento de quatro dias), sem edição simultânea estilo Google Docs (o modelo de redator dispensa), sem biblioteca de texto rico (cada cláusula é uma caixa de texto e a formatação sai do tipo da cláusula) e sem chat geral (o WhatsApp já faz).</p>
+
+<h2>17. Plano por fases</h2>
+<figure>
+<svg viewBox="0 0 760 290" role="img" aria-label="Plano em quatro fases" font-family="Noto Sans, DejaVu Sans, sans-serif" font-size="11.5">
+  <text x="24" y="24" font-size="14" font-weight="600" fill="#1b2430">Cada fase só começa quando a anterior passou no seu teste</text>
+  <g stroke="#5b6b7f" stroke-width="1.25">
+    <rect x="24" y="48" width="160" height="180" rx="8" fill="#fff"/>
+    <rect x="208" y="48" width="160" height="180" rx="8" fill="#eaf0f6" stroke="#1f4e79" stroke-width="2"/>
+    <rect x="392" y="48" width="160" height="180" rx="8" fill="#fff"/>
+    <rect x="576" y="48" width="160" height="180" rx="8" fill="#fff"/>
+  </g>
+  <g fill="#1f4e79" font-size="10.5" font-weight="600" letter-spacing="1">
+    <text x="40" y="72">FASE 0</text><text x="224" y="72">FASE 1</text><text x="408" y="72">FASE 2</text><text x="592" y="72">FASE 3</text>
+  </g>
+  <g fill="#1b2430" font-size="13" font-weight="600">
+    <text x="40" y="92">Validação</text><text x="224" y="92">Piloto de teste</text><text x="408" y="92">Evento completo</text><text x="592" y="92">Crescimento</text>
+  </g>
+  <g fill="#1b2430">
+    <text x="40" y="118">Ouvir secretaria</text><text x="40" y="136">e equipe de crise</text><text x="40" y="154">Definir a data-alvo</text><text x="40" y="172">Avaliar o MUNify</text>
+    <text x="224" y="118">Poucos testers, grátis</text><text x="224" y="136">Login Google e senha</text><text x="224" y="154">Agora, perfis, DPO</text><text x="224" y="172">Agenda, sessão, telão</text><text x="224" y="190">Crise e editor</text><text x="224" y="208">Press simples</text>
+    <text x="408" y="118">Pro e Broadcast</text><text x="408" y="136">Login pelo crachá</text><text x="408" y="154">Offline completo</text><text x="408" y="172">Votação e emendas</text><text x="408" y="190">Check-in, certificados</text><text x="408" y="208">Placa, jornal, inglês</text>
+    <text x="592" y="118">Avaliações e prêmios</text><text x="592" y="136">Passaporte do delegado</text><text x="592" y="154">Retrospectiva</text><text x="592" y="172">Outros eventos</text>
+  </g>
+  <g stroke="#5b6b7f" stroke-width="1" stroke-dasharray="2 3">
+    <path d="M196 147 V238"/><path d="M380 147 V238"/><path d="M564 147 V238"/>
+  </g>
+  <g fill="#1f4e79">
+    <polygon points="196,129 205,138 196,147 187,138"/><polygon points="380,129 389,138 380,147 371,138"/><polygon points="564,129 573,138 564,147 555,138"/>
+  </g>
+  <g fill="#5d6878" font-size="11" text-anchor="middle">
+    <text x="196" y="254">secretaria aceita</text><text x="196" y="270">o piloto</text>
+    <text x="380" y="254">piloto aprovado</text><text x="380" y="270">pela mesa e crise</text>
+    <text x="564" y="254">segunda edição</text><text x="564" y="270">usando o app</text>
+  </g>
+</svg>
+<figcaption>Os losangos são os testes que liberam a fase seguinte. O piloto roda antes do evento, com poucos usuários e tudo gratuito; a fase 2 precisa estar pronta para a próxima edição do UFRGSMUN.</figcaption>
+</figure>
+<p>Todos os comitês produzem resoluções e podem ter crise, por isso o editor e a crise entram juntos no piloto. A press também entra, porque é simples: publicar, mostrar no telão e compartilhar nas redes. O que só importa na escala do evento (plano Pro, Broadcast, login pelo crachá, offline completo) fica para a fase 2. <b>Se o prazo apertar,</b> a prioridade é o editor e a crise, porque são os problemas observados na prática. O resto pode esperar.</p>
+<h3>Calendário sugerido</h3>
+<p>A edição de 2026 acabou de acontecer, e a próxima deve ser daqui a cerca de um ano. As datas abaixo são uma sugestão, a confirmar com a organização.</p>
+<table>
+  <thead><tr><th style="width:22%">Quando</th><th style="width:22%">Fase</th><th>O que acontece</th></tr></thead>
+  <tr><td>Dez/2026 a fev/2027</td><td>0 · Validação</td><td>Conversa com o secretariado e a equipe de crise, data da edição de 2027 confirmada, projeto e banco criados.</td></tr>
+  <tr><td>Mar a jun/2027</td><td>1 · Piloto</td><td>Construção do piloto e testes com um grupo pequeno, por exemplo numa sessão de treinamento ou numa simulação interna.</td></tr>
+  <tr><td>Jul a set/2027</td><td>2 · Evento completo</td><td>Plano Pro, Broadcast, login pelo crachá, offline, votação, certificados e inglês.</td></tr>
+  <tr><td>Out/2027</td><td>2 · Ensaio</td><td>Importação das inscrições, crachás, teste de carga e ensaio com mesas, crise e press.</td></tr>
+  <tr><td>Edição de 2027</td><td>Evento</td><td>Uso real, com o plano B em papel à mão.</td></tr>
+  <tr><td>Depois da edição</td><td>Pós-evento</td><td>Arquivo da edição entregue à organização, pesquisa de satisfação e exclusão dos dados pessoais no prazo combinado.</td></tr>
+</table>
+<p>Outros eventos podem usar o app no futuro, mas o foco agora é o UFRGSMUN. O modelo de dados já separa eventos, então abrir para outras simulações na fase 3 não exige reescrever nada. Até lá, nenhum recurso é construído só para isso.</p>
+
+<h2>18. Riscos</h2>
+<table>
+  <tr><th style="width:34%">Risco</th><th>Como reduzir</th></tr>
+  <tr><td>A organização não adota</td><td>Convencer o secretariado com o argumento de menos trabalho, configurar junto e começar por um comitê.</td></tr>
+  <tr><td>Internet ruim no local ou só internet móvel</td><td>App leve com cache, atualizações pequenas, notas guardadas sem conexão e plano B em papel.</td></tr>
+  <tr><td>Enxurrada de notas de crise</td><td>Limite de notas pendentes por delegação, posição na fila visível ao delegado e respostas em grupo.</td></tr>
+  <tr><td>Escopo grande para poucas pessoas</td><td>Fases que funcionam sozinhas, com o editor e a crise em primeiro lugar.</td></tr>
+  <tr><td>Equipe da organização muda todo ano</td><td>Modelos de comitê, regras e crise salvos; configuração simples para a nova equipe.</td></tr>
+  <tr><td>Privacidade (notas secretas, possíveis menores de idade no futuro, LGPD)</td><td>Regras de acesso no banco, nenhum telefone exposto, coleta só dos dados necessários.</td></tr>
+  <tr><td>Pico de acessos durante o evento</td><td>Cerca de 150 delegações mais a equipe: conferir os limites do Supabase e contratar o plano pago no mês do evento.</td></tr>
+  <tr><td>Projeto gratuito do Supabase pausado por falta de uso</td><td>Reativar antes de cada rodada de testes. No evento, o plano Pro não pausa.</td></tr>
+  <tr><td>Matéria fora do decoro, já que não há aprovação prévia</td><td>A press responde pelo que publica. O app avisa sobre palavrões antes da publicação, há botão de denúncia e o bureau pode ocultar a matéria na hora.</td></tr>
+  <tr><td>Notícia da simulação confundida com notícia real</td><td>Selo "Simulação · UFRGSMUN" em tudo que sai do app; veículos reais só pelo nome, sem logotipo.</td></tr>
+  <tr><td>Uso indevido de símbolos</td><td>Sem emblema da ONU; licenças de bandeiras e brasões conferidas.</td></tr>
+</table>
+
+<h2>19. Como medir o sucesso do piloto</h2>
+<ul>
+  <li>Tempo médio de resposta às notas de crise, antes e depois do app.</li>
+  <li>Quantas notas se perderam ou ficaram sem resposta.</li>
+  <li>Quantos delegados entraram no app no primeiro dia.</li>
+  <li>Quantas resoluções ficaram prontas dentro do tempo de caucus.</li>
+  <li>Quantas matérias da imprensa foram publicadas e lidas durante as sessões.</li>
+  <li>Quantos caucus terminaram com resultado registrado e quantas rodadas cada resolução levou.</li>
+  <li>Quantos dados móveis um delegado gastou por dia.</li>
+  <li>A mesa e a equipe de crise querem usar de novo? Se não pedirem o app no ano seguinte, nenhum outro recurso salva.</li>
+</ul>
+
+<h2>20. Próximos passos</h2>
+<ul class="tasks">
+  <li>Confirmar as respostas abaixo com o secretariado e a equipe de crise do UFRGSMUN.</li>
+  <li>Confirmar a data da próxima edição, que vira o prazo da fase 2.</li>
+  <li>Avaliar o código do MUNify: licença e o que dá para aproveitar.</li>
+  <li>Transformar o Guia de Regras em configuração: o padrão do evento e os ajustes de CSNU, Conselho Europeu, OEA e Imprensa.</li>
+  <li>Montar o modelo único de DPO, working paper, resolução e carta a partir dos documentos do UNOCT, em português e inglês, e traduzir a lista de verbos do guia de vocabulário.</li>
+  <li>Criar o projeto (SvelteKit + Supabase, nos planos gratuitos) e o banco com as regras de acesso de cada função.</li>
+  <li>Reunir um grupo pequeno de teste para o piloto, usando dados fictícios.</li>
+  <li>Fazer um protótipo da fila de crise e do editor de cláusulas para mostrar à organização.</li>
+</ul>
+<h3>O que já sabemos do UFRGSMUN</h3>
+<p class="muted small">A partir da experiência no evento e do site da edição de 2026.</p>
+<table class="long">
+  <thead><tr><th style="width:20%">Pergunta</th><th style="width:40%">Resposta</th><th>O que muda no app</th></tr></thead>
+  <tr><td>Tamanho do evento</td><td>6 comitês com 15 a 28 delegações cada (147 no total) e uma press por comitê.</td><td>Pico de 150 a 200 aparelhos; plano pago do Supabase no mês do evento.</td></tr>
+  <tr><td>Próxima edição</td><td>Daqui a cerca de um ano; a de 2026 acabou de acontecer.</td><td>Prazo da fase 2, com calendário na seção 17.</td></tr>
+  <tr><td>Outros eventos</td><td>Podem usar o app no futuro, mas o foco é o UFRGSMUN.</td><td>O modelo de dados já separa eventos; nada é construído só para isso agora.</td></tr>
+  <tr><td>Delegados por delegação</td><td>A maioria tem 1; alguns casos têm 2.</td><td>Número livre; voto, placa e notas contam por delegação.</td></tr>
+  <tr><td>Comitês com crise</td><td>Todos podem ter.</td><td>Crise ligada por comitê, a qualquer momento.</td></tr>
+  <tr><td>Volume de notas de crise</td><td>Considerar o pior caso: todo mundo escrevendo ao mesmo tempo.</td><td>Painel de crise pensado para o pico (seção 7).</td></tr>
+  <tr><td>O que mais dá errado</td><td>Revisões que não acabam e debates que não chegam a lugar nenhum.</td><td>Objetivo e prazo para debates, rodadas com fim e impasse decidido no voto (seção 11).</td></tr>
+  <tr><td>Agenda</td><td>Antes dos debates, os delegados discutem o que será discutido.</td><td>A agenda aprovada vira o roteiro do comitê (seção 11).</td></tr>
+  <tr><td>Documentos do comitê</td><td>Pasta do UNOCT 2026: proposta de agenda, 13 DPOs, working papers, resoluções, resolução de crise, cartas e guia de vocabulário. Não há formato oficial.</td><td>Modelo único para todos os comitês, baseado no UNOCT, em português ou inglês (seção 1).</td></tr>
+  <tr><td>Onde a press publica</td><td>Pela conta do evento no Instagram, X e WhatsApp. O bureau cuida das redes.</td><td>Imagem e legenda prontas para o bureau postar (seção 8).</td></tr>
+  <tr><td>Decoro da press</td><td>A press responde pelo que publica e é livre. Só não pode xingar nem usar palavrões.</td><td>Publicação sem aprovação, aviso automático de palavrões e ocultação pelo bureau.</td></tr>
+  <tr><td>Documentos</td><td>Certificados depois do evento; resoluções escritas na hora, depois do debate da agenda; crachá só com nome e comitê.</td><td>Certificados automáticos, editor rápido, agenda e presidência no painel, crachá com bandeira e QR code.</td></tr>
+  <tr><td>Menores de idade</td><td>A princípio não há, mas pode haver no futuro.</td><td>Privacidade pensada desde já: nenhum telefone exposto e coleta mínima de dados.</td></tr>
+  <tr><td>Internet</td><td>Normalmente há, mas pode ser ruim, e muitos usam a internet móvel.</td><td>App leve, com cache e pouco consumo de dados (seção 16).</td></tr>
+</table>
+<h3>Ainda em aberto</h3>
+<ul>
+  <li>Qual é a data exata da edição de 2027?</li>
+  <li>A combinar com a organização: se o app é oficial do evento, o papel de cada um na LGPD, o prazo para apagar os dados, se a mesa pode ler bilhetes e quem paga o plano do mês do evento.</li>
+  <li>A arte da press liga o New York Times à AGNU, mas o comitê listado é o CSNU. Qual está certo?</li>
+</ul>
+
+<h2>Fontes</h2>
+<ul class="sources">
+  <li>UFRGSMUN, site oficial: <a href="https://www.ufrgs.br/ufrgsmun/">https://www.ufrgs.br/ufrgsmun/</a></li>
+  <li>UFRGSMUN XXIII (2026), Guia de Regras: <a href="https://drive.google.com/file/d/132VsxewhVrI7O4Q7IJphMQCS4JK8339z/view">drive.google.com/file/d/132VsxewhVrI7O4Q7IJphMQCS4JK8339z</a></li>
+  <li>UFRGSMUN XXIII (2026), comitês e press: <a href="https://www.ufrgs.br/ufrgsmun/xxiiiedicao/">https://www.ufrgs.br/ufrgsmun/xxiiiedicao/</a></li>
+  <li>MyMUN Conference Management System: <a href="https://bestdelegate.com/the-days-of-excel-powered-mun-are-over-introducing-the-mymun-conference-management-system">bestdelegate.com/the-days-of-excel-powered-mun-are-over-introducing-the-mymun-conference-management-system</a></li>
+  <li>MUN Command: <a href="https://mwm.ai/apps/mun-command/1659644089">mwm.ai/apps/mun-command/1659644089</a></li>
+  <li>Wisemee, MUN Committee Software: <a href="https://www.wisemee.com/?p=1586">wisemee.com/?p=1586</a></li>
+  <li>Muncoordinated: <a href="https://deploy-preview-172--muncoordinated.netlify.app">deploy-preview-172--muncoordinated.netlify.app</a></li>
+  <li>MUNify (Deutsche Model United Nations): <a href="https://github.com/DeutscheModelUnitedNations/munify">github.com/DeutscheModelUnitedNations/munify</a></li>
+  <li>Kennesaw State, Model UN Crisis Software: <a href="https://digitalcommons.kennesaw.edu/cday/Spring_2024/Undergraduate_Capstone/2">digitalcommons.kennesaw.edu/cday/Spring_2024/Undergraduate_Capstone/2</a></li>
+  <li>NYUMUNC, crise conjunta com 10 comitês: <a href="https://bestdelegate.com/new-york-university-model-united-nations-conference-nyumunc-10-way-joint-crisis">bestdelegate.com/new-york-university-model-united-nations-conference-nyumunc-10-way-joint-crisis</a></li>
+  <li>BearMUN 2021, logística com Google Docs e Discord: <a href="https://bearmun.berkeley.edu/static/BearMUN-2021-Zoom-Logistics.pdf">bearmun.berkeley.edu/static/BearMUN-2021-Zoom-Logistics.pdf</a></li>
+  <li>Model Diplomat, ferramentas de simulação 2026: <a href="https://blog.modeldiplomat.com/mun-simulation-software-tools-2026">blog.modeldiplomat.com/mun-simulation-software-tools-2026</a></li>
+  <li>NAVISMUN 2026 no MyMUN: <a href="https://mymun.com/conferences/navismun-2026">mymun.com/conferences/navismun-2026</a></li>
+</ul>
+
+</body>
+</html>
