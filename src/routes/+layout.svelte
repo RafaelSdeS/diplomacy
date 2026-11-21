@@ -4,15 +4,8 @@
 	import '../app.css';
 	import { afterNavigate, beforeNavigate, goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import CalendarDays from '@lucide/svelte/icons/calendar-days';
-	import Gavel from '@lucide/svelte/icons/gavel';
-	import Siren from '@lucide/svelte/icons/siren';
-	import House from '@lucide/svelte/icons/house';
-	import Landmark from '@lucide/svelte/icons/landmark';
-	import Megaphone from '@lucide/svelte/icons/megaphone';
-	import Newspaper from '@lucide/svelte/icons/newspaper';
-	import PenLine from '@lucide/svelte/icons/pen-line';
-	import Users from '@lucide/svelte/icons/users';
+	import Ellipsis from '@lucide/svelte/icons/ellipsis';
+	import { menu } from '#lib/menu.ts';
 	import { caixa } from '#lib/caixa.ts';
 	import { esquecerConta } from '#lib/conta.ts';
 	import { desativarPush } from '#lib/push.ts';
@@ -28,53 +21,30 @@
 
 	let { data, children }: LayoutProps = $props();
 
-	type Tela = { href: string; rotulo: string; icone: typeof House; papeis?: Papel[] };
-
-	const papeis = $derived(new Set(data.participacoes.map((p) => p.papel)));
-	const sigla = $derived(data.participacoes.find((p) => p.comite_sigla)?.comite_sigla);
-	const siglaCrise = $derived(data.participacoes.find((p) => p.papel === 'crise')?.comite_sigla);
-
-	// Cada passo adiciona aqui as telas que cria. Sem "papeis", todos veem. O menu muda
-	// com o papel principal (passo 32): a mesa tem o painel; a crise e a press, as suas
-	// telas logo depois do Agora.
+	// O menu por tarefa (passo 43, #lib/menu.ts): no celular, 4 telas e "Mais"; no
+	// notebook, todas na lateral.
 	const principal = $derived(papelPrincipal(data.participacoes));
+	const itens = $derived(menu(data.participacoes));
+	const temMais = $derived(itens.some((i) => i.mais));
 	// Passo 43: quem a pessoa é no evento fica sempre à vista na faixa (país ou papel).
 	const eu = $derived(data.participacoes.find((p) => p.papel === principal) ?? data.participacoes[0]);
 	// As bandeiras (271 arquivos) ficam fora da primeira abertura: o componente vem sob demanda.
 	const bandeira = import('#lib/ui/Bandeira.svelte');
-	const telas: Tela[] = $derived([
-		{ href: '/', rotulo: t('Agora'), icone: House },
-		...(siglaCrise ? [{ href: `/crise/${siglaCrise}`, rotulo: t('Crise'), icone: Siren, papeis: ['crise' as const] }] : []),
-		...(principal === 'press'
-			? [
-					{ href: '/press', rotulo: t('Press'), icone: Newspaper },
-					{ href: '/press/escrever', rotulo: t('Escrever'), icone: PenLine }
-				]
-			: []),
-		...(sigla
-			? [
-					principal === 'mesa'
-						? { href: `/comite/${sigla}/sessao/presidencia`, rotulo: t('Painel'), icone: Gavel }
-						: { href: `/comite/${sigla}/sessao`, rotulo: t('Sessão'), icone: Gavel },
-					{ href: `/comite/${sigla}`, rotulo: t('Comitê'), icone: Landmark }
-				]
-			: []),
-		...(principal === 'press' ? [] : [{ href: '/press', rotulo: t('Press'), icone: Newspaper }]),
-		{ href: '/cronograma', rotulo: t('Cronograma'), icone: CalendarDays },
-		{ href: '/avisos', rotulo: t('Avisos'), icone: Megaphone },
-		{ href: '/secretaria/participantes', rotulo: t('Participantes'), icone: Users, papeis: ['secretaria'] }
-	]);
-	const itens = $derived(telas.filter((t) => !t.papeis || t.papeis.some((p) => papeis.has(p))));
 	const comMenu = $derived(data.participacoes.length > 0);
 	// O telão e as páginas de impressão ocupam a tela inteira, sem cabeçalho nem menu.
 	const semMoldura = $derived(/^\/(telao|imprimir)\//.test(page.url.pathname));
 	// O item do menu mais específico que contém a tela atual: "page" se é a própria
 	// tela; "true" numa subtela (as regras do comitê ficam sob "Comitê").
+	// Uma tela pode abranger outra pasta: o Painel da mesa abrange as telas da sessão.
+	const dentro = (caminho: string, h: string) => caminho === h || (h !== '/' && caminho.startsWith(`${h}/`));
 	const marcado = $derived(
 		itens
-			.map((i) => i.href)
-			.filter((h) => page.url.pathname === h || (h !== '/' && page.url.pathname.startsWith(`${h}/`)))
-			.sort((a, b) => b.length - a.length)[0]
+			.flatMap((i) => [i.href, ...(i.abrange ? [i.abrange] : [])].filter((h) => dentro(page.url.pathname, h)).map((h) => ({ href: i.href, h })))
+			.sort((a, b) => b.h.length - a.h.length)[0]?.href
+	);
+	// No celular, a tela atual que está em "Mais" marca o próprio "Mais".
+	const maisMarcado = $derived(
+		page.url.pathname === '/mais' ? 'page' : itens.some((i) => i.mais && i.href === marcado) ? 'true' : undefined
 	);
 	// Passo 43: na trilha, a mesa volta ao Painel (não à tela do delegado).
 	const siglaDaTela = $derived(page.params.sigla ?? (page.data as { comite?: { sigla: string } }).comite?.sigla);
@@ -198,13 +168,21 @@
 			<nav class="navegacao" aria-label={t('Principal')}>
 				<ul>
 					{#each itens as item (item.href)}
-						<li>
+						<li class:item-de-mais={item.mais}>
 							<a href={item.href} aria-current={atual(item.href)}>
 								<item.icone aria-hidden="true" size={20} strokeWidth={1.5} />
 								<span>{item.rotulo}</span>
 							</a>
 						</li>
 					{/each}
+					{#if temMais}
+						<li class="item-mais">
+							<a href="/mais" aria-current={maisMarcado}>
+								<Ellipsis aria-hidden="true" size={20} strokeWidth={1.5} />
+								<span>{t('Mais')}</span>
+							</a>
+						</li>
+					{/if}
 				</ul>
 			</nav>
 		{/if}

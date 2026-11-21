@@ -1,6 +1,6 @@
 import { expect, test, type Browser, type Page } from '@playwright/test';
 import { contaDoTreino, isolado } from '../scripts/delegacoes.ts';
-import { clienteComo, entrar } from './ajuda.ts';
+import { clienteComo, entrar, irPeloMenu } from './ajuda.ts';
 
 // Passo 39: a cópia do TREINO só deste arquivo (scripts/delegacoes.ts).
 const C = isolado('15');
@@ -41,7 +41,7 @@ test('depois do primeiro acesso, o app abre sem rede', async ({ browser }) => {
 	await page.goto('/');
 	await expect(page.getByRole('heading', { level: 1, name: 'Agora' })).toBeVisible();
 	await expect(page.getByText('Sem conexão')).toBeVisible();
-	await page.getByRole('navigation', { name: 'Principal' }).getByRole('link', { name: 'Cronograma' }).click();
+	await irPeloMenu(page, 'Cronograma');
 	await expect(page.getByRole('heading', { level: 1, name: 'Cronograma' })).toBeVisible();
 	await page.context().close();
 });

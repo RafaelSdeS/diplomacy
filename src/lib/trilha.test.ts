@@ -8,6 +8,9 @@ describe('trilha', () => {
 	it('subtelas do comitê voltam ao comitê, com a sigla como rótulo', () => {
 		expect(hrefs('/comite/[sigla]/regras')).toEqual(['/comite/UNOCT']);
 		expect(hrefs('/comite/[sigla]/delegacao/[id]')).toEqual(['/comite/UNOCT']);
+		// Passo 43: o que se escreve volta à central de Documentos.
+		expect(hrefs('/comite/[sigla]/dpo')).toEqual(['/comite/UNOCT', '/comite/UNOCT/documentos']);
+		expect(hrefs('/comite/[sigla]/cartas')).toEqual(['/comite/UNOCT', '/comite/UNOCT/documentos']);
 		expect(trilha('/comite/[sigla]/votacoes', { sigla: 'UNOCT' }, {})[0].rotulo).toBe('UNOCT');
 	});
 	it('telas da sessão passam pela sessão', () => {
@@ -21,7 +24,7 @@ describe('trilha', () => {
 		expect(mesa('/comite/[sigla]/sessao/presidencia')).toEqual(['/comite/UNOCT']);
 	});
 	it('o documento usa o comitê carregado', () => {
-		expect(hrefs('/documento/[id]', { id: 'x' }, { comite: { sigla: 'CSNU' } })).toEqual(['/comite/CSNU', '/comite/CSNU/blocos']);
+		expect(hrefs('/documento/[id]', { id: 'x' }, { comite: { sigla: 'CSNU' } })).toEqual(['/comite/CSNU', '/comite/CSNU/documentos']);
 	});
 	it('press, secretaria e perfil voltam à tela do menu', () => {
 		expect(hrefs('/press/escrever', {})).toEqual(['/press']);
@@ -29,7 +32,7 @@ describe('trilha', () => {
 		expect(hrefs('/perfil/meus-dados', {})).toEqual(['/perfil']);
 	});
 	it('telas do menu não têm trilha', () => {
-		for (const rota of ['/', '/comite/[sigla]', '/comite/[sigla]/sessao', '/press', '/cronograma', '/secretaria/participantes', '/crise/[sigla]'])
+		for (const rota of ['/', '/comite/[sigla]', '/comite/[sigla]/sessao', '/comite/[sigla]/documentos', '/comite/[sigla]/mensagens', '/press', '/cronograma', '/mais', '/secretaria/participantes', '/crise/[sigla]'])
 			expect(hrefs(rota)).toEqual([]);
 	});
 });

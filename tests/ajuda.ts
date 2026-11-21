@@ -16,6 +16,18 @@ export const CONTAS = {
 	semConvite: 'semconvite@exemplo.test'
 } as const;
 
+/**
+ * Vai a uma tela do menu como a pessoa faria (passo 43): no notebook pela lateral; no
+ * celular, o que não cabe na barra fica em "Mais".
+ */
+export async function irPeloMenu(page: Page, nome: string) {
+	const menu = page.getByRole('navigation', { name: 'Principal' });
+	const link = menu.getByRole('link', { name: nome, exact: true });
+	if (await link.isVisible()) return link.click();
+	await menu.getByRole('link', { name: 'Mais', exact: true }).click();
+	await page.getByRole('main').getByRole('link', { name: new RegExp(`^${nome}`) }).click();
+}
+
 export async function entrar(page: Page, email: string) {
 	await page.goto('/entrar');
 	await page.getByLabel('E-mail', { exact: true }).fill(email);

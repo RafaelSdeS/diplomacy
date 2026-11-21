@@ -48,7 +48,10 @@ sw.addEventListener('activate', (evento) => {
 
 /** Do aparelho; se ainda não estiver lá, da rede, e fica guardado. */
 async function doCacheOuDaRede(pedido: Request, cache: string) {
-	const guardado = await caches.match(pedido);
+	// Passo 43: sem ignoreVary, o pedido de um módulo (com Origin) não encontra o arquivo
+	// guardado na instalação (sem Origin) quando a resposta tem "Vary": a tela que a pessoa
+	// ainda não tinha aberto com rede falhava sem rede. Estes arquivos nunca mudam.
+	const guardado = await caches.match(pedido, { ignoreVary: true });
 	if (guardado) return guardado;
 	const resposta = await fetch(pedido);
 	if (resposta.ok) {

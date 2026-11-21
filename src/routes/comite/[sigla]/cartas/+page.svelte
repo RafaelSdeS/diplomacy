@@ -69,6 +69,28 @@
 <h1>{t('Cartas diplomáticas')}</h1>
 
 {#if eu}
+	<p class="acoes"><a class="botao" href="#t-escrever">{t('Escrever carta')}</a></p>
+{/if}
+
+<section aria-labelledby="t-cartas">
+	<h2 id="t-cartas">{t('Cartas')}</h2>
+	<ul class="lista">
+		{#each data.cartas as c (c.id)}
+			<li>
+				<span>
+					<strong>{c.titulo}</strong>
+					{#if c.publica}<span class="selo selo--info">{t('Pública')}</span>{/if}
+					<span class="detalhe">{t('De')} {de(c)} · {t('para')} {para(c)} · {formatarQuando(c.enviada_em, agora)}</span>
+				</span>
+				<a href={`/imprimir/carta/${c.id}`} aria-label={`Abrir e imprimir a carta "${c.titulo}"`}>{t('Abrir')}</a>
+			</li>
+		{:else}
+			<li class="suave">{t('Nenhuma carta ainda.')}</li>
+		{/each}
+	</ul>
+</section>
+
+{#if eu}
 	<section aria-labelledby="t-escrever">
 		<h2 id="t-escrever">{t('Escrever carta')}</h2>
 		<form class="formulario formulario--largo" onsubmit={enviar}>
@@ -116,21 +138,3 @@
 		</form>
 	</section>
 {/if}
-
-<section aria-labelledby="t-cartas">
-	<h2 id="t-cartas">{t('Cartas')}</h2>
-	<ul class="lista">
-		{#each data.cartas as c (c.id)}
-			<li>
-				<span>
-					<strong>{c.titulo}</strong>
-					{#if c.publica}<span class="selo selo--info">{t('Pública')}</span>{/if}
-					<span class="detalhe">{t('De')} {de(c)} · {t('para')} {para(c)} · {formatarQuando(c.enviada_em, agora)}</span>
-				</span>
-				<a href={`/imprimir/carta/${c.id}`} aria-label={`Abrir e imprimir a carta "${c.titulo}"`}>{t('Abrir')}</a>
-			</li>
-		{:else}
-			<li class="suave">{t('Nenhuma carta ainda.')}</li>
-		{/each}
-	</ul>
-</section>

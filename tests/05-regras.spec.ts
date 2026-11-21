@@ -1,10 +1,10 @@
 import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { CONTAS, entrar } from './ajuda.ts';
+import { CONTAS, entrar, irPeloMenu } from './ajuda.ts';
 
-test('as regras do comitê de teste mostram a votação do CSNU e o quórum', async ({ page }) => {
+test('as regras do comitê de teste mostram a votação do CSNU e o quórum', async ({ page }, info) => {
 	await entrar(page, CONTAS.delegado);
-	await page.getByRole('navigation', { name: 'Principal' }).getByRole('link', { name: 'Comitê' }).click();
+	await irPeloMenu(page, 'Comitê');
 	await page.getByRole('link', { name: 'Regras de procedimento' }).click();
 
 	await expect(page.getByRole('heading', { level: 1, name: 'Regras de procedimento' })).toBeVisible();
@@ -16,9 +16,9 @@ test('as regras do comitê de teste mostram a votação do CSNU e o quórum', as
 	await expect(page.getByRole('region', { name: 'Sessão' })).toContainText('até 45 minutos por sessão');
 	await expect(page.getByRole('region', { name: 'Sessão' })).toContainText('Hoje: 5 de 15 delegações.');
 
-	// O menu continua marcando o comitê.
+	// O menu continua marcando o comitê (no celular, o "Mais", onde o comitê fica).
 	await expect(
-		page.getByRole('navigation', { name: 'Principal' }).getByRole('link', { name: 'Comitê' })
+		page.getByRole('navigation', { name: 'Principal' }).getByRole('link', { name: info.project.name === 'celular' ? 'Mais' : 'Comitê', exact: true })
 	).toHaveAttribute('aria-current', 'true');
 });
 

@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
 import { isolado } from '../scripts/delegacoes.ts';
-import { clienteComo, comiteEmDebate, CONTAS, entrar } from './ajuda.ts';
+import { clienteComo, comiteEmDebate, CONTAS, entrar, irPeloMenu } from './ajuda.ts';
 
 // Passo 43: fácil de achar, fácil de voltar, sem rolar. Os testes medem tarefas
 // (cliques, o que está na primeira tela, para onde o "Voltar" leva), não a aparência.
@@ -78,4 +79,45 @@ test('no painel, o nome da delegação abre a ficha sem sair da tela', async ({ 
 	await page.keyboard.press('Escape');
 	await expect(ficha).toBeHidden();
 	await expect(page.getByRole('region', { name: 'Com a palavra' })).toBeVisible();
+});
+
+const semErrosDeAcessibilidade = async (page: Page) => {
+	const { violations } = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze();
+	expect(violations).toEqual([]);
+};
+
+test('delegado: Documentos reúne o que se escreve, e o "Voltar" volta para lá', async ({ page }) => {
+	await entrar(page, EUA);
+	await irPeloMenu(page, 'Documentos');
+	await expect(page.getByRole('heading', { level: 1, name: 'Documentos' })).toBeVisible();
+	for (const nome of ['Seu DPO', 'Dos seus blocos', 'Cartas', 'Caderno da delegação', 'Do comitê'])
+		await expect(page.getByRole('region', { name: nome })).toBeVisible();
+	await semErrosDeAcessibilidade(page);
+
+	await page.getByRole('region', { name: 'Seu DPO' }).getByRole('link').first().click();
+	await expect(page.getByRole('heading', { level: 1, name: 'Documento de posição oficial' })).toBeVisible();
+	await page.getByRole('link', { name: '‹ Voltar para Documentos' }).click();
+	await expect(page.getByRole('heading', { level: 1, name: 'Documentos' })).toBeVisible();
+});
+
+test('mesa: Documentos começa pelo que espera a avaliação', async ({ page }, info) => {
+	test.skip(info.project.name !== 'notebook', 'uma tela basta');
+	await entrar(page, MESA);
+	await irPeloMenu(page, 'Documentos');
+	await expect(page.getByRole('region', { name: 'Para avaliar' })).toBeVisible();
+	await expect(page.getByRole('region', { name: 'Seu DPO' })).toHaveCount(0);
+});
+
+test('no celular, "Mais" guarda o resto do menu, e o "Voltar" volta a ele', async ({ page }, info) => {
+	test.skip(info.project.name !== 'celular', 'a barra de baixo é do celular');
+	await entrar(page, EUA);
+	const menu = page.getByRole('navigation', { name: 'Principal' });
+	await expect(menu.getByRole('link')).toHaveText(['Agora', 'Sessão', 'Documentos', 'Mensagens', 'Mais']);
+	await menu.getByRole('link', { name: 'Mais' }).click();
+	await semErrosDeAcessibilidade(page);
+	await page.getByRole('main').getByRole('link', { name: /^Cronograma/ }).click();
+	await expect(page.getByRole('heading', { level: 1, name: 'Cronograma' })).toBeVisible();
+	await expect(menu.getByRole('link', { name: 'Mais' })).toHaveAttribute('aria-current', 'true');
+	await page.getByRole('link', { name: '‹ Voltar para Mais' }).click();
+	await expect(page).toHaveURL('/mais');
 });

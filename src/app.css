@@ -390,8 +390,20 @@ main.main-sem-moldura {
 	box-shadow: inset 0 2px 0 var(--cor-fio-dourado);
 }
 
+/* Passo 43: no celular, as telas de "Mais" saem da barra; no notebook, a lateral mostra
+   todas e o próprio "Mais" some. */
+@media (max-width: 1023px) {
+	.navegacao .item-de-mais {
+		display: none;
+	}
+}
+
 /* Notebook: navegação na lateral. */
 @media (min-width: 1024px) {
+	.navegacao .item-mais {
+		display: none;
+	}
+
 	.app {
 		grid-template-columns: var(--largura-nav) 1fr;
 		grid-template-areas: 'timbre timbre' 'nav conteudo';
@@ -2662,4 +2674,127 @@ dialog.ficha {
 	background: rgb(0 0 0 / 0.7);
 	color: #ffffff;
 	font-size: 1rem;
+}
+
+/* Passo 43: atalhos grandes (Mais, Comitê), cada um dizendo para que serve. */
+.grade-atalhos {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+	gap: 0.75rem;
+	margin: 0 0 1.5rem;
+	padding: 0;
+	list-style: none;
+}
+
+.grade-atalhos a {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	grid-template-rows: auto auto;
+	column-gap: 0.75rem;
+	align-items: center;
+	height: 100%;
+	padding: 0.9rem 1rem;
+	border: var(--linha);
+	border-radius: var(--raio);
+	background: var(--cor-fundo);
+	color: var(--cor-texto);
+	text-decoration: none;
+}
+
+.grade-atalhos a:hover {
+	border-color: var(--cor-marinho);
+	background: var(--cor-marinho-suave);
+}
+
+.grade-atalhos svg {
+	grid-row: span 2;
+	color: var(--cor-marinho);
+}
+
+.grade-atalhos-nome {
+	font-family: var(--fonte-titulo);
+	font-weight: 600;
+	font-size: 1.1rem;
+	color: var(--cor-marinho);
+}
+
+.grade-atalhos-descricao {
+	font-size: 0.875rem;
+	color: var(--cor-texto-suave);
+}
+
+.topicos {
+	margin: 0 0 1.5rem;
+	padding-left: 1.5rem;
+	font-family: var(--fonte-titulo);
+	font-size: 1.1rem;
+}
+
+.topicos li + li {
+	margin-top: 0.35rem;
+}
+
+.mesa-do-comite {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem 1.5rem;
+	margin: 0 0 1.5rem;
+	padding: 0;
+	list-style: none;
+}
+
+/* As delegações em cartões com a bandeira; a da pessoa fica marcada. */
+.grade-delegacoes {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr));
+	gap: 0.5rem;
+	margin: 0 0 1.5rem;
+	padding: 0;
+	list-style: none;
+}
+
+.grade-delegacoes li {
+	position: relative;
+	display: grid;
+	grid-template-columns: auto 1fr;
+	column-gap: 0.75rem;
+	align-items: center;
+	padding: 0.75rem 0.9rem;
+	border: var(--linha);
+	border-radius: var(--raio);
+	background: var(--cor-fundo);
+}
+
+.grade-delegacoes li:hover {
+	border-color: var(--cor-marinho);
+}
+
+.grade-delegacoes li.minha {
+	border-left: 3px solid var(--cor-fio-dourado);
+}
+
+.grade-delegacoes .bandeira {
+	grid-row: span 2;
+	width: 2.25rem;
+	height: auto;
+	box-shadow: 0 0 0 1px var(--cor-linha);
+}
+
+.grade-delegacoes-nome {
+	font-weight: 600;
+	color: var(--cor-marinho);
+	text-decoration: none;
+}
+
+.grade-delegacoes-nome::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+}
+
+.grade-delegacoes .detalhe {
+	font-size: 0.8rem;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }

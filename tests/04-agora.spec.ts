@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { CONTAS, entrar } from './ajuda.ts';
+import { CONTAS, entrar, irPeloMenu } from './ajuda.ts';
 
 // Hora fixa no primeiro dia do evento de teste (seed), durante a Sessão 1. Fica no
 // passado: com o relógio depois do vencimento da sessão, o login seria renovado o tempo todo.
@@ -100,7 +100,7 @@ test('um aviso da secretaria chega ao delegado sem recarregar', async ({ page, b
 
 test('a página do comitê mostra tópicos, mesa e as 15 delegações com bandeira', async ({ page }) => {
 	await entrar(page, CONTAS.delegado);
-	await page.getByRole('navigation', { name: 'Principal' }).getByRole('link', { name: 'Comitê' }).click();
+	await irPeloMenu(page, 'Comitê');
 
 	await expect(page.getByRole('heading', { level: 1, name: 'Conselho de Segurança (teste)' })).toBeVisible();
 	await expect(page.getByRole('region', { name: 'Tópicos' })).toContainText('Iêmen');

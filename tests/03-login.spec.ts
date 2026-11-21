@@ -63,18 +63,20 @@ test('conta sem convite cai em /sem-acesso, sem menu', async ({ page }) => {
 });
 
 const MENUS = {
-	delegado: ['Agora', 'Sessão', 'Comitê', 'Press', 'Cronograma', 'Avisos'],
-	mesa: ['Agora', 'Painel', 'Comitê', 'Press', 'Cronograma', 'Avisos'],
-	crise: ['Agora', 'Crise', 'Sessão', 'Comitê', 'Press', 'Cronograma', 'Avisos'],
-	press: ['Agora', 'Press', 'Escrever', 'Sessão', 'Comitê', 'Cronograma', 'Avisos'],
-	secretaria: ['Agora', 'Press', 'Cronograma', 'Avisos', 'Participantes']
+	delegado: ['Agora', 'Sessão', 'Documentos', 'Mensagens', 'Comitê', 'Press', 'Cronograma', 'Avisos'],
+	mesa: ['Agora', 'Painel', 'Documentos', 'Mensagens', 'Comitê', 'Press', 'Cronograma', 'Avisos'],
+	crise: ['Agora', 'Crise', 'Sessão', 'Mensagens', 'Documentos', 'Comitê', 'Press', 'Cronograma', 'Avisos'],
+	press: ['Agora', 'Press', 'Escrever', 'Mensagens', 'Sessão', 'Documentos', 'Comitê', 'Cronograma', 'Avisos'],
+	secretaria: ['Agora', 'Participantes', 'Press', 'Cronograma', 'Avisos']
 } as const;
 
+// Passo 43: menu por tarefa. No notebook, todas as telas; no celular, as 4 primeiras e "Mais".
 for (const [papel, itens] of Object.entries(MENUS)) {
-	test(`${papel} vê só o próprio menu`, async ({ page }) => {
+	test(`${papel} vê só o próprio menu`, async ({ page }, info) => {
 		await entrar(page, CONTAS[papel as keyof typeof MENUS]);
 		const links = page.getByRole('navigation', { name: 'Principal' }).getByRole('link');
-		await expect(links).toHaveText([...itens]);
+		const celular = info.project.name === 'celular' && itens.length > 5;
+		await expect(links).toHaveText(celular ? [...itens.slice(0, 4), 'Mais'] : [...itens]);
 	});
 }
 
