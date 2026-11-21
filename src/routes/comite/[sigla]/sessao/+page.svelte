@@ -9,7 +9,7 @@
 		mensagemDeErro,
 		PONTOS,
 		pontosEmOrdem,
-		SITUACAO_PONTO,
+		situacaoDoPonto,
 		type TipoPonto
 	} from '#lib/sessao.ts';
 	import { supabase } from '#lib/supabase.ts';
@@ -90,7 +90,7 @@
 				p_topico: tipoPonto === 'topico_no_topo' ? topico : undefined,
 				p_minutos: tipoPonto === 'informal_informal' ? minutos : undefined
 			}),
-			`${PONTOS[tipoPonto]}: enviado à presidência.`
+			t('{pedido}: enviado à mesa.', { pedido: PONTOS[tipoPonto] })
 		);
 		if (ok) detalhe = '';
 	}
@@ -311,7 +311,7 @@
 					{t('Detalhe (opcional)')}
 					<textarea maxlength="300" bind:value={detalhe}></textarea>
 				</label>
-				<button class="botao">{t('Enviar à presidência')}</button>
+				<button class="botao">{t('Enviar à mesa')}</button>
 			</form>
 			{#if meusPontos.length}
 				<ul class="lista" aria-label={t('Seus pontos e moções')}>
@@ -320,7 +320,7 @@
 							{descreverPonto(ponto)}
 							<span
 								class="selo {ponto.status === 'aceito' ? 'selo--ok' : ponto.status === 'recusado' ? 'selo--erro' : 'selo--info'}"
-								>{SITUACAO_PONTO[ponto.status as keyof typeof SITUACAO_PONTO]}</span
+								>{situacaoDoPonto(ponto)}</span
 							>
 						</li>
 					{/each}

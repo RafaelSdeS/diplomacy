@@ -1970,3 +1970,15 @@ kbd {
 	gap: 1rem;
 	padding-top: 0.5rem;
 }
+
+/* Pontos e moções em duas etapas (passo 29). */
+.motivo {
+	width: 10rem;
+	font: inherit;
+	font-size: 0.85rem;
+}
+
+.telao-analise {
+	margin: 0.5rem 0;
+	font-size: 1.4rem;
+}

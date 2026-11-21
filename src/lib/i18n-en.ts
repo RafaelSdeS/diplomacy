@@ -254,7 +254,6 @@ export const EN: Record<string, string> = {
 	'Enviar respostas': 'Send answers',
 	'Enviar à crise': 'Send to the crisis team',
 	'Enviar à mesa': 'Send to the dais',
-	'Enviar à presidência': 'Send to the chair',
 	'Equipe de crise': 'Crisis team',
 	'Erro': 'Error',
 	'Escolha a aprovação: por consenso ou por votação.': 'Choose the approval: by consensus or by vote.',
@@ -899,6 +898,21 @@ export const EN: Record<string, string> = {
 	'Voltar ao formal-informal': 'Back to moderated debate',
 	'Informal-informal encerrado nesta sessão: {n} de {total} min': 'Unmoderated caucus closed this session: {n} of {total} min',
 	'O tempo de fala vai de 1 a 3600 segundos.': 'Speaking time goes from 1 to 3600 seconds.',
+	// Passo 29
+	'Aprovado pelo bureau · aguardando a presidência': 'Approved by the dais · awaiting the chair',
+	'Aguardando o bureau': 'Awaiting the dais',
+	'Bureau · pedidos para aprovar': 'Dais · requests to approve',
+	'Em ordem: {pedido}, {delegacao}': 'In order: {pedido}, {delegacao}',
+	'Em ordem': 'In order',
+	'Motivo (opcional)': 'Reason (optional)',
+	'Motivo da recusa: {pedido}': 'Reason for refusal: {pedido}',
+	'Fora de ordem: {pedido}, {delegacao}': 'Out of order: {pedido}, {delegacao}',
+	'Nenhum pedido esperando o bureau.': 'No requests awaiting the dais.',
+	'A presidência concede os pedidos que o bureau aprovou.': 'The chair grants the requests the dais approved.',
+	'Aprovado pelo bureau': 'Approved by the dais',
+	'{pedido}: enviado à mesa.': '{pedido}: sent to the dais.',
+	'Este pedido já foi julgado.': 'This request has already been ruled on.',
+	'O bureau ainda não aprovou este pedido.': 'The dais has not approved this request yet.',
 };
 
 /** Mensagens do banco com partes variáveis: [padrão em português, tradução]. */

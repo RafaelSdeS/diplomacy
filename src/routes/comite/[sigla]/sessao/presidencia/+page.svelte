@@ -5,7 +5,7 @@
 	import type { Database } from '#lib/database.types.ts';
 	import { nomeDoDocumento, STATUS_DOCUMENTO } from '#lib/formatacao.ts';
 	import { assinaturasDesconfianca, REGRAS_VOTACAO } from '#lib/votacao.ts';
-	import { descreverPonto, ehPonto, FORMAS, mensagemDeErro, MOCOES_COM_LISTA, SITUACAO_PONTO, type TipoPonto } from '#lib/sessao.ts';
+	import { bureauPreside, descreverPonto, ehPonto, FORMAS, mensagemDeErro, MOCOES_COM_LISTA, SITUACAO_PONTO, type TipoPonto } from '#lib/sessao.ts';
 	import { supabase } from '#lib/supabase.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import Bandeira from '#lib/ui/Bandeira.svelte';
@@ -43,6 +43,15 @@
 	const fila = $derived(sessao?.pedidos ?? []);
 	const pontosAbertos = $derived((sessao?.pontos ?? []).filter((p) => !['aceito', 'recusado'].includes(p.status)));
 	const emDiscussao = $derived(pontosAbertos.find((p) => p.status === 'em_discussao'));
+	// Passo 29: com uma delegação presidindo, o bureau aprova antes e a presidência só vê o aprovado.
+	const presidePeloBureau = $derived(bureauPreside(data.fase, data.estado?.mesa_assumiu, sessao?.presidencia?.id));
+	const paraJulgar = $derived(pontosAbertos.filter((p) => p.status === 'aberto' && p.aprovado_bureau == null));
+	const paraConceder = $derived(
+		presidePeloBureau ? pontosAbertos : pontosAbertos.filter((p) => p.status !== 'aberto' || p.aprovado_bureau)
+	);
+	let motivo = $state<Record<string, string>>({});
+	const julgar = (ponto: string, emOrdem: boolean) =>
+		rpc('julgar_ponto', { p_ponto: ponto, p_em_ordem: emOrdem, p_motivo: emOrdem ? undefined : motivo[ponto] || undefined });
 	const lista = $derived(listaAtiva(data.lista, emDiscussao?.id, data.fase));
 	const proximo = $derived(proximoDaLista(lista));
 	const pausado = $derived(data.estado?.cronometro_pausado_restante_seg !== null);
@@ -593,14 +602,53 @@
 				</section>
 			{/if}
 
+			{#if ehMesa && !presidePeloBureau}
+				<section class="cartao cartao--destaque" aria-labelledby="t-julgar">
+					<h2 id="t-julgar">{t('Bureau · pedidos para aprovar')}</h2>
+					<ul class="lista">
+						{#each paraJulgar as ponto (ponto.id)}
+							{@const nome = descreverPonto(ponto)}
+							<li>
+								<span>{nome} <span class="detalhe">{ponto.delegacao?.nome}{ponto.detalhe ? ` · ${ponto.detalhe}` : ''}</span></span>
+								<span class="acoes">
+									<button
+										class="botao botao--pequeno"
+										type="button"
+										aria-label={t('Em ordem: {pedido}, {delegacao}', { pedido: nome, delegacao: ponto.delegacao?.nome ?? '' })}
+										onclick={() => julgar(ponto.id, true)}>{t('Em ordem')}</button
+									>
+									<input
+										class="motivo"
+										maxlength="200"
+										placeholder={t('Motivo (opcional)')}
+										aria-label={t('Motivo da recusa: {pedido}', { pedido: nome })}
+										bind:value={motivo[ponto.id]}
+									/>
+									<button
+										class="botao botao--secundario botao--pequeno"
+										type="button"
+										aria-label={t('Fora de ordem: {pedido}, {delegacao}', { pedido: nome, delegacao: ponto.delegacao?.nome ?? '' })}
+										onclick={() => julgar(ponto.id, false)}>{t('Fora de ordem')}</button
+									>
+								</span>
+							</li>
+						{:else}
+							<li class="suave">{t('Nenhum pedido esperando o bureau.')}</li>
+						{/each}
+					</ul>
+				</section>
+			{/if}
+
 			<section class="cartao" aria-labelledby="t-pontos">
 				<h2 id="t-pontos">{t('Pontos e moções')}</h2>
+				{#if !presidePeloBureau}<p class="suave">{t('A presidência concede os pedidos que o bureau aprovou.')}</p>{/if}
 				<ul class="lista">
-					{#each pontosAbertos as ponto (ponto.id)}
+					{#each paraConceder as ponto (ponto.id)}
 						{@const nome = descreverPonto(ponto)}
 						<li>
 							<span>
 								{nome}
+								{#if ponto.aprovado_bureau && ponto.status === 'aberto'}<span class="selo selo--ok">{t('Aprovado pelo bureau')}</span>{/if}
 								<span class="detalhe"
 									>{ponto.delegacao?.nome}{ponto.detalhe ? ` · ${ponto.detalhe}` : ''}{ponto.tipo === 'voto_desconfianca'
 										? ` · ${t('{n} de {total} assinaturas', { n: ponto.assinaturas.length, total: assinaturasDesconfianca(data.regras.assinaturas_desconfianca_fracao, data.delegacoes) })}`

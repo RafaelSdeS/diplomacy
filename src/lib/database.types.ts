@@ -1231,14 +1231,14 @@ isOneToOne: false
                   ]
                 },"ponto_mocao": {
                   Row: {
-                    "comite_id": string,"criado_em": string,"delegacao_id": string,"detalhe": string | null,"id": string,"minutos": number | null,"sessao_id": string,"status": string,"tipo": string,"topico": number | null
+                    "aprovado_bureau": boolean | null,"comite_id": string,"criado_em": string,"delegacao_id": string,"detalhe": string | null,"id": string,"julgado_em": string | null,"julgado_por": string | null,"minutos": number | null,"motivo": string | null,"sessao_id": string,"status": string,"tipo": string,"topico": number | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "comite_id": string,"criado_em"?: string,"delegacao_id": string,"detalhe"?: string | null,"id"?: string,"minutos"?: number | null,"sessao_id": string,"status"?: string,"tipo": string,"topico"?: number | null
+                    "aprovado_bureau"?: boolean | null,"comite_id": string,"criado_em"?: string,"delegacao_id": string,"detalhe"?: string | null,"id"?: string,"julgado_em"?: string | null,"julgado_por"?: string | null,"minutos"?: number | null,"motivo"?: string | null,"sessao_id": string,"status"?: string,"tipo": string,"topico"?: number | null
                   }
                   Update: {
-                    "comite_id"?: string,"criado_em"?: string,"delegacao_id"?: string,"detalhe"?: string | null,"id"?: string,"minutos"?: number | null,"sessao_id"?: string,"status"?: string,"tipo"?: string,"topico"?: number | null
+                    "aprovado_bureau"?: boolean | null,"comite_id"?: string,"criado_em"?: string,"delegacao_id"?: string,"detalhe"?: string | null,"id"?: string,"julgado_em"?: string | null,"julgado_por"?: string | null,"minutos"?: number | null,"motivo"?: string | null,"sessao_id"?: string,"status"?: string,"tipo"?: string,"topico"?: number | null
                   }
                   Relationships: [
                     {
@@ -1247,6 +1247,12 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "delegacao"
       referencedColumns: ["id","comite_id"]
+    },{
+      foreignKeyName: "ponto_mocao_julgado_por_fkey"
+      columns: ["julgado_por"]
+isOneToOne: false
+      referencedRelation: "pessoa"
+      referencedColumns: ["id"]
     },{
       foreignKeyName: "ponto_mocao_sessao_id_comite_id_fkey"
       columns: ["sessao_id","comite_id"]
@@ -1718,6 +1724,9 @@ isOneToOne: false
 "bloquear_bilhetes":
 { Args: { "p_bloquear": boolean,"p_comite": string,"p_delegacao": string }; Returns: undefined
                            },
+"bureau_preside":
+{ Args: { "p_comite": string }; Returns: boolean
+                           },
 "checkin_por_cracha":
 { Args: { "p_codigo": string,"p_evento": string }; Returns: string
                            },
@@ -1925,6 +1934,9 @@ isOneToOne: false
                            },
 "inscrever_lista":
 { Args: { "p_lado": string,"p_ponto": string }; Returns: undefined
+                           },
+"julgar_ponto":
+{ Args: { "p_em_ordem": boolean,"p_motivo"?: string,"p_ponto": string }; Returns: undefined
                            },
 "levantar_placa":
 { Args: { "p_comite": string }; Returns: undefined

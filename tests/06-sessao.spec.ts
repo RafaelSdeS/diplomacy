@@ -123,7 +123,7 @@ test('plenária de abertura: discursos pela lista de oradores e moção do tópi
 	const eua = await abrir(browser, CONTAS.delegado, SESSAO, { width: 360, height: 740 });
 	await eua.getByLabel('Tipo').selectOption({ label: 'Moção de introdução do tópico no topo da agenda' });
 	await eua.getByRole('combobox', { name: /^Tópico/ }).selectOption({ index: 1 });
-	await eua.getByRole('button', { name: 'Enviar à presidência' }).click();
+	await eua.getByRole('button', { name: 'Enviar à mesa' }).click();
 	await expect(eua.getByRole('status').filter({ hasText: 'enviado' })).toBeVisible();
 
 	// Lista especial: a Rússia fala a favor.
@@ -229,17 +229,26 @@ test('um ponto chega à presidência, e a resposta volta à delegação', async 
 	const delegado = await abrir(browser, contaDaDelegacao(outra), SESSAO);
 	await delegado.getByLabel('Tipo').selectOption({ label: 'Ponto de dúvida' });
 	await delegado.getByLabel('Detalhe (opcional)').fill('Qual é o tempo de fala?');
-	await delegado.getByRole('button', { name: 'Enviar à presidência' }).click();
+	await delegado.getByRole('button', { name: 'Enviar à mesa' }).click();
 	await expect(delegado.getByRole('status').filter({ hasText: 'enviado' })).toBeVisible();
 
+	// Passo 29: o bureau aprova, e só então a presidência vê o pedido.
 	const painel = await abrir(browser, contaDaDelegacao(preside), PRESIDENCIA);
 	const pontos = painel.getByRole('region', { name: 'Pontos e moções' });
+	await expect(pontos).not.toContainText('Qual é o tempo de fala?');
+	await expect(delegado.getByRole('list', { name: 'Seus pontos e moções' })).toContainText('Aguardando o bureau');
+	const mesa = await abrir(browser, CONTAS.mesa, PRESIDENCIA);
+	await mesa
+		.getByRole('region', { name: 'Bureau · pedidos para aprovar' })
+		.getByRole('button', { name: `Em ordem: Ponto de dúvida, ${outra}` })
+		.click();
+	await expect(delegado.getByRole('list', { name: 'Seus pontos e moções' })).toContainText('Aprovado pelo bureau');
 	await expect(pontos).toContainText('Qual é o tempo de fala?');
 	await pontos.getByRole('button', { name: `Aceitar: Ponto de dúvida, ${outra}` }).click();
 	await expect(pontos).toContainText('Nenhum ponto ou moção');
 
 	await expect(delegado.getByRole('list', { name: 'Seus pontos e moções' })).toContainText('Aceito');
-	await Promise.all([painel, delegado].map((p) => p.context().close()));
+	await Promise.all([painel, delegado, mesa].map((p) => p.context().close()));
 });
 
 test('quem não preside não usa o painel', async ({ page }) => {

@@ -2,7 +2,7 @@
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { t } from '#lib/i18n.svelte.ts';
 	import { onMount } from 'svelte';
-	import { FORMAS } from '#lib/sessao.ts';
+	import { descreverPonto, FORMAS } from '#lib/sessao.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import Bandeira from '#lib/ui/Bandeira.svelte';
 	import Cronometro from '#lib/ui/Cronometro.svelte';
@@ -20,6 +20,8 @@
 
 	const sessao = $derived(data.estado?.sessao);
 	const emDiscussao = $derived(sessao?.pontos.find((p) => p.status === 'em_discussao'));
+	// Um pedido esperando o bureau ou a presidência (passo 29).
+	const emAnalise = $derived(sessao?.pontos.find((p) => p.status === 'aberto'));
 	const lista = $derived(listaAtiva(data.lista, emDiscussao?.id, data.fase).filter((i) => !i.falou));
 	// Os próximos: da lista de oradores em uso ou, sem lista, da fila de placas.
 	const proximos = $derived(
@@ -118,6 +120,9 @@
 
 	{#if plantao}
 		<p class="telao-plantao" role="status"><span class="rotulo">{plantao.rotulo}</span> {plantao.texto}</p>
+	{/if}
+	{#if emAnalise}
+		<p class="telao-analise"><span class="rotulo">{t('Em análise')}</span> {descreverPonto(emAnalise)} · {emAnalise.delegacao?.nome}</p>
 	{/if}
 
 	<section class="telao-orador" aria-label={t('Com a palavra')}>

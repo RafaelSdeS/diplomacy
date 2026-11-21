@@ -32,7 +32,7 @@ export async function carregarSessao(comiteId: string) {
 					presenca(delegacao_id, situacao),
 					avisos:aviso_chegada(delegacao(id, nome, bandeira)),
 					pedidos:pedido_fala(id, delegacao(id, nome, bandeira)),
-					pontos:ponto_mocao(id, tipo, detalhe, status, topico, minutos, delegacao(id, nome), assinaturas:assinatura_mocao(delegacao_id)),
+					pontos:ponto_mocao(id, tipo, detalhe, status, topico, minutos, aprovado_bureau, motivo, delegacao(id, nome), assinaturas:assinatura_mocao(delegacao_id)),
 					votacoes:votacao(id, objeto, tipo, regra, aberta, a_favor, contra, abstencoes, necessario,
 						aprovada, encerrada_em, nominal, partes, votos:voto(delegacao_id, escolha, registrado_pela_mesa),
 						passes:passe(delegacao_id)))`
@@ -159,6 +159,18 @@ export const SITUACAO_PONTO = bilingue({
 	aceito: 'Aceito',
 	recusado: 'Recusado'
 } as const);
+
+/** O bureau preside agora (plenária, ação, mesa assumiu ou sem delegação na presidência)? */
+export const bureauPreside = (fase: string, mesaAssumiu: boolean | null | undefined, presidencia: string | null | undefined) =>
+	fase !== 'debate' || !!mesaAssumiu || !presidencia;
+
+/** A etapa do pedido para quem o fez (passo 29): bureau, presidência ou o resultado. */
+export function situacaoDoPonto(p: { status: string; aprovado_bureau?: boolean | null; motivo?: string | null }) {
+	if (p.status === 'aberto')
+		return p.aprovado_bureau ? t('Aprovado pelo bureau · aguardando a presidência') : t('Aguardando o bureau');
+	const rotulo = SITUACAO_PONTO[p.status as keyof typeof SITUACAO_PONTO] ?? p.status;
+	return p.status === 'recusado' && p.motivo ? `${rotulo}: ${p.motivo}` : rotulo;
+}
 
 /** O nome de uma moção com o detalhe que ela carrega (tópico ou minutos). */
 export function descreverPonto(p: { tipo: string; topico?: number | null; minutos?: number | null }) {
