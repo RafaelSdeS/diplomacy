@@ -48,7 +48,7 @@ test('o QR do crachá entra no celular, cria a conta no primeiro acesso e vale e
 		await page.goto(`/entrar/cracha#${codigo}`);
 		await expect(page.getByRole('heading', { level: 1, name: 'Agora' }), vez).toBeVisible({ timeout: 15_000 });
 		expect(page.url(), 'o código sai da barra de endereço').not.toContain(codigo);
-		await expect(page.getByRole('article', { name: 'Você' })).toContainText('Delegado · Chile · TREINO');
+		await expect(page.getByRole('banner').getByRole('link', { name: 'Chile · TREINO' })).toBeVisible();
 		await page.context().close();
 	}
 
@@ -137,7 +137,7 @@ test('os crachás do comitê saem com QR, e o QR de um deles entra no app', asyn
 
 	const celular = await (await browser.newContext({ viewport: { width: 360, height: 740 }, isMobile: true })).newPage();
 	await celular.goto((await cracha.locator('figure').getAttribute('data-link'))!);
-	await expect(celular.getByRole('article', { name: 'Você' })).toContainText('Delegado · Bolívia · TREINO', { timeout: 15_000 });
+	await expect(celular.getByRole('banner').getByRole('link', { name: 'Bolívia · TREINO' })).toBeVisible({ timeout: 15_000 });
 	await celular.context().close();
 });
 

@@ -2,8 +2,6 @@
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { t } from '#lib/i18n.svelte.ts';
 	import { formatarDia, formatarHora, formatarQuando, itensAtuais, proximoItem } from '#lib/cronograma.ts';
-	import { rotuloPapel } from '#lib/papeis.ts';
-	import Bandeira from '#lib/ui/Bandeira.svelte';
 	import { FASES } from '#lib/votacao.ts';
 	import { SELO_NOTA, STATUS_NOTA, type StatusNota } from '#lib/crise.ts';
 	import { STATUS_DPO } from '#lib/impressao.ts';
@@ -71,6 +69,8 @@
 	);
 	// Tecnologia restrita: durante a sessão, a mesa opera o app (a placa fica com ela).
 	const restrita = $derived(!!data.aoVivo?.restrita && !!estado);
+	// Passo 43: os DPOs que ainda pedem algo da delegação (rascunho ou ajustes da mesa).
+	const dposPendentes = $derived(data.dpos.filter((d) => d.status === 'rascunho' || d.status === 'pede_ajustes'));
 	const paraJulgar = $derived(
 		(sessao?.pontos ?? []).filter((p) => p.status === 'aberto' && p.aprovado_bureau == null).length
 	);
@@ -129,21 +129,30 @@
 		</article>
 	{/if}
 
-	{#if data.principal === 'delegado' && (data.bilhetes.length || data.rodadas.length)}
-		<article class="cartao" aria-labelledby="c-caixa">
-			<h2 id="c-caixa">{t('Na sua caixa')}</h2>
+	<!-- Passo 43: o que espera a delegação, cada item a um clique do lugar exato. -->
+	{#if data.principal === 'delegado'}
+		<article class="cartao cartao--destaque" aria-labelledby="c-caixa">
+			<h2 id="c-caixa">{t('Precisa de você')}</h2>
 			<ul class="lista">
-				{#each data.bilhetes as b (b.id)}
-					<li><span><strong>{b.de?.nome}</strong> {b.texto}</span></li>
-				{/each}
 				{#each data.rodadas as r (r.documento?.id)}
 					<li>
 						<a href={`/documento/${r.documento?.id}`}>{r.documento?.titulo}</a>
 						<span class="detalhe">{t('rodada até {hora}', { hora: formatarHora(r.fim) })}</span>
 					</li>
 				{/each}
+				{#each dposPendentes as dpo (dpo.id)}
+					<li>
+						<a href={`/comite/${sigla}/dpo`}>{t('DPO do tópico {n}', { n: dpo.topico })}</a>
+						<span class="selo {STATUS_DPO[dpo.status].selo}">{STATUS_DPO[dpo.status].rotulo}</span>
+					</li>
+				{/each}
+				{#each data.bilhetes as b (b.id)}
+					<li><span><strong>{b.de?.nome}</strong> {b.texto}</span> <a href={`/comite/${sigla}/mensagens`}>{t('Responder')}</a></li>
+				{/each}
+				{#if !data.rodadas.length && !dposPendentes.length && !data.bilhetes.length}
+					<li class="suave">{t('Nada esperando você agora.')}</li>
+				{/if}
 			</ul>
-			<p><a href={`/comite/${sigla}/mensagens`}>{t('Ver as mensagens')}</a></p>
 		</article>
 	{/if}
 
@@ -290,36 +299,4 @@
 		</article>
 	{/if}
 
-	{#if data.dpos.length}
-		<article class="cartao" aria-labelledby="c-dpo">
-			<h2 id="c-dpo">{t('Seus DPOs')}</h2>
-			<ul class="lista">
-				{#each data.dpos as dpo (dpo.id)}
-					<li>
-						<span>{t('Tópico')} {dpo.topico}</span>
-						<span class="selo {STATUS_DPO[dpo.status].selo}">{STATUS_DPO[dpo.status].rotulo}</span>
-					</li>
-				{/each}
-			</ul>
-			<p>
-				<a href={`/comite/${data.participacoes.find((p) => p.comite_id === data.dpos[0].comite_id)?.comite_sigla}/dpo`}
-					>{t('Abrir os DPOs')}</a
-				>
-			</p>
-		</article>
-	{/if}
-
-	<article class="cartao" aria-labelledby="c-voce">
-		<h2 id="c-voce">{t('Você')}</h2>
-		<ul class="lista">
-			{#each data.participacoes as p (p.id)}
-				<li>
-					<span class="com-bandeira">
-						<Bandeira codigo={p.delegacao_bandeira} />
-						{junto(rotuloPapel(p.papel), p.delegacao_nome, p.comite_sigla)}
-					</span>
-				</li>
-			{/each}
-		</ul>
-	</article>
 </div>

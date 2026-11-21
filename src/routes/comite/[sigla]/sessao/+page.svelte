@@ -176,6 +176,18 @@
 <p class="rotulo">{t('Comitê')} · {data.comite.sigla} <AoVivo comiteId={data.comite.id} bind:diferenca /></p>
 <h1>{sessao ? t('Sessão {n}', { n: sessao.numero }) : t('Sessão')}</h1>
 
+<!-- Passo 43: só o que é da sessão, no topo (documentos e mensagens estão no menu). -->
+<nav class="nesta-sessao" aria-label={t('Telas da sessão')}>
+	{#if data.podePresidir}
+		<a class="botao" href={`/comite/${data.comite.sigla}/sessao/presidencia`}>{t('Painel da presidência')}</a>
+	{/if}
+	{#if ehMesa}<a href={`/comite/${data.comite.sigla}/sessao/chamada`}>{t('Chamada e rodízio')}</a>{/if}
+	<a href={`/comite/${data.comite.sigla}/sessao/agenda`}>{t('Agenda')}</a>
+	<a href={`/comite/${data.comite.sigla}/votacoes`}>{t('Votações')}</a>
+	{#if data.comite.crise_ligada && eu}<a href={`/comite/${data.comite.sigla}/crise`}>{t('Notas de crise')}</a>{/if}
+	<a href={`/telao/${data.comite.sigla}`}>{t('Telão')}</a>
+</nav>
+
 {#if !data.estado || !sessao}
 	<p class="suave">{t('Nenhuma sessão aberta. A mesa abre a sessão.')}</p>
 {:else}
@@ -209,256 +221,241 @@
 
 	{#if minhaVez}<p class="sua-vez" role="status">{t('A palavra é sua')}</p>{/if}
 
-	<div class="cartoes">
-		<AlertaCrise incidentes={data.incidentes} {diferenca} />
-		{#if momento === 'pausa' && eu && !restrita && !impedida}
-			<article class="cartao cartao--destaque pausa-pontos" aria-labelledby="c-pausa">
-				<h2 id="c-pausa">{t('Há pontos ou moções?')}</h2>
-				<button class="botao" type="button" onclick={irAoPonto}>{t('Fazer um ponto ou moção')}</button>
-			</article>
-		{/if}
-		{#if eu && !minhaPresenca && minhaSituacao !== 'suspensa'}
-			{@const avisei = sessao.avisos.some((a) => a.delegacao?.id === eu.delegacao_id)}
-			<article class="cartao cartao--destaque" aria-labelledby="c-chegada">
-				<h2 id="c-chegada">{t('Sua delegação está ausente na chamada')}</h2>
-				{#if avisei}
-					<p>{t('Aguardando a mesa confirmar a presença.')}</p>
-				{:else}
-					<p class="suave">{t('Chegou agora? Avise a mesa para entrar na chamada e votar.')}</p>
-					<button
-						class="botao"
-						type="button"
-						onclick={() => executar(supabase.rpc('avisar_chegada', { p_comite: data.comite.id }), t('A mesa foi avisada.'))}
-						>{t('Cheguei')}</button
-					>
-				{/if}
-			</article>
-		{/if}
-		{#each desconfiancas as p (p.id)}
-			{@const assinou = p.assinaturas.some((a) => a.delegacao_id === eu?.delegacao_id)}
-			<article class="cartao" aria-labelledby={`c-desconfianca-${p.id}`}>
-				<h2 id={`c-desconfianca-${p.id}`}>{t('Pedido de não-confiança')}</h2>
-				<p>
-					{p.delegacao?.nome} ·
-					<Contagem
-						rotulo={t('{n} de {total} assinaturas para ir a voto', {
-							n: p.assinaturas.length,
-							total: assinaturasDesconfianca(data.regras.assinaturas_desconfianca_fracao, data.delegacoes)
-						})}
-						itens={p.assinaturas.map((a) => ({
-							texto: data.delegacoes.find((d) => d.id === a.delegacao_id)?.nome ?? '',
-							href: `/comite/${data.comite.sigla}/delegacao/${a.delegacao_id}`
-						}))}
-					/>
-				</p>
-				{#if eu && !restrita && !assinou}
-					<button class="botao" type="button" onclick={() => executar(supabase.rpc('assinar_mocao', { p_ponto: p.id }))}
-						>{t('Assinar o pedido')}</button
-					>
-				{:else if assinou}
-					<p class="suave">{t('Sua delegação assinou.')}</p>
-				{/if}
-			</article>
-		{/each}
-		{#if data.votacao}
-			<article class="cartao cartao--destaque" aria-labelledby="c-votacao">
-				<h2 id="c-votacao" tabindex="-1">{data.votacao.aberta ? t('Votação aberta') : t('Última votação')}</h2>
-				<p class="destaque">{data.votacao.objeto}</p>
-				{#if data.votacao.aberta && data.votacao.nominal}<p><strong>{t('Votação nominal:')}</strong> {t('a mesa chama as delegações em ordem alfabética.')}</p>{/if}
-				{#if !data.votacao.aberta}
-					<p>{textoResultado(data.votacao)}</p>
-					<ListaVotos sigla={data.comite.sigla} delegacoes={data.delegacoes} votos={data.votacao.votos} tipo={data.votacao.tipo} {presentes} />
-				{:else if impedida}
-					<p class="suave">{t('Sua delegação está impedida pela crise.')}</p>
-				{:else if meuVoto || posso.length}
-					<Votar votacaoId={data.votacao.id} escolhas={posso} {meuVoto} representada={representada?.id} onerro={(m) => (erro = m)} />
-				{:else if eu}
-					<p class="suave">{t('Sua delegação não vota nesta questão (ausente na chamada, observadora ou suspensa).')}</p>
-				{/if}
-			</article>
-		{/if}
-
-		<article class="cartao cartao--ao-vivo" aria-labelledby="c-palavra">
-			<h2 id="c-palavra">{t('Com a palavra')}</h2>
-			{#if data.estado.orador}
-				<p class="destaque com-bandeira">
-					<Bandeira codigo={data.estado.orador.bandeira} />
-					{data.estado.orador.nome}
-				</p>
-			{:else}
-				<p class="suave">{t('Ninguém com a palavra.')}</p>
+	<!-- Passo 43: no notebook, o que a delegação faz à esquerda e o que acontece na sala à
+	     direita; no celular, a ação vem primeiro. -->
+	<div class="sessao-colunas">
+		<div class="cartoes sessao-acao">
+			<AlertaCrise incidentes={data.incidentes} {diferenca} />
+			{#if momento === 'pausa' && eu && !restrita && !impedida}
+				<article class="cartao cartao--destaque pausa-pontos" aria-labelledby="c-pausa">
+					<h2 id="c-pausa">{t('Há pontos ou moções?')}</h2>
+					<button class="botao" type="button" onclick={irAoPonto}>{t('Fazer um ponto ou moção')}</button>
+				</article>
 			{/if}
-			<Cronometro cronometro={data.estado} avisoSeg={data.regras.aviso_fala_seg} {diferenca} />
-			{#if temDebate(data.estado)}
-				<p class="rotulo">{FORMAS[data.estado.forma]} · {t('tempo do debate')}</p>
-				<Cronometro cronometro={relogioDebate(data.estado)} avisoSeg={60} {diferenca} />
-			{/if}
-		</article>
-
-		{#if lista.length}
-			<article class="cartao" aria-labelledby="c-lista">
-				<h2 id="c-lista">{emDiscussao ? t('Lista especial') : t('Lista de oradores')}</h2>
-				{#if emDiscussao}
-					<p>{descreverPonto(emDiscussao)}</p>
-				{/if}
-				<ol class="lista">
-					{#each lista as inscricao (inscricao.id)}
-						<li>
-							<NomeDelegacao ficha sigla={data.comite.sigla} delegacao={inscricao.delegacao} />
-							{#if inscricao.lado}<span class="selo">{inscricao.lado === 'a_favor' ? t('A favor') : t('Contra')}</span>{/if}
-							{#if inscricao.falou}<span class="selo selo--ok">{t('Falou')}</span>{/if}
-						</li>
-					{/each}
-				</ol>
-			</article>
-		{/if}
-
-		{#if emDiscussao && eu && !restrita}
-			<article class="cartao" aria-labelledby="c-inscricao">
-				<h2 id="c-inscricao">{t('Lista especial aberta')}</h2>
-				<p>{descreverPonto(emDiscussao)}. {t('Até 2 discursos a favor e 2 contra.')}</p>
-				<div class="acoes">
-					<button class="botao" type="button" onclick={() => inscrever('a_favor')}>{t('Falar a favor')}</button>
-					<button class="botao botao--secundario" type="button" onclick={() => inscrever('contra')}>{t('Falar contra')}</button>
-				</div>
-			</article>
-		{/if}
-
-		{#if eu && !restrita && !impedida && data.fase !== 'plenaria'}
-			<article class="cartao" aria-labelledby="c-placa">
-				<h2 id="c-placa">{t('Sua placa')}</h2>
-				{#if naListaCurta >= 0}
-					<p class="sucesso" role="status">{t('Sua delegação é a {n}ª da lista curta.', { n: naListaCurta + 1 })}</p>
-				{/if}
-				<BotaoPlaca comiteId={data.comite.id} {posicao} nome={eu.delegacao_nome ?? ''} onerro={(m) => (erro = m)} />
-				<p>
-					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => placa?.showModal()}>
-						{t('Mostrar placa em tela cheia')}
-					</button>
-				</p>
-			</article>
-
-			<article class="cartao" aria-labelledby="c-fila">
-				<h2 id="c-fila">{t('Pedidos de fala')}</h2>
-				<ol class="lista">
-					{#each fila as pedido (pedido.id)}
-						<li><NomeDelegacao ficha sigla={data.comite.sigla} delegacao={pedido.delegacao} /></li>
+			{#if eu && !minhaPresenca && minhaSituacao !== 'suspensa'}
+				{@const avisei = sessao.avisos.some((a) => a.delegacao?.id === eu.delegacao_id)}
+				<article class="cartao cartao--destaque" aria-labelledby="c-chegada">
+					<h2 id="c-chegada">{t('Sua delegação está ausente na chamada')}</h2>
+					{#if avisei}
+						<p>{t('Aguardando a mesa confirmar a presença.')}</p>
 					{:else}
-						<li class="suave">{t('Nenhuma placa levantada.')}</li>
-					{/each}
-				</ol>
-			</article>
-		{/if}
-	</div>
-
-	{#if eu && !restrita && !representada}
-		<details class="anotar">
-			<summary>{t('Anotar')}</summary>
-			<form class="formulario" onsubmit={anotar} aria-label={t('Anotar no caderno')}>
-				<label class="campo">
-					{t('Nota rápida')}
-					<textarea required rows="2" maxlength="4000" bind:value={nota} {@attach contador(nota)}></textarea>
-				</label>
-				<button class="botao botao--secundario botao--pequeno">{t('Guardar no caderno')}</button>
-			</form>
-		</details>
-	{/if}
-
-	{#if data.votacoes.length}
-		<section aria-labelledby="t-votacoes">
-			<h2 id="t-votacoes">{t('Votações desta sessão')}</h2>
-			{#each data.votacoes as v (v.id)}
-				<details class="votacao-historico">
-					<summary>
-						{v.objeto}
-						<span class="selo {v.aprovada ? 'selo--ok' : 'selo--erro'}">{v.aprovada ? t('Aprovada') : t('Rejeitada')}</span>
-					</summary>
-					<p>{textoResultado(v)}</p>
-					<ListaVotos sigla={data.comite.sigla} delegacoes={data.delegacoes} votos={v.votos} tipo={v.tipo} {presentes} />
-				</details>
+						<p class="suave">{t('Chegou agora? Avise a mesa para entrar na chamada e votar.')}</p>
+						<button
+							class="botao"
+							type="button"
+							onclick={() => executar(supabase.rpc('avisar_chegada', { p_comite: data.comite.id }), t('A mesa foi avisada.'))}
+							>{t('Cheguei')}</button
+						>
+					{/if}
+				</article>
+			{/if}
+			{#each desconfiancas as p (p.id)}
+				{@const assinou = p.assinaturas.some((a) => a.delegacao_id === eu?.delegacao_id)}
+				<article class="cartao" aria-labelledby={`c-desconfianca-${p.id}`}>
+					<h2 id={`c-desconfianca-${p.id}`}>{t('Pedido de não-confiança')}</h2>
+					<p>
+						{p.delegacao?.nome} ·
+						<Contagem
+							rotulo={t('{n} de {total} assinaturas para ir a voto', {
+								n: p.assinaturas.length,
+								total: assinaturasDesconfianca(data.regras.assinaturas_desconfianca_fracao, data.delegacoes)
+							})}
+							itens={p.assinaturas.map((a) => ({
+								texto: data.delegacoes.find((d) => d.id === a.delegacao_id)?.nome ?? '',
+								href: `/comite/${data.comite.sigla}/delegacao/${a.delegacao_id}`
+							}))}
+						/>
+					</p>
+					{#if eu && !restrita && !assinou}
+						<button class="botao" type="button" onclick={() => executar(supabase.rpc('assinar_mocao', { p_ponto: p.id }))}
+							>{t('Assinar o pedido')}</button
+						>
+					{:else if assinou}
+						<p class="suave">{t('Sua delegação assinou.')}</p>
+					{/if}
+				</article>
 			{/each}
-		</section>
-	{/if}
+			{#if data.votacao}
+				<article class="cartao cartao--destaque" aria-labelledby="c-votacao">
+					<h2 id="c-votacao" tabindex="-1">{data.votacao.aberta ? t('Votação aberta') : t('Última votação')}</h2>
+					<p class="destaque">{data.votacao.objeto}</p>
+					{#if data.votacao.aberta && data.votacao.nominal}<p><strong>{t('Votação nominal:')}</strong> {t('a mesa chama as delegações em ordem alfabética.')}</p>{/if}
+					{#if !data.votacao.aberta}
+						<p>{textoResultado(data.votacao)}</p>
+						<ListaVotos sigla={data.comite.sigla} delegacoes={data.delegacoes} votos={data.votacao.votos} tipo={data.votacao.tipo} {presentes} />
+					{:else if impedida}
+						<p class="suave">{t('Sua delegação está impedida pela crise.')}</p>
+					{:else if meuVoto || posso.length}
+						<Votar votacaoId={data.votacao.id} escolhas={posso} {meuVoto} representada={representada?.id} onerro={(m) => (erro = m)} />
+					{:else if eu}
+						<p class="suave">{t('Sua delegação não vota nesta questão (ausente na chamada, observadora ou suspensa).')}</p>
+					{/if}
+				</article>
+			{/if}
+			{#if eu && !restrita && !impedida && data.fase !== 'plenaria'}
+				<article class="cartao" aria-labelledby="c-placa">
+					<h2 id="c-placa">{t('Sua placa')}</h2>
+					{#if naListaCurta >= 0}
+						<p class="sucesso" role="status">{t('Sua delegação é a {n}ª da lista curta.', { n: naListaCurta + 1 })}</p>
+					{/if}
+					<BotaoPlaca comiteId={data.comite.id} {posicao} nome={eu.delegacao_nome ?? ''} onerro={(m) => (erro = m)} />
+					<p>
+						<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => placa?.showModal()}>
+							{t('Mostrar placa em tela cheia')}
+						</button>
+					</p>
+				</article>
 
-	{#if eu && !restrita && !impedida}
-		<section aria-labelledby="t-ponto">
-			<h2 id="t-ponto">{t('Ponto ou moção')}</h2>
-			<form class="formulario" onsubmit={enviarPonto}>
-				<label class="campo">
-					{t('Tipo')}
-					<select id="tipo-ponto" bind:value={tipoPonto}>
-						{#each tiposEmOrdem as tipo (tipo)}
-							<option value={tipo}>{PONTOS[tipo]}</option>
-						{/each}
-					</select>
-				</label>
-				{#if tipoPonto === 'topico_no_topo'}
+			{/if}
+		{#if eu && !restrita && !impedida}
+			<section class="cartao" aria-labelledby="t-ponto">
+				<h2 id="t-ponto">{t('Ponto ou moção')}</h2>
+				<form class="formulario" onsubmit={enviarPonto}>
 					<label class="campo">
-						{t('Tópico')}
-						<select bind:value={topico}>
-							{#each data.comite.topicos as tp, i (tp)}
-								<option value={i + 1}>{i + 1}. {tp}</option>
+						{t('Tipo')}
+						<select id="tipo-ponto" bind:value={tipoPonto}>
+							{#each tiposEmOrdem as tipo (tipo)}
+								<option value={tipo}>{PONTOS[tipo]}</option>
 							{/each}
 						</select>
 					</label>
-				{:else if tipoPonto === 'informal_informal'}
-					<label class="campo campo--curto">
-						{t('Minutos (até {n} por sessão)', { n: data.regras.informal_informal_max_min })}
-						<input type="number" min="1" max={data.regras.informal_informal_max_min} required bind:value={minutos} />
+					{#if tipoPonto === 'topico_no_topo'}
+						<label class="campo">
+							{t('Tópico')}
+							<select bind:value={topico}>
+								{#each data.comite.topicos as tp, i (tp)}
+									<option value={i + 1}>{i + 1}. {tp}</option>
+								{/each}
+							</select>
+						</label>
+					{:else if tipoPonto === 'informal_informal'}
+						<label class="campo campo--curto">
+							{t('Minutos (até {n} por sessão)', { n: data.regras.informal_informal_max_min })}
+							<input type="number" min="1" max={data.regras.informal_informal_max_min} required bind:value={minutos} />
+						</label>
+					{/if}
+					<label class="campo">
+						{t('Detalhe (opcional)')}
+						<textarea maxlength="300" bind:value={detalhe} {@attach contador(detalhe)}></textarea>
 					</label>
-				{/if}
-				<label class="campo">
-					{t('Detalhe (opcional)')}
-					<textarea maxlength="300" bind:value={detalhe} {@attach contador(detalhe)}></textarea>
-				</label>
-				<button class="botao">{t('Enviar à mesa')}</button>
-			</form>
-			{#if meusPontos.length}
-				<ul class="lista" aria-label={t('Seus pontos e moções')}>
-					{#each meusPontos as ponto (ponto.id)}
-						<li>
-							{descreverPonto(ponto)}
-							<span
-								class="selo {ponto.status === 'aceito' ? 'selo--ok' : ponto.status === 'recusado' ? 'selo--erro' : 'selo--info'}"
-								>{situacaoDoPonto(ponto)}</span
-							>
-							{#if ponto.status === 'aberto'}
-								<button
-									class="botao botao--secundario botao--pequeno"
-									type="button"
-									onclick={() => executar(supabase.rpc('retirar_ponto', { p_ponto: ponto.id }), t('Pedido retirado.'))}
-									>{t('Retirar')}</button
+					<button class="botao">{t('Enviar à mesa')}</button>
+				</form>
+				{#if meusPontos.length}
+					<ul class="lista" aria-label={t('Seus pontos e moções')}>
+						{#each meusPontos as ponto (ponto.id)}
+							<li>
+								{descreverPonto(ponto)}
+								<span
+									class="selo {ponto.status === 'aceito' ? 'selo--ok' : ponto.status === 'recusado' ? 'selo--erro' : 'selo--info'}"
+									>{situacaoDoPonto(ponto)}</span
 								>
-							{/if}
-						</li>
-					{/each}
-				</ul>
-			{/if}
-		</section>
+								{#if ponto.status === 'aberto'}
+									<button
+										class="botao botao--secundario botao--pequeno"
+										type="button"
+										onclick={() => executar(supabase.rpc('retirar_ponto', { p_ponto: ponto.id }), t('Pedido retirado.'))}
+										>{t('Retirar')}</button
+									>
+								{/if}
+							</li>
+						{/each}
+					</ul>
+				{/if}
+			</section>
 
-		<dialog class="placa" bind:this={placa} aria-label="Placa de {eu.delegacao_nome}">
-			<Bandeira codigo={eu.delegacao_bandeira} />
-			<p>{eu.delegacao_nome}</p>
-			<form method="dialog"><button class="botao botao--secundario">{t('Fechar')}</button></form>
-		</dialog>
-	{/if}
+			<dialog class="placa" bind:this={placa} aria-label="Placa de {eu.delegacao_nome}">
+				<Bandeira codigo={eu.delegacao_bandeira} />
+				<p>{eu.delegacao_nome}</p>
+				<form method="dialog"><button class="botao botao--secundario">{t('Fechar')}</button></form>
+			</dialog>
+		{/if}
+		{#if eu && !restrita && !representada}
+			<details class="anotar">
+				<summary>{t('Anotar')}</summary>
+				<form class="formulario" onsubmit={anotar} aria-label={t('Anotar no caderno')}>
+					<label class="campo">
+						{t('Nota rápida')}
+						<textarea required rows="2" maxlength="4000" bind:value={nota} {@attach contador(nota)}></textarea>
+					</label>
+					<button class="botao botao--secundario botao--pequeno">{t('Guardar no caderno')}</button>
+				</form>
+			</details>
+		{/if}
+		</div>
+		<div class="cartoes sessao-sala">
+			<article class="cartao cartao--ao-vivo" aria-labelledby="c-palavra">
+				<h2 id="c-palavra">{t('Com a palavra')}</h2>
+				{#if data.estado.orador}
+					<p class="destaque com-bandeira">
+						<Bandeira codigo={data.estado.orador.bandeira} />
+						{data.estado.orador.nome}
+					</p>
+				{:else}
+					<p class="suave">{t('Ninguém com a palavra.')}</p>
+				{/if}
+				<Cronometro cronometro={data.estado} avisoSeg={data.regras.aviso_fala_seg} {diferenca} />
+				{#if temDebate(data.estado)}
+					<p class="rotulo">{FORMAS[data.estado.forma]} · {t('tempo do debate')}</p>
+					<Cronometro cronometro={relogioDebate(data.estado)} avisoSeg={60} {diferenca} />
+				{/if}
+			</article>
+
+			{#if lista.length}
+				<article class="cartao" aria-labelledby="c-lista">
+					<h2 id="c-lista">{emDiscussao ? t('Lista especial') : t('Lista de oradores')}</h2>
+					{#if emDiscussao}
+						<p>{descreverPonto(emDiscussao)}</p>
+					{/if}
+					<ol class="lista">
+						{#each lista as inscricao (inscricao.id)}
+							<li>
+								<NomeDelegacao ficha sigla={data.comite.sigla} delegacao={inscricao.delegacao} />
+								{#if inscricao.lado}<span class="selo">{inscricao.lado === 'a_favor' ? t('A favor') : t('Contra')}</span>{/if}
+								{#if inscricao.falou}<span class="selo selo--ok">{t('Falou')}</span>{/if}
+							</li>
+						{/each}
+					</ol>
+				</article>
+			{/if}
+
+			{#if emDiscussao && eu && !restrita}
+				<article class="cartao" aria-labelledby="c-inscricao">
+					<h2 id="c-inscricao">{t('Lista especial aberta')}</h2>
+					<p>{descreverPonto(emDiscussao)}. {t('Até 2 discursos a favor e 2 contra.')}</p>
+					<div class="acoes">
+						<button class="botao" type="button" onclick={() => inscrever('a_favor')}>{t('Falar a favor')}</button>
+						<button class="botao botao--secundario" type="button" onclick={() => inscrever('contra')}>{t('Falar contra')}</button>
+					</div>
+				</article>
+			{/if}
+			{#if eu && !restrita && !impedida && data.fase !== 'plenaria'}
+				<article class="cartao" aria-labelledby="c-fila">
+					<h2 id="c-fila">{t('Pedidos de fala')}</h2>
+					<ol class="lista">
+						{#each fila as pedido (pedido.id)}
+							<li><NomeDelegacao ficha sigla={data.comite.sigla} delegacao={pedido.delegacao} /></li>
+						{:else}
+							<li class="suave">{t('Nenhuma placa levantada.')}</li>
+						{/each}
+					</ol>
+				</article>
+			{/if}
+		{#if data.votacoes.length}
+			<section aria-labelledby="t-votacoes">
+				<h2 id="t-votacoes">{t('Votações desta sessão')}</h2>
+				{#each data.votacoes as v (v.id)}
+					<details class="votacao-historico">
+						<summary>
+							{v.objeto}
+							<span class="selo {v.aprovada ? 'selo--ok' : 'selo--erro'}">{v.aprovada ? t('Aprovada') : t('Rejeitada')}</span>
+						</summary>
+						<p>{textoResultado(v)}</p>
+						<ListaVotos sigla={data.comite.sigla} delegacoes={data.delegacoes} votos={v.votos} tipo={v.tipo} {presentes} />
+					</details>
+				{/each}
+			</section>
+		{/if}
+		</div>
+	</div>
 {/if}
 
-<nav class="atalhos" aria-label={t('Telas da sessão')}>
-	{#if data.podePresidir}
-		<a class="botao" href={`/comite/${data.comite.sigla}/sessao/presidencia`}>{t('Painel da presidência')}</a>
-	{/if}
-	{#if ehMesa}
-		<a class="botao botao--secundario" href={`/comite/${data.comite.sigla}/sessao/chamada`}>{t('Chamada e rodízio')}</a>
-	{/if}
-	<a class="botao botao--secundario" href={`/comite/${data.comite.sigla}/sessao/agenda`}>{t('Agenda')}</a>
-	<a class="botao botao--secundario" href={`/comite/${data.comite.sigla}/votacoes`}>{t('Votações')}</a>
-	{#if eu}<a class="botao botao--secundario" href={`/comite/${data.comite.sigla}/caderno`}>{t('Caderno')}</a>{/if}
-	<a class="botao botao--secundario" href={`/comite/${data.comite.sigla}/blocos`}>{t('Blocos e documentos')}</a>
-	<a class="botao botao--secundario" href={`/comite/${data.comite.sigla}/cartas`}>{t('Cartas')}</a>
-	<a class="botao botao--secundario" href={`/comite/${data.comite.sigla}/mensagens`}>{t('Mensagens')}</a>
-	{#if data.comite.crise_ligada && eu}
-		<a class="botao botao--secundario" href={`/comite/${data.comite.sigla}/crise`}>{t('Notas de crise')}</a>
-	{/if}
-	<a class="botao botao--secundario" href={`/telao/${data.comite.sigla}`}>{t('Telão')}</a>
-</nav>

@@ -39,7 +39,8 @@ test('a Agora mostra o que acontece agora e o que vem depois', async ({ page }) 
 	await expect(depois).toContainText('Almoço');
 	await expect(depois).toContainText('às 12:30');
 
-	await expect(page.getByRole('article', { name: 'Você' })).toContainText('Delegado · EUA · CSNU-T');
+	// Passo 43: quem entrou fica na faixa, com a bandeira.
+	await expect(page.getByRole('banner').getByRole('link', { name: 'EUA · CSNU-T' })).toBeVisible();
 });
 
 test('o cronograma agrupa por dia e destaca o que está acontecendo', async ({ page }) => {

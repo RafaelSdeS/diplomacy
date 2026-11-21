@@ -250,8 +250,11 @@ a {
 
 .conta {
 	display: flex;
+	flex-wrap: wrap; /* em 320 px (zoom de 200%), identidade, busca e conta quebram a linha */
 	align-items: center;
-	gap: 0.75rem;
+	justify-content: flex-end;
+	gap: 0.5rem 0.75rem;
+	min-width: 0;
 }
 
 /* Passo 43: quem a pessoa é no evento (a bandeira e o país, ou o papel), sempre à vista. */
@@ -2830,4 +2833,32 @@ dialog.ir-para {
 
 .ir-para .lista a:hover {
 	text-decoration: underline;
+}
+
+/* Passo 43: a sessão do delegado. As telas da sessão numa linha no topo; no notebook,
+   a ação à esquerda e a sala à direita. */
+.nesta-sessao {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.25rem 1.25rem;
+	margin: 0 0 1rem;
+	font-size: 0.95rem;
+}
+
+.sessao-colunas {
+	display: grid;
+	gap: 1rem;
+}
+
+.sessao-colunas > .cartoes {
+	grid-template-columns: minmax(0, 1fr);
+	align-content: start;
+}
+
+@media (min-width: 1024px) {
+	.sessao-colunas {
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		align-items: start;
+	}
 }

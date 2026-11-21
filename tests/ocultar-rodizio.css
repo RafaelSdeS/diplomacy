@@ -5,10 +5,14 @@
 .telao-orador .bandeira,
 .telao-orador .telao-nome,
 .telao-fila li,
-.timbre .identidade,
 .painel-quem,
 [aria-labelledby='t-palavra'] .com-bandeira,
 [aria-labelledby='t-fila'] li .com-bandeira,
 .barra-painel > p.suave {
 	visibility: hidden;
+}
+
+/* A identidade na faixa tem a largura do nome sorteado e empurraria a busca e a conta. */
+.timbre .identidade {
+	display: none;
 }
