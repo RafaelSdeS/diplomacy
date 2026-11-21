@@ -2006,3 +2006,43 @@ kbd {
 	border-color: var(--cor-dourado);
 	border-left-width: 4px;
 }
+
+/* Números clicáveis (passo 33): o número abre a lista do que ele conta. */
+.contagem {
+	display: inline-block;
+	position: relative;
+}
+
+.contagem > summary {
+	display: inline;
+	cursor: pointer;
+	text-decoration: underline dotted;
+	text-underline-offset: 0.2em;
+}
+
+.contagem > summary::-webkit-details-marker {
+	display: none;
+}
+
+.contagem[open] > .contagem-lista {
+	position: absolute;
+	z-index: 10;
+	min-width: 14rem;
+	max-height: 18rem;
+	margin: 0.25rem 0 0;
+	padding: 0.5rem 0.75rem;
+	overflow: auto;
+	border: var(--linha);
+	border-radius: var(--raio);
+	background: var(--cor-fundo);
+	list-style: none;
+	font-size: 0.9rem;
+	font-weight: 400;
+}
+
+/* Alvos de pelo menos 24 px (WCAG 2.2). */
+.contagem-lista a {
+	display: block;
+	min-height: 1.75rem;
+	line-height: 1.75rem;
+}

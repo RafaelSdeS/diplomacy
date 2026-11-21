@@ -14,7 +14,7 @@ const FORA = [
 	'src/routes/verificar/'
 ];
 // Não se traduzem: a marca do app, os nomes dos idiomas e teclas.
-const LIVRES = new Set(['Diplomacy', 'Português', 'English', 'Enter', 'Espaço', 'America/Sao_Paulo']);
+const LIVRES = new Set(['Diplomacy', 'Português', 'English', 'Enter', 'Escape', 'Espaço', 'America/Sao_Paulo']);
 
 function svelte(pasta: string): string[] {
 	return readdirSync(pasta, { withFileTypes: true }).flatMap((e) =>

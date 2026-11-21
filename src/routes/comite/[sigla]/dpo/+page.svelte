@@ -8,6 +8,7 @@
 	import { supabase } from '#lib/supabase.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import Bandeira from '#lib/ui/Bandeira.svelte';
+	import NomeDelegacao from '#lib/ui/NomeDelegacao.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -137,7 +138,7 @@
 			{#each outros as d (d.id)}
 				<li>
 					<span>
-						<span class="com-bandeira"><Bandeira codigo={d.delegacao?.bandeira} /> {d.delegacao?.nome}</span>
+						<NomeDelegacao sigla={data.comite.sigla} delegacao={d.delegacao} />
 						<span class="detalhe">{t('Tópico')} {d.topico} · <span class="selo {STATUS[d.status].selo}">{STATUS[d.status].rotulo}</span></span>
 					</span>
 					<span class="acoes">

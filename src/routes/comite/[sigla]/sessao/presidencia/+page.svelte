@@ -11,6 +11,7 @@
 	import Bandeira from '#lib/ui/Bandeira.svelte';
 	import NomeDelegacao from '#lib/ui/NomeDelegacao.svelte';
 	import Cronometro from '#lib/ui/Cronometro.svelte';
+	import Contagem from '#lib/ui/Contagem.svelte';
 	import { relogioDebate, restanteSeg, temDebate } from '#lib/cronometro.ts';
 	import GradeVotos from '#lib/ui/GradeVotos.svelte';
 	import {
@@ -86,6 +87,17 @@
 	const ausentes = $derived(new Set(data.delegacoes.filter((d) => !sessao?.presenca.some((p) => p.delegacao_id === d.id)).map((d) => d.id)));
 	const paraAssumir = $derived([...data.delegacoes].sort((a, b) => Number(ausentes.has(b.id)) - Number(ausentes.has(a.id))));
 	let assumir = $state('');
+	// Passo 33: os números abrem o que contam.
+	const paginaDe = (id: string) => `/comite/${data.comite.sigla}/delegacao/${id}`;
+	const nomeDe = (id: string) => data.delegacoes.find((d) => d.id === id)?.nome ?? '';
+	const chamada = $derived(
+		data.delegacoes
+			.filter((d) => d.situacao !== 'suspensa')
+			.map((d) => ({ d, presente: !ausentes.has(d.id) }))
+			.sort((a, b) => Number(b.presente) - Number(a.presente))
+			.map(({ d, presente }) => ({ texto: `${d.nome} · ${presente ? t('presente') : t('ausente')}`, href: paginaDe(d.id) }))
+	);
+	const presentesN = $derived(chamada.length - [...ausentes].filter((id) => data.delegacoes.find((d) => d.id === id)?.situacao !== 'suspensa').length);
 	const correndo = $derived(!!data.estado?.cronometro_inicio && !pausado);
 	const votacao = $derived(data.votacao);
 	// Quem pode votar nesta votação: presentes, menos suspensas (e observadoras, na substantiva).
@@ -151,7 +163,7 @@
 	// placas. Só fora de campos e botões.
 	function atalho(evento: KeyboardEvent) {
 		const alvo = evento.target as HTMLElement;
-		if (alvo.closest('input, textarea, select, button, a, dialog, [contenteditable]')) return;
+		if (alvo.closest('input, textarea, select, button, a, summary, dialog, [contenteditable]')) return;
 		const seguinte = proximos[0]?.delegacao?.id ?? proximo?.delegacao?.id ?? fila[0]?.delegacao?.id;
 		if (evento.key === ' ') {
 			evento.preventDefault();
@@ -219,6 +231,7 @@
 	{/if}
 {:else}
 	<p class="suave">
+		<Contagem rotulo={t('Presentes: {n} de {total}', { n: presentesN, total: chamada.length })} itens={chamada} /> ·
 		{t('Sessão {n}', { n: sessao.numero })} · {FASES[data.fase]} · {FORMAS[data.estado.forma]} · {t('Presidência')}: {presidenciaEmVigor(
 			data.fase,
 			data.estado.mesa_assumiu,
@@ -621,7 +634,13 @@
 							<li>
 								<span>
 									{ACOES_EMENDA[e.acao]}{e.clausula ? `: "${e.clausula.texto}"` : ''}{e.texto ? ` → "${e.texto}"` : ''}
-									<span class="detalhe">{e.delegacao?.nome} · {t('{n} de {total} assinaturas', { n: e.assinaturas.length, total: data.regras.assinaturas_emenda })}</span>
+									<span class="detalhe"
+										>{e.delegacao?.nome} ·
+										<Contagem
+											rotulo={t('{n} de {total} assinaturas', { n: e.assinaturas.length, total: data.regras.assinaturas_emenda })}
+											itens={e.assinaturas.map((x) => ({ texto: nomeDe(x.delegacao_id), href: paginaDe(x.delegacao_id) }))}
+										/></span
+									>
 								</span>
 								<button
 									class="botao botao--pequeno"
@@ -641,7 +660,13 @@
 					<p class="destaque">{votacao.objeto}</p>
 					{#if votacao.aberta}
 						<p>
-							{t('{n} de {total} votaram', { n: votacao.votos.length, total: votantes.length })} · {votacao.tipo === 'substantiva'
+							<Contagem
+								rotulo={t('{n} de {total} votaram', { n: votacao.votos.length, total: votantes.length })}
+								itens={votantes.map((d) => {
+									const v = votacao.votos.find((x) => x.delegacao_id === d.id);
+									return { texto: `${d.nome} · ${v ? ESCOLHAS[v.escolha] : t('falta votar')}`, href: paginaDe(d.id) };
+								})}
+							/> · {votacao.tipo === 'substantiva'
 								? t('substantiva')
 								: t('procedimental')}, {REGRAS_VOTACAO[votacao.regra]}
 							{#if votacao.nominal}· <strong>{t('votação nominal')}</strong>, {t('em ordem alfabética')}{/if}

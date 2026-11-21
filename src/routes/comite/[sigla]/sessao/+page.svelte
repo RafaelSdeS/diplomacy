@@ -19,6 +19,7 @@
 	import Cronometro from '#lib/ui/Cronometro.svelte';
 	import { relogioDebate, temDebate } from '#lib/cronometro.ts';
 	import ListaVotos from '#lib/ui/ListaVotos.svelte';
+	import Contagem from '#lib/ui/Contagem.svelte';
 	import BotaoPlaca from '#lib/ui/BotaoPlaca.svelte';
 	import Votar from '#lib/ui/Votar.svelte';
 	import { assinaturasDesconfianca, escolhasPermitidas, ETAPAS, FASES, listaAtiva, presidenciaEmVigor, textoResultado } from '#lib/votacao.ts';
@@ -129,7 +130,9 @@
 		{FORMAS[data.estado.forma]} · {t('Presidência')}: {presidenciaEmVigor(data.fase, data.estado.mesa_assumiu, sessao.presidencia?.nome)}
 	</p>
 	{#if topicoAtual}
-		<p class="topico-atual"><span class="rotulo">{t('Tópico em debate')}</span> {topicoAtual}</p>
+		<p class="topico-atual">
+			<span class="rotulo">{t('Tópico em debate')}</span> <a href={`/comite/${data.comite.sigla}/sessao/agenda`}>{topicoAtual}</a>
+		</p>
 	{/if}
 
 	{#if erro}
@@ -175,10 +178,17 @@
 			<article class="cartao" aria-labelledby={`c-desconfianca-${p.id}`}>
 				<h2 id={`c-desconfianca-${p.id}`}>{t('Pedido de não-confiança')}</h2>
 				<p>
-					{p.delegacao?.nome} · {t('{n} de {total} assinaturas para ir a voto', {
-						n: p.assinaturas.length,
-						total: assinaturasDesconfianca(data.regras.assinaturas_desconfianca_fracao, data.delegacoes)
-					})}
+					{p.delegacao?.nome} ·
+					<Contagem
+						rotulo={t('{n} de {total} assinaturas para ir a voto', {
+							n: p.assinaturas.length,
+							total: assinaturasDesconfianca(data.regras.assinaturas_desconfianca_fracao, data.delegacoes)
+						})}
+						itens={p.assinaturas.map((a) => ({
+							texto: data.delegacoes.find((d) => d.id === a.delegacao_id)?.nome ?? '',
+							href: `/comite/${data.comite.sigla}/delegacao/${a.delegacao_id}`
+						}))}
+					/>
 				</p>
 				{#if eu && !restrita && !assinou}
 					<button class="botao" type="button" onclick={() => executar(supabase.rpc('assinar_mocao', { p_ponto: p.id }))}

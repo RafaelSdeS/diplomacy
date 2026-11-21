@@ -955,6 +955,10 @@ export const EN: Record<string, string> = {
 	'Secretaria': 'Secretariat',
 	'Check-in': 'Check-in',
 	'Painel': 'Panel',
+	// Passo 33
+	'Ninguém ainda.': 'No one yet.',
+	'presente': 'present',
+	'falta votar': 'yet to vote',
 };
 
 /** Mensagens do banco com partes variáveis: [padrão em português, tradução]. */
