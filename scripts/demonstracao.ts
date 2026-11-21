@@ -12,6 +12,7 @@ import { randomUUID } from 'node:crypto';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { conectarAdmin, criarContas, SENHA, tipoDoItem, usuariosPorEmail, verificar } from './admin.ts';
 import { bioFicticia, COM_DOIS_DELEGADOS, COMITES, CRONOGRAMA, EVENTO, nomeFicticio, type Comite } from './demonstracao/dados.ts';
+import { BLOCOS, CARTAS, CRISE, DPOS, DPOS_T2, NOTICIAS, PROJETO_A, PROJETO_B, WORKING_PAPERS, type Dpo } from './demonstracao/csnu.ts';
 
 const inicio = Date.now();
 const { db, url, chavePublica } = await conectarAdmin('DEMO_PERMITIR_REMOTO');
@@ -182,43 +183,47 @@ async function conteudo(c: Comite) {
 	const topico = c.topicos[0];
 	const mesa = await como(email(c.sigla, 'mesa1'));
 
-	// DPOs: um aprovado, um enviado e um rascunho.
-	const dpos: string[] = [];
-	for (const [k, m] of [a, b, d3].entries()) {
-		const cliente = await como(m.conta);
-		const texto = tx(
-			`A delegação de ${m.nome} acompanha com preocupação "${topico}".\n\nDefendemos soluções construídas em conjunto, com respeito à soberania dos Estados e ao direito internacional.\n\nPropomos cooperação regional, troca de informações e apoio às populações afetadas.`,
-			`The delegation of ${m.nome} follows "${topico}" with concern.\n\nWe support jointly built solutions that respect the sovereignty of States and international law.\n\nWe propose regional cooperation, information sharing and support for affected populations.`
-		);
-		const id = await chamar<string>(cliente, 'salvar_dpo', { p_comite: ids.comite, p_topico: 1, p_texto: texto, p_referencias: ['Carta das Nações Unidas (1945)'] });
-		if (k < 2) await chamar(cliente, 'enviar_dpo', { p_dpo: id });
-		dpos.push(id);
-	}
-	await chamar(mesa, 'avaliar_dpo', { p_dpo: dpos[0], p_status: 'aprovado', p_comentario: tx('Bem fundamentado.', 'Well argued.') });
-
-	// Cartas: uma pública e uma privada.
 	const ca = await como(a.conta);
 	const cb = await como(b.conta);
-	await chamar(ca, 'enviar_carta', {
-		p_comite: ids.comite,
-		p_titulo: tx('Proposta de cooperação', 'Proposal for cooperation'),
-		p_corpo: tx(
-			`Excelentíssima delegação de ${b.nome},\n\nPropomos trabalharmos juntos em "${topico}", começando pela troca de informações.\n\nCom os melhores votos,\nDelegação de ${a.nome}`,
-			`Distinguished delegation of ${b.nome},\n\nWe propose working together on "${topico}", starting with information sharing.\n\nWith our best regards,\nDelegation of ${a.nome}`
-		),
-		p_publica: true,
-		p_destinatarios: [b.id]
-	});
-	await chamar(cb, 'enviar_carta', {
-		p_comite: ids.comite,
-		p_titulo: tx('Resposta reservada', 'Confidential reply'),
-		p_corpo: tx(
-			`Excelentíssima delegação de ${a.nome},\n\nAceitamos conversar antes da próxima sessão.\n\nDelegação de ${b.nome}`,
-			`Distinguished delegation of ${a.nome},\n\nWe agree to talk before the next session.\n\nDelegation of ${b.nome}`
-		),
-		p_publica: false,
-		p_destinatarios: [a.id]
-	});
+	// Passo 43: o CSNU tem conteúdo completo e realista (scripts/demonstracao/csnu.ts).
+	if (c.sigla !== 'CSNU') {
+		// DPOs: um aprovado, um enviado e um rascunho.
+		const dpos: string[] = [];
+		for (const [k, m] of [a, b, d3].entries()) {
+			const cliente = await como(m.conta);
+			const texto = tx(
+				`A delegação de ${m.nome} acompanha com preocupação "${topico}".\n\nDefendemos soluções construídas em conjunto, com respeito à soberania dos Estados e ao direito internacional.\n\nPropomos cooperação regional, troca de informações e apoio às populações afetadas.`,
+				`The delegation of ${m.nome} follows "${topico}" with concern.\n\nWe support jointly built solutions that respect the sovereignty of States and international law.\n\nWe propose regional cooperation, information sharing and support for affected populations.`
+			);
+			const id = await chamar<string>(cliente, 'salvar_dpo', { p_comite: ids.comite, p_topico: 1, p_texto: texto, p_referencias: ['Carta das Nações Unidas (1945)'] });
+			if (k < 2) await chamar(cliente, 'enviar_dpo', { p_dpo: id });
+			dpos.push(id);
+		}
+		await chamar(mesa, 'avaliar_dpo', { p_dpo: dpos[0], p_status: 'aprovado', p_comentario: tx('Bem fundamentado.', 'Well argued.') });
+
+		// Cartas: uma pública e uma privada.
+		await chamar(ca, 'enviar_carta', {
+			p_comite: ids.comite,
+			p_titulo: tx('Proposta de cooperação', 'Proposal for cooperation'),
+			p_corpo: tx(
+				`Excelentíssima delegação de ${b.nome},\n\nPropomos trabalharmos juntos em "${topico}", começando pela troca de informações.\n\nCom os melhores votos,\nDelegação de ${a.nome}`,
+				`Distinguished delegation of ${b.nome},\n\nWe propose working together on "${topico}", starting with information sharing.\n\nWith our best regards,\nDelegation of ${a.nome}`
+			),
+			p_publica: true,
+			p_destinatarios: [b.id]
+		});
+		await chamar(cb, 'enviar_carta', {
+			p_comite: ids.comite,
+			p_titulo: tx('Resposta reservada', 'Confidential reply'),
+			p_corpo: tx(
+				`Excelentíssima delegação de ${a.nome},\n\nAceitamos conversar antes da próxima sessão.\n\nDelegação de ${b.nome}`,
+				`Distinguished delegation of ${a.nome},\n\nWe agree to talk before the next session.\n\nDelegation of ${b.nome}`
+			),
+			p_publica: false,
+			p_destinatarios: [a.id]
+		});
+
+	}
 
 	// Agenda do tópico 1, proposta por uma delegação e adotada pela mesa.
 	await chamar(ca, 'salvar_proposta_agenda', {
@@ -239,45 +244,49 @@ async function conteudo(c: Comite) {
 	);
 	await chamar(mesa, 'adotar_proposta', { p_proposta: proposta.id });
 
-	// Um bloco com working paper e um projeto em rodada de revisão.
-	const bloco = await chamar<string>(ca, 'criar_bloco', { p_comite: ids.comite, p_nome: tx('Bloco da cooperação', 'Cooperation bloc') });
-	await chamar(cb, 'entrar_bloco', { p_bloco: bloco });
-	const wp = await chamar<string>(ca, 'criar_documento', { p_bloco: bloco, p_tipo: 'working_paper', p_titulo: tx('Notas sobre o item A.1', 'Notes on item A.1'), p_topico: 1 });
-	await chamar(ca, 'adicionar_clausula', { p_documento: wp, p_tipo: 'texto', p_texto: tx('Levantamento dos atores e das resoluções anteriores.', 'Survey of the actors and previous resolutions.') });
-	const projeto = await chamar<string>(ca, 'criar_documento', { p_bloco: bloco, p_tipo: 'projeto', p_titulo: topico, p_topico: 1 });
-	for (const [tipo, texto] of [
-		['preambular', tx('Reconhecendo a gravidade da situação,', 'Recognising the gravity of the situation,')],
-		['preambular', tx('Recordando as resoluções anteriores sobre o tema,', 'Recalling previous resolutions on the matter,')],
-		['operativa', tx('Exorta os Estados a ampliar a cooperação regional;', 'Urges States to expand regional cooperation;')],
-		['operativa', tx('Solicita ao Secretariado um relatório sobre o andamento das medidas;', 'Requests the Secretariat to report on progress;')],
-		['operativa', tx('Decide continuar ocupando-se ativamente da questão.', 'Decides to remain actively seized of the matter.')]
-	]) {
-		await chamar(ca, 'adicionar_clausula', { p_documento: projeto, p_tipo: tipo, p_texto: texto });
-	}
-	await chamar(ca, 'abrir_rodada', { p_documento: projeto, p_minutos: 120 });
+	if (c.sigla === 'CSNU') await csnuCompleto(c, ids, mesa);
+	else {
+		// Um bloco com working paper e um projeto em rodada de revisão.
+		const bloco = await chamar<string>(ca, 'criar_bloco', { p_comite: ids.comite, p_nome: tx('Bloco da cooperação', 'Cooperation bloc') });
+		await chamar(cb, 'entrar_bloco', { p_bloco: bloco });
+		const wp = await chamar<string>(ca, 'criar_documento', { p_bloco: bloco, p_tipo: 'working_paper', p_titulo: tx('Notas sobre o item A.1', 'Notes on item A.1'), p_topico: 1 });
+		await chamar(ca, 'adicionar_clausula', { p_documento: wp, p_tipo: 'texto', p_texto: tx('Levantamento dos atores e das resoluções anteriores.', 'Survey of the actors and previous resolutions.') });
+		const projeto = await chamar<string>(ca, 'criar_documento', { p_bloco: bloco, p_tipo: 'projeto', p_titulo: topico, p_topico: 1 });
+		for (const [tipo, texto] of [
+			['preambular', tx('Reconhecendo a gravidade da situação,', 'Recognising the gravity of the situation,')],
+			['preambular', tx('Recordando as resoluções anteriores sobre o tema,', 'Recalling previous resolutions on the matter,')],
+			['operativa', tx('Exorta os Estados a ampliar a cooperação regional;', 'Urges States to expand regional cooperation;')],
+			['operativa', tx('Solicita ao Secretariado um relatório sobre o andamento das medidas;', 'Requests the Secretariat to report on progress;')],
+			['operativa', tx('Decide continuar ocupando-se ativamente da questão.', 'Decides to remain actively seized of the matter.')]
+		]) {
+			await chamar(ca, 'adicionar_clausula', { p_documento: projeto, p_tipo: tipo, p_texto: texto });
+		}
+		await chamar(ca, 'abrir_rodada', { p_documento: projeto, p_minutos: 120 });
 
-	// Duas notícias publicadas, citando delegações.
-	const press = await como(email(c.sigla, 'press'));
-	for (const [titulo, texto, citadas] of [
-		[
-			tx(`Comitê começa a debater "${topico}"`, `Committee starts debating "${topico}"`),
-			tx('As delegações apresentaram as primeiras posições e adotaram a agenda do tópico.', 'Delegations presented their first positions and adopted the agenda for the topic.'),
-			[a.id]
-		],
-		[
-			tx(`${a.nome} e ${b.nome} trocam cartas antes da sessão`, `${a.nome} and ${b.nome} exchange letters before the session`),
-			tx('A correspondência sugere um bloco em formação.', 'The correspondence hints at a bloc in the making.'),
-			[a.id, b.id]
-		]
-	] as const) {
-		await chamar(press, 'publicar_noticia', {
-			p_id: randomUUID(),
-			p_veiculo: ids.veiculo,
-			p_tipo: 'reportagem',
-			p_titulo: titulo,
-			p_texto: texto,
-			p_citadas: citadas
-		});
+		// Duas notícias publicadas, citando delegações.
+		const press = await como(email(c.sigla, 'press'));
+		for (const [titulo, texto, citadas] of [
+			[
+				tx(`Comitê começa a debater "${topico}"`, `Committee starts debating "${topico}"`),
+				tx('As delegações apresentaram as primeiras posições e adotaram a agenda do tópico.', 'Delegations presented their first positions and adopted the agenda for the topic.'),
+				[a.id]
+			],
+			[
+				tx(`${a.nome} e ${b.nome} trocam cartas antes da sessão`, `${a.nome} and ${b.nome} exchange letters before the session`),
+				tx('A correspondência sugere um bloco em formação.', 'The correspondence hints at a bloc in the making.'),
+				[a.id, b.id]
+			]
+		] as const) {
+			await chamar(press, 'publicar_noticia', {
+				p_id: randomUUID(),
+				p_veiculo: ids.veiculo,
+				p_tipo: 'reportagem',
+				p_titulo: titulo,
+				p_texto: texto,
+				p_citadas: citadas
+			});
+		}
+
 	}
 
 	// A sessão 1: chamada, plenária de abertura e a votação do tópico no topo.
@@ -306,6 +315,93 @@ async function conteudo(c: Comite) {
 		await chamar(mesa, 'encerrar_votacao', { p_votacao: votacao.id });
 	}
 	await chamar(mesa, 'encerrar_sessao', { p_comite: ids.comite });
+}
+
+// Passo 43: o CSNU completo. 19 DPOs em situações diferentes, dois blocos com working
+// papers, um projeto aprovado pela mesa e outro em rodada (com propostas, comentários e
+// cláusulas acordadas), cartas, crise com notas e notícias. Nada vai a votação.
+async function csnuCompleto(c: Comite, ids: { comite: string; veiculo: string; delegacoes: Map<string, string> }, mesa: SupabaseClient) {
+	const indice = new Map(c.delegacoes.map((d, i) => [d[0], i]));
+	const clientes = new Map<string, SupabaseClient>();
+	const de = async (nome: string) => {
+		if (!clientes.has(nome)) clientes.set(nome, await como(email(c.sigla, doisDigitos(indice.get(nome)!))));
+		return clientes.get(nome)!;
+	};
+	const id = (nome: string) => ids.delegacoes.get(nome)!;
+
+	for (const [topico, dpos] of [[1, DPOS], [2, DPOS_T2]] as [number, Record<string, Dpo>][]) {
+		for (const [nome, dpo] of Object.entries(dpos)) {
+			const cliente = await de(nome);
+			const dpoId = await chamar<string>(cliente, 'salvar_dpo', { p_comite: ids.comite, p_topico: topico, p_texto: dpo.texto, p_referencias: dpo.referencias });
+			if (dpo.situacao === 'rascunho') continue;
+			await chamar(cliente, 'enviar_dpo', { p_dpo: dpoId });
+			if (dpo.situacao === 'aprovado') await chamar(mesa, 'avaliar_dpo', { p_dpo: dpoId, p_status: 'aprovado' });
+			if (dpo.situacao === 'pede_ajustes') await chamar(mesa, 'avaliar_dpo', { p_dpo: dpoId, p_status: 'pede_ajustes', p_comentario: dpo.comentario });
+		}
+	}
+
+	for (const carta of CARTAS) {
+		await chamar(await de(carta.de), 'enviar_carta', {
+			p_comite: ids.comite,
+			p_titulo: carta.titulo,
+			p_corpo: carta.corpo,
+			p_publica: carta.publica,
+			p_destinatarios: carta.para.map(id)
+		});
+	}
+
+	const blocos: string[] = [];
+	for (const b of BLOCOS) {
+		const bloco = await chamar<string>(await de(b.membros[0]), 'criar_bloco', { p_comite: ids.comite, p_nome: b.nome });
+		for (const m of b.membros.slice(1)) await chamar(await de(m), 'entrar_bloco', { p_bloco: bloco });
+		blocos.push(bloco);
+	}
+	for (const wp of WORKING_PAPERS) {
+		const autor = await de(BLOCOS[wp.bloco].membros[0]);
+		const doc = await chamar<string>(autor, 'criar_documento', { p_bloco: blocos[wp.bloco], p_tipo: 'working_paper', p_titulo: wp.titulo, p_topico: 1 });
+		for (const texto of wp.texto) await chamar(autor, 'adicionar_clausula', { p_documento: doc, p_tipo: 'texto', p_texto: texto });
+	}
+	const projeto = async (p: typeof PROJETO_A | typeof PROJETO_B) => {
+		const autor = await de(BLOCOS[p.bloco].membros[0]);
+		const doc = await chamar<string>(autor, 'criar_documento', { p_bloco: blocos[p.bloco], p_tipo: 'projeto', p_titulo: p.titulo, p_topico: 1 });
+		for (const texto of p.preambulares) await chamar(autor, 'adicionar_clausula', { p_documento: doc, p_tipo: 'preambular', p_texto: texto });
+		const operativas: string[] = [];
+		for (const texto of p.operativas) operativas.push(await chamar<string>(autor, 'adicionar_clausula', { p_documento: doc, p_tipo: 'operativa', p_texto: texto }));
+		return { autor, doc, operativas };
+	};
+
+	const a = await projeto(PROJETO_A);
+	for (const nome of PROJETO_A.signatarios) await chamar(await de(nome), 'assinar', { p_documento: a.doc, p_assinar: true });
+	await chamar(a.autor, 'enviar_documento', { p_documento: a.doc, p_aprovacao: 'votacao' });
+	await chamar(mesa, 'aprovar_documento', { p_documento: a.doc, p_aprovar: true });
+
+	const b = await projeto(PROJETO_B);
+	await chamar(b.autor, 'abrir_rodada', { p_documento: b.doc, p_minutos: 120 });
+	for (const i of PROJETO_B.acordadas) await chamar(b.autor, 'marcar_clausula', { p_clausula: b.operativas[i], p_status: 'acordada' });
+	for (const p of PROJETO_B.propostas) await chamar(await de(p.de), 'propor_alteracao', { p_clausula: b.operativas[p.operativa], p_texto: p.texto });
+	for (const x of PROJETO_B.comentarios) await chamar(await de(x.de), 'comentar', { p_clausula: b.operativas[x.operativa], p_texto: x.texto });
+
+	const crise = await como(email(c.sigla, 'crise1'));
+	await chamar(crise, 'publicar_atualizacao', { p_comites: [ids.comite], p_texto: CRISE.atualizacao });
+	for (const n of CRISE.notas) {
+		const notaId = randomUUID();
+		await chamar(await de(n.de), 'enviar_nota', { p_id: notaId, p_comite: ids.comite, p_tipo: 'nota', p_titulo: n.titulo, p_texto: n.texto });
+		if (!n.resposta) continue;
+		await chamar(crise, 'assumir_nota', { p_id: notaId });
+		await chamar(crise, 'responder_notas', { p_ids: [notaId], p_status: 'aprovada', p_resposta: n.resposta });
+	}
+
+	const press = await como(email(c.sigla, 'press'));
+	for (const n of NOTICIAS) {
+		await chamar(press, 'publicar_noticia', {
+			p_id: randomUUID(),
+			p_veiculo: ids.veiculo,
+			p_tipo: 'reportagem',
+			p_titulo: n.titulo,
+			p_texto: n.texto,
+			p_citadas: n.citadas.map(id)
+		});
+	}
 }
 
 for (const c of COMITES) {
