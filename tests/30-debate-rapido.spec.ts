@@ -48,9 +48,14 @@ test('a presidência escolhe a lista curta, e a pausa para pontos e moções vem
 	await telao.clock.install();
 	await entrar(telao, MESA);
 	await telao.goto(`/telao/${C.sigla}`);
+	// Antes de pular o relógio, o telão precisa ter medido a diferença para o servidor:
+	// medida depois, ela desfaz o pulo (a grade ficaria mais 30 s reais).
+	await aoVivo(telao);
 	// A votação do tópico na preparação deixa a grade 30 s na tela (passo 23): o relógio pula.
 	await telao.clock.fastForward(30_000);
 	await expect(telao.getByRole('complementary', { name: 'Próximos oradores' }).getByRole('listitem').first()).toContainText('França');
+	// O relógio do telão volta à hora certa: a pausa (abaixo) dura menos que os 30 s pulados.
+	await telao.clock.setSystemTime(Date.now());
 
 	const alemanha = await (await browser.newContext()).newPage();
 	await entrar(alemanha, ALEMANHA);
