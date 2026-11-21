@@ -18,7 +18,8 @@
 	import { desativarPush } from '#lib/push.ts';
 	import { APP, marca } from '#lib/titulo.svelte.ts';
 	import { trilha } from '#lib/trilha.ts';
-	import { papelPrincipal } from '#lib/papeis.ts';
+	import { papelPrincipal, rotuloPapel } from '#lib/papeis.ts';
+	import Bandeira from '#lib/ui/Bandeira.svelte';
 	import Trilha from '#lib/ui/Trilha.svelte';
 	import { supabase, type Papel } from '#lib/supabase.ts';
 	import { assinarAvisos, esquecerLeituras, recarregarAoVivo } from '#lib/tempo-real.ts';
@@ -36,6 +37,8 @@
 	// com o papel principal (passo 32): a mesa tem o painel; a crise e a press, as suas
 	// telas logo depois do Agora.
 	const principal = $derived(papelPrincipal(data.participacoes));
+	// Passo 43: quem a pessoa é no evento fica sempre à vista na faixa (país ou papel).
+	const eu = $derived(data.participacoes.find((p) => p.papel === principal) ?? data.participacoes[0]);
 	const telas: Tela[] = $derived([
 		{ href: '/', rotulo: t('Agora'), icone: House },
 		...(siglaCrise ? [{ href: `/crise/${siglaCrise}`, rotulo: t('Crise'), icone: Siren, papeis: ['crise' as const] }] : []),
@@ -148,7 +151,23 @@
 				<div class="conta">
 					{#if !online}<span class="selo selo--alerta">{t('Sem conexão')}</span>{/if}
 					{#if pendentes}<span class="selo selo--info" role="status">{t('{n} para enviar', { n: pendentes })}</span>{/if}
-					<span class="conta-nome">{data.nome}</span>
+					{#if eu?.papel === 'delegado' && eu.delegacao_id}
+						<a
+							class="identidade"
+							href={`/comite/${eu.comite_sigla}/delegacao/${eu.delegacao_id}`}
+							aria-label={`${eu.delegacao_nome} · ${eu.comite_sigla}`}
+							title={data.nome ?? undefined}
+						>
+							<Bandeira codigo={eu.delegacao_bandeira} />
+							<span class="identidade-nome">{eu.delegacao_nome}</span>
+							<span class="identidade-comite">{eu.comite_sigla}</span>
+						</a>
+					{:else if eu}
+						<span class="identidade" title={data.nome ?? undefined}>
+							<span class="identidade-nome">{rotuloPapel(eu.papel)}</span>
+							{#if eu.comite_sigla}<span class="identidade-comite">{eu.comite_sigla}</span>{/if}
+						</span>
+					{/if}
 					{#if comMenu}
 						<a
 							class="botao botao--secundario botao--pequeno"

@@ -27,6 +27,8 @@ test('o tempo do debate segue contando quando alguém recebe a palavra', async (
 	await entrar(page, MESA);
 	await page.goto(PAINEL);
 	await aoVivo(page);
+	// Passo 43: a forma de debate e o tempo de fala ficam nos ajustes, recolhidos.
+	await page.locator('summary', { hasText: 'Ajustes da fala e do debate' }).click();
 	const formulario = page.getByRole('form', { name: 'Forma de debate' });
 	await formulario.getByRole('combobox', { name: /^Forma de debate/ }).selectOption('formal_informal');
 	await formulario.getByLabel('Minutos (opcional)').fill('20');
@@ -53,6 +55,7 @@ test('o informal-informal esgotado oferece a volta ao formal-informal', async ({
 	await entrar(page, MESA);
 	await page.goto(PAINEL);
 	await aoVivo(page);
+	await page.locator('summary', { hasText: 'Ajustes da fala e do debate' }).click();
 	const formulario = page.getByRole('form', { name: 'Forma de debate' });
 	await formulario.getByRole('combobox', { name: /^Forma de debate/ }).selectOption('informal_informal');
 	await formulario.getByLabel(/^Minutos \(até/).fill('1');

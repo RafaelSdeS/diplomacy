@@ -5,9 +5,10 @@
 .telao-orador .bandeira,
 .telao-orador .telao-nome,
 .telao-fila li,
-.conta-nome,
+.timbre .identidade,
+.painel-quem,
 [aria-labelledby='t-palavra'] .com-bandeira,
 [aria-labelledby='t-fila'] li .com-bandeira,
-main > h1 + p.suave {
+.barra-painel > p.suave {
 	visibility: hidden;
 }

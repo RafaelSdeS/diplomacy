@@ -254,13 +254,37 @@ a {
 	gap: 0.75rem;
 }
 
-.conta-nome {
-	font-size: 0.9rem;
-	color: var(--cor-texto-suave);
+/* Passo 43: quem a pessoa é no evento (a bandeira e o país, ou o papel), sempre à vista. */
+.identidade {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	color: var(--cor-sobre-faixa);
+	text-decoration: none;
+	font-family: var(--fonte-titulo);
+	font-weight: 600;
+	font-size: 1.05rem;
 }
 
+a.identidade:hover .identidade-nome {
+	text-decoration: underline;
+}
+
+.identidade .bandeira {
+	box-shadow: 0 0 0 1px rgb(255 255 255 / 0.35);
+}
+
+.identidade-comite {
+	font-family: var(--fonte-ui);
+	font-size: 0.8rem;
+	font-weight: 400;
+	letter-spacing: 0.08em;
+	color: var(--cor-fio-dourado);
+}
+
+/* No celular, o delegado vê a bandeira e a sigla; os outros papéis, o nome do papel. */
 @media (max-width: 639px) {
-	.conta-nome {
+	a.identidade .identidade-nome {
 		display: none;
 	}
 }
@@ -997,6 +1021,91 @@ kbd {
 	.painel {
 		grid-template-columns: 1fr 1.3fr 1fr;
 		align-items: start;
+	}
+}
+
+/* Passo 43: o painel cabe na tela do notebook. A página não rola; cada coluna rola
+   sozinha, e o raro (assumir delegação, atalhos, ajustes) fica recolhido. */
+.painel-quem {
+	font-weight: 400;
+}
+
+.barra-painel {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem 1rem;
+	margin-bottom: 1rem;
+}
+
+.barra-painel > p {
+	margin: 0;
+}
+
+.menu-painel > summary {
+	list-style: none;
+}
+
+.menu-painel > summary::-webkit-details-marker {
+	display: none;
+}
+
+.menu-painel[open] > :not(summary) {
+	margin: 0.5rem 0 0;
+}
+
+.ajustes {
+	margin-top: 1rem;
+	padding-top: 0.75rem;
+	border-top: var(--linha);
+}
+
+.ajustes > summary {
+	cursor: pointer;
+	font-weight: 600;
+	color: var(--cor-marinho);
+}
+
+@media (min-width: 1024px) {
+	.menu-painel {
+		position: relative;
+	}
+
+	.menu-painel[open] > :not(summary) {
+		position: absolute;
+		top: calc(100% + 0.25rem);
+		right: 0;
+		z-index: 10;
+		width: min(24rem, 80vw);
+		max-width: none;
+	}
+}
+
+@media (min-width: 1024px) and (min-height: 600px) {
+	.app:has(.painel) {
+		height: 100dvh;
+	}
+
+	.app:has(.painel) main {
+		display: flex;
+		flex-direction: column;
+		min-height: 0;
+		overflow: hidden;
+	}
+
+	.painel {
+		flex: 1;
+		min-height: 0;
+		grid-template-rows: minmax(0, 1fr);
+		align-items: stretch;
+	}
+
+	/* A folga em volta deixa o contorno de foco visível dentro da rolagem. */
+	.painel > .painel-coluna {
+		overflow-y: auto;
+		overscroll-behavior: contain;
+		padding: 3px 4px 1rem 3px;
 	}
 }
 

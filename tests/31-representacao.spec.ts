@@ -27,6 +27,8 @@ test('a mesa assume a Itália, levanta a placa por ela e deixa', async ({ page }
 	await entrar(page, MESA);
 	await page.goto(PAINEL);
 	await aoVivo(page);
+	// Passo 43: assumir uma delegação fica num menu recolhido da barra do painel.
+	await page.locator('summary', { hasText: 'Assumir uma delegação' }).click();
 	const assumir = page.getByRole('region', { name: 'Assumir uma delegação' });
 	await assumir.getByRole('combobox', { name: /^Delegação/ }).selectOption({ label: 'Itália' });
 	await assumir.getByRole('button', { name: 'Assumir' }).click();
@@ -43,6 +45,7 @@ test('a mesa assume a Itália, levanta a placa por ela e deixa', async ({ page }
 	const fila = page.getByRole('region', { name: 'Pedidos de fala' });
 	await expect(fila.getByRole('listitem').filter({ hasText: 'Itália' })).toContainText('pela mesa');
 
+	await page.locator('summary', { hasText: 'No lugar de Itália' }).click();
 	await page.getByRole('region', { name: 'Assumir uma delegação' }).getByRole('button', { name: 'Deixar' }).click();
 	await expect(page.getByRole('region', { name: 'Assumir uma delegação' }).getByRole('button', { name: 'Assumir' })).toBeVisible();
 	await page.goto(`/comite/${C.sigla}/sessao`);

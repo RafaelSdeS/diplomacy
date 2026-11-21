@@ -216,6 +216,8 @@ test('Espaço pausa e retoma o cronômetro, mas não dentro de um campo', async 
 	await expect(palavra.locator('[data-cronometro]')).toHaveText(pausado!);
 
 	// Digitar no campo não pausa nem retoma, e o valor digitado não some com os eventos ao vivo.
+	// Passo 43: o tempo de fala fica nos ajustes, recolhidos.
+	await painel.locator('summary', { hasText: 'Ajustes da fala e do debate' }).click();
 	await painel.getByLabel('Tempo de fala (segundos)').fill('120');
 	await painel.getByLabel('Tempo de fala (segundos)').press('Space');
 	await expect(palavra.getByRole('status')).toHaveText('Pausado');
