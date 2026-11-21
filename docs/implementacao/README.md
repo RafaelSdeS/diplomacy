@@ -1,6 +1,6 @@
 # Plano de implementação
 
-Ordem dos passos para construir o app. Os passos 01 a 12 formam o **piloto**: planos gratuitos, poucos usuários e dados fictícios. Os passos 13 a 19 levam o app à **escala do evento**.
+Ordem dos passos para construir o app. Os passos 01 a 12 formam o **piloto**: planos gratuitos, poucos usuários e dados fictícios. Os passos 13 a 19 levam o app à **escala do evento**. Os passos 20 a 38 são as **melhorias depois da revisão** do app, explicadas e priorizadas em [melhorias-pos-revisao.pdf](../melhorias-pos-revisao.pdf).
 
 Cada passo só começa quando os passos de que ele depende estão prontos. As regras de procedimento que o app segue estão resumidas em [regras-de-procedimento.md](../regras-de-procedimento.md).
 
@@ -27,6 +27,44 @@ Cada passo só começa quando os passos de que ele depende estão prontos. As re
 | [17](17-comunicacao-completa.md) | Bilhetes, entrevistas, coletiva, edição do dia e redes | 11, 15 |
 | [18](18-idiomas.md) | Português e inglês | 12 |
 | [19](19-lgpd-e-pos-evento.md) | Direitos do titular, exclusão de dados e arquivo da edição | 14 |
+| **Melhorias depois da revisão** | | |
+| [20](20-proposta-e-demonstracao.md) | Proposta de valor e evento de demonstração (6 comitês, 147 delegações) | — |
+| [21](21-chamada-e-sessao.md) | Chamada, abertura, encerramento e chegada atrasada | 20 |
+| [22](22-agenda.md) | Agenda: retirar e editar a adoção; agenda antes das resoluções | 20 |
+| [23](23-lista-de-votos.md) | Lista de quem votou a favor e contra, e histórico | 21 |
+| [24](24-bloqueio-de-bilhetes.md) | Bloqueio de bilhetes entre delegações | 20 |
+| [25](25-trilha.md) | Trilha de navegação (voltar) | 20 |
+| [26](26-pagina-da-delegacao.md) | Página da delegação (clicar no país) | 23, 24 |
+| [27](27-diplomacy-nome-e-logo.md) | Nome Diplomacy e logo | 25 |
+| [28](28-dois-cronometros.md) | Dois cronômetros: fala e debate | 21 |
+| [29](29-mocoes-em-duas-etapas.md) | Pontos e moções: bureau, depois presidência | 28 |
+| [30](30-debate-rapido.md) | Debate rápido: "há pontos ou moções?" e lista curta | 28, 29 |
+| [31](31-bureau-representa-delegacao.md) | Bureau no lugar de uma delegação ausente | 29 |
+| [32](32-agora-por-papel.md) | Aba Agora e menu por papel | 26, 28, 29, 30 |
+| [33](33-numeros-clicaveis.md) | Números e telas clicáveis | 26, 32 |
+| [34](34-caderno-da-delegacao.md) | Caderno da delegação, com compartilhamento | 26, 32 |
+| [35](35-crise-com-prazo.md) | Crise com prazo | 31, 32 |
+| [36](36-press-nas-redes.md) | Press: WhatsApp, X e Instagram | 27 |
+| [37](37-visual-geral.md) | Visual geral | 20 a 36 |
+| [38](38-melhorias-de-uso.md) | Melhorias de uso (cada uma pode entrar antes, no passo da mesma tela) | 21 |
+
+## Melhorias depois da revisão
+
+**Antes de começar:** as notificações push (bônus do passo 15) e os bilhetes mais rápidos já estão na `main` (13db7fb). As migrações dos passos novos começam em `20261208090000`. Regras de acesso de tabelas lidas em lista usam os conjuntos de `20261207100000_mensagens_rapidas.sql` (`minhas_delegacoes()`, `meus_comites()`), calculados uma vez por consulta, em vez de uma função chamada linha a linha.
+
+**Decisões tomadas em 20/11/2026** (cada passo repete as suas):
+
+- "Presente" e "presente e votando" são a mesma coisa: a chamada tem dois estados (passo 21).
+- A agenda é sempre debatida e adotada antes das resoluções; o banco impede o projeto antes da adoção (passo 22).
+- A delegação bloqueada fica sabendo do bloqueio de bilhetes (passo 24).
+- Listas plausíveis para os 6 comitês da demonstração (passo 20).
+- O logo é proposto no passo 27 (três opções em SVG).
+- Pontos e moções passam pelo bureau e só depois a presidência concede (passo 29).
+- O limite do informal-informal é de 45 minutos somados em cada sessão (passo 28).
+- O bureau assume a delegação de quem faltou, com o mínimo de regras (passo 31).
+- O caderno pode ser compartilhado com as delegações escolhidas (passo 34).
+
+**Fora do plano por enquanto** (itens 24 a 26 do documento): edição simultânea do mesmo texto (o editor por cláusula cobre posições e comentários); configuração para outros eventos (a base existe; esperar um segundo evento); habilidades especiais para delegações (não recomendado: a equipe de crise julga o realismo das diretivas de cada país).
 
 ## Convenções
 
@@ -129,6 +167,25 @@ Cada passo tem uma seção "Testes" com os testes que provam que ele funciona e 
 | 17 | sim | sim | sim | sim |
 | 18 | — | checagem no CI | sim | — |
 | 19 | sim | — | sim | sim |
+| 20 | — | sim | — (CI roda a demonstração) | sim |
+| 21 | sim | sim | sim | — |
+| 22 | sim | — | sim | — |
+| 23 | — | sim | sim | — |
+| 24 | sim | — | sim | — |
+| 25 | — | sim | sim | — |
+| 26 | sim | — | sim | — |
+| 27 | — | sim | sim | sim |
+| 28 | sim | sim | sim | — |
+| 29 | sim | — | sim | — |
+| 30 | sim | sim | sim | — |
+| 31 | sim | — | sim | — |
+| 32 | — | sim | sim | — |
+| 33 | — | — | sim | — |
+| 34 | sim | sim | sim | — |
+| 35 | sim | — | sim | — |
+| 36 | — | sim | sim | sim |
+| 37 | — | — | capturas e axe | sim |
+| 38 | sim | sim | sim | sim |
 
 ## Aparência
 

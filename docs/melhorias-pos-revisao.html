@@ -1,0 +1,687 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Diplomacy · melhorias depois da revisão</title>
+<style>
+  @page {
+    size: A4;
+    margin: 20mm 18mm 22mm 18mm;
+    @bottom-left { content: "Diplomacy · melhorias depois da revisão"; font: 8pt "Noto Sans", sans-serif; color: #7a8594; }
+    @bottom-right { content: counter(page) " / " counter(pages); font: 8pt "Noto Sans", sans-serif; color: #7a8594; }
+  }
+  :root { --ink: #1b2430; --quiet: #5d6878; --line: #d5dbe3; --accent: #1f4e79; --tint: #eaf0f6; --gold: #8c6d2c; --gold-tint: #f7f0e1; --warn: #8a5a00; --warn-tint: #fdf5e4; }
+  * { box-sizing: border-box; }
+  body { font: 10pt/1.55 "Noto Sans", "DejaVu Sans", sans-serif; color: var(--ink); margin: 0; background: #fff; }
+  h1, h2, h3 { font-family: "Noto Serif", "DejaVu Serif", serif; color: var(--accent); line-height: 1.25; break-after: avoid; }
+  h1 { font-size: 24pt; margin: 6pt 0 4pt; }
+  h2 { font-size: 15pt; margin: 22pt 0 6pt; padding-bottom: 3pt; border-bottom: 1.5px solid var(--accent); }
+  h2.novo { margin-top: 26pt; }
+  .grupo-intro, .item > .pills, .item > .obs { break-after: avoid; }
+  h3 { font-size: 12pt; margin: 0 0 4pt; color: var(--ink); }
+  p { margin: 0 0 7pt; }
+  ul, ol { margin: 0 0 8pt; padding-left: 16pt; }
+  li { margin-bottom: 2.5pt; }
+  code { font-family: "DejaVu Sans Mono", monospace; font-size: 8.3pt; color: #33415a; }
+  table { width: 100%; border-collapse: collapse; margin: 6pt 0 10pt; font-size: 9pt; }
+  th { background: var(--tint); color: var(--accent); text-align: left; font-weight: 600; }
+  th, td { border: 1px solid var(--line); padding: 4pt 6pt; vertical-align: top; }
+  tr { break-inside: avoid; }
+  td.n { text-align: right; width: 22pt; color: var(--quiet); }
+  .kicker { font-size: 9pt; letter-spacing: .08em; text-transform: uppercase; color: var(--quiet); margin-top: 0; }
+  .subtitle { font-size: 12pt; color: var(--quiet); margin: 0 0 4pt; }
+  .meta { font-size: 9pt; color: var(--quiet); margin-bottom: 16pt; }
+  .summary { background: var(--tint); border-left: 4px solid var(--accent); padding: 10pt 14pt; border-radius: 0 6px 6px 0; break-inside: avoid; margin-bottom: 10pt; }
+  .summary p:last-child, .summary ul:last-child { margin-bottom: 0; }
+  .note { background: var(--warn-tint); border-left: 4px solid var(--warn); padding: 8pt 12pt; border-radius: 0 6px 6px 0; break-inside: avoid; margin: 8pt 0 10pt; }
+  .note p:last-child, .note ul:last-child { margin-bottom: 0; }
+  .lead { font-size: 10.5pt; }
+  figure { margin: 8pt 0 12pt; break-inside: avoid; }
+  figure svg { width: 100%; height: auto; display: block; }
+  figcaption { font-size: 8.5pt; color: var(--quiet); margin-top: 4pt; }
+  .muted { color: var(--quiet); }
+
+  /* Cartão de cada item */
+  .item { border: 1px solid var(--line); border-radius: 8pt; padding: 10pt 12pt 4pt; margin: 0 0 12pt; }
+  .item-topo { display: flex; align-items: baseline; gap: 8pt; break-after: avoid; }
+  .num { font-family: "Noto Serif", serif; font-weight: 700; font-size: 13pt; color: #fff; background: var(--accent); border-radius: 999px; min-width: 21pt; height: 21pt; display: inline-flex; align-items: center; justify-content: center; flex: none; }
+  .g2 .num { background: #fff; color: var(--accent); border: 1.5px solid var(--accent); }
+  .g3 .num { background: var(--gold); }
+  .g4 .num { background: #8a94a3; }
+  .pills { display: flex; flex-wrap: wrap; gap: 4pt; margin: 4pt 0 6pt; font-size: 8pt; }
+  .pill { border: 1px solid var(--accent); color: var(--accent); border-radius: 999px; padding: 1pt 7pt; background: #fff; }
+  .pill.cheia { background: var(--accent); color: #fff; }
+  .pill.ouro { border-color: var(--gold); color: var(--gold); }
+  .obs { font-size: 9pt; color: var(--quiet); font-style: italic; border-left: 2px solid var(--line); padding-left: 7pt; margin-bottom: 7pt; }
+  .rot { font-variant: small-caps; letter-spacing: .04em; color: var(--accent); font-weight: 700; }
+  .item p, .item li { font-size: 9.5pt; }
+  .item ul { margin-bottom: 6pt; }
+  .grupo-intro { font-size: 10pt; color: var(--quiet); margin-bottom: 10pt; }
+  .papeis td:first-child { width: 88pt; font-weight: 600; }
+  .etapas td:first-child { width: 70pt; font-weight: 600; color: var(--accent); }
+  .etapas td:nth-child(2) { width: 150pt; }
+  .legenda { display: flex; flex-wrap: wrap; gap: 12pt; font-size: 8.5pt; color: var(--quiet); margin-top: 4pt; }
+  .legenda span::before { content: ""; display: inline-block; width: 9pt; height: 9pt; border-radius: 999px; margin-right: 4pt; vertical-align: -1pt; }
+  .l1::before { background: var(--accent); }
+  .l2::before { background: #fff; border: 1.5px solid var(--accent); }
+  .l3::before { background: var(--gold); }
+  .l4::before { background: #8a94a3; }
+</style>
+</head>
+<body>
+
+<p class="kicker">Diplomacy · app do UFRGSMUN</p>
+<h1>Melhorias depois da revisão</h1>
+<p class="subtitle">As observações da revisão do app, conferidas no código e ordenadas da mais fácil e importante à mais difícil e menos importante.</p>
+<p class="meta">20 de novembro de 2026 · atualizado com as decisões do mesmo dia · passos detalhados em <code>docs/implementacao/</code>, 20 a 38</p>
+
+<div class="summary">
+  <p><b>Em resumo.</b> As 40 observações viraram <b>26 itens</b> (várias falavam da mesma coisa), em quatro grupos: <b>fáceis e importantes</b> (1–10), <b>importantes e trabalhosos</b> (11–19), <b>fáceis e menos importantes</b> (20–23) e <b>difíceis e pouco importantes agora</b> (24–26).</p>
+  <p>O que mais pesa, conferido no código:</p>
+  <ul>
+    <li>O tempo definido pela presidência para o debate é <b>apagado</b> quando alguém recebe a palavra: os dois tempos usam o mesmo cronômetro (item 11).</li>
+    <li>Moções e pontos são decididos num passo só, por quem preside; o fluxo real tem o <b>bureau</b> e depois a <b>presidência</b> (item 12).</li>
+    <li>A chamada não tem “concluir”, e abrir e encerrar a sessão ficam escondidos nela (item 3).</li>
+    <li>Os países não são clicáveis: não há página da delegação, com delegados, DPO e cartas (item 10).</li>
+    <li>A aba Agora não mostra a sessão ao vivo, embora o app já tenha esses dados (item 14).</li>
+  </ul>
+</div>
+
+<h2>Como ler</h2>
+<p><b>Esforço</b>, em tamanhos relativos: <b>P</b> até 1 dia · <b>M</b> 2 a 5 dias · <b>G</b> 1 a 2 semanas · <b>GG</b> mais que isso. Cada item já conta com seus testes, como nos passos anteriores. <b>Impacto</b>: alto, médio-alto, médio, baixo-médio ou baixo, pensando no evento real.</p>
+<p>Cada item traz: a <b>observação</b> original, o que existe <b>hoje</b> no app, a <b>proposta</b>, as <b>decisões</b> que são suas e os <b>testes</b>. Os itens 2 e 10 têm esforço M, mas ficam no primeiro grupo porque destravam os outros: um dá dados realistas para testar tudo; o outro é a página onde vários itens se penduram.</p>
+
+<figure>
+<svg viewBox="0 0 520 250" xmlns="http://www.w3.org/2000/svg" font-family="Noto Sans, sans-serif">
+  <!-- área -->
+  <rect x="70" y="10" width="440" height="200" fill="#fbfcfd" stroke="#d5dbe3"/>
+  <!-- linhas de impacto -->
+  <g stroke="#e6eaf0">
+    <line x1="70" y1="50" x2="510" y2="50"/><line x1="70" y1="90" x2="510" y2="90"/>
+    <line x1="70" y1="130" x2="510" y2="130"/><line x1="70" y1="170" x2="510" y2="170"/>
+  </g>
+  <g font-size="8.5" fill="#5d6878" text-anchor="end">
+    <text x="64" y="33">Alto</text><text x="64" y="73">Médio-alto</text><text x="64" y="113">Médio</text>
+    <text x="64" y="153">Baixo-médio</text><text x="64" y="193">Baixo</text>
+  </g>
+  <g font-size="8.5" fill="#5d6878" text-anchor="middle">
+    <text x="125" y="224">P</text><text x="195" y="224">P–M</text><text x="265" y="224">M</text>
+    <text x="340" y="224">M–G</text><text x="410" y="224">G</text><text x="475" y="224">GG</text>
+  </g>
+  <text x="290" y="244" font-size="9" fill="#1b2430" text-anchor="middle">esforço →</text>
+  <text x="14" y="110" font-size="9" fill="#1b2430" text-anchor="middle" transform="rotate(-90 14 110)">impacto →</text>
+  <g font-size="8.5" font-weight="700" text-anchor="middle">
+    <!-- grupo 1: cheio -->
+    <g fill="#1f4e79"><circle cx="113" cy="30" r="9"/><circle cx="137" cy="30" r="9"/><circle cx="195" cy="30" r="9"/><circle cx="227" cy="30" r="9"/><circle cx="246" cy="30" r="9"/>
+      <circle cx="113" cy="70" r="9"/><circle cx="137" cy="70" r="9"/><circle cx="87" cy="110" r="9"/><circle cx="106" cy="110" r="9"/><circle cx="125" cy="110" r="9"/></g>
+    <g fill="#fff"><text x="113" y="33">1</text><text x="137" y="33">5</text><text x="195" y="33">3</text><text x="227" y="33">2</text><text x="246" y="33">10</text>
+      <text x="113" y="73">4</text><text x="137" y="73">6</text><text x="87" y="113">7</text><text x="106" y="113">8</text><text x="125" y="113">9</text></g>
+    <!-- grupo 2: contorno -->
+    <g fill="#fff" stroke="#1f4e79" stroke-width="1.5"><circle cx="265" cy="30" r="9"/><circle cx="284" cy="30" r="9"/><circle cx="303" cy="30" r="9"/>
+      <circle cx="345" cy="30" r="9"/><circle cx="367" cy="30" r="9"/><circle cx="410" cy="30" r="9"/>
+      <circle cx="253" cy="70" r="9"/><circle cx="277" cy="70" r="9"/><circle cx="265" cy="110" r="9"/></g>
+    <g fill="#1f4e79"><text x="265" y="33">11</text><text x="284" y="33">12</text><text x="303" y="33">13</text>
+      <text x="345" y="33">14</text><text x="367" y="33">15</text><text x="410" y="33">19</text>
+      <text x="253" y="73">16</text><text x="277" y="73">18</text><text x="265" y="113">17</text></g>
+    <!-- grupo 3: dourado -->
+    <g fill="#8c6d2c"><circle cx="144" cy="110" r="9"/><circle cx="163" cy="110" r="9"/><circle cx="125" cy="150" r="9"/><circle cx="195" cy="110" r="9"/></g>
+    <g fill="#fff"><text x="144" y="113">22</text><text x="163" y="113">23</text><text x="125" y="153">20</text><text x="195" y="113">21</text></g>
+    <!-- grupo 4: cinza -->
+    <g fill="#8a94a3"><circle cx="463" cy="190" r="9"/><circle cx="487" cy="190" r="9"/><circle cx="265" cy="190" r="9"/></g>
+    <g fill="#fff"><text x="463" y="193">24</text><text x="487" y="193">25</text><text x="265" y="193">26</text></g>
+  </g>
+</svg>
+<div class="legenda"><span class="l1">1–10 fáceis e importantes</span><span class="l2">11–19 importantes e trabalhosos</span><span class="l3">20–23 fáceis e menos importantes</span><span class="l4">24–26 difíceis e pouco importantes agora</span></div>
+<figcaption>Impacto × esforço dos 26 itens. Itens 22 e 23 ficam como “médio” por convenção: o impacto real depende do que surgir nas regras e no piloto.</figcaption>
+</figure>
+
+<h2>Visão geral, na ordem</h2>
+<table>
+  <thead><tr><th>#</th><th>Item</th><th>Esforço</th><th>Impacto</th></tr></thead>
+  <tbody>
+    <tr><th colspan="4">Fáceis e importantes</th></tr>
+    <tr><td class="n">1</td><td>Por que cada um usaria o app</td><td>P</td><td>Alto</td></tr>
+    <tr><td class="n">2</td><td>Dados de teste realistas (6 comitês, 147 delegações)</td><td>M</td><td>Alto</td></tr>
+    <tr><td class="n">3</td><td>Chamada, abertura e encerramento de sessão</td><td>P–M</td><td>Alto</td></tr>
+    <tr><td class="n">4</td><td>Delegação que chega no meio da sessão</td><td>P</td><td>Médio-alto</td></tr>
+    <tr><td class="n">5</td><td>Agenda: retirar e corrigir a adoção</td><td>P</td><td>Alto</td></tr>
+    <tr><td class="n">6</td><td>Lista de quem votou a favor e contra</td><td>P</td><td>Médio-alto</td></tr>
+    <tr><td class="n">7</td><td>Bloqueio de bilhetes entre delegações</td><td>P</td><td>Médio</td></tr>
+    <tr><td class="n">8</td><td>Botões de voltar</td><td>P</td><td>Médio</td></tr>
+    <tr><td class="n">9</td><td>Nome Diplomacy e novo logo</td><td>P + design</td><td>Médio</td></tr>
+    <tr><td class="n">10</td><td>Página da delegação (clicar no país)</td><td>M</td><td>Alto</td></tr>
+    <tr><th colspan="4">Importantes e trabalhosos</th></tr>
+    <tr><td class="n">11</td><td>Cronômetros da presidência</td><td>M</td><td>Alto</td></tr>
+    <tr><td class="n">12</td><td>Moções e pontos em duas etapas (bureau, depois presidência)</td><td>M</td><td>Alto</td></tr>
+    <tr><td class="n">13</td><td>Debate rápido: “há pontos ou moções?” e lista de fala</td><td>M</td><td>Alto</td></tr>
+    <tr><td class="n">14</td><td>Aba Agora e menu por papel</td><td>M–G</td><td>Alto</td></tr>
+    <tr><td class="n">15</td><td>Crise com prazo</td><td>M–G</td><td>Alto</td></tr>
+    <tr><td class="n">16</td><td>Caderno da delegação</td><td>M</td><td>Médio-alto</td></tr>
+    <tr><td class="n">17</td><td>Números e telas clicáveis</td><td>M</td><td>Médio</td></tr>
+    <tr><td class="n">18</td><td>Agenda antes das resoluções</td><td>M</td><td>Médio-alto</td></tr>
+    <tr><td class="n">19</td><td>Visual geral</td><td>G</td><td>Alto</td></tr>
+    <tr><th colspan="4">Fáceis e menos importantes</th></tr>
+    <tr><td class="n">20</td><td>Press: WhatsApp, X e Instagram</td><td>P</td><td>Baixo-médio</td></tr>
+    <tr><td class="n">21</td><td>Bureau no lugar de uma delegação ausente</td><td>P–M</td><td>Médio</td></tr>
+    <tr><td class="n">22</td><td>Revisar os tipos de debate</td><td>P</td><td>Depende da regra</td></tr>
+    <tr><td class="n">23</td><td>Melhorias de uso</td><td>P cada</td><td>Médio, somadas</td></tr>
+    <tr><th colspan="4">Difíceis e pouco importantes agora</th></tr>
+    <tr><td class="n">24</td><td>Edição ao vivo do mesmo texto</td><td>GG</td><td>Baixo agora</td></tr>
+    <tr><td class="n">25</td><td>Outros eventos e outras regras</td><td>GG</td><td>Baixo agora</td></tr>
+    <tr><td class="n">26</td><td>Habilidades especiais para delegações</td><td>M</td><td>Não recomendado</td></tr>
+  </tbody>
+</table>
+
+<h2>Antes de começar</h2>
+<div class="note">
+  <p><b>Trabalho em aberto: resolvido.</b> As notificações push e os bilhetes mais rápidos já estão na <code>main</code> (commit 13db7fb). Os passos novos começam pela migração <code>20261208090000</code>.</p>
+</div>
+<p><b>Regras que valem para todos os itens</b> (as mesmas dos 19 passos):</p>
+<ul>
+  <li>Cada item é um passo com testes: pgTAP no banco, Vitest na lógica, Playwright nos 3 tamanhos de tela, axe para acessibilidade, e capturas de referência quando a tela muda.</li>
+  <li>Tabela nova sempre com RLS e teste de permissão; escrita por funções do banco.</li>
+  <li>Todo texto novo com tradução para o inglês (<code>npm run textos</code> e o teste de i18n conferem, inclusive as mensagens de erro do banco).</li>
+  <li>Comitês com tecnologia restrita (OEA): ações novas de delegado respeitam o bloqueio durante a sessão.</li>
+  <li>Telas ao vivo: medir o consumo de dados, como no passo 15.</li>
+  <li>Deploy: <code>db push --remote</code> antes do <code>git push</code>.</li>
+</ul>
+
+<!-- ============================ GRUPO 1 ============================ -->
+<h2 class="novo">1. Fáceis e importantes</h2>
+<p class="grupo-intro">Começar por aqui: pouco trabalho, efeito visível já na próxima sessão de teste. Os itens 3 a 8 são independentes entre si e podem ir em qualquer ordem.</p>
+
+<section class="item g1">
+  <div class="item-topo"><span class="num">1</span><h3>Por que cada um usaria o app</h3></div>
+  <p class="pills"><span class="pill cheia">Esforço P</span><span class="pill">Impacto alto</span><span class="pill ouro">Escrita, não código</span></p>
+  <p class="obs">“Por que o UFRGSMUN usaria meu aplicativo? Por que um delegado usaria? O pessoal do bureau? O presidente atual da sessão?”</p>
+  <p><span class="rot">Hoje.</span> O app tem as funções, mas não há uma frase de valor para cada papel. Sem ela, fica difícil decidir o que cortar e como apresentar o app à organização.</p>
+  <p><span class="rot">Proposta.</span> Uma frase por papel, a dor que ela resolve e o que precisa estar excelente para a frase ser verdade. Rascunho para validar:</p>
+  <table class="papeis">
+    <thead><tr><th>Papel</th><th>Por que usaria</th><th>Precisa estar excelente</th></tr></thead>
+    <tbody>
+      <tr><td>Organização</td><td>Um só lugar para inscritos, crachás, check-in, certificados, avisos e arquivo, com a LGPD cuidada. Menos planilha e menos papel.</td><td>Importação, check-in, certificados, dados (já feitos)</td></tr>
+      <tr><td>Delegado</td><td>Acompanhar e agir sem sair da cadeira: placa, pontos e moções, votos, bilhetes, documentos do bloco e DPO. Sempre sabe o que está acontecendo.</td><td>Itens 10, 13, 14, 16</td></tr>
+      <tr><td>Bureau</td><td>Conduzir sem contagem manual: chamada, quórum, votos contados, moções em ordem, rodadas de revisão com prazo. Ataca a maior dor do evento: revisões e debates que não andam.</td><td>Itens 3, 12; editor com rodadas (já feito)</td></tr>
+      <tr><td>Presidência</td><td>Presidir pela primeira vez sem errar o procedimento: o painel mostra quem pediu a palavra, os relógios e só o que está em ordem.</td><td>Itens 11, 13</td></tr>
+      <tr><td>Press</td><td>Publicar rápido, com imagem pronta para as redes do evento; entrevistas e coletiva organizadas.</td><td>Item 20</td></tr>
+      <tr><td>Crise</td><td>Receber e responder notas em fila, sem papel perdido, e lançar a crise no telão com prazo.</td><td>Item 15</td></tr>
+    </tbody>
+  </table>
+  <p><span class="rot">Decisões suas.</span> Validar o rascunho com a organização do UFRGSMUN. As frases finais podem abrir a tela de entrada e a apresentação no “mock and rules” do primeiro dia.</p>
+</section>
+
+<section class="item g1">
+  <div class="item-topo"><span class="num">2</span><h3>Dados de teste realistas</h3></div>
+  <p class="pills"><span class="pill cheia">Esforço M</span><span class="pill">Impacto alto</span><span class="pill">Destrava os outros itens</span></p>
+  <p class="obs">“Refazer os comitês e perfis e popular o database para teste.”</p>
+  <p><span class="rot">Hoje.</span> Só há comitês de teste (CSNU-T, TREINO, OEA-T, CE-T, UNOCT-T) com contas genéricas, e os testes automáticos dependem deles. Na nuvem, o piloto tem CSNU-T e TREINO (<code>supabase/demonstracao.sql</code>, <code>supabase/treino.sql</code>).</p>
+  <p><span class="rot">Proposta.</span></p>
+  <ul>
+    <li>Um conjunto de demonstração <b>separado</b>, com os 6 comitês do UFRGSMUN 2026: CSNU (15), ARF (24), OEA histórica (26), CEUE (27), ACEG-UA (27) e UNOCT (28, em inglês). São 147 delegações.</li>
+    <li>Mesas, um veículo de press por comitê, equipe de crise e o cronograma dos 4 dias.</li>
+    <li>Conteúdo para as telas não ficarem vazias: alguns DPOs, cartas, notícias, um bloco com projeto em rodada de revisão e uma votação encerrada.</li>
+    <li>Pessoas fictícias, com foto genérica e minibiografia. Algumas delegações com 2 delegados.</li>
+    <li>Os comitês “-T” ficam intactos, para os testes não quebrarem. Um script local (<code>npm run seed:demo</code>) e um <code>.sql</code> para a nuvem.</li>
+  </ul>
+  <p><span class="rot">Decidido.</span> Listas plausíveis, montadas no passo 20. O repositório é público, então só nomes fictícios de pessoas.</p>
+  <p><span class="rot">Testes.</span> O conjunto carrega do zero no CI sem erro; contagens por comitê conferidas.</p>
+</section>
+
+<section class="item g1">
+  <div class="item-topo"><span class="num">3</span><h3>Chamada, abertura e encerramento de sessão</h3></div>
+  <p class="pills"><span class="pill cheia">Esforço P–M</span><span class="pill">Impacto alto</span></p>
+  <p class="obs">“A chamada não é intuitiva. Faço a chamada, mas não há um botão para terminá-la ou ir para a sessão em si?” · “Melhorar como é começada e terminada cada sessão.”</p>
+  <p><span class="rot">Hoje</span> (<code>sessao/chamada/+page.svelte</code>):</p>
+  <ul>
+    <li>“Abrir sessão” e “Encerrar sessão” ficam na tela da chamada.</li>
+    <li>“Abrir a próxima sessão” encerra a atual sem pedir confirmação; a função do banco também fecha as votações abertas.</li>
+    <li>Cada delegação tem três botões de opção (ausente, presente, presente e votando): 28 linhas assim no UNOCT.</li>
+    <li>Não há “Concluir chamada” nem caminho para o painel da presidência. O sorteio do rodízio fica na mesma tela.</li>
+    <li>Encerrar a sessão não mostra nenhum resumo.</li>
+  </ul>
+  <p><span class="rot">Proposta.</span> Um roteiro guiado, com os passos à vista:</p>
+  <ol>
+    <li><b>Abrir sessão.</b></li>
+    <li><b>Chamada:</b> um toque por delegação, que alterna a situação; botão “Marcar todas como presentes”; contador de quórum fixo no topo.</li>
+    <li><b>Concluir chamada:</b> mostra o quórum e a presidência da vez e leva ao painel (ou à plenária, na primeira sessão).</li>
+    <li><b>Encerrar sessão</b> no próprio painel, com confirmação e um resumo: duração, falas, moções e votações.</li>
+  </ol>
+  <p>O sorteio do rodízio vai para uma seção de preparação, feita uma vez. Toda ação que encerra algo pede confirmação.</p>
+  <p><span class="rot">Decidido.</span> No UFRGSMUN, “presente” e “presente e votando” são a mesma coisa: a chamada tem dois estados, ausente e presente.</p>
+  <p><span class="rot">Testes.</span> Playwright do fluxo inteiro: abrir, chamada, concluir, encerrar; confirmação antes de encerrar.</p>
+</section>
+
+<section class="item g1">
+  <div class="item-topo"><span class="num">4</span><h3>Delegação que chega no meio da sessão</h3></div>
+  <p class="pills"><span class="pill cheia">Esforço P</span><span class="pill">Impacto médio-alto</span></p>
+  <p class="obs">“O sistema deve ser capaz de aceitar uma delegação que chega no meio da sessão.”</p>
+  <p><span class="rot">Hoje.</span> A mesa pode marcar presença a qualquer momento (a chamada grava na hora) e o quórum se recalcula. Quem não está presente não vota. Mas a delegação não tem como avisar que chegou, e a mesa precisa voltar à tela da chamada.</p>
+  <p><span class="rot">Proposta.</span> Botão “Cheguei” na tela da sessão para a delegação ausente. No painel da mesa aparece “Chegou: França · confirmar presença”, com um toque. A hora de chegada fica registrada.</p>
+  <p><span class="rot">Testes.</span> pgTAP: só a própria delegação avisa e só a mesa confirma. Playwright: chegada, confirmação e voto liberado.</p>
+</section>
+
+<section class="item g1">
+  <div class="item-topo"><span class="num">5</span><h3>Agenda: retirar e corrigir a adoção</h3></div>
+  <p class="pills"><span class="pill cheia">Esforço P</span><span class="pill">Impacto alto</span></p>
+  <p class="obs">“Sistema de agenda e tópicos meio ruim, pode ser melhorado. Há a opção de adotar, mas não de retirar.”</p>
+  <p><span class="rot">Hoje.</span> <code>adotar_proposta</code> (<code>plenaria_e_votacao.sql:850</code>) só troca qual proposta está adotada em cada tópico. Não dá para retirar a adoção, nem editar a agenda adotada (juntar itens de duas propostas, corrigir um item). O andamento de cada item (pendente, em debate, debatido) muda num botão que gira entre os três estados.</p>
+  <p><span class="rot">Proposta.</span></p>
+  <ul>
+    <li>“Retirar adoção”, para a mesa.</li>
+    <li>“Editar agenda adotada”: a mesa parte da proposta adotada e ajusta, ou traz itens de outras propostas.</li>
+    <li>Andamento com escolha direta, no lugar do botão que gira.</li>
+  </ul>
+  <p><span class="rot">Decisões suas.</span> A pergunta aberta das regras (<code>docs/regras-de-procedimento.md:100</code>): quem sugere a agenda informal, só o bureau ou as delegações também?</p>
+  <p><span class="rot">Testes.</span> pgTAP de retirar e editar (só a mesa); Playwright adotar, retirar e adotar outra.</p>
+</section>
+
+<section class="item g1">
+  <div class="item-topo"><span class="num">6</span><h3>Lista de quem votou a favor e contra</h3></div>
+  <p class="pills"><span class="pill cheia">Esforço P</span><span class="pill">Impacto médio-alto</span></p>
+  <p class="obs">Das ideias extras, a que você escolheu para agora.</p>
+  <p><span class="rot">Hoje.</span> Todo o comitê já pode ler os votos (o banco trata as placas como públicas). A grade com o voto de cada delegação (<code>ui/GradeVotos.svelte</code>) só aparece no painel da presidência e no telão, e só com a votação aberta. O delegado vê apenas o resultado em texto, e só da última votação da sessão.</p>
+  <p><span class="rot">Proposta.</span></p>
+  <ul>
+    <li>No resultado, para todos: “A favor (9): …”, “Contra (3): …”, “Abstenção (2): …”, “Não votaram: …”, com bandeiras.</li>
+    <li>Histórico “Votações da sessão” (e do comitê), cada uma abrindo a sua lista.</li>
+    <li>No telão, a lista fica alguns segundos depois de encerrada a votação.</li>
+  </ul>
+  <p><span class="rot">Testes.</span> Vitest do agrupamento; Playwright: depois de encerrada, o delegado vê o seu país na coluna certa.</p>
+</section>
+
+<section class="item g1">
+  <div class="item-topo"><span class="num">7</span><h3>Bloqueio de bilhetes entre delegações</h3></div>
+  <p class="pills"><span class="pill cheia">Esforço P</span><span class="pill">Impacto médio</span></p>
+  <p class="obs">“Adicionar a opção de bloquear ‘bilhetes diplomáticos’.” Esclarecido: uma delegação bloquear outra (ex.: Israel e Irã).</p>
+  <p><span class="rot">Hoje.</span> A mesa pode bloquear todos os bilhetes do comitê ou passar a lê-los (<code>definir_bilhetes</code>, tela Mensagens). Uma delegação não consegue bloquear outra.</p>
+  <p><span class="rot">Proposta.</span></p>
+  <ul>
+    <li>Tabela de bloqueios (comitê, quem bloqueia, quem foi bloqueada), lida e alterada só pela própria delegação.</li>
+    <li>A função de envio recusa o bilhete se o destinatário bloqueou o remetente.</li>
+    <li>Botão “Bloquear bilhetes desta delegação” em Mensagens e, depois, na página da delegação (item 10). Desbloquear a qualquer momento.</li>
+    <li>A mesa vê a lista de bloqueios do comitê, sem poder desfazê-los.</li>
+  </ul>
+  <p><span class="rot">Decidido.</span> A delegação bloqueada fica sabendo: “A delegação de Israel não aceita bilhetes da sua delegação”. Cortar a comunicação é um gesto diplomático e pode até virar notícia.</p>
+  <p><span class="rot">Testes.</span> pgTAP: só a própria delegação bloqueia; envio recusado; desbloqueio. Tradução da nova mensagem de erro. Playwright de ponta a ponta.</p>
+</section>
+
+<section class="item g1">
+  <div class="item-topo"><span class="num">8</span><h3>Botões de voltar</h3></div>
+  <p class="pills"><span class="pill cheia">Esforço P</span><span class="pill">Impacto médio</span></p>
+  <p class="obs">“Botões de voltar/retornar.”</p>
+  <p><span class="rot">Hoje.</span> Só a tela de regras (“Voltar ao comitê”) e as de impressão têm volta. As subtelas (painel da presidência, chamada, agenda, documento, notícia) dependem do menu ou do botão do navegador, que não existe no app instalado no celular.</p>
+  <p><span class="rot">Proposta.</span> Uma trilha curta no topo de toda subtela (“UNOCT › Sessão › Presidência”), feita uma vez no layout a partir do endereço. No celular, só “‹ Sessão”.</p>
+  <p><span class="rot">Testes.</span> Playwright de navegação nos 3 tamanhos; axe.</p>
+</section>
+
+<section class="item g1">
+  <div class="item-topo"><span class="num">9</span><h3>Nome Diplomacy e novo logo</h3></div>
+  <p class="pills"><span class="pill cheia">Esforço P + design</span><span class="pill">Impacto médio</span></p>
+  <p class="obs">“Melhorar os ícones e imagens, como o logo por exemplo. O aplicativo provavelmente vai se chamar Diplomacy, enquanto o evento é o UFRGSMUN.”</p>
+  <p><span class="rot">Hoje.</span> O ícone é um “U” branco num quadrado azul (<code>static/favicon.svg</code>). “UFRGSMUN” está fixo no cabeçalho, no manifest do app e no título de todas as páginas.</p>
+  <p><span class="rot">Proposta.</span></p>
+  <ul>
+    <li><b>Diplomacy</b> é a marca do app: logo, ícone, nome ao instalar, tela de entrada.</li>
+    <li><b>UFRGSMUN</b> é o evento: o nome vem do banco e aparece no cabeçalho e nos títulos.</li>
+    <li>Logo sóbrio: monograma ou emblema em linha fina, azul-marinho com dourado discreto, sem o emblema da ONU.</li>
+    <li>Ícones em todos os tamanhos (192, 512, maskable, Apple).</li>
+  </ul>
+  <p><span class="rot">Decidido.</span> O logo é proposto no passo 27, em três opções em SVG: a placa (recomendada), o selo, e globo e pena.</p>
+  <p><span class="rot">Testes.</span> Capturas de referência refeitas; teste de que nenhuma tela fixa o nome do evento.</p>
+</section>
+
+<section class="item g1">
+  <div class="item-topo"><span class="num">10</span><h3>Página da delegação</h3></div>
+  <p class="pills"><span class="pill cheia">Esforço M</span><span class="pill">Impacto alto</span><span class="pill">Resolve 5 observações</span></p>
+  <p class="obs">“Ser possível ver o perfil de cada delegado ao clicar em seu país” · “Acessar o DPO de qualquer delegação mais facilmente” · “Em alguns comitês, uma delegação pode ter mais de um delegado” · “Melhorar tela de perfil (foto?, dados da delegação)” · “Maior integração entre componentes”.</p>
+  <p><span class="rot">Hoje.</span></p>
+  <ul>
+    <li>Na tela do comitê, os países são uma lista sem link.</li>
+    <li>O DPO de outra delegação só aparece no fim da tela de DPO, com um link “Imprimir”, e só se o comitê abriu os DPOs aprovados.</li>
+    <li>O banco aceita mais de um delegado por delegação (no seed, os EUA têm dois), mas nenhuma tela mostra quem são.</li>
+    <li>O perfil tem foto, nome, minibiografia e idioma, mas não os dados da delegação.</li>
+  </ul>
+  <p><span class="rot">Proposta.</span> Uma página por delegação (<code>/comite/[sigla]/delegacao/[id]</code>) com:</p>
+  <ul>
+    <li>bandeira grande, nome oficial e situação (membro, observadora, suspensa);</li>
+    <li>os delegados, com foto, nome e minibiografia;</li>
+    <li>os DPOs (conforme a regra do comitê), as cartas públicas, as citações na press e os votos recentes (item 6);</li>
+    <li>ações: mandar bilhete, bloquear (item 7) e, depois, suas anotações sobre essa delegação (item 16).</li>
+  </ul>
+  <p>Todo nome de país no app vira link para essa página: lista do comitê, fila, lista de oradores, votos, documentos. O perfil ganha o bloco “Sua delegação”, com link para a página.</p>
+  <p><span class="rot">Privacidade.</span> Foto e minibiografia só para quem é do mesmo comitê (a regra <code>pode_ver_pessoa</code> já existe). Nada de e-mail.</p>
+  <p><span class="rot">Testes.</span> RLS: quem não é do comitê não vê. Playwright: clicar no país abre a página; axe.</p>
+</section>
+
+<!-- ============================ GRUPO 2 ============================ -->
+<h2 class="novo">2. Importantes e trabalhosos</h2>
+<p class="grupo-intro">O centro do plano. A ordem importa: os itens 11 a 13 mudam o fluxo da sessão, o 14 mostra esse fluxo no Agora, e o visual (19) vem por último porque os outros mudam a estrutura das telas.</p>
+
+<section class="item g2">
+  <div class="item-topo"><span class="num">11</span><h3>Cronômetros da presidência</h3></div>
+  <p class="pills"><span class="pill cheia">Esforço M</span><span class="pill">Impacto alto</span><span class="pill ouro">Correção</span></p>
+  <p class="obs">“Arrumar o tempo definido pela presidência.”</p>
+  <p><span class="rot">Hoje.</span> Há um só cronômetro por comitê.</p>
+  <ul>
+    <li>Os minutos do formal-informal e do informal-informal (<code>aplicar_forma</code>, <code>plenaria_e_votacao.sql:368</code>) e o tempo de fala (<code>dar_palavra</code>, <code>:401</code>) usam o mesmo cronômetro. Dar a palavra a alguém <b>apaga</b> o tempo do debate que a presidência definiu.</li>
+    <li>O campo “Tempo de fala” só vale na próxima vez que alguém recebe a palavra, sem nenhum aviso.</li>
+    <li>Os minutos do informal-informal são descontados inteiros no início, mesmo que ele acabe antes (<code>:361</code>).</li>
+    <li>Quando o tempo do informal acaba, nada acontece.</li>
+  </ul>
+  <p><span class="rot">Proposta.</span></p>
+  <ul>
+    <li>Dois relógios, o da fala e o do debate, visíveis no painel, na sessão do delegado e no telão. Cada um pausa sozinho.</li>
+    <li>Campo de tempo de fala com “Aplicar”, que vale para a fala atual e as próximas, e valores rápidos (30, 60, 90 s).</li>
+    <li>Fim do informal-informal: aviso no painel “Tempo esgotado · voltar ao formal-informal?”, com um toque.</li>
+    <li>Encerrado antes, desconta só os minutos usados.</li>
+  </ul>
+  <p><span class="rot">Testes.</span> Vitest do cálculo dos dois relógios; pgTAP: dar a palavra não mexe no tempo do debate, desconto parcial; Playwright no painel e no telão.</p>
+</section>
+
+<section class="item g2">
+  <div class="item-topo"><span class="num">12</span><h3>Moções e pontos em duas etapas</h3></div>
+  <p class="pills"><span class="pill cheia">Esforço M</span><span class="pill">Impacto alto</span></p>
+  <p class="obs">“O fluxo normal de moções e pontos é: uma delegação levanta sua placa, apresenta seu ponto ou moção, o bureau (não são uma delegação) aprova ou recusa, então a presidência (uma das delegações) concede.”</p>
+  <p><span class="rot">Hoje.</span> A delegação envia (<code>enviar_ponto</code>) e quem preside, seja a mesa ou a delegação da vez, aceita ou recusa num passo só (<code>responder_ponto</code>). O app não separa julgar se está em ordem (bureau) de conceder (presidência).</p>
+  <p><span class="rot">Proposta.</span> O fluxo real, com as etapas à vista:</p>
+  <ol>
+    <li>A delegação apresenta. Situação: <i>aguardando o bureau</i>.</li>
+    <li>O bureau marca <i>em ordem</i> ou <i>fora de ordem</i> (com motivo).</li>
+    <li>A presidência concede: abre a votação, a lista especial ou aplica.</li>
+  </ol>
+  <ul>
+    <li>O bureau vê só a fila do que julgar; a presidência vê só o que o bureau admitiu.</li>
+    <li>O delegado vê em que etapa está o pedido dele; o telão mostra “Moção em análise”.</li>
+    <li>Quando o próprio bureau preside (plenária, fase de ação, mesa assumiu), as duas etapas viram um toque só.</li>
+  </ul>
+  <p><span class="rot">Decidido.</span> Pontos e moções, de todos os tipos, passam pelo bureau e só depois a presidência concede.</p>
+  <p><span class="rot">Testes.</span> pgTAP das permissões de cada etapa; Playwright de uma moção do envio à votação.</p>
+</section>
+
+<section class="item g2">
+  <div class="item-topo"><span class="num">13</span><h3>Debate rápido: “há pontos ou moções?” e lista de fala</h3></div>
+  <p class="pills"><span class="pill cheia">Esforço M</span><span class="pill">Impacto alto</span><span class="pill">Depende de 11 e 12</span></p>
+  <p class="obs">“O debate é dinâmico. Tudo vai rápido. Hoje uma delegação para de falar, há um tempo para perguntar se há moções ou pontos, e depois aqueles que querem falar levantam as placas. O app deve imitar isso, ser rápido, dinâmico e intuitivo. Não substituir a parte física do evento, mas ajudá-la.” · “A lista de fala deve ser implementada.”</p>
+  <p><span class="rot">Hoje.</span> Quando a fala termina, o app só zera o orador. As placas levantadas formam a fila “Pedidos de fala”, por ordem de chegada, e a presidência dá a palavra a qualquer uma. A lista de oradores só existe na plenária de abertura e nas listas especiais (2 a favor, 2 contra).</p>
+  <p><span class="rot">Proposta.</span> Imitar o ritmo da sala:</p>
+  <ol>
+    <li><b>Fala.</b> Relógio da fala correndo.</li>
+    <li><b>“Há pontos ou moções?”</b> Ao encerrar a fala, telão e celulares mostram isso em destaque por alguns segundos (configurável, padrão 10 a 15 s), com o botão de ponto ou moção em primeiro plano.</li>
+    <li><b>Placas.</b> Quem quer falar levanta. A presidência escolhe 2 a 4 de uma vez, formando uma lista curta numerada no telão (“Próximos: Brasil, França, Japão”). Enter passa ao próximo.</li>
+  </ol>
+  <p>Os atalhos de teclado do painel continuam valendo.</p>
+  <p><span class="rot">Padrão adotado.</span> Pausa de 10 s (regra configurável; 0 desliga). As placas continuam levantadas entre as falas, e a presidência tem “Baixar todas”.</p>
+  <p><span class="rot">Testes.</span> Vitest da sequência fala → pausa → placas → fala; Playwright com 3 delegações; captura do telão.</p>
+</section>
+
+<section class="item g2">
+  <div class="item-topo"><span class="num">14</span><h3>Aba Agora e menu por papel</h3></div>
+  <p class="pills"><span class="pill cheia">Esforço M–G</span><span class="pill">Impacto alto</span><span class="pill">Melhor depois de 11–13</span></p>
+  <p class="obs">“A aba Agora é meio inútil, ela deve ficar mais importante e ‘decorada’.” · “UI diferenciada para cada delegação e role.” · “Maior integração entre componentes.”</p>
+  <p><span class="rot">Hoje.</span> O Agora mostra cronograma, avisos, respostas de crise, citações na press, DPOs e “Você”. Não mostra a sessão, embora o app já tenha esses dados em tempo real. O menu é o mesmo para quase todos (só “Crise” e “Participantes” dependem do papel). A mesa chega ao painel por botões no fim da tela Sessão.</p>
+  <p><span class="rot">Proposta.</span> O Agora vira o painel principal, diferente para cada papel:</p>
+  <ul>
+    <li><b>Delegado:</b> cartão grande da sessão ao vivo (quem fala, os dois relógios, sua placa, posição na fila, votação aberta com os botões); notas de crise e bilhetes não lidos; prazos (DPO, rodada do documento); próximo item do cronograma.</li>
+    <li><b>Delegação que preside:</b> “Você preside a sessão 3”, com botão para o painel.</li>
+    <li><b>Mesa:</b> atalhos para abrir a sessão, o painel, os DPOs a avaliar e os documentos enviados.</li>
+    <li><b>Press:</b> pautas do dia, entrevistas marcadas, últimas notícias.</li>
+    <li><b>Crise:</b> fila de notas e prazo da crise ativa.</li>
+    <li><b>Secretaria:</b> check-in e avisos.</li>
+  </ul>
+  <p>O menu também muda com o papel (por exemplo, a mesa tem “Painel” no lugar de “Sessão”). Visual de capa: timbre do comitê, data e número da sessão.</p>
+  <p><span class="rot">Testes.</span> Playwright por papel (o que cada um vê); capturas nos 3 tamanhos.</p>
+</section>
+
+<section class="item g2">
+  <div class="item-topo"><span class="num">15</span><h3>Crise com prazo</h3></div>
+  <p class="pills"><span class="pill cheia">Esforço M–G</span><span class="pill">Impacto alto</span></p>
+  <p class="obs">“As crises se tratam de momentos tensos e inesperados, normalmente com um limite de tempo. No UNOCT, por exemplo, o delegado russo foi ‘assassinado’ por rebeldes do Sahel […] e os delegados tiveram um certo tempo para ‘negociar’ com esses rebeldes. No Conselho Europeu, o representante da Polônia foi sequestrado pela Rússia e o Conselho teve que reagir a isso em determinado tempo.”</p>
+  <p><span class="rot">Hoje.</span> A crise tem notas e diretivas das delegações, com fila e resposta da equipe, e atualizações em texto para um ou mais comitês, com 5 minutos de destaque no telão. Não há prazo, contagem regressiva nem efeito sobre uma delegação.</p>
+  <p><span class="rot">Proposta.</span> Um <b>incidente de crise</b>, lançado pela equipe:</p>
+  <ul>
+    <li>Título, briefing, imagem opcional e prazo (ex.: 20 minutos). Pode valer para vários comitês, como as atualizações já valem.</li>
+    <li>Telão em modo crise: tela cheia, contagem regressiva, faixa “URGENTE”. No celular, alerta e cartão no Agora.</li>
+    <li>Efeitos opcionais sobre delegações: “delegado assassinado” ou “sequestrado” deixa a delegação sem voz (placa e pontos bloqueados) por um tempo ou até a crise se resolver.</li>
+    <li>No fim do prazo, a equipe registra o desfecho (resolvido ou fracassou) e publica uma atualização.</li>
+  </ul>
+  <p><span class="rot">Padrão adotado.</span> A atingida fica sem placa, pontos, votos e assinatura de moção, mas continua mandando notas de crise e bilhetes, porque a negociação acontece por aí. A crise não pausa a sessão sozinha: a mesa decide.</p>
+  <p><span class="rot">Testes.</span> pgTAP: só a equipe de crise lança; o efeito bloqueia a delegação; fim do prazo. Playwright com o telão; captura.</p>
+</section>
+
+<section class="item g2">
+  <div class="item-topo"><span class="num">16</span><h3>Caderno da delegação</h3></div>
+  <p class="pills"><span class="pill cheia">Esforço M</span><span class="pill">Impacto médio-alto</span></p>
+  <p class="obs">“Anotações individuais de cada delegação em relação a outras delegações.” · “Algum sistema que ajude as pessoas a anotar seus pensamentos e montar suas falas ao longo do debate (?) — Como? Qual?”</p>
+  <p><span class="rot">Hoje.</span> Não há nada para anotar no app.</p>
+  <p><span class="rot">Proposta.</span> Um caderno dos delegados da mesma delegação. A mesa nunca lê, e as outras delegações só leem o que for compartilhado com elas.</p>
+  <ul>
+    <li><b>Sobre outras delegações:</b> posição, aliados, o que disseram. Aparece também, só para você, na página de cada delegação (item 10).</li>
+    <li><b>Notas rápidas na sessão:</b> um campo sempre à mão na tela da sessão. Cada nota guarda o tópico e quem estava falando.</li>
+    <li><b>Rascunho de fala:</b> texto com a duração estimada comparada ao tempo de fala atual (“~1 min 20 s de 1 min 30 s”) e o botão “Usar na próxima fala”, que mostra o texto em letra grande.</li>
+    <li><b>Compartilhar:</b> cada anotação pode ser compartilhada, só para leitura, com as delegações escolhidas (EUA e Israel, por exemplo).</li>
+  </ul>
+  <p>Funciona sem internet (a caixa de saída já existe). Entra em “Meus dados” e é apagado junto com os dados do evento.</p>
+  <p><span class="rot">Testes.</span> RLS: outras delegações e a mesa não leem; Vitest da estimativa; Playwright sem conexão.</p>
+</section>
+
+<section class="item g2">
+  <div class="item-topo"><span class="num">17</span><h3>Números e telas clicáveis</h3></div>
+  <p class="pills"><span class="pill cheia">Esforço M</span><span class="pill">Impacto médio</span><span class="pill">Depende de 10</span></p>
+  <p class="obs">“Mais interatividade. Muitas telas e números, mas quase nenhum pode ser clicado e interagido.”</p>
+  <p><span class="rot">Hoje.</span> Muitos números e nomes são só texto: “Presentes: 12 de 15”, o quórum, “9 de 15 votaram”, as contagens de assinaturas, os nomes de países nas listas.</p>
+  <p><span class="rot">Proposta.</span> Regra geral: todo número abre o que ele conta e todo nome de país abre a página da delegação. Por exemplo:</p>
+  <ul>
+    <li>presentes abre a lista de presentes e ausentes;</li>
+    <li>votos abre quem votou (item 6); assinaturas abre quem assinou;</li>
+    <li>posição na fila abre a fila; tópico em debate abre a agenda adotada.</li>
+  </ul>
+  <p>Feito como um componente pequeno e reaproveitado: o número e o painel que ele abre.</p>
+  <p><span class="rot">Testes.</span> Playwright em algumas telas; axe (o painel que abre é acessível pelo teclado).</p>
+</section>
+
+<section class="item g2">
+  <div class="item-topo"><span class="num">18</span><h3>Agenda antes das resoluções</h3></div>
+  <p class="pills"><span class="pill cheia">Esforço M</span><span class="pill">Impacto médio-alto</span><span class="pill">Depende de 5</span></p>
+  <p class="obs">“Os delegados devem ser capazes de debater primeiro a agenda de cada tópico para então depois discutir resolutions.”</p>
+  <p><span class="rot">Hoje.</span> A ordem dos tópicos sai da moção na plenária, e as propostas de agenda informal ficam separadas por tópico. Mas blocos e documentos podem ser criados a qualquer momento, sem relação com a agenda.</p>
+  <p><span class="rot">Proposta.</span> Para cada tópico, etapas visíveis:</p>
+  <ol>
+    <li>Debate da agenda (propostas e junção, item 5).</li>
+    <li>Agenda adotada.</li>
+    <li>Blocos e working papers ligados aos itens da agenda (A.1, A.3), como nos documentos reais do UNOCT.</li>
+    <li>Projeto de resolução.</li>
+  </ol>
+  <p>O banco impede criar um projeto de resolução antes da agenda adotada do tópico.</p>
+  <p><span class="rot">Decidido.</span> A agenda é sempre a primeira coisa a ser debatida: impedir, sem regra configurável. Como ficou simples, foi para o passo 22, junto com o item 5.</p>
+  <p><span class="rot">Testes.</span> pgTAP da regra; Playwright do caminho agenda → documento.</p>
+</section>
+
+<section class="item g2">
+  <div class="item-topo"><span class="num">19</span><h3>Visual geral</h3></div>
+  <p class="pills"><span class="pill cheia">Esforço G</span><span class="pill">Impacto alto</span><span class="pill">Por último no grupo</span></p>
+  <p class="obs">“Melhorar o estilo geral. Muito básico agora. Manter a ‘austeridade’, profissionalismo e aspecto ‘premium’ de documentos diplomáticos.” · “Melhorar visual geral das telas.” · “Textos, exceto as mensagens ‘secretas’ entre delegações, devem ter um aspecto formal e ‘bonito’ para imersão dos delegados.” · “Melhorar detalhes do perfil e página no geral.” · “Pode-se melhorar o cronograma, deixá-lo mais bonito e visível.”</p>
+  <p><span class="rot">Hoje.</span> A base da aparência está definida (<code>app.css</code>: cores, fontes, serifa nos títulos, selos), mas o resultado ficou básico. O cronograma é uma lista simples por dia. DPOs, cartas e resoluções só ficam bonitos na impressão; na tela, aparecem como texto comum.</p>
+  <p><span class="rot">Proposta.</span> Manter a austeridade e o aspecto de documento oficial:</p>
+  <ul>
+    <li><b>Timbre</b> no topo das telas: evento, comitê, código do documento, data, linha fina dupla.</li>
+    <li><b>Documentos na tela</b> com o formato da impressão: folha clara, margens, serifa, cláusulas numeradas, assinaturas. Os bilhetes entre delegações continuam no estilo de conversa.</li>
+    <li><b>Hierarquia:</b> um destaque por tela e menos botões iguais lado a lado.</li>
+    <li><b>Selos</b> tipo carimbo para status (aprovado, em votação), com moderação.</li>
+    <li><b>Cronograma</b> em linha do tempo por dia, com marcador de “agora”, tipos (sessão, intervalo, cerimônia) e o comitê como etiqueta.</li>
+    <li><b>Perfil</b> como uma credencial: foto em moldura, bandeira, comitê.</li>
+    <li><b>Telão</b> com letra maior e o modo crise (item 15). Tema escuro revisto.</li>
+  </ul>
+  <p>Primeiro os componentes compartilhados (timbre, cartão, documento, selo), depois as telas na ordem de uso: sessão, Agora, comitê, documentos, press.</p>
+  <p><span class="rot">Testes.</span> Capturas de referência refeitas no CI; axe com contraste nos dois temas.</p>
+</section>
+
+<!-- ============================ GRUPO 3 ============================ -->
+<h2 class="novo">3. Fáceis e menos importantes</h2>
+<p class="grupo-intro">Bons para encaixar entre os itens grandes, como pausa, ou quando alguém do UFRGSMUN pedir.</p>
+
+<section class="item g3">
+  <div class="item-topo"><span class="num">20</span><h3>Press: WhatsApp, X e Instagram</h3></div>
+  <p class="pills"><span class="pill cheia">Esforço P</span><span class="pill">Impacto baixo-médio</span></p>
+  <p class="obs">“Opção da press compartilhar para Twitter, Instagram, Whatsapp.”</p>
+  <p><span class="rot">Hoje.</span> A notícia gera imagem para post e story (<code>src/lib/imagem-redes.ts</code>). No celular, o botão abre o compartilhamento do sistema com imagem e legenda (<code>press/[sigla]/+page.svelte:43</code>), e dali vai para Instagram, WhatsApp e X. No notebook, só baixa a imagem.</p>
+  <p><span class="rot">Proposta.</span> Botões diretos “WhatsApp” e “X” com o texto pronto, e “Copiar legenda” com as hashtags do evento. No notebook: baixa a imagem e abre o link. O Instagram não aceita link direto de postagem, então continua pelo compartilhamento do sistema.</p>
+  <p><span class="rot">Testes.</span> Vitest dos links gerados; Playwright dos botões.</p>
+</section>
+
+<section class="item g3">
+  <div class="item-topo"><span class="num">21</span><h3>Bureau no lugar de uma delegação ausente</h3></div>
+  <p class="pills"><span class="pill cheia">Esforço P–M</span><span class="pill">Impacto médio</span></p>
+  <p class="obs">“Possibilidade do bureau também adotar a identidade de um país caso um participante falte, por exemplo.”</p>
+  <p><span class="rot">Hoje.</span> A mesa já registra votos de placa (<code>registrar_voto</code>) e, nos comitês com tecnologia restrita, pedidos de fala (<code>registrar_pedido_fala</code>).</p>
+  <p><span class="rot">Proposta.</span> “Representar delegação”: a mesa escolhe uma delegação e, enquanto a representa, pode levantar a placa, enviar pontos e moções, votar e assinar em nome dela. Tudo fica marcado como “pela mesa” e vai para o histórico. Reaproveita o que já existe para a tecnologia restrita.</p>
+  <p><span class="rot">Decidido.</span> Sem muitas regras: qualquer pessoa da mesa do comitê assume qualquer delegação, e tudo fica registrado.</p>
+  <p><span class="rot">Testes.</span> pgTAP: só a mesa representa, e a ação fica registrada; Playwright.</p>
+</section>
+
+<section class="item g3">
+  <div class="item-topo"><span class="num">22</span><h3>Revisar os tipos de debate</h3></div>
+  <p class="pills"><span class="pill cheia">Esforço P</span><span class="pill">Impacto depende da regra</span><span class="pill ouro">Decisão de regra</span></p>
+  <p class="obs">“Há diferentes tipos de debate, reveja-os.”</p>
+  <p><span class="rot">Hoje.</span> O app tem formal-formal (só na plenária), formal-informal (o fluxo normal) e informal-informal (por moção, até 45 minutos). São exatamente as formas das regras do UNOCT, adotadas para todos os comitês (<code>docs/regras-de-procedimento.md:43</code>). O limite de 45 minutos vale para a soma de cada sessão (confirmado), como o app já faz.</p>
+  <p><span class="rot">Proposta.</span> Revisar com as regras do UFRGSMUN 2027 se entra alguma forma nova, como o debate moderado, com tema e tempo de fala próprios, comum em outros MUNs. Se entrar, a estrutura já existe (forma, minutos e lista), e o esforço passa a M.</p>
+</section>
+
+<section class="item g3">
+  <div class="item-topo"><span class="num">23</span><h3>Melhorias de uso</h3></div>
+  <p class="pills"><span class="pill cheia">Esforço P cada</span><span class="pill">Impacto médio, somadas</span></p>
+  <p class="obs">“Várias melhorias de quality of life.”</p>
+  <p><span class="rot">Proposta.</span> Onze melhorias, detalhadas no passo 38: tela sempre acesa na sessão; aviso de “sua vez”; votação aberta que chama a atenção; retirar o próprio ponto ou moção; rascunhos guardados no aparelho; filtro nas listas longas de delegações; contador de caracteres; confirmação do que não tem volta; hora relativa; tema claro ou escuro escolhido; telão em tela cheia com uma tecla. Outras vêm do piloto, com o questionário de <code>docs/piloto.md</code>.</p>
+</section>
+
+<!-- ============================ GRUPO 4 ============================ -->
+<h2 class="novo">4. Difíceis e pouco importantes agora</h2>
+<p class="grupo-intro">Deixar para depois. Cada um traz o motivo e o que fazer no lugar.</p>
+
+<section class="item g4">
+  <div class="item-topo"><span class="num">24</span><h3>Edição ao vivo do mesmo texto</h3></div>
+  <p class="pills"><span class="pill cheia">Esforço GG</span><span class="pill">Impacto baixo agora</span></p>
+  <p class="obs">“Capacidade de editar o mesmo texto de forma colaborativa, considerando as diferentes posições, comentários, etc.” · “Documento público que pode ser editado já está feito?”</p>
+  <p><span class="rot">Hoje.</span> Sim, o documento colaborativo já existe (<code>documento/[id]</code>), no modelo por cláusula:</p>
+  <ul>
+    <li>o redator edita; os outros propõem alterações e comentam cada cláusula;</li>
+    <li>rodadas de revisão com prazo, cláusulas acordadas travadas, assinaturas;</li>
+    <li>caminho bloco → mesa → comitê.</li>
+  </ul>
+  <p>Se duas pessoas editam a mesma cláusula ao mesmo tempo, a segunda é recusada. Não é edição simultânea, como no Google Docs.</p>
+  <p><span class="rot">Por que deixar para depois.</span> Edição simultânea exige uma biblioteca de colaboração em tempo real, sincronização própria e muito teste, e vai contra o app leve para internet ruim. O modelo por cláusula já cobre posições e comentários, e ainda ataca a maior dor do evento, as revisões sem fim.</p>
+  <p><span class="rot">No lugar.</span> Melhorias pequenas no editor atual: mostrar quem está editando qual cláusula, aceitar uma sugestão com um toque, visual de documento (item 19).</p>
+</section>
+
+<section class="item g4">
+  <div class="item-topo"><span class="num">25</span><h3>Outros eventos e outras regras</h3></div>
+  <p class="pills"><span class="pill cheia">Esforço GG</span><span class="pill">Impacto baixo agora</span></p>
+  <p class="obs">“Pode ser que o aplicativo se estenda além do UFRGSMUN, então ele deve ser fácil de configurar para diferentes regras e convenções. E cada evento coloca seu nome, staff, etc. Isso é mais no futuro.”</p>
+  <p><span class="rot">Hoje.</span> A base existe: tabela de eventos, regras padrão por evento com ajuste por comitê, cópia de um evento para outro.</p>
+  <p><span class="rot">Por que deixar para depois.</span> Só vale a pena com um segundo evento interessado. Até lá, basta não amarrar mais nada ao UFRGSMUN (o item 9 já tira o nome fixo). Quando chegar a hora, faltarão: configuração do evento (nome, logo, cores, staff), editor de regras, convites por evento e a questão de hospedagem e custo.</p>
+</section>
+
+<section class="item g4">
+  <div class="item-topo"><span class="num">26</span><h3>Habilidades especiais para delegações</h3></div>
+  <p class="pills"><span class="pill cheia">Esforço M</span><span class="pill">Não recomendado</span></p>
+  <p class="obs">“Habilidades especiais para algumas delegações (?) — Talvez ruim, introduz preferências. Ex: Mossad israelense. Tecnologia americana. Militar russo.”</p>
+  <p><span class="rot">Por que não fazer como regra do app.</span></p>
+  <ul>
+    <li><b>O UFRGSMUN já escolheu a igualdade.</b> O guia tirou o veto dos P5 no CSNU, que é a habilidade especial mais forte do mundo real.</li>
+    <li><b>A sorte de qual país você recebe passaria a pesar mais.</b> Com 147 delegações, alguém teria que equilibrar e justificar todo ano quem tem habilidade e quem não tem. É trabalho para o secretariado e motivo de reclamação.</li>
+    <li><b>A crise já cobre isso.</b> Numa nota ou diretiva, a delegação escreve “nossa inteligência infiltra os rebeldes”, e a equipe de crise julga se é realista para aquele país. A tecnologia americana e o poder militar russo já entram assim, pelo critério da equipe, sem regra fixa no app.</li>
+  </ul>
+</section>
+
+<!-- ============================ ORDEM ============================ -->
+<h2 class="novo">Ordem sugerida de execução</h2>
+<p>Da mais fácil e importante à mais difícil e menos importante. Os itens do grupo 3 entram como pausa entre os grandes.</p>
+<table class="etapas">
+  <thead><tr><th>Etapa</th><th>Itens → passos</th><th>Por quê</th></tr></thead>
+  <tbody>
+        <tr><td>A · Base</td><td>1, 2 → 20</td><td>O “porquê” decide o que fica de fora; os dados realistas servem para testar todo o resto.</td></tr>
+    <tr><td>B · Sessão sem atrito</td><td>3, 4 → 21 · 5, 18 → 22 · 6 → 23 · 7 → 24 · 8 → 25</td><td>Pequenos e visíveis: corrigem as queixas diretas sobre chamada, agenda e navegação.</td></tr>
+    <tr><td>C · Ligar as telas</td><td>10 → 26 · 9 → 27</td><td>A página da delegação é o ponto onde outros itens se penduram; o nome e o logo entram junto.</td></tr>
+    <tr><td>D · O debate</td><td>11 → 28 · 12 → 29 · 13, 22 → 30 · 21 → 31</td><td>O coração do app, nessa ordem: relógios, depois moções, depois o ritmo; o bureau no lugar do ausente mexe nas mesmas funções.</td></tr>
+    <tr><td>E · App vivo</td><td>14 → 32 · 17 → 33 · 16 → 34</td><td>Com o fluxo pronto, o Agora mostra a sessão; números clicáveis e caderno completam.</td></tr>
+    <tr><td>F · Imersão</td><td>15 → 35 · 20 → 36 · 19 → 37</td><td>Crise com prazo e o visual por último: os itens anteriores mudam a estrutura das telas.</td></tr>
+    <tr><td>Junto</td><td>23 → 38</td><td>Cada melhoria de uso pode entrar no passo que mexe na mesma tela.</td></tr>
+    <tr><td>Depois</td><td>24, 25</td><td>Edição ao vivo e outros eventos, quando houver motivo.</td></tr>
+    <tr><td>Não fazer</td><td>26</td><td>Habilidades especiais ficam com o julgamento da equipe de crise, sem regra fixa no app.</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================ APÊNDICES ============================ -->
+<h2>Apêndice A · Respostas diretas</h2>
+<table>
+  <thead><tr><th>Pergunta</th><th>Resposta</th></tr></thead>
+  <tbody>
+    <tr><td>Documento público que pode ser editado já está feito?</td><td>Sim, por cláusula, com propostas, comentários, rodadas e assinaturas. Não é edição simultânea (item 24).</td></tr>
+    <tr><td>Dá para bloquear bilhetes?</td><td>A mesa já bloqueia os bilhetes do comitê inteiro. Uma delegação bloquear outra é o item 7.</td></tr>
+    <tr><td>Uma delegação pode ter mais de um delegado?</td><td>O banco já aceita (no seed, os EUA têm dois). Falta mostrar quem são (item 10).</td></tr>
+    <tr><td>Os tipos de debate estão certos?</td><td>São os três das regras do UNOCT. Mudar é decisão de regra (item 22).</td></tr>
+    <tr><td>A lista de fala existe?</td><td>Na plenária e nas listas especiais, sim. No formal-informal é uma fila de placas; a lista curta é o item 13.</td></tr>
+    <tr><td>A press compartilha nas redes?</td><td>Sim, pelo compartilhamento do sistema no celular. Botões diretos e o notebook ficam no item 20.</td></tr>
+  </tbody>
+</table>
+
+<h2>Apêndice B · Ideias para depois</h2>
+<p>Surgiram na investigação (“outras possibilidades que podem ajudar os delegados” e “para o UFRGSMUN”). Você escolheu só a lista de votos para agora (item 6); as outras ficam registradas aqui:</p>
+<ul>
+  <li><b>“O que perdi”:</b> resumo do que aconteceu na sessão desde a última vez que o delegado abriu o app.</li>
+  <li><b>Mapa de alianças:</b> quem vota com quem ao longo do evento, a partir do histórico do item 6.</li>
+  <li><b>Por que essa moção não aparece:</b> explicar por que só certas moções estão disponíveis agora (o filtro por fase já existe).</li>
+  <li><b>Verbos de cláusula no caderno:</b> a lista de verbos preambulares e operativos (<code>src/lib/verbos.ts</code>) à mão ao escrever.</li>
+  <li><b>Falas por delegação:</b> quantas vezes cada uma falou, para o bureau ver se a presidência distribui a palavra de forma justa. Precisa registrar as falas, o que o app ainda não faz.</li>
+  <li><b>Página pública ao vivo:</b> um telão somente leitura para família e redes.</li>
+  <li><b>Apresentação no primeiro dia:</b> usar o horário de “mock and rules” para ensinar o app aos delegados.</li>
+</ul>
+
+<h2>Apêndice C · De onde veio cada item</h2>
+<table>
+  <thead><tr><th>#</th><th>Observação</th><th>Itens</th></tr></thead>
+  <tbody>
+    <tr><td class="n">1</td><td>Maior integração entre componentes</td><td>10, 14, 17</td></tr>
+    <tr><td class="n">2</td><td>Melhorar detalhes do perfil e página no geral</td><td>10, 19</td></tr>
+    <tr><td class="n">3</td><td>UI diferenciada para cada delegação e role</td><td>14</td></tr>
+    <tr><td class="n">4</td><td>Arrumar o tempo definido pela presidência</td><td>11</td></tr>
+    <tr><td class="n">5</td><td>Anotações individuais sobre outras delegações</td><td>16</td></tr>
+    <tr><td class="n">6</td><td>Acessar o DPO de qualquer delegação mais facilmente</td><td>10</td></tr>
+    <tr><td class="n">7</td><td>Melhorar o estilo geral (austeridade, aspecto premium)</td><td>19</td></tr>
+    <tr><td class="n">8</td><td>Botões de voltar/retornar</td><td>8</td></tr>
+    <tr><td class="n">9</td><td>Documento público que pode ser editado já está feito?</td><td>24, Apêndice A</td></tr>
+    <tr><td class="n">10</td><td>Press compartilhar para Twitter, Instagram, WhatsApp</td><td>20</td></tr>
+    <tr><td class="n">11</td><td>Mais interatividade: números clicáveis</td><td>17</td></tr>
+    <tr><td class="n">12</td><td>Agenda e tópicos: adotar, mas não retirar</td><td>5, 18</td></tr>
+    <tr><td class="n">13</td><td>O debate é dinâmico; o app deve imitar o ritmo</td><td>13</td></tr>
+    <tr><td class="n">14</td><td>Fluxo de moções e pontos: bureau, depois presidência</td><td>12</td></tr>
+    <tr><td class="n">15</td><td>Aceitar delegação que chega no meio da sessão</td><td>4</td></tr>
+    <tr><td class="n">16</td><td>Sistema para anotar pensamentos e montar falas</td><td>16</td></tr>
+    <tr><td class="n">17</td><td>A chamada não é intuitiva</td><td>3</td></tr>
+    <tr><td class="n">18</td><td>Melhorar início e fim de cada sessão</td><td>3</td></tr>
+    <tr><td class="n">19</td><td>Cronograma mais bonito e visível</td><td>19</td></tr>
+    <tr><td class="n">20</td><td>Tela de perfil (foto, dados da delegação)</td><td>10, 19</td></tr>
+    <tr><td class="n">21</td><td>Mais de um delegado por delegação</td><td>10</td></tr>
+    <tr><td class="n">22</td><td>Ver o perfil de cada delegado ao clicar no país</td><td>10</td></tr>
+    <tr><td class="n">23</td><td>Por que o UFRGSMUN, o delegado, o bureau e a presidência usariam?</td><td>1</td></tr>
+    <tr><td class="n">24</td><td>A lista de fala deve ser implementada</td><td>13</td></tr>
+    <tr><td class="n">25</td><td>Há diferentes tipos de debate, reveja-os</td><td>22</td></tr>
+    <tr><td class="n">26</td><td>Bureau adotar a identidade de um país ausente</td><td>21</td></tr>
+    <tr><td class="n">27</td><td>Melhorar visual geral das telas</td><td>19</td></tr>
+    <tr><td class="n">28</td><td>Refazer comitês e perfis e popular o banco para teste</td><td>2</td></tr>
+    <tr><td class="n">29</td><td>Crises: momentos tensos com limite de tempo</td><td>15</td></tr>
+    <tr><td class="n">30</td><td>Várias melhorias de quality of life</td><td>23</td></tr>
+    <tr><td class="n">31</td><td>Ícones, imagens e logo; nome Diplomacy</td><td>9</td></tr>
+    <tr><td class="n">32</td><td>A aba Agora é meio inútil</td><td>14</td></tr>
+    <tr><td class="n">33</td><td>Debater a agenda de cada tópico antes das resoluções</td><td>18</td></tr>
+    <tr><td class="n">34</td><td>Configurar para outros eventos e regras</td><td>25</td></tr>
+    <tr><td class="n">35</td><td>Editar o mesmo texto de forma colaborativa</td><td>24</td></tr>
+    <tr><td class="n">36</td><td>Textos com aspecto formal e bonito</td><td>19</td></tr>
+    <tr><td class="n">37</td><td>Bloquear bilhetes diplomáticos</td><td>7</td></tr>
+    <tr><td class="n">38</td><td>Outras possibilidades para os delegados</td><td>6, Apêndice B</td></tr>
+    <tr><td class="n">39</td><td>Outras possibilidades para o UFRGSMUN</td><td>Apêndice B</td></tr>
+    <tr><td class="n">40</td><td>Habilidades especiais para algumas delegações</td><td>26</td></tr>
+  </tbody>
+</table>
+
+</body>
+</html>

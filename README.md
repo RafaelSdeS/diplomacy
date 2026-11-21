@@ -49,7 +49,7 @@ Detalhes e justificativas na seção 16 do plano.
 
 ## Plano de implementação
 
-O app é construído em 19 passos, cada um com o seu plano: o que construir, banco, telas para celular e notebook, testes e quando está pronto. O índice, as convenções de código, a definição de pronto, a estratégia de testes e a aparência do app estão em [docs/implementacao/](docs/implementacao/README.md).
+O app é construído em passos, cada um com o seu plano: o que construir, banco, telas para celular e notebook, testes e quando está pronto. O índice, as convenções de código, a definição de pronto, a estratégia de testes e a aparência do app estão em [docs/implementacao/](docs/implementacao/README.md).
 
 Cada passo traz os testes que provam que ele funciona. Um passo só termina quando esses testes, e os de todos os passos anteriores, passam no CI.
 
@@ -76,12 +76,33 @@ Cada passo traz os testes que provam que ele funciona. Um passo só termina quan
 | [17](docs/implementacao/17-comunicacao-completa.md) | Comunicação completa |
 | [18](docs/implementacao/18-idiomas.md) | Idiomas |
 | [19](docs/implementacao/19-lgpd-e-pos-evento.md) | LGPD e pós-evento |
+| **Melhorias depois da revisão** ([PDF](docs/melhorias-pos-revisao.pdf)) | |
+| [20](docs/implementacao/20-proposta-e-demonstracao.md) | Proposta de valor e evento de demonstração |
+| [21](docs/implementacao/21-chamada-e-sessao.md) | Chamada, abertura e encerramento de sessão |
+| [22](docs/implementacao/22-agenda.md) | Agenda antes das resoluções |
+| [23](docs/implementacao/23-lista-de-votos.md) | Lista de votos |
+| [24](docs/implementacao/24-bloqueio-de-bilhetes.md) | Bloqueio de bilhetes entre delegações |
+| [25](docs/implementacao/25-trilha.md) | Trilha de navegação |
+| [26](docs/implementacao/26-pagina-da-delegacao.md) | Página da delegação |
+| [27](docs/implementacao/27-diplomacy-nome-e-logo.md) | Nome Diplomacy e logo |
+| [28](docs/implementacao/28-dois-cronometros.md) | Dois cronômetros |
+| [29](docs/implementacao/29-mocoes-em-duas-etapas.md) | Pontos e moções em duas etapas |
+| [30](docs/implementacao/30-debate-rapido.md) | Debate rápido |
+| [31](docs/implementacao/31-bureau-representa-delegacao.md) | Bureau no lugar de uma delegação ausente |
+| [32](docs/implementacao/32-agora-por-papel.md) | Aba Agora e menu por papel |
+| [33](docs/implementacao/33-numeros-clicaveis.md) | Números clicáveis |
+| [34](docs/implementacao/34-caderno-da-delegacao.md) | Caderno da delegação |
+| [35](docs/implementacao/35-crise-com-prazo.md) | Crise com prazo |
+| [36](docs/implementacao/36-press-nas-redes.md) | Press nas redes |
+| [37](docs/implementacao/37-visual-geral.md) | Visual geral |
+| [38](docs/implementacao/38-melhorias-de-uso.md) | Melhorias de uso |
 
 As fases do projeto (validação, piloto, evento e crescimento) e o calendário até a edição de 2027 estão na seção 17 do plano completo.
 
 ## Documentos
 
 - [Plano completo (PDF)](docs/plano-do-app.pdf): problema, módulos, regras, arquitetura, riscos e calendário.
+- [Melhorias depois da revisão (PDF)](docs/melhorias-pos-revisao.pdf): as observações da revisão, priorizadas por impacto e esforço; fonte em [HTML](docs/melhorias-pos-revisao.html), gerada do mesmo jeito.
 - [Fonte do plano (HTML)](docs/plano-do-app.html). Para gerar o PDF de novo:
 
   ```sh

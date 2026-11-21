@@ -46,7 +46,7 @@ Termina com a **moção de introdução do tópico no topo da agenda**.
 |---|---|---|
 | Formal-formal | Só na plenária de abertura | Lista de oradores |
 | Formal-informal | Fluxo normal do debate | A presidência escolhe quem tem a palavra entre as placas levantadas |
-| Informal-informal | Por moção | Sem interferência do bureau; aprovado por maioria simples; no máximo 45 minutos |
+| Informal-informal | Por moção | Sem interferência do bureau; aprovado por maioria simples; no máximo 45 minutos somados em cada sessão |
 
 ## Pontos e moções
 
@@ -87,14 +87,13 @@ Podem ser levantados entre discursos ou durante o próprio discurso.
 ## Do Guia de Regras (detalhes que o UNOCT não traz)
 
 - Aviso de tempo quando faltam 10 segundos.
-- Questões procedimentais: só a favor ou contra, e observadoras votam. Questões substantivas: com abstenção, menos para quem está "presente e votando". Suspensas não votam.
+- Questões procedimentais: só a favor ou contra, e observadoras votam. Questões substantivas: com abstenção. Na chamada, a delegação está presente ou ausente: no UFRGSMUN, "presente" e "presente e votando" são a mesma coisa. Suspensas não votam.
 - Votação nominal: cada delegação pode passar a vez uma vez; quem passou não se abstém depois.
 - Divisão da questão aprovada: 5 minutos de informal-informal para receber as propostas, votadas da mais à menos substancial; se todas as operativas caírem, o projeto é rejeitado.
 - Regras especiais: CSNU (9 votos a favor e nenhum voto contra de membro permanente; a parte numa disputa se abstém), Conselho Europeu (unanimidade das previstas) e OEA (tecnologia restrita, observadoras e uma delegação suspensa).
 
 ## Dúvidas para a organização
 
-- O limite de 45 minutos do informal-informal vale para cada informal ou para a soma da sessão? Por enquanto, o app usa a soma da sessão, como no Guia.
 - "Sessão fechada", na não-confiança, quer dizer o quê?
 - Delegações suspensas contam como previstas no quórum? Por enquanto, não contam.
 - Quem sugere a agenda informal: só o bureau, ou as delegações também propõem?
