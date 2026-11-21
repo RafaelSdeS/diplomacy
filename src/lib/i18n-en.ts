@@ -936,6 +936,25 @@ export const EN: Record<string, string> = {
 	'Assumir': 'Stand in',
 	'pela mesa': 'by the dais',
 	'Escolha uma delegação do comitê.': 'Choose a delegation of the committee.',
+	// Passo 32
+	'Você preside a sessão {n}': 'You chair session {n}',
+	'Abrir o painel': 'Open the panel',
+	'Sessão ao vivo': 'Live session',
+	'Abrir a sessão': 'Open the session',
+	'Na sua caixa': 'In your inbox',
+	'rodada até {hora}': 'round until {hora}',
+	'Ver as mensagens': 'See the messages',
+	'Chegadas a confirmar': 'Arrivals to confirm',
+	'Pedidos para o bureau': 'Requests for the dais',
+	'DPOs enviados': 'Position papers submitted',
+	'Documentos enviados à mesa': 'Documents sent to the dais',
+	'{n} notas esperando resposta': '{n} notes awaiting a reply',
+	'Abrir a fila da crise': 'Open the crisis queue',
+	'Nenhuma entrevista marcada.': 'No interviews scheduled.',
+	'Escrever': 'Write',
+	'Secretaria': 'Secretariat',
+	'Check-in': 'Check-in',
+	'Painel': 'Panel',
 };
 
 /** Mensagens do banco com partes variáveis: [padrão em português, tradução]. */

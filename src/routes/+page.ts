@@ -1,9 +1,23 @@
+import { papelPrincipal } from '#lib/papeis.ts';
+import { carregarSessao } from '#lib/sessao.ts';
 import { supabase } from '#lib/supabase.ts';
 import type { PageLoad } from './$types';
 
+const contar = async (consulta: PromiseLike<{ count: number | null; error: unknown }>) => {
+	const { count, error } = await consulta;
+	if (error) throw error;
+	return count ?? 0;
+};
+
 export const load: PageLoad = async ({ parent, depends }) => {
 	depends('app:avisos');
+	depends('app:sessao-ao-vivo');
 	const { usuario, participacoes } = await parent();
+	// Passo 32: o Agora de cada papel. Delegado e mesa veem a sessão ao vivo do comitê.
+	const principal = papelPrincipal(participacoes);
+	const minha = participacoes.find((p) => p.papel === principal && p.comite_id);
+	const comiteAoVivo = principal === 'delegado' || principal === 'mesa' ? (minha?.comite_id ?? null) : null;
+	const agoraIso = new Date().toISOString();
 	const comites = [...new Set(participacoes.map((p) => p.comite_id).filter((id) => id !== null))];
 
 	const delegacoes = participacoes.filter((p) => p.papel === 'delegado' && p.delegacao_id).map((p) => p.delegacao_id!);
@@ -33,6 +47,46 @@ export const load: PageLoad = async ({ parent, depends }) => {
 			.order('noticia(publicada_em)', { ascending: false })
 			.limit(3)
 	]);
+	const minhaDelegacao = principal === 'delegado' ? (minha?.delegacao_id ?? null) : null;
+	const [aoVivo, bilhetes, rodadas, mesa, crise, entrevistas] = await Promise.all([
+		comiteAoVivo
+			? Promise.all([
+					carregarSessao(comiteAoVivo),
+					supabase.from('comite').select('tecnologia_restrita').eq('id', comiteAoVivo).single()
+				]).then(([sessao, comite]) => ({ ...sessao, restrita: !!comite.data?.tecnologia_restrita }))
+			: null,
+		minhaDelegacao
+			? supabase
+					.from('mensagem')
+					.select('id, texto, criado_em, de:delegacao!mensagem_de_delegacao_id_comite_id_fkey(nome)')
+					.eq('tipo', 'bilhete')
+					.eq('para_delegacao_id', minhaDelegacao)
+					.order('criado_em', { ascending: false })
+					.limit(3)
+			: { data: [], error: null },
+		minhaDelegacao
+			? supabase.from('rodada').select('fim, documento!inner(id, titulo)').gt('fim', agoraIso).order('fim')
+			: { data: [], error: null },
+		principal === 'mesa' && minha?.comite_id
+			? Promise.all([
+					contar(supabase.from('dpo').select('id', { count: 'exact', head: true }).eq('comite_id', minha.comite_id).eq('status', 'enviado')),
+					contar(supabase.from('documento').select('id', { count: 'exact', head: true }).eq('comite_id', minha.comite_id).eq('status', 'enviado'))
+				]).then(([dpos, documentos]) => ({ dpos, documentos }))
+			: null,
+		principal === 'crise' && minha?.comite_id
+			? contar(supabase.from('nota_crise').select('id', { count: 'exact', head: true }).eq('comite_id', minha.comite_id).eq('status', 'pendente'))
+			: null,
+		principal === 'press'
+			? supabase
+					.from('entrevista')
+					.select('id, tema, horario, delegacao(nome)')
+					.eq('status', 'aceita')
+					.gte('horario', agoraIso)
+					.order('horario')
+					.limit(3)
+			: { data: [], error: null }
+	]);
+	for (const r of [bilhetes, rodadas, entrevistas]) if (r.error) throw r.error;
 	if (dpos.error) throw dpos.error;
 	if (citacoes.error) throw citacoes.error;
 	if (comitesAoVivo.error) throw comitesAoVivo.error;
@@ -48,6 +102,14 @@ export const load: PageLoad = async ({ parent, depends }) => {
 		comitesAoVivo: comitesAoVivo.data,
 		respostasCrise: respostasCrise.data,
 		dpos: dpos.data,
-		citacoes: citacoes.data.map((c) => c.noticia)
+		citacoes: citacoes.data.map((c) => c.noticia),
+		principal,
+		minha: minha ?? null,
+		aoVivo,
+		bilhetes: bilhetes.data ?? [],
+		rodadas: rodadas.data ?? [],
+		mesa,
+		notasPendentes: crise,
+		entrevistas: entrevistas.data ?? []
 	};
 };

@@ -1996,3 +1996,13 @@ kbd {
 	font-family: var(--fonte-titulo);
 	font-size: 2rem;
 }
+
+/* Agora por papel (passo 32). */
+.cartao--largo {
+	grid-column: 1 / -1;
+}
+
+.cartao--presidencia {
+	border-color: var(--cor-dourado);
+	border-left-width: 4px;
+}

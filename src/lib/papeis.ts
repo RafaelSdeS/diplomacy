@@ -18,3 +18,8 @@ export const PAPEIS: { valor: Papel; rotulo: string }[] = [
 ];
 
 export const rotuloPapel = (papel: Papel | null | undefined) => PAPEIS.find((p) => p.valor === papel)?.rotulo ?? '';
+
+// Passo 32: o papel que monta o Agora e o menu, quando a pessoa tem mais de um.
+const PRIORIDADE: Papel[] = ['secretaria', 'diretoria_press', 'mesa', 'crise', 'press', 'delegado'];
+export const papelPrincipal = (participacoes: { papel: Papel }[]): Papel | null =>
+	PRIORIDADE.find((p) => participacoes.some((x) => x.papel === p)) ?? null;

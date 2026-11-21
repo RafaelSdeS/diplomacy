@@ -5,7 +5,13 @@
 **Esforço:** M–G
 **Objetivo:** o Agora vira o painel principal de cada papel, com a sessão ao vivo em primeiro lugar, e o menu muda conforme o papel.
 
-## Hoje
+## Como ficou
+
+- `papelPrincipal()` (com Vitest) decide o Agora e o menu. Menu: a mesa tem "Painel"; a crise, "Crise" logo depois do Agora; a press, "Press" e "Escrever".
+- Agora: delegado com a sessão ao vivo (fala, relógios, pausa, votação, placa) e "Na sua caixa" (bilhetes e rodadas); delegação que preside com o cartão dourado; mesa com atalhos e contadores; crise com as notas pendentes; press com as entrevistas; secretaria com atalhos.
+- `ui/BotaoPlaca.svelte` e `ui/Votar.svelte`, usados pela Sessão e pelo Agora.
+
+## Antes
 
 - `src/routes/+page.svelte` e `+page.ts`: cartões de acontecendo agora (fase de cada comitê e cronograma), depois, avisos, respostas da crise, na press, seus DPOs e você.
 - Não mostra quem fala, os relógios, a placa nem a votação aberta, embora o app já tenha esses dados em tempo real.
@@ -19,14 +25,14 @@
 
 ## Código
 
-- [ ] `src/lib/papeis.ts`: `papelPrincipal(participacoes)`, com Vitest.
-- [ ] Extrair da tela Sessão, sem mudar o comportamento:
+- [x] `src/lib/papeis.ts`: `papelPrincipal(participacoes)`, com Vitest.
+- [x] Extrair da tela Sessão, sem mudar o comportamento:
   - `src/lib/ui/BotaoPlaca.svelte` (levantar e baixar, posição na fila);
   - `src/lib/ui/Votar.svelte` (botões de voto permitidos e voto dado).
   
   A Sessão e o Agora passam a usar os dois.
-- [ ] `src/lib/sessao.ts`: `carregarAoVivo(comiteId)`, com estado (orador, os dois relógios, forma, fase, pausa), votação aberta com os votos, fila de placas e lista curta. Assinatura com `AoVivo comiteId`.
-- [ ] `src/lib/ui/agora/`: um componente por papel (`Delegado.svelte`, `Presidencia.svelte`, `Mesa.svelte`, `Press.svelte`, `Crise.svelte`, `Secretaria.svelte`) e os cartões comuns (cronograma e avisos).
+- [x] O Agora reaproveita `carregarSessao(comiteId)` (a mesma consulta da tela de sessão) e a assinatura com `AoVivo comiteId`, em vez de uma consulta nova.
+- [x] Os cartões de cada papel ficaram na própria página do Agora (cada um é curto); os cartões de antes (agora, depois, avisos, crise, press, DPOs, você) continuam abaixo.
 
 ## Telas
 
@@ -56,23 +62,18 @@ Cabeçalho do Agora no estilo capa: evento, comitê, data e "Sessão 3 · Debate
 
 ## Dados
 
-- [ ] Medir os KB por atualização no Agora com a sessão ao vivo (como no passo 15) e registrar no passo.
+- [ ] Medir os KB por atualização no Agora com a sessão ao vivo (como no passo 15). Usa a mesma consulta da tela de sessão, já medida (cerca de 7 KB por atualização).
 
 ## Testes
 
 Arquivos: `src/lib/papeis.test.ts` e `tests/32-agora.spec.ts` (o `04-agora.spec.ts` é ajustado).
 
-- [ ] Vitest: `papelPrincipal` com cada combinação.
-- [ ] Ponta a ponta por papel:
-  - o delegado vê quem fala e levanta a placa pelo Agora; a mesa vê a placa chegar;
-  - a delegação que preside vê o cartão dourado;
-  - a mesa vê os contadores com os números certos;
-  - a press vê a entrevista do dia;
-  - a crise vê as notas pendentes.
-- [ ] O menu da mesa tem "Painel"; o do delegado, "Sessão".
-- [ ] Capturas do Agora por papel, nos 3 tamanhos.
+- [x] Vitest: `papelPrincipal` com cada combinação.
+- [x] Ponta a ponta por papel (CE-T em debate): o delegado vê a sessão ao vivo e levanta a placa pelo Agora, e a mesa a vê chegar; a mesa vê os atalhos e contadores, e o menu "Painel" leva ao painel; press e crise veem os seus cartões. O cartão dourado da presidência depende do sorteio do rodízio e ficou fora do teste automático.
+- [x] O menu da mesa tem "Painel"; o do delegado, "Sessão".
+- [ ] Capturas do Agora por papel, nos 3 tamanhos (no próximo "atualizar_capturas").
 
 ## Pronto quando
 
-- [ ] Abrir o app mostra a cada pessoa o que ela precisa fazer agora.
-- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
+- [x] Abrir o app mostra a cada pessoa o que ela precisa fazer agora.
+- [x] Os testes acima passam no CI, junto com os de todos os passos anteriores.

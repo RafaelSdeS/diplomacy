@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { t } from '#lib/i18n.svelte.ts';
-	import Hand from '@lucide/svelte/icons/hand';
 	import { invalidate } from '$app/navigation';
 	import {
 		descreverPonto,
@@ -20,7 +19,9 @@
 	import Cronometro from '#lib/ui/Cronometro.svelte';
 	import { relogioDebate, temDebate } from '#lib/cronometro.ts';
 	import ListaVotos from '#lib/ui/ListaVotos.svelte';
-	import { assinaturasDesconfianca, escolhasPermitidas, ESCOLHAS, ETAPAS, FASES, listaAtiva, presidenciaEmVigor, textoResultado, type Escolha } from '#lib/votacao.ts';
+	import BotaoPlaca from '#lib/ui/BotaoPlaca.svelte';
+	import Votar from '#lib/ui/Votar.svelte';
+	import { assinaturasDesconfianca, escolhasPermitidas, ETAPAS, FASES, listaAtiva, presidenciaEmVigor, textoResultado } from '#lib/votacao.ts';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -94,14 +95,6 @@
 		return !error;
 	}
 
-	const placaAcao = (funcao: 'levantar_placa' | 'baixar_placa') =>
-		executar(supabase.rpc(funcao, { p_comite: data.comite.id }));
-	const votar = (escolha: Escolha) =>
-		executar(
-			representada
-				? supabase.rpc('registrar_voto', { p_votacao: data.votacao!.id, p_delegacao: representada.id, p_escolha: escolha })
-				: supabase.rpc('votar', { p_votacao: data.votacao!.id, p_escolha: escolha })
-		);
 	const inscrever = (lado: 'a_favor' | 'contra') =>
 		executar(supabase.rpc('inscrever_lista', { p_ponto: emDiscussao!.id, p_lado: lado }), t('Sua delegação entrou na lista.'));
 
@@ -204,14 +197,8 @@
 				{#if !data.votacao.aberta}
 					<p>{textoResultado(data.votacao)}</p>
 					<ListaVotos sigla={data.comite.sigla} delegacoes={data.delegacoes} votos={data.votacao.votos} tipo={data.votacao.tipo} {presentes} />
-				{:else if meuVoto}
-					<p>{t('Voto da sua delegação:')} <strong>{ESCOLHAS[meuVoto]}</strong></p>
-				{:else if posso.length}
-					<div class="acoes">
-						{#each posso as escolha (escolha)}
-							<button class="botao botao--grande" type="button" onclick={() => votar(escolha)}>{ESCOLHAS[escolha]}</button>
-						{/each}
-					</div>
+				{:else if meuVoto || posso.length}
+					<Votar votacaoId={data.votacao.id} escolhas={posso} {meuVoto} representada={representada?.id} onerro={(m) => (erro = m)} />
 				{:else if eu}
 					<p class="suave">{t('Sua delegação não vota nesta questão (ausente na chamada, observadora ou suspensa).')}</p>
 				{/if}
@@ -270,17 +257,7 @@
 				{#if naListaCurta >= 0}
 					<p class="sucesso" role="status">{t('Sua delegação é a {n}ª da lista curta.', { n: naListaCurta + 1 })}</p>
 				{/if}
-				{#if posicao >= 0}
-					<p class="destaque">{t('Placa levantada')} · {t('{n}ª na fila', { n: posicao + 1 })}</p>
-					<button class="botao botao--grande" type="button" aria-pressed="true" onclick={() => placaAcao('baixar_placa')}>
-						<Hand aria-hidden="true" size={20} /> {t('Baixar placa')}
-					</button>
-				{:else}
-					<p class="suave">{eu.delegacao_nome}</p>
-					<button class="botao botao--grande" type="button" aria-pressed="false" onclick={() => placaAcao('levantar_placa')}>
-						<Hand aria-hidden="true" size={20} /> {t('Levantar placa')}
-					</button>
-				{/if}
+				<BotaoPlaca comiteId={data.comite.id} {posicao} nome={eu.delegacao_nome ?? ''} onerro={(m) => (erro = m)} />
 				<p>
 					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => placa?.showModal()}>
 						{t('Mostrar placa em tela cheia')}

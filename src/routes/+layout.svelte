@@ -11,12 +11,14 @@
 	import Landmark from '@lucide/svelte/icons/landmark';
 	import Megaphone from '@lucide/svelte/icons/megaphone';
 	import Newspaper from '@lucide/svelte/icons/newspaper';
+	import PenLine from '@lucide/svelte/icons/pen-line';
 	import Users from '@lucide/svelte/icons/users';
 	import { caixa } from '#lib/caixa.ts';
 	import { esquecerConta } from '#lib/conta.ts';
 	import { desativarPush } from '#lib/push.ts';
 	import { APP, marca } from '#lib/titulo.svelte.ts';
 	import { trilha } from '#lib/trilha.ts';
+	import { papelPrincipal } from '#lib/papeis.ts';
 	import Trilha from '#lib/ui/Trilha.svelte';
 	import { supabase, type Papel } from '#lib/supabase.ts';
 	import { assinarAvisos } from '#lib/tempo-real.ts';
@@ -30,17 +32,28 @@
 	const sigla = $derived(data.participacoes.find((p) => p.comite_sigla)?.comite_sigla);
 	const siglaCrise = $derived(data.participacoes.find((p) => p.papel === 'crise')?.comite_sigla);
 
-	// Cada passo adiciona aqui as telas que cria. Sem "papeis", todos veem.
+	// Cada passo adiciona aqui as telas que cria. Sem "papeis", todos veem. O menu muda
+	// com o papel principal (passo 32): a mesa tem o painel; a crise e a press, as suas
+	// telas logo depois do Agora.
+	const principal = $derived(papelPrincipal(data.participacoes));
 	const telas: Tela[] = $derived([
 		{ href: '/', rotulo: t('Agora'), icone: House },
+		...(siglaCrise ? [{ href: `/crise/${siglaCrise}`, rotulo: t('Crise'), icone: Siren, papeis: ['crise' as const] }] : []),
+		...(principal === 'press'
+			? [
+					{ href: '/press', rotulo: t('Press'), icone: Newspaper },
+					{ href: '/press/escrever', rotulo: t('Escrever'), icone: PenLine }
+				]
+			: []),
 		...(sigla
 			? [
-					{ href: `/comite/${sigla}/sessao`, rotulo: t('Sessão'), icone: Gavel },
+					principal === 'mesa'
+						? { href: `/comite/${sigla}/sessao/presidencia`, rotulo: t('Painel'), icone: Gavel }
+						: { href: `/comite/${sigla}/sessao`, rotulo: t('Sessão'), icone: Gavel },
 					{ href: `/comite/${sigla}`, rotulo: t('Comitê'), icone: Landmark }
 				]
 			: []),
-		...(siglaCrise ? [{ href: `/crise/${siglaCrise}`, rotulo: t('Crise'), icone: Siren, papeis: ['crise' as const] }] : []),
-		{ href: '/press', rotulo: t('Press'), icone: Newspaper },
+		...(principal === 'press' ? [] : [{ href: '/press', rotulo: t('Press'), icone: Newspaper }]),
 		{ href: '/cronograma', rotulo: t('Cronograma'), icone: CalendarDays },
 		{ href: '/avisos', rotulo: t('Avisos'), icone: Megaphone },
 		{ href: '/secretaria/participantes', rotulo: t('Participantes'), icone: Users, papeis: ['secretaria'] }
