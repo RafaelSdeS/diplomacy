@@ -49,6 +49,30 @@ export function escolhasPermitidas(
 	return tipo === 'substantiva' ? ['a_favor', 'contra', 'abstencao'] : ['a_favor', 'contra'];
 }
 
+type DelegacaoVoto = { id: string; nome: string; bandeira: string | null; situacao?: string | null };
+export type GruposDeVotos<D> = { a_favor: D[]; contra: D[]; abstencao: D[]; sem_voto: D[] };
+
+/**
+ * Como cada delegação votou, em quatro grupos em ordem alfabética. "Sem voto" são só
+ * as que podiam votar (presentes na sessão; na substantiva, as membros) e não votaram.
+ */
+export function agruparVotos<D extends DelegacaoVoto>(
+	delegacoes: D[],
+	votos: { delegacao_id: string; escolha: Escolha }[],
+	tipo: string,
+	presentes: Set<string>,
+	idioma = 'pt-BR'
+): GruposDeVotos<D> {
+	const escolha = new Map(votos.map((v) => [v.delegacao_id, v.escolha]));
+	const grupos: GruposDeVotos<D> = { a_favor: [], contra: [], abstencao: [], sem_voto: [] };
+	for (const d of [...delegacoes].sort((a, b) => a.nome.localeCompare(b.nome, idioma))) {
+		const e = escolha.get(d.id);
+		if (e) grupos[e].push(d);
+		else if (escolhasPermitidas(tipo, d.situacao, presentes.has(d.id) ? 'presente' : null).length) grupos.sem_voto.push(d);
+	}
+	return grupos;
+}
+
 type Resultado = {
 	a_favor: number | null;
 	contra: number | null;

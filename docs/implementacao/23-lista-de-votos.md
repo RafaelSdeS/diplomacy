@@ -5,7 +5,14 @@
 **Esforço:** P
 **Objetivo:** todos no comitê veem como cada delegação votou, na hora do resultado e depois, num histórico.
 
-## Hoje
+## Como ficou
+
+- `agruparVotos` em `src/lib/votacao.ts` e o componente `ui/ListaVotos.svelte`: a favor, contra, abstenção e "não votaram" (só quem podia votar), com ícone, contagem e bandeira.
+- Sessão: a lista no cartão da última votação e a seção "Votações desta sessão".
+- Telão: a grade fica 30 s depois de encerrada, com "Não votou" para quem não votou.
+- Página `/comite/[sigla]/votacoes`, com link na tela do comitê e na sessão.
+
+## Antes
 
 - Todo o comitê já pode ler os votos: a política "quem está no comitê vê os votos (as placas são públicas)" está em `20261124090000_plenaria_e_votacao.sql:210`.
 - A grade com o voto de cada delegação (`src/lib/ui/GradeVotos.svelte`) só aparece no painel da presidência e no telão, e só com a votação aberta.
@@ -22,12 +29,12 @@ Nada novo: as leituras já são permitidas. Se a consulta do histórico ficar le
 
 ## Código e telas
 
-- [ ] `src/lib/votacao.ts`: `agruparVotos(delegacoes, votos)` devolve `{ a_favor, contra, abstencao, sem_voto }`, cada um com as delegações em ordem alfabética do idioma.
-- [ ] `src/lib/ui/ListaVotos.svelte`: os quatro grupos com título e contagem ("A favor (9)"), bandeira, ícone e texto (nunca só cor). Nome do país como texto agora; vira link no passo 26.
-- [ ] **Sessão** (delegado): no cartão "Última votação", a `ListaVotos` abaixo do resultado.
-- [ ] **Sessão**: seção "Votações desta sessão", com uma entrada recolhível (`<details>`) por votação encerrada, cada uma com o resultado e a `ListaVotos`.
-- [ ] **Telão:** depois de encerrada, a lista fica na tela por 30 s (`encerrada_em` + 30 s, com a diferença de relógio que o telão já mede); depois volta à fila.
-- [ ] **Página nova** `/comite/[sigla]/votacoes`: todas as votações encerradas do comitê, agrupadas por sessão, mais recentes primeiro. Link na tela do comitê. Uma consulta:
+- [x] `src/lib/votacao.ts`: `agruparVotos(delegacoes, votos)` devolve `{ a_favor, contra, abstencao, sem_voto }`, cada um com as delegações em ordem alfabética do idioma.
+- [x] `src/lib/ui/ListaVotos.svelte`: os quatro grupos com título e contagem ("A favor (9)"), bandeira, ícone e texto (nunca só cor). Nome do país como texto agora; vira link no passo 26.
+- [x] **Sessão** (delegado): no cartão "Última votação", a `ListaVotos` abaixo do resultado.
+- [x] **Sessão**: seção "Votações desta sessão", com uma entrada recolhível (`<details>`) por votação encerrada, cada uma com o resultado e a `ListaVotos`.
+- [x] **Telão:** depois de encerrada, a lista fica na tela por 30 s (`encerrada_em` + 30 s, com a diferença de relógio que o telão já mede); depois volta à fila.
+- [x] **Página nova** `/comite/[sigla]/votacoes`: todas as votações encerradas do comitê, agrupadas por sessão, mais recentes primeiro. Link na tela do comitê. Uma consulta:
 
   ```ts
   supabase.from('votacao')
@@ -44,11 +51,11 @@ Rótulos dos grupos e da página com tradução.
 
 Arquivos: `src/lib/votacao.test.ts` (ampliado) e `tests/23-votos.spec.ts`.
 
-- [ ] Vitest: `agruparVotos` separa os quatro grupos e põe em "Não votaram" só quem podia votar.
-- [ ] Ponta a ponta: depois de encerrada a votação, o delegado vê o próprio país em "A favor"; a página `/votacoes` lista essa votação com o mesmo agrupamento; axe na página nova.
-- [ ] Captura do cartão de resultado.
+- [x] Vitest: `agruparVotos` separa os quatro grupos e põe em "Não votaram" só quem podia votar.
+- [x] Ponta a ponta (no UNOCT-T, em inglês, que nenhum outro teste abre em sessão): o telão mantém a grade com "Did not vote"; o delegado vê o próprio país em "In favour"; a página `/votacoes` lista a votação com o mesmo agrupamento; axe na página nova.
+- [ ] Captura do cartão de resultado (no próximo `workflow_dispatch` "atualizar_capturas").
 
 ## Pronto quando
 
-- [ ] Qualquer pessoa do comitê sabe como cada delegação votou em qualquer votação.
-- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
+- [x] Qualquer pessoa do comitê sabe como cada delegação votou em qualquer votação.
+- [x] Os testes acima passam no CI, junto com os de todos os passos anteriores.

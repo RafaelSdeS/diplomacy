@@ -8,8 +8,8 @@
 
 	// Cada delegação com o voto dela: ícone e texto, nunca só a cor.
 	type Delegacao = { id: string; nome: string; bandeira: string | null };
-	type Props = { delegacoes: Delegacao[]; votos: { delegacao_id: string; escolha: Escolha }[] };
-	let { delegacoes, votos }: Props = $props();
+	type Props = { delegacoes: Delegacao[]; votos: { delegacao_id: string; escolha: Escolha }[]; encerrada?: boolean };
+	let { delegacoes, votos, encerrada = false }: Props = $props();
 
 	const votoDe = $derived(new Map(votos.map((v) => [v.delegacao_id, v.escolha])));
 	const ICONES = { a_favor: Check, contra: X, abstencao: Minus };
@@ -23,7 +23,7 @@
 			<span class="com-bandeira"><Bandeira codigo={d.bandeira} /> {d.nome}</span>
 			<span class="voto-escolha">
 				{#if Icone}<Icone aria-hidden="true" size={16} />{/if}
-				{escolha ? ESCOLHAS[escolha] : t('Aguardando')}
+				{escolha ? ESCOLHAS[escolha] : encerrada ? t('Não votou') : t('Aguardando')}
 			</span>
 		</li>
 	{/each}

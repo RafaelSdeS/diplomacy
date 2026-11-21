@@ -15,6 +15,7 @@
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import Bandeira from '#lib/ui/Bandeira.svelte';
 	import Cronometro from '#lib/ui/Cronometro.svelte';
+	import ListaVotos from '#lib/ui/ListaVotos.svelte';
 	import { assinaturasDesconfianca, escolhasPermitidas, ESCOLHAS, ETAPAS, FASES, listaAtiva, presidenciaEmVigor, textoResultado, type Escolha } from '#lib/votacao.ts';
 	import type { PageProps } from './$types';
 
@@ -42,6 +43,7 @@
 	const lista = $derived(listaAtiva(data.lista, emDiscussao?.id, data.fase));
 	const tiposEmOrdem = $derived(pontosEmOrdem(data.fase, data.estado?.etapa_plenaria, data.salaFechada));
 	const minhaSituacao = $derived(data.delegacoes.find((d) => d.id === eu?.delegacao_id)?.situacao);
+	const presentes = $derived(new Set((sessao?.presenca ?? []).map((p) => p.delegacao_id)));
 	const minhaPresenca = $derived(sessao?.presenca.find((p) => p.delegacao_id === eu?.delegacao_id)?.situacao);
 	const meuVoto = $derived(data.votacao?.votos.find((v) => v.delegacao_id === eu?.delegacao_id)?.escolha);
 	// Tecnologia restrita: durante a sessão, a mesa opera o app; o delegado acompanha.
@@ -164,6 +166,7 @@
 				{#if data.votacao.aberta && data.votacao.nominal}<p><strong>{t('Votação nominal:')}</strong> {t('a mesa chama as delegações em ordem alfabética.')}</p>{/if}
 				{#if !data.votacao.aberta}
 					<p>{textoResultado(data.votacao)}</p>
+					<ListaVotos delegacoes={data.delegacoes} votos={data.votacao.votos} tipo={data.votacao.tipo} {presentes} />
 				{:else if meuVoto}
 					<p>{t('Voto da sua delegação:')} <strong>{ESCOLHAS[meuVoto]}</strong></p>
 				{:else if posso.length}
@@ -254,6 +257,22 @@
 		{/if}
 	</div>
 
+	{#if data.votacoes.length}
+		<section aria-labelledby="t-votacoes">
+			<h2 id="t-votacoes">{t('Votações desta sessão')}</h2>
+			{#each data.votacoes as v (v.id)}
+				<details class="votacao-historico">
+					<summary>
+						{v.objeto}
+						<span class="selo {v.aprovada ? 'selo--ok' : 'selo--erro'}">{v.aprovada ? t('Aprovada') : t('Rejeitada')}</span>
+					</summary>
+					<p>{textoResultado(v)}</p>
+					<ListaVotos delegacoes={data.delegacoes} votos={v.votos} tipo={v.tipo} {presentes} />
+				</details>
+			{/each}
+		</section>
+	{/if}
+
 	{#if eu && !restrita}
 		<section aria-labelledby="t-ponto">
 			<h2 id="t-ponto">{t('Ponto ou moção')}</h2>
@@ -318,6 +337,7 @@
 		<a class="botao botao--secundario" href={`/comite/${data.comite.sigla}/sessao/chamada`}>{t('Chamada e rodízio')}</a>
 	{/if}
 	<a class="botao botao--secundario" href={`/comite/${data.comite.sigla}/sessao/agenda`}>{t('Agenda')}</a>
+	<a class="botao botao--secundario" href={`/comite/${data.comite.sigla}/votacoes`}>{t('Votações')}</a>
 	<a class="botao botao--secundario" href={`/comite/${data.comite.sigla}/blocos`}>{t('Blocos e documentos')}</a>
 	<a class="botao botao--secundario" href={`/comite/${data.comite.sigla}/cartas`}>{t('Cartas')}</a>
 	<a class="botao botao--secundario" href={`/comite/${data.comite.sigla}/mensagens`}>{t('Mensagens')}</a>

@@ -27,6 +27,7 @@
 	{/if}
 	<p><a href={`/comite/${data.comite.sigla}/regras`}>{t('Regras de procedimento')}</a></p>
 	<p><a href={`/comite/${data.comite.sigla}/blocos`}>{t('Blocos e documentos')}</a></p>
+	<p><a href={`/comite/${data.comite.sigla}/votacoes`}>{t('Votações')}</a></p>
 	<p><a href={`/comite/${data.comite.sigla}/dpo`}>{t('DPO (documento de posição oficial)')}</a></p>
 	<p><a href={`/comite/${data.comite.sigla}/cartas`}>{t('Cartas diplomáticas')}</a></p>
 	<p><a href={`/comite/${data.comite.sigla}/mensagens`}>{t('Mensagens (bilhetes e conversa com a mesa)')}</a></p>

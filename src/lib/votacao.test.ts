@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { assinaturasDesconfianca, escolhasPermitidas, escreverEsboco, lerEsboco, listaAtiva, presidenciaEmVigor, proximoDaLista, textoResultado } from './votacao.ts';
+import { agruparVotos, assinaturasDesconfianca, escolhasPermitidas, escreverEsboco, lerEsboco, listaAtiva, presidenciaEmVigor, proximoDaLista, textoResultado } from './votacao.ts';
 
 describe('escolhasPermitidas', () => {
 	it('questão procedimental: só a favor ou contra, e observadora vota', () => {
@@ -74,5 +74,28 @@ describe('assinaturas da não-confiança', () => {
 		expect(assinaturasDesconfianca([1, 5], comite(15))).toBe(3);
 		expect(assinaturasDesconfianca([1, 5], comite(16))).toBe(4);
 		expect(assinaturasDesconfianca([1, 5], comite(16, 1))).toBe(3);
+	});
+});
+
+describe('agruparVotos', () => {
+	const d = (id: string, nome: string, situacao = 'membro') => ({ id, nome, bandeira: null, situacao });
+	const delegacoes = [d('1', 'Uruguai'), d('2', 'Argentina'), d('3', 'Chile'), d('4', 'Espanha', 'observadora'), d('5', 'Cuba', 'suspensa'), d('6', 'Peru')];
+	const presentes = new Set(['1', '2', '3', '4', '5']);
+	const votos = [
+		{ delegacao_id: '1', escolha: 'a_favor' as const },
+		{ delegacao_id: '2', escolha: 'a_favor' as const },
+		{ delegacao_id: '3', escolha: 'contra' as const }
+	];
+	const nomes = (g: { nome: string }[]) => g.map((x) => x.nome);
+
+	it('separa os votos em ordem alfabética', () => {
+		const g = agruparVotos(delegacoes, votos, 'procedimental', presentes);
+		expect(nomes(g.a_favor)).toEqual(['Argentina', 'Uruguai']);
+		expect(nomes(g.contra)).toEqual(['Chile']);
+		expect(g.abstencao).toEqual([]);
+	});
+	it('"sem voto" só tem quem podia votar: presente, não suspensa e, na substantiva, membro', () => {
+		expect(nomes(agruparVotos(delegacoes, votos, 'procedimental', presentes).sem_voto)).toEqual(['Espanha']);
+		expect(agruparVotos(delegacoes, votos, 'substantiva', presentes).sem_voto).toEqual([]);
 	});
 });

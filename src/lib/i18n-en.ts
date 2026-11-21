@@ -863,6 +863,12 @@ export const EN: Record<string, string> = {
 	'A agenda vem antes das resoluções: adote a agenda de um tópico para apresentar um projeto.': 'The agenda comes before resolutions: adopt the agenda of a topic to submit a draft.',
 	'Só a agenda adotada é editada assim.': 'Only the adopted agenda is edited this way.',
 	'Adote a agenda do tópico antes de apresentar um projeto de resolução.': 'Adopt the agenda of the topic before submitting a draft resolution.',
+	// Passo 23
+	'Não votaram': 'Did not vote',
+	'Não votou': 'Did not vote',
+	'Votações desta sessão': 'Votes in this session',
+	'Nenhuma votação encerrada ainda.': 'No closed votes yet.',
+	'Votação nominal': 'Roll-call vote',
 };
 
 /** Mensagens do banco com partes variáveis: [padrão em português, tradução]. */

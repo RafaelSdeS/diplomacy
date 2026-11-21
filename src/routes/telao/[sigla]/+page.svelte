@@ -22,25 +22,34 @@
 	const proximos = $derived(
 		(lista.length ? lista.map((i) => ({ id: i.id, delegacao: i.delegacao })) : (sessao?.pedidos ?? [])).slice(0, 4)
 	);
+	let agora = $state(Date.now());
+	$effect(() => {
+		const relogio = setInterval(() => (agora = Date.now()), 10_000);
+		return () => clearInterval(relogio);
+	});
 	const votacao = $derived(data.votacao?.aberta ? data.votacao : null);
+	// Depois de encerrada, a grade com o voto de cada delegação fica 30 s na tela (passo 23).
+	const VOTOS_MS = 30_000;
+	const recemEncerrada = $derived(
+		data.votacao && !data.votacao.aberta && data.votacao.encerrada_em
+			&& agora + diferenca - Date.parse(data.votacao.encerrada_em) < VOTOS_MS
+			? data.votacao
+			: null
+	);
+	const naTela = $derived(votacao ?? recemEncerrada);
 	const presentes = $derived(new Set(sessao?.presenca.map((p) => p.delegacao_id)));
 	const votantes = $derived(
 		data.delegacoes.filter(
 			(d) =>
 				presentes.has(d.id) &&
 				d.situacao !== 'suspensa' &&
-				(votacao?.tipo !== 'substantiva' || d.situacao === 'membro')
+				(naTela?.tipo !== 'substantiva' || d.situacao === 'membro')
 		)
 	);
 	const topico = $derived(data.estado?.topico_atual ? data.comite.topicos[data.estado.topico_atual - 1] : null);
 
 	// O plantão (crise ou nota urgente da press) fica em destaque por 5 minutos depois de publicado.
 	const PLANTAO_MS = 5 * 60_000;
-	let agora = $state(Date.now());
-	$effect(() => {
-		const relogio = setInterval(() => (agora = Date.now()), 10_000);
-		return () => clearInterval(relogio);
-	});
 	const plantao = $derived(
 		data.plantao && agora + diferenca - Date.parse(data.plantao.publicada_em) < PLANTAO_MS ? data.plantao : null
 	);
@@ -114,10 +123,11 @@
 		{/if}
 	</section>
 
-	{#if votacao}
+	{#if naTela}
 		<aside class="telao-fila telao-votacao" aria-label={t('Votação')}>
-			<p class="rotulo">{votacao.nominal ? "Votação nominal" : "Votação"} · {votacao.objeto}</p>
-			<GradeVotos delegacoes={votantes} votos={votacao.votos} />
+			<p class="rotulo">{naTela.nominal ? t('Votação nominal') : t('Votação')} · {naTela.objeto}</p>
+			{#if !naTela.aberta}<p class="telao-resultado">{textoResultado(naTela)}</p>{/if}
+			<GradeVotos delegacoes={votantes} votos={naTela.votos} encerrada={!naTela.aberta} />
 		</aside>
 	{:else}
 		<aside class="telao-fila" aria-label={t('Próximos oradores')}>
