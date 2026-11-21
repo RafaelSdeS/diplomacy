@@ -19,7 +19,6 @@
 	import { APP, marca } from '#lib/titulo.svelte.ts';
 	import { trilha } from '#lib/trilha.ts';
 	import { papelPrincipal, rotuloPapel } from '#lib/papeis.ts';
-	import Bandeira from '#lib/ui/Bandeira.svelte';
 	import Trilha from '#lib/ui/Trilha.svelte';
 	import { supabase, type Papel } from '#lib/supabase.ts';
 	import { assinarAvisos, esquecerLeituras, recarregarAoVivo } from '#lib/tempo-real.ts';
@@ -39,6 +38,8 @@
 	const principal = $derived(papelPrincipal(data.participacoes));
 	// Passo 43: quem a pessoa é no evento fica sempre à vista na faixa (país ou papel).
 	const eu = $derived(data.participacoes.find((p) => p.papel === principal) ?? data.participacoes[0]);
+	// As bandeiras (271 arquivos) ficam fora da primeira abertura: o componente vem sob demanda.
+	const bandeira = import('#lib/ui/Bandeira.svelte');
 	const telas: Tela[] = $derived([
 		{ href: '/', rotulo: t('Agora'), icone: House },
 		...(siglaCrise ? [{ href: `/crise/${siglaCrise}`, rotulo: t('Crise'), icone: Siren, papeis: ['crise' as const] }] : []),
@@ -158,7 +159,7 @@
 							aria-label={`${eu.delegacao_nome} · ${eu.comite_sigla}`}
 							title={data.nome ?? undefined}
 						>
-							<Bandeira codigo={eu.delegacao_bandeira} />
+							{#await bandeira then { default: Bandeira }}<Bandeira codigo={eu.delegacao_bandeira} />{/await}
 							<span class="identidade-nome">{eu.delegacao_nome}</span>
 							<span class="identidade-comite">{eu.comite_sigla}</span>
 						</a>
