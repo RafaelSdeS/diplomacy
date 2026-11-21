@@ -58,5 +58,5 @@ O push vai sem esperar o CI, e o que falhar lá se conserta em seguida.
 ## Testes
 
 - [x] A suíte inteira passa no computador com os workers padrão.
-- [ ] `npm run capturas` regrava as referências, e o CI as aceita sem mudança.
+- [x] `npm run capturas` regrava as referências, e o CI as aceita sem mudança (f769bab, CI verde).
 - [ ] Três execuções verdes seguidas no CI. Depois disso, ligar `failOnFlakyTests` e testar `workers: 2` por parte.

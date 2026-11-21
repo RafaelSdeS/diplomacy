@@ -1,3 +1,4 @@
+import { readdirSync, readFileSync } from 'node:fs';
 import { defineConfig, devices } from '@playwright/test';
 
 const ci = !!process.env.CI;
@@ -10,13 +11,22 @@ const telas = {
 	telao: { viewport: { width: 1920, height: 1080 } }
 };
 
+// Passo 39: os arquivos que só rodam no notebook (os que começam com o beforeEach que pula
+// os outros projetos) nem entram no celular e no telão. Pulados em massa, eles
+// desequilibravam as partes do CI, que dividem os testes por quantidade.
+const SO_NOTEBOOK = readdirSync('tests').filter(
+	(f) =>
+		f.endsWith('.spec.ts') &&
+		/^test\.beforeEach\(\(\{\}, info\) => \{\n\ttest\.skip\(info\.project\.name !== 'notebook'/m.test(readFileSync(`tests/${f}`, 'utf8'))
+);
+
 export default defineConfig({
 	testDir: 'tests',
 	fullyParallel: true,
-	// No CI, um processo só: os fluxos ao vivo (sessão, crise, avisos) juntos passam do
-	// limite do tempo real local (100 mensagens por segundo, o mesmo do plano gratuito),
-	// e o servidor descarta mensagens. A capacidade tem teste próprio (passo 13).
-	workers: ci ? 1 : undefined,
+	// Cada arquivo que mexe em estado ao vivo tem o próprio comitê (passo 39), e o tempo
+	// real só avisa (Broadcast) e relê o que mudou (passo 40): no computador, 10 processos
+	// num Supabase só passam. No CI, cada parte tem 2 vCPUs por processo de navegador.
+	workers: ci ? 2 : undefined,
 	forbidOnly: ci,
 	retries: ci ? 1 : 0,
 	reporter: ci ? [['github'], ['html', { open: 'never' }]] : 'list',
@@ -29,7 +39,8 @@ export default defineConfig({
 	},
 	projects: Object.entries(telas).map(([name, tela]) => ({
 		name,
-		use: { ...devices['Desktop Chrome'], ...tela }
+		use: { ...devices['Desktop Chrome'], ...tela },
+		testIgnore: name === 'notebook' ? [] : SO_NOTEBOOK
 	})),
 	webServer: {
 		// No CI o build já foi feito (e medido) antes dos testes.
