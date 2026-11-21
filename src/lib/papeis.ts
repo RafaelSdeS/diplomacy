@@ -1,12 +1,20 @@
+import { t } from './i18n.svelte.ts';
 import type { Papel } from './supabase.ts';
 
+const papel = (valor: Papel, rotulo: string) => ({
+	valor,
+	get rotulo() {
+		return t(rotulo);
+	}
+});
+
 export const PAPEIS: { valor: Papel; rotulo: string }[] = [
-	{ valor: 'delegado', rotulo: 'Delegado' },
-	{ valor: 'mesa', rotulo: 'Mesa' },
-	{ valor: 'crise', rotulo: 'Crise' },
-	{ valor: 'press', rotulo: 'Press' },
-	{ valor: 'diretoria_press', rotulo: 'Diretoria da Press' },
-	{ valor: 'secretaria', rotulo: 'Secretaria' }
+	papel('delegado', 'Delegado'),
+	papel('mesa', 'Mesa'),
+	papel('crise', 'Crise'),
+	papel('press', 'Press'),
+	papel('diretoria_press', 'Diretoria da Press'),
+	papel('secretaria', 'Secretaria')
 ];
 
 export const rotuloPapel = (papel: Papel | null | undefined) => PAPEIS.find((p) => p.valor === papel)?.rotulo ?? '';

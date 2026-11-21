@@ -52,7 +52,7 @@ Arquivos: `supabase/tests/19-lgpd.test.sql` e `tests/19-lgpd.spec.ts`.
 
 ## Pronto quando
 
-- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
+- [x] Os testes acima passam no CI, junto com os de todos os passos anteriores.
 - [x] Os direitos do titular funcionam pelo app.
 - [x] A exclusão no prazo foi testada com dados fictícios (pgTAP).
 - [ ] O arquivo da edição é gerado e entregue.

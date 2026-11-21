@@ -24,8 +24,9 @@
 		"seed": "node scripts/seed.ts",
 		"test:db": "supabase test db",
 		"test:unit": "vitest run",
+		"textos": "node scripts/textos-fixos.ts",
 		"test:e2e": "playwright test",
-		"testar": "npm run check && npm run test:unit && npm run test:db && npm run build && npm run tamanho && npm run test:e2e"
+		"testar": "npm run check && npm run textos && npm run test:unit && npm run test:db && npm run build && npm run tamanho && npm run test:e2e"
 	},
 	"devDependencies": {
 		"@axe-core/playwright": "^4.14.0",

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/i18n.svelte.ts';
 	import { onMount, untrack } from 'svelte';
 	import { invalidate } from '$app/navigation';
 	import Bell from '@lucide/svelte/icons/bell';
@@ -17,7 +18,7 @@
 
 	const agora = new Date();
 	const destinoDe = (id: string | null) =>
-		id ? `Para o ${data.comites.find((c) => c.id === id)?.sigla ?? 'comitê'}` : 'Para todos';
+		id ? `Para o ${data.comites.find((c) => c.id === id)?.sigla ?? t('comitê')}` : t('Para todos');
 	const podeRemover = (autorId: string | null) => data.secretaria || autorId === data.usuario?.id;
 
 	let texto = $state('');
@@ -31,7 +32,7 @@
 			.from('aviso')
 			.insert({ evento_id: data.evento!, comite_id: destino || null, texto: texto.trim() });
 		if (error) {
-			erro = 'Não foi possível publicar o aviso.';
+			erro = t('Não foi possível publicar o aviso.');
 			return;
 		}
 		texto = '';
@@ -42,7 +43,7 @@
 		erro = '';
 		const { error } = await supabase.from('aviso').delete().eq('id', id);
 		if (error) {
-			erro = 'Não foi possível remover o aviso.';
+			erro = t('Não foi possível remover o aviso.');
 			return;
 		}
 		await invalidate('app:avisos');
@@ -50,22 +51,22 @@
 </script>
 
 <svelte:head>
-	<title>Avisos · UFRGSMUN</title>
+	<title>{t('Avisos · UFRGSMUN')}</title>
 </svelte:head>
 
-<p class="rotulo">Evento</p>
-<h1>Avisos</h1>
+<p class="rotulo">{t('Evento')}</p>
+<h1>{t('Avisos')}</h1>
 
 {#if data.destinos.length > 0}
 	<section aria-labelledby="t-publicar">
-		<h2 id="t-publicar">Publicar aviso</h2>
+		<h2 id="t-publicar">{t('Publicar aviso')}</h2>
 		<form class="formulario" onsubmit={publicar}>
 			<label class="campo">
-				Aviso
+				{t('Aviso')}
 				<textarea required maxlength="1000" bind:value={texto}></textarea>
 			</label>
 			<label class="campo">
-				Para
+				{t('Para')}
 				<select bind:value={destino}>
 					{#each data.destinos as d (d.id)}
 						<option value={d.id}>{d.rotulo}</option>
@@ -75,19 +76,19 @@
 			{#if erro}
 				<p class="erro" role="alert">{erro}</p>
 			{/if}
-			<button class="botao">Publicar</button>
+			<button class="botao">{t('Publicar')}</button>
 		</form>
 	</section>
 {/if}
 
 <section aria-labelledby="t-avisos">
-	<h2 id="t-avisos">Todos os avisos</h2>
+	<h2 id="t-avisos">{t('Todos os avisos')}</h2>
 	<ul class="lista">
 		{#each data.avisos as aviso (aviso.id)}
 			<li>
 				<span>
 					{#if ehNovo(aviso.criado_em)}
-						<span class="selo selo--info"><Bell aria-hidden="true" size={14} /> Novo</span>
+						<span class="selo selo--info"><Bell aria-hidden="true" size={14} /> {t('Novo')}</span>
 					{/if}
 					{aviso.texto}
 					<span class="detalhe">{destinoDe(aviso.comite_id)} · {formatarQuando(aviso.criado_em, agora)}</span>
@@ -97,12 +98,12 @@
 						class="botao botao--secundario botao--pequeno"
 						type="button"
 						aria-label={`Remover o aviso "${aviso.texto.slice(0, 40)}"`}
-						onclick={() => remover(aviso.id)}>Remover</button
+						onclick={() => remover(aviso.id)}>{t('Remover')}</button
 					>
 				{/if}
 			</li>
 		{:else}
-			<li class="suave">Nenhum aviso ainda.</li>
+			<li class="suave">{t('Nenhum aviso ainda.')}</li>
 		{/each}
 	</ul>
 </section>

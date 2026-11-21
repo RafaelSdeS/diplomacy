@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/i18n.svelte.ts';
 	import { goto, invalidate } from '$app/navigation';
 	import { nomeDoDocumento, STATUS_DOCUMENTO, TIPOS_DOCUMENTO } from '#lib/formatacao.ts';
 	import { mensagemDeErro } from '#lib/sessao.ts';
@@ -62,21 +63,21 @@
 </script>
 
 <svelte:head>
-	<title>Blocos · {data.comite.sigla} · UFRGSMUN</title>
+	<title>{t('Blocos')} · {data.comite.sigla} · UFRGSMUN</title>
 </svelte:head>
 
 <p class="rotulo">
-	Comitê · {data.comite.sigla}
+	{t('Comitê')} · {data.comite.sigla}
 	<AoVivo comiteId={data.comite.id} tabelas={TABELAS_BLOCOS} dependencia="app:blocos" />
 </p>
-<h1>Blocos e documentos</h1>
+<h1>{t('Blocos e documentos')}</h1>
 
 {#if erro}
 	<p class="erro" role="alert">{erro}</p>
 {/if}
 
 <section aria-labelledby="t-blocos">
-	<h2 id="t-blocos">Blocos</h2>
+	<h2 id="t-blocos">{t('Blocos')}</h2>
 	<div class="propostas">
 		{#each data.blocos as bloco (bloco.id)}
 			{@const membro = souDo(bloco)}
@@ -86,7 +87,7 @@
 					{#each bloco.membros as m (m.delegacao?.id)}
 						<li>
 							<span class="com-bandeira"><Bandeira codigo={m.delegacao?.bandeira} /> {m.delegacao?.nome}</span>
-							{#if m.redator}<span class="selo selo--info">Redator</span>{/if}
+							{#if m.redator}<span class="selo selo--info">{t('Redator')}</span>{/if}
 						</li>
 					{/each}
 				</ul>
@@ -99,33 +100,33 @@
 				{#if eu}
 					<div class="acoes">
 						{#if membro}
-							<button class="botao botao--pequeno" type="button" onclick={() => (novoEm = bloco.id)}>Novo documento</button>
+							<button class="botao botao--pequeno" type="button" onclick={() => (novoEm = bloco.id)}>{t('Novo documento')}</button>
 							<button
 								class="botao botao--secundario botao--pequeno"
 								type="button"
-								onclick={() => executar(supabase.rpc('sair_bloco', { p_bloco: bloco.id }))}>Sair do bloco</button
+								onclick={() => executar(supabase.rpc('sair_bloco', { p_bloco: bloco.id }))}>{t('Sair do bloco')}</button
 							>
 						{:else}
 							<button
 								class="botao botao--pequeno"
 								type="button"
 								aria-label={`Entrar no bloco ${bloco.nome}`}
-								onclick={() => executar(supabase.rpc('entrar_bloco', { p_bloco: bloco.id }))}>Entrar no bloco</button
+								onclick={() => executar(supabase.rpc('entrar_bloco', { p_bloco: bloco.id }))}>{t('Entrar no bloco')}</button
 							>
 						{/if}
 					</div>
 				{/if}
 			</article>
 		{:else}
-			<p class="suave">Ainda não há blocos.</p>
+			<p class="suave">{t('Ainda não há blocos.')}</p>
 		{/each}
 	</div>
 
 	{#if novoEm}
-		<form class="formulario formulario--largo cartao" onsubmit={criarDocumento} aria-label="Novo documento">
-			<h3>Novo documento · {data.blocos.find((b) => b.id === novoEm)?.nome}</h3>
+		<form class="formulario formulario--largo cartao" onsubmit={criarDocumento} aria-label={t('Novo documento')}>
+			<h3>{t('Novo documento')} · {data.blocos.find((b) => b.id === novoEm)?.nome}</h3>
 			<label class="campo">
-				Tipo
+				{t('Tipo')}
 				<select bind:value={tipo}>
 					<option value="working_paper">{TIPOS_DOCUMENTO.working_paper}</option>
 					{#if !observadora}
@@ -137,22 +138,22 @@
 				</select>
 			</label>
 			<label class="campo">
-				Título
+				{t('Título')}
 				<input required maxlength="200" bind:value={titulo} />
 			</label>
 			<label class="campo">
-				Tópico
+				{t('Tópico')}
 				<select bind:value={topico}>
-					{#each data.comite.topicos as t, i (t)}
-						<option value={i + 1}>{i + 1}. {t}</option>
+					{#each data.comite.topicos as tp, i (tp)}
+						<option value={i + 1}>{i + 1}. {tp}</option>
 					{/each}
 				</select>
 			</label>
 			{#if tipo === 'working_paper' && data.subtopicos.some((s) => s.topico === topico)}
 				<label class="campo">
-					Subtópico da agenda
+					{t('Subtópico da agenda')}
 					<select bind:value={subtopico}>
-						<option value="">Nenhum</option>
+						<option value="">{t('Nenhum')}</option>
 						{#each data.subtopicos.filter((s) => s.topico === topico) as s (s.id)}
 							<option value={s.id}>{s.texto}</option>
 						{/each}
@@ -161,7 +162,7 @@
 			{/if}
 			{#if tipo === 'resolucao_crise'}
 				<label class="campo">
-					Atualização de crise
+					{t('Atualização de crise')}
 					<select bind:value={atualizacao} required>
 						{#each data.atualizacoes as a (a.id)}
 							<option value={a.id}>{a.texto.slice(0, 80)}</option>
@@ -170,8 +171,8 @@
 				</label>
 			{/if}
 			<div class="acoes">
-				<button class="botao">Criar e abrir</button>
-				<button class="botao botao--secundario" type="button" onclick={() => (novoEm = null)}>Cancelar</button>
+				<button class="botao">{t('Criar e abrir')}</button>
+				<button class="botao botao--secundario" type="button" onclick={() => (novoEm = null)}>{t('Cancelar')}</button>
 			</div>
 		</form>
 	{/if}
@@ -179,16 +180,16 @@
 	{#if eu}
 		<form class="formulario" onsubmit={criarBloco}>
 			<label class="campo">
-				Nome do novo bloco
-				<input required maxlength="80" bind:value={nomeBloco} placeholder="Aliança dos Estados do Sahel" />
+				{t('Nome do novo bloco')}
+				<input required maxlength="80" bind:value={nomeBloco} placeholder={t('Aliança dos Estados do Sahel')} />
 			</label>
-			<button class="botao botao--secundario">Criar bloco</button>
+			<button class="botao botao--secundario">{t('Criar bloco')}</button>
 		</form>
 	{/if}
 </section>
 
 <section aria-labelledby="t-documentos">
-	<h2 id="t-documentos">Documentos do comitê</h2>
+	<h2 id="t-documentos">{t('Documentos do comitê')}</h2>
 	<ul class="lista">
 		{#each outrosDocumentos as d (d.id)}
 			<li>
@@ -196,7 +197,7 @@
 				<span class="selo {STATUS_DOCUMENTO[d.status].selo}">{STATUS_DOCUMENTO[d.status].rotulo}</span>
 			</li>
 		{:else}
-			<li class="suave">Nenhum documento aprovado pela mesa ainda.</li>
+			<li class="suave">{t('Nenhum documento aprovado pela mesa ainda.')}</li>
 		{/each}
 	</ul>
 </section>

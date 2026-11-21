@@ -1,49 +1,50 @@
 <script lang="ts">
+	import { bilingue, t } from '#lib/i18n.svelte.ts';
 	import Bandeira from '#lib/ui/Bandeira.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 
-	const SITUACOES = { membro: '', observadora: 'Observadora', suspensa: 'Suspensa' } as const;
+	const SITUACOES = bilingue({ membro: '', observadora: 'Observadora', suspensa: 'Suspensa' } as const);
 </script>
 
 <svelte:head>
 	<title>{data.comite.sigla} · UFRGSMUN</title>
 </svelte:head>
 
-<p class="rotulo">Comitê · {data.comite.sigla}</p>
+<p class="rotulo">{t('Comitê')} · {data.comite.sigla}</p>
 <h1>{data.comite.nome}</h1>
 
 <section aria-labelledby="t-topicos">
-	<h2 id="t-topicos">Tópicos</h2>
+	<h2 id="t-topicos">{t('Tópicos')}</h2>
 	<ol>
 		{#each data.comite.topicos as topico (topico)}
 			<li>{topico}</li>
 		{/each}
 	</ol>
 	{#if data.comite.guia_url}
-		<p><a href={data.comite.guia_url} target="_blank" rel="noopener">Guia de estudos</a></p>
+		<p><a href={data.comite.guia_url} target="_blank" rel="noopener">{t('Guia de estudos')}</a></p>
 	{/if}
-	<p><a href={`/comite/${data.comite.sigla}/regras`}>Regras de procedimento</a></p>
-	<p><a href={`/comite/${data.comite.sigla}/blocos`}>Blocos e documentos</a></p>
-	<p><a href={`/comite/${data.comite.sigla}/dpo`}>DPO (documento de posição oficial)</a></p>
-	<p><a href={`/comite/${data.comite.sigla}/cartas`}>Cartas diplomáticas</a></p>
-	<p><a href={`/comite/${data.comite.sigla}/mensagens`}>Mensagens (bilhetes e conversa com a mesa)</a></p>
+	<p><a href={`/comite/${data.comite.sigla}/regras`}>{t('Regras de procedimento')}</a></p>
+	<p><a href={`/comite/${data.comite.sigla}/blocos`}>{t('Blocos e documentos')}</a></p>
+	<p><a href={`/comite/${data.comite.sigla}/dpo`}>{t('DPO (documento de posição oficial)')}</a></p>
+	<p><a href={`/comite/${data.comite.sigla}/cartas`}>{t('Cartas diplomáticas')}</a></p>
+	<p><a href={`/comite/${data.comite.sigla}/mensagens`}>{t('Mensagens (bilhetes e conversa com a mesa)')}</a></p>
 </section>
 
 <section aria-labelledby="t-mesa">
-	<h2 id="t-mesa">Mesa</h2>
+	<h2 id="t-mesa">{t('Mesa')}</h2>
 	<ul class="lista">
 		{#each data.mesa as membro (membro.id)}
 			<li>{membro.pessoa?.nome}</li>
 		{:else}
-			<li class="suave">A mesa ainda não foi definida.</li>
+			<li class="suave">{t('A mesa ainda não foi definida.')}</li>
 		{/each}
 	</ul>
 </section>
 
 <section aria-labelledby="t-delegacoes">
-	<h2 id="t-delegacoes">Delegações ({data.delegacoes.length})</h2>
+	<h2 id="t-delegacoes">{t('Delegações')} ({data.delegacoes.length})</h2>
 	<ul class="lista grade">
 		{#each data.delegacoes as d (d.id)}
 			<li>

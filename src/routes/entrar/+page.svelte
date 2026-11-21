@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/i18n.svelte.ts';
 	import { goto } from '$app/navigation';
 	import { LOGIN_GOOGLE } from '$app/env/public';
 	import { entrarComCodigo } from '#lib/credenciais.ts';
@@ -18,8 +19,8 @@
 		if (error) {
 			erro =
 				error.code === 'invalid_credentials'
-					? 'E-mail ou senha incorretos.'
-					: 'Não foi possível entrar agora. Tente de novo em instantes.';
+					? t('E-mail ou senha incorretos.')
+					: t('Não foi possível entrar agora. Tente de novo em instantes.');
 			return;
 		}
 		await goto('/', { invalidateAll: true });
@@ -56,7 +57,7 @@
 		enviando = true;
 		const { error } = await supabase.auth.verifyOtp({ email: emailOtp.trim(), token: codigoEmail.trim(), type: 'email' });
 		enviando = false;
-		if (error) erroEmail = 'Código inválido ou vencido. Peça outro.';
+		if (error) erroEmail = t('Código inválido ou vencido. Peça outro.');
 		else await goto('/', { invalidateAll: true });
 	}
 
@@ -66,41 +67,41 @@
 </script>
 
 <svelte:head>
-	<title>Entrar · UFRGSMUN</title>
+	<title>{t('Entrar · UFRGSMUN')}</title>
 </svelte:head>
 
-<p class="rotulo">Acesso</p>
-<h1>Entrar</h1>
-<p class="suave">Use a conta que a secretaria do evento cadastrou para você.</p>
+<p class="rotulo">{t('Acesso')}</p>
+<h1>{t('Entrar')}</h1>
+<p class="suave">{t('Use a conta que a secretaria do evento cadastrou para você.')}</p>
 
 <form class="formulario" onsubmit={entrar}>
 	<label class="campo">
-		E-mail
+		{t('E-mail')}
 		<input type="email" autocomplete="email" required bind:value={email} />
 	</label>
 	<label class="campo">
-		Senha
+		{t('Senha')}
 		<input type="password" autocomplete="current-password" required bind:value={senha} />
 	</label>
 	{#if erro}
 		<p class="erro" role="alert">{erro}</p>
 	{/if}
-	<button class="botao" disabled={enviando}>Entrar</button>
+	<button class="botao" disabled={enviando}>{t('Entrar')}</button>
 </form>
 
 {#if LOGIN_GOOGLE}
-	<button class="botao botao--secundario" type="button" onclick={entrarComGoogle}>Entrar com Google</button>
+	<button class="botao botao--secundario" type="button" onclick={entrarComGoogle}>{t('Entrar com Google')}</button>
 {/if}
 
-<p class="suave"><a href="/privacidade">Aviso de privacidade</a></p>
+<p class="suave"><a href="/privacidade">{t('Aviso de privacidade')}</a></p>
 
-<p class="suave">Tem crachá? Leia o QR com a câmera do celular: ele já entra no app.</p>
+<p class="suave">{t('Tem crachá? Leia o QR com a câmera do celular: ele já entra no app.')}</p>
 
 <section aria-labelledby="t-codigo">
-	<h2 id="t-codigo">Código da secretaria</h2>
+	<h2 id="t-codigo">{t('Código da secretaria')}</h2>
 	<form class="formulario" onsubmit={entrarComCodigoDaSecretaria}>
 		<label class="campo">
-			Código de 8 letras e números
+			{t('Código de 8 letras e números')}
 			<input
 				required
 				minlength="8"
@@ -114,25 +115,25 @@
 		{#if erroCodigo}
 			<p class="erro" role="alert">{erroCodigo}</p>
 		{/if}
-		<button class="botao botao--secundario" disabled={enviando}>Entrar com o código</button>
+		<button class="botao botao--secundario" disabled={enviando}>{t('Entrar com o código')}</button>
 	</form>
 </section>
 
 <section aria-labelledby="t-email">
-	<h2 id="t-email">Por e-mail</h2>
+	<h2 id="t-email">{t('Por e-mail')}</h2>
 	{#if !enviado}
 		<form class="formulario" onsubmit={pedirEmail}>
 			<label class="campo">
-				E-mail da sua conta
+				{t('E-mail da sua conta')}
 				<input type="email" autocomplete="email" required bind:value={emailOtp} />
 			</label>
-			<button class="botao botao--secundario" disabled={enviando}>Receber link e código</button>
+			<button class="botao botao--secundario" disabled={enviando}>{t('Receber link e código')}</button>
 		</form>
 	{:else}
-		<p role="status">Se houver uma conta com esse e-mail, enviamos um link e um código. Abra o link ou digite o código.</p>
+		<p role="status">{t('Se houver uma conta com esse e-mail, enviamos um link e um código. Abra o link ou digite o código.')}</p>
 		<form class="formulario" onsubmit={entrarComCodigoDoEmail}>
 			<label class="campo">
-				Código do e-mail
+				{t('Código do e-mail')}
 				<input
 					required
 					inputmode="numeric"
@@ -144,7 +145,7 @@
 			{#if erroEmail}
 				<p class="erro" role="alert">{erroEmail}</p>
 			{/if}
-			<button class="botao botao--secundario" disabled={enviando}>Entrar com o código do e-mail</button>
+			<button class="botao botao--secundario" disabled={enviando}>{t('Entrar com o código do e-mail')}</button>
 		</form>
 	{/if}
 </section>

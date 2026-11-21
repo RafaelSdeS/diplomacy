@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/i18n.svelte.ts';
 	import { invalidate } from '$app/navigation';
 	import { formatarQuando } from '#lib/cronograma.ts';
 	import { mensagemDeErro } from '#lib/sessao.ts';
@@ -24,7 +25,7 @@
 	const de = (c: (typeof data.cartas)[number]) => c.bloco_remetente?.nome ?? c.remetente?.nome ?? '';
 	const para = (c: (typeof data.cartas)[number]) =>
 		c.publica
-			? 'Todo o comitê'
+			? t('Todo o comitê')
 			: c.destinatarios.map((d) => d.delegacao?.nome ?? d.bloco?.nome).filter(Boolean).join(', ');
 
 	async function enviar(evento: SubmitEvent) {
@@ -43,7 +44,7 @@
 			erro = mensagemDeErro(error);
 			return;
 		}
-		mensagem = 'Carta enviada.';
+		mensagem = t('Carta enviada.');
 		titulo = corpo = '';
 		delegacoes = [];
 		blocos = [];
@@ -52,21 +53,21 @@
 </script>
 
 <svelte:head>
-	<title>Cartas · {data.comite.sigla} · UFRGSMUN</title>
+	<title>{t('Cartas')} · {data.comite.sigla} · UFRGSMUN</title>
 </svelte:head>
 
 <p class="rotulo">
-	Comitê · {data.comite.sigla}
+	{t('Comitê')} · {data.comite.sigla}
 	<AoVivo comiteId={data.comite.id} tabelas={['carta']} dependencia="app:cartas" />
 </p>
-<h1>Cartas diplomáticas</h1>
+<h1>{t('Cartas diplomáticas')}</h1>
 
 {#if eu}
 	<section aria-labelledby="t-escrever">
-		<h2 id="t-escrever">Escrever carta</h2>
+		<h2 id="t-escrever">{t('Escrever carta')}</h2>
 		<form class="formulario formulario--largo" onsubmit={enviar}>
 			<label class="campo">
-				Em nome de
+				{t('Em nome de')}
 				<select bind:value={remetente}>
 					<option value="">{eu.delegacao_nome}</option>
 					{#each meusBlocos as b (b.id)}
@@ -74,17 +75,17 @@
 					{/each}
 				</select>
 			</label>
-			<label class="opcao"><input type="checkbox" bind:checked={publica} /> Carta pública (todo o comitê lê)</label>
+			<label class="opcao"><input type="checkbox" bind:checked={publica} /> {t('Carta pública (todo o comitê lê)')}</label>
 			{#if !publica}
 				<fieldset class="opcoes voluntarias">
-					<legend>Para as delegações</legend>
+					<legend>{t('Para as delegações')}</legend>
 					{#each data.delegacoes.filter((d) => d.id !== eu.delegacao_id) as d (d.id)}
 						<label class="opcao"><input type="checkbox" value={d.id} bind:group={delegacoes} /> {d.nome}</label>
 					{/each}
 				</fieldset>
 				{#if data.blocos.length}
 					<fieldset class="opcoes voluntarias">
-						<legend>Para os blocos</legend>
+						<legend>{t('Para os blocos')}</legend>
 						{#each data.blocos as b (b.id)}
 							<label class="opcao"><input type="checkbox" value={b.id} bind:group={blocos} /> {b.nome}</label>
 						{/each}
@@ -92,11 +93,11 @@
 				{/if}
 			{/if}
 			<label class="campo">
-				Título
+				{t('Título')}
 				<input required maxlength="200" bind:value={titulo} />
 			</label>
 			<label class="campo">
-				Carta
+				{t('Carta')}
 				<textarea required maxlength="8000" rows="8" bind:value={corpo}></textarea>
 			</label>
 			{#if erro}
@@ -105,25 +106,25 @@
 			{#if mensagem}
 				<p class="sucesso" role="status">{mensagem}</p>
 			{/if}
-			<button class="botao">Enviar carta</button>
+			<button class="botao">{t('Enviar carta')}</button>
 		</form>
 	</section>
 {/if}
 
 <section aria-labelledby="t-cartas">
-	<h2 id="t-cartas">Cartas</h2>
+	<h2 id="t-cartas">{t('Cartas')}</h2>
 	<ul class="lista">
 		{#each data.cartas as c (c.id)}
 			<li>
 				<span>
 					<strong>{c.titulo}</strong>
-					{#if c.publica}<span class="selo selo--info">Pública</span>{/if}
-					<span class="detalhe">De {de(c)} · para {para(c)} · {formatarQuando(c.enviada_em, agora)}</span>
+					{#if c.publica}<span class="selo selo--info">{t('Pública')}</span>{/if}
+					<span class="detalhe">{t('De')} {de(c)} · {t('para')} {para(c)} · {formatarQuando(c.enviada_em, agora)}</span>
 				</span>
-				<a href={`/imprimir/carta/${c.id}`} aria-label={`Abrir e imprimir a carta "${c.titulo}"`}>Abrir</a>
+				<a href={`/imprimir/carta/${c.id}`} aria-label={`Abrir e imprimir a carta "${c.titulo}"`}>{t('Abrir')}</a>
 			</li>
 		{:else}
-			<li class="suave">Nenhuma carta ainda.</li>
+			<li class="suave">{t('Nenhuma carta ainda.')}</li>
 		{/each}
 	</ul>
 </section>

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/i18n.svelte.ts';
 	import Bandeira from '#lib/ui/Bandeira.svelte';
 	import BotaoImprimir from '#lib/ui/BotaoImprimir.svelte';
 	import type { PageProps } from './$types';
@@ -8,12 +9,12 @@
 </script>
 
 <svelte:head>
-	<title>DPO · {m.pais} · UFRGSMUN</title>
+	<title>{t('DPO')} · {m.pais} · UFRGSMUN</title>
 </svelte:head>
 
 <div class="impressao">
 	<BotaoImprimir voltar={`/comite/${data.sigla}/dpo`} />
-	<article class="a4 dpo" aria-label="DPO para impressão">
+	<article class="a4 dpo" lang={data.idioma === 'en' ? 'en' : 'pt-BR'} aria-label={t('DPO para impressão')}>
 		<header class="dpo-cabecalho">
 			<Bandeira codigo={m.bandeira} />
 			<h1>{m.pais}</h1>

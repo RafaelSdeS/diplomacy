@@ -1,7 +1,11 @@
+<script lang="ts">
+	import { t } from '#lib/i18n.svelte.ts';
+</script>
+
 <svelte:head>
-	<title>Sem acesso · UFRGSMUN</title>
+	<title>{t('Sem acesso · UFRGSMUN')}</title>
 </svelte:head>
 
-<p class="rotulo">Acesso</p>
-<h1>Sem acesso</h1>
-<p>Sua conta ainda não tem um convite para este evento. Fale com a secretaria do UFRGSMUN.</p>
+<p class="rotulo">{t('Acesso')}</p>
+<h1>{t('Sem acesso')}</h1>
+<p>{t('Sua conta ainda não tem um convite para este evento. Fale com a secretaria do UFRGSMUN.')}</p>

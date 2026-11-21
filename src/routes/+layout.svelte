@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/i18n.svelte.ts';
 	import '@fontsource/source-serif-4/latin-600.css';
 	import '../app.css';
 	import { goto, invalidate } from '$app/navigation';
@@ -27,18 +28,18 @@
 
 	// Cada passo adiciona aqui as telas que cria. Sem "papeis", todos veem.
 	const telas: Tela[] = $derived([
-		{ href: '/', rotulo: 'Agora', icone: House },
+		{ href: '/', rotulo: t('Agora'), icone: House },
 		...(sigla
 			? [
-					{ href: `/comite/${sigla}/sessao`, rotulo: 'Sessão', icone: Gavel },
-					{ href: `/comite/${sigla}`, rotulo: 'Comitê', icone: Landmark }
+					{ href: `/comite/${sigla}/sessao`, rotulo: t('Sessão'), icone: Gavel },
+					{ href: `/comite/${sigla}`, rotulo: t('Comitê'), icone: Landmark }
 				]
 			: []),
-		...(siglaCrise ? [{ href: `/crise/${siglaCrise}`, rotulo: 'Crise', icone: Siren, papeis: ['crise' as const] }] : []),
-		{ href: '/press', rotulo: 'Press', icone: Newspaper },
-		{ href: '/cronograma', rotulo: 'Cronograma', icone: CalendarDays },
-		{ href: '/avisos', rotulo: 'Avisos', icone: Megaphone },
-		{ href: '/secretaria/participantes', rotulo: 'Participantes', icone: Users, papeis: ['secretaria'] }
+		...(siglaCrise ? [{ href: `/crise/${siglaCrise}`, rotulo: t('Crise'), icone: Siren, papeis: ['crise' as const] }] : []),
+		{ href: '/press', rotulo: t('Press'), icone: Newspaper },
+		{ href: '/cronograma', rotulo: t('Cronograma'), icone: CalendarDays },
+		{ href: '/avisos', rotulo: t('Avisos'), icone: Megaphone },
+		{ href: '/secretaria/participantes', rotulo: t('Participantes'), icone: Users, papeis: ['secretaria'] }
 	]);
 	const itens = $derived(telas.filter((t) => !t.papeis || t.papeis.some((p) => papeis.has(p))));
 	const comMenu = $derived(data.participacoes.length > 0);
@@ -106,33 +107,33 @@
 		{@render children()}
 	</main>
 {:else}
-	<a class="pular" href="#conteudo">Pular para o conteúdo</a>
+	<a class="pular" href="#conteudo">{t('Pular para o conteúdo')}</a>
 
 	<div class="app" class:app--sem-menu={!comMenu}>
 		<header class="timbre">
 			<a class="marca" href="/">
 				<span class="marca-sigla">UFRGSMUN</span>
-				<span class="marca-nome">Simulação das Nações Unidas</span>
+				<span class="marca-nome">{t('Simulação das Nações Unidas')}</span>
 			</a>
 			{#if data.usuario}
 				<div class="conta">
-					{#if !online}<span class="selo selo--alerta">Sem conexão</span>{/if}
-					{#if pendentes}<span class="selo selo--info" role="status">{pendentes} para enviar</span>{/if}
+					{#if !online}<span class="selo selo--alerta">{t('Sem conexão')}</span>{/if}
+					{#if pendentes}<span class="selo selo--info" role="status">{t('{n} para enviar', { n: pendentes })}</span>{/if}
 					<span class="conta-nome">{data.nome}</span>
 					{#if comMenu}
 						<a
 							class="botao botao--secundario botao--pequeno"
 							href="/perfil"
-							aria-current={page.url.pathname === '/perfil' ? 'page' : undefined}>Perfil</a
+							aria-current={page.url.pathname === '/perfil' ? 'page' : undefined}>{t('Perfil')}</a
 						>
 					{/if}
-					<button class="botao botao--secundario botao--pequeno" type="button" onclick={sair}>Sair</button>
+					<button class="botao botao--secundario botao--pequeno" type="button" onclick={sair}>{t('Sair')}</button>
 				</div>
 			{/if}
 		</header>
 
 		{#if comMenu}
-			<nav class="navegacao" aria-label="Principal">
+			<nav class="navegacao" aria-label={t('Principal')}>
 				<ul>
 					{#each itens as item (item.href)}
 						<li>

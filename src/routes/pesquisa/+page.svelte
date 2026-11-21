@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/i18n.svelte.ts';
 	import { rotuloPapel } from '#lib/papeis.ts';
 	import { mensagemDeErro } from '#lib/sessao.ts';
 	import { supabase, type Papel } from '#lib/supabase.ts';
@@ -8,14 +9,14 @@
 
 	// As perguntas do questionário do piloto (docs/piloto.md), por função.
 	const COMUNS = [
-		'Em algum momento você não soube o que fazer na tela? Qual?',
-		'O app travou ou ficou sem atualizar no seu aparelho? Quando?'
+		t('Em algum momento você não soube o que fazer na tela? Qual?'),
+		t('O app travou ou ficou sem atualizar no seu aparelho? Quando?')
 	];
 	const POR_PAPEL: Partial<Record<Papel, string[]>> = {
-		delegado: ['Levantar a placa, votar e mandar nota de crise pelo celular foi mais fácil ou mais difícil do que no papel?'],
-		mesa: ['O painel da presidência deu conta do ritmo da sessão? O que faltou?', 'Você usaria o app no evento? Por quê?'],
-		crise: ['A fila de notas deu conta? Alguma nota se perdeu ou chegou duplicada?', 'Você usaria o app no evento? Por quê?'],
-		press: ['Publicar do celular foi rápido o bastante para cobrir a sessão?']
+		delegado: [t('Levantar a placa, votar e mandar nota de crise pelo celular foi mais fácil ou mais difícil do que no papel?')],
+		mesa: [t('O painel da presidência deu conta do ritmo da sessão? O que faltou?'), t('Você usaria o app no evento? Por quê?')],
+		crise: [t('A fila de notas deu conta? Alguma nota se perdeu ou chegou duplicada?'), t('Você usaria o app no evento? Por quê?')],
+		press: [t('Publicar do celular foi rápido o bastante para cobrir a sessão?')]
 	};
 
 	const papeis = $derived([...new Set(data.participacoes.map((p) => p.papel))]);
@@ -42,27 +43,27 @@
 </script>
 
 <svelte:head>
-	<title>Pesquisa de satisfação · UFRGSMUN</title>
+	<title>{t('Pesquisa de satisfação · UFRGSMUN')}</title>
 </svelte:head>
 
-<p class="rotulo">Pesquisa</p>
-<h1>Pesquisa de satisfação</h1>
-<p class="suave">Anônima: a resposta não guarda quem respondeu. Uma resposta por pessoa.</p>
+<p class="rotulo">{t('Pesquisa')}</p>
+<h1>{t('Pesquisa de satisfação')}</h1>
+<p class="suave">{t('Anônima: a resposta não guarda quem respondeu. Uma resposta por pessoa.')}</p>
 
 {#if data.jaRespondeu || enviada}
-	<p class="sucesso" role="status">Obrigado por responder!</p>
+	<p class="sucesso" role="status">{t('Obrigado por responder!')}</p>
 {:else if data.evento}
 	<form class="formulario formulario--largo" onsubmit={enviar}>
 		{#if papeis.length > 1}
 			<label class="campo">
-				Responder como
+				{t('Responder como')}
 				<select bind:value={papel}>
 					{#each papeis as p (p)}<option value={p}>{rotuloPapel(p)}</option>{/each}
 				</select>
 			</label>
 		{/if}
 		<fieldset class="opcoes">
-			<legend>De 1 a 5, o app ajudou ou atrapalhou o evento?</legend>
+			<legend>{t('De 1 a 5, o app ajudou ou atrapalhou o evento?')}</legend>
 			{#each [1, 2, 3, 4, 5] as n (n)}
 				<label class="opcao"><input type="radio" required value={n} bind:group={nota} /> {n}</label>
 			{/each}
@@ -76,6 +77,6 @@
 		{#if erro}
 			<p class="erro" role="alert">{erro}</p>
 		{/if}
-		<button class="botao">Enviar respostas</button>
+		<button class="botao">{t('Enviar respostas')}</button>
 	</form>
 {/if}

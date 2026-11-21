@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/i18n.svelte.ts';
 	import Check from '@lucide/svelte/icons/check';
 	import Minus from '@lucide/svelte/icons/minus';
 	import X from '@lucide/svelte/icons/x';
@@ -22,7 +23,7 @@
 			<span class="com-bandeira"><Bandeira codigo={d.bandeira} /> {d.nome}</span>
 			<span class="voto-escolha">
 				{#if Icone}<Icone aria-hidden="true" size={16} />{/if}
-				{escolha ? ESCOLHAS[escolha] : 'Aguardando'}
+				{escolha ? ESCOLHAS[escolha] : t('Aguardando')}
 			</span>
 		</li>
 	{/each}

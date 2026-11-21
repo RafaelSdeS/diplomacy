@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/i18n.svelte.ts';
 	import { onMount } from 'svelte';
 	import { FORMAS } from '#lib/sessao.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
@@ -70,7 +71,7 @@
 <svelte:window onclick={telaCheia} onkeydown={(e) => e.key.toLowerCase() === 'f' && telaCheia()} />
 
 <svelte:head>
-	<title>Telão · {data.comite.sigla} · UFRGSMUN</title>
+	<title>{t('Telão')} · {data.comite.sigla} · UFRGSMUN</title>
 </svelte:head>
 
 <div class="telao">
@@ -79,18 +80,18 @@
 			<p class="telao-comite">{data.comite.sigla} · {data.comite.nome}</p>
 			<h1 class="telao-sessao">
 				{#if sessao && data.estado}
-					Sessão {sessao.numero} · {data.fase === 'plenaria'
+					{t('Sessão {n}', { n: sessao.numero })} · {data.fase === 'plenaria'
 						? ETAPAS[data.estado.etapa_plenaria].rotulo
 						: `${FASES[data.fase]} · ${FORMAS[data.estado.forma]}`}
 				{:else}
-					Sessão não iniciada
+					{t('Sessão não iniciada')}
 				{/if}
 			</h1>
-			{#if topico}<p class="telao-topico">Tópico em debate: {topico}</p>{/if}
+			{#if topico}<p class="telao-topico">{t('Tópico em debate')}: {topico}</p>{/if}
 		</div>
 		<div class="telao-presidencia">
 			{#if sessao}
-				<span class="rotulo">Presidência</span>
+				<span class="rotulo">{t('Presidência')}</span>
 				<span>{presidenciaEmVigor(data.fase, data.estado?.mesa_assumiu, sessao.presidencia?.nome)}</span>
 			{/if}
 			<AoVivo comiteId={data.comite.id} tabelas={[...TABELAS_SESSAO, 'atualizacao_comite', 'noticia']} bind:diferenca />
@@ -101,12 +102,12 @@
 		<p class="telao-plantao" role="status"><span class="rotulo">{plantao.rotulo}</span> {plantao.texto}</p>
 	{/if}
 
-	<section class="telao-orador" aria-label="Com a palavra">
+	<section class="telao-orador" aria-label={t('Com a palavra')}>
 		{#if data.estado?.orador}
 			<Bandeira codigo={data.estado.orador.bandeira} />
 			<p class="telao-nome">{data.estado.orador.nome}</p>
 		{:else}
-			<p class="telao-nome telao-nome--vazio">{sessao ? 'Aguardando orador' : 'UFRGSMUN'}</p>
+			<p class="telao-nome telao-nome--vazio">{sessao ? t('Aguardando orador') : 'UFRGSMUN'}</p>
 		{/if}
 		{#if data.estado}
 			<Cronometro cronometro={data.estado} avisoSeg={data.regras.aviso_fala_seg} {diferenca} grande />
@@ -114,21 +115,21 @@
 	</section>
 
 	{#if votacao}
-		<aside class="telao-fila telao-votacao" aria-label="Votação">
+		<aside class="telao-fila telao-votacao" aria-label={t('Votação')}>
 			<p class="rotulo">{votacao.nominal ? "Votação nominal" : "Votação"} · {votacao.objeto}</p>
 			<GradeVotos delegacoes={votantes} votos={votacao.votos} />
 		</aside>
 	{:else}
-		<aside class="telao-fila" aria-label="Próximos oradores">
+		<aside class="telao-fila" aria-label={t('Próximos oradores')}>
 			{#if data.votacao && !data.votacao.aberta}
 				<p class="telao-resultado">{data.votacao.objeto}. {textoResultado(data.votacao)}</p>
 			{/if}
-			<p class="rotulo">{lista.length ? (emDiscussao ? 'Lista especial' : 'Lista de oradores') : 'Próximos'}</p>
+			<p class="rotulo">{lista.length ? (emDiscussao ? t('Lista especial') : t('Lista de oradores')) : t('Próximos')}</p>
 			<ol>
 				{#each proximos as item (item.id)}
 					<li class="com-bandeira"><Bandeira codigo={item.delegacao?.bandeira} /> {item.delegacao?.nome}</li>
 				{:else}
-					<li class="telao-vazio">Nenhuma placa levantada</li>
+					<li class="telao-vazio">{t('Nenhuma placa levantada')}</li>
 				{/each}
 			</ol>
 		</aside>

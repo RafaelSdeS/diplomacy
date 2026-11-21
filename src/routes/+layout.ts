@@ -1,5 +1,6 @@
 import { redirect } from '@sveltejs/kit';
 import { carregarConta } from '#lib/conta.ts';
+import { definirIdioma } from '#lib/i18n.svelte.ts';
 import { supabase } from '#lib/supabase.ts';
 import type { LayoutLoad } from './$types';
 
@@ -24,7 +25,8 @@ export const load: LayoutLoad = async ({ url, depends }) => {
 	}
 	if (url.pathname === '/entrar') redirect(307, '/');
 
-	const { participacoes, nome } = await carregarConta(session.user);
+	const { participacoes, nome, idioma } = await carregarConta(session.user);
+	definirIdioma(idioma);
 
 	// Conta sem convite não entra no app; quem tem convite não fica preso em /sem-acesso.
 	if (participacoes.length === 0 && !publica && url.pathname !== '/sem-acesso') redirect(307, '/sem-acesso');

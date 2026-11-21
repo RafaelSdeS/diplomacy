@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/i18n.svelte.ts';
 	import { formatarQuando } from '#lib/cronograma.ts';
 	import { TIPOS_NOTICIA } from '#lib/press.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
@@ -9,31 +10,31 @@
 </script>
 
 <svelte:head>
-	<title>Press · UFRGSMUN</title>
+	<title>{t('Press · UFRGSMUN')}</title>
 </svelte:head>
 
 <p class="rotulo">
-	Press · Simulação
+	{t('Press · Simulação')}
 	<AoVivo eventoId={data.participacoes[0]?.evento_id} tabelas={['noticia']} dependencia="app:press" />
 </p>
-<h1>Capa</h1>
+<h1>{t('Capa')}</h1>
 
 <p class="acoes">
-	<a class="botao botao--secundario" href="/press/coletiva">Coletiva de imprensa</a>
-	{#if data.minhaPress.length}<a class="botao botao--secundario" href="/press/entrevistas">Entrevistas</a>{/if}
+	<a class="botao botao--secundario" href="/press/coletiva">{t('Coletiva de imprensa')}</a>
+	{#if data.minhaPress.length}<a class="botao botao--secundario" href="/press/entrevistas">{t('Entrevistas')}</a>{/if}
 </p>
 
 {#if data.minhaPress.length}
 	<p class="acoes">
-		<a class="botao" href="/press/escrever">Escrever matéria</a>
+		<a class="botao" href="/press/escrever">{t('Escrever matéria')}</a>
 		{#each data.minhaPress as sigla (sigla)}
-			<a class="botao botao--secundario" href={`/press/${sigla}`}>Meu veículo ({sigla})</a>
+			<a class="botao botao--secundario" href={`/press/${sigla}`}>{t('Meu veículo')} ({sigla})</a>
 		{/each}
 	</p>
 {/if}
 
 <section aria-labelledby="t-manchetes">
-	<h2 id="t-manchetes">Manchetes</h2>
+	<h2 id="t-manchetes">{t('Manchetes')}</h2>
 	<ul class="capa">
 		{#each data.noticias as n (n.id)}
 			<li>
@@ -41,7 +42,7 @@
 					{#if n.imagem}<img src={n.imagem} alt={n.imagem_descricao ?? ''} loading="lazy" />{/if}
 					<p class="rotulo">
 						{n.veiculo?.nome}
-						{#if n.tipo === 'nota_urgente'}<span class="selo selo--erro">Urgente</span>{/if}
+						{#if n.tipo === 'nota_urgente'}<span class="selo selo--erro">{t('Urgente')}</span>{/if}
 					</p>
 					<h3 id={`m-${n.id}`}><a href={`/press/${n.veiculo?.comite?.sigla}?n=${n.id}`}>{n.titulo}</a></h3>
 					{#if n.linha_fina}<p>{n.linha_fina}</p>{/if}
@@ -49,13 +50,13 @@
 				</article>
 			</li>
 		{:else}
-			<li class="suave">Nenhuma notícia ainda.</li>
+			<li class="suave">{t('Nenhuma notícia ainda.')}</li>
 		{/each}
 	</ul>
 </section>
 
 <section aria-labelledby="t-veiculos">
-	<h2 id="t-veiculos">Veículos</h2>
+	<h2 id="t-veiculos">{t('Veículos')}</h2>
 	<ul class="lista">
 		{#each data.veiculos as v (v.id)}
 			<li><a href={`/press/${v.comite?.sigla}`}>{v.nome}</a> <span class="detalhe">{v.comite?.sigla}</span></li>

@@ -1,14 +1,15 @@
 // Funções puras da crise (testadas em crise.test.ts).
+import { bilingue, idioma, t } from './i18n.svelte.ts';
 
 export type StatusNota = 'pendente' | 'em_analise' | 'aprovada' | 'rejeitada' | 'pede_ajuste';
 
-export const STATUS_NOTA: Record<StatusNota, string> = {
+export const STATUS_NOTA: Record<StatusNota, string> = bilingue({
 	pendente: 'Na fila',
 	em_analise: 'Em análise',
 	aprovada: 'Aprovada',
 	rejeitada: 'Rejeitada',
 	pede_ajuste: 'Pede ajuste'
-};
+});
 
 export const SELO_NOTA: Record<StatusNota, string> = {
 	pendente: 'selo--info',
@@ -22,7 +23,7 @@ export const SELO_NOTA: Record<StatusNota, string> = {
 // ponytail: um limite fixo; vira regra do comitê se a organização quiser ajustar.
 export const ESPERA_MAXIMA_MIN = 10;
 
-export const RESPOSTAS_PRONTAS = [
+const PRONTAS = [
 	'Recebido. A crise está analisando a sua ação.',
 	'Aprovada. Os efeitos aparecem na próxima atualização de crise.',
 	'Rejeitada: a ação não é plausível para a sua delegação neste momento.',
@@ -35,8 +36,21 @@ export const esperando = (status: string) => status === 'pendente' || status ===
 export const minutosDesde = (desde: string, agoraMs: number) =>
 	Math.max(0, Math.floor((agoraMs - Date.parse(desde)) / 60_000));
 
+/** Respostas prontas da equipe de crise, no idioma da interface. */
+export const respostasProntas = () => PRONTAS.map((r) => t(r));
+
 export const formatarEspera = (min: number) =>
-	min < 1 ? 'agora' : min < 60 ? `há ${min} min` : `há ${Math.floor(min / 60)} h ${min % 60} min`;
+	idioma.atual === 'en'
+		? min < 1
+			? 'now'
+			: min < 60
+				? `${min} min ago`
+				: `${Math.floor(min / 60)} h ${min % 60} min ago`
+		: min < 1
+			? 'agora'
+			: min < 60
+				? `há ${min} min`
+				: `há ${Math.floor(min / 60)} h ${min % 60} min`;
 
 type NotaNaFila = { status: string; criado_em: string };
 

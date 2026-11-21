@@ -51,6 +51,6 @@ Arquivos: `supabase/tests/17-comunicacao.test.sql`, `src/lib/imagem-redes.test.t
 
 ## Pronto quando
 
-- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
+- [x] Os testes acima passam no CI, junto com os de todos os passos anteriores.
 - [x] As delegações trocam bilhetes, e as regras da mesa são respeitadas.
 - [x] A press faz entrevistas, coletiva, edição do dia e imagens para as redes pelo app.

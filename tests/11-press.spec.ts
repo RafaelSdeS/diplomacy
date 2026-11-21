@@ -47,7 +47,7 @@ test('a matéria publicada no celular chega à capa sem recarregar, e a delegaç
 		.getByLabel(/^Texto/)
 		.fill('O Brasil propôs um cessar-fogo. "Que merda de proposta", disse um diplomata.\n\nO debate continua.');
 	// O aviso de palavrão não bloqueia a publicação.
-	await expect(press.getByText(/^Atenção: o texto tem uma palavra/)).toContainText('(merda)');
+	await expect(press.getByText(/^Atenção: o texto tem palavras/)).toContainText('(merda)');
 	await press.getByLabel('Imagem (opcional)').setInputFiles({ name: 'foto.png', mimeType: 'image/png', buffer: PNG });
 	await press.getByLabel(/^Descrição da imagem/).fill('Plenário do Conselho');
 	await press.getByRole('group', { name: 'Delegações citadas' }).getByLabel('Brasil', { exact: true }).check();

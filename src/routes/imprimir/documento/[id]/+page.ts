@@ -21,6 +21,7 @@ export const load: PageLoad = async ({ params }) => {
 	return {
 		documento: documento.data,
 		sigla: comite.sigla,
+		idioma: comite.idioma === 'en' ? ('en' as const) : ('pt' as const),
 		formatado: formatarDocumento(
 			clausulas.data,
 			comite,

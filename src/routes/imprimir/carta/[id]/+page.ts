@@ -18,5 +18,5 @@ export const load: PageLoad = async ({ params }) => {
 	const c = carta.data;
 	const remetente = c.bloco_remetente?.nome ?? c.remetente?.nome_oficial ?? '';
 	const destinatarios = c.destinatarios.map((d) => d.delegacao?.nome_oficial ?? d.bloco?.nome ?? '').filter(Boolean);
-	return { sigla: c.comite!.sigla, enviadaEm: c.enviada_em, modelo: modeloCarta(c, remetente, destinatarios, c.comite!) };
+	return { sigla: c.comite!.sigla, idioma: c.comite!.idioma, enviadaEm: c.enviada_em, modelo: modeloCarta(c, remetente, destinatarios, c.comite!) };
 };

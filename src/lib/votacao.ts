@@ -1,21 +1,40 @@
 // Funções puras da plenária, da votação e da agenda (testadas em votacao.test.ts).
+import { bilingue, idioma, t } from './i18n.svelte.ts';
 
 export type Escolha = 'a_favor' | 'contra' | 'abstencao';
 export type Fase = 'plenaria' | 'debate' | 'acao' | 'encerrado';
 
-export const ESCOLHAS: Record<Escolha, string> = { a_favor: 'A favor', contra: 'Contra', abstencao: 'Abstenção' };
+export const ESCOLHAS: Record<Escolha, string> = bilingue({ a_favor: 'A favor', contra: 'Contra', abstencao: 'Abstenção' });
 
-export const FASES: Record<Fase, string> = {
+export const FASES: Record<Fase, string> = bilingue({
 	plenaria: 'Plenária de abertura',
 	debate: 'Debate',
 	acao: 'Fase de ação',
 	encerrado: 'Encerrado'
-};
+});
 
 export const ETAPAS: Record<string, { rotulo: string; proxima?: string }> = {
-	briefing: { rotulo: 'Briefing e diálogo interativo', proxima: 'Começar os discursos de abertura' },
-	discursos: { rotulo: 'Discursos de abertura', proxima: 'Passar à moção do tópico no topo' },
-	topico: { rotulo: 'Moção do tópico no topo da agenda' }
+	briefing: {
+		get rotulo() {
+			return t('Briefing e diálogo interativo');
+		},
+		get proxima() {
+			return t('Começar os discursos de abertura');
+		}
+	},
+	discursos: {
+		get rotulo() {
+			return t('Discursos de abertura');
+		},
+		get proxima() {
+			return t('Passar à moção do tópico no topo');
+		}
+	},
+	topico: {
+		get rotulo() {
+			return t('Moção do tópico no topo da agenda');
+		}
+	}
 };
 
 /** As escolhas que a delegação pode fazer nesta votação (o banco confere de novo). */
@@ -42,6 +61,11 @@ const plural = (n: number, um: string, varios: string) => `${n} ${n === 1 ? um :
 
 /** "Aprovada: 4 a favor, 1 contra e 0 abstenções (eram necessários 4)". */
 export function textoResultado(r: Resultado): string {
+	if (idioma.atual === 'en') {
+		const ab = r.abstencoes ?? 0;
+		const nec = r.necessario ?? 0;
+		return `${r.aprovada ? 'Adopted' : 'Rejected'}: ${r.a_favor ?? 0} in favour, ${r.contra ?? 0} against and ${ab} ${ab === 1 ? 'abstention' : 'abstentions'} (${nec} ${nec === 1 ? 'vote' : 'votes'} required)`;
+	}
 	const partes = `${r.a_favor ?? 0} a favor, ${r.contra ?? 0} contra e ${plural(r.abstencoes ?? 0, 'abstenção', 'abstenções')}`;
 	return `${r.aprovada ? 'Aprovada' : 'Rejeitada'}: ${partes} (${plural(r.necessario ?? 0, 'voto necessário', 'votos necessários')})`;
 }
@@ -52,7 +76,7 @@ export function presidenciaEmVigor(
 	mesaAssumiu: boolean | null | undefined,
 	delegacao: string | null | undefined
 ): string {
-	if (fase !== 'debate' || mesaAssumiu || !delegacao) return 'Mesa';
+	if (fase !== 'debate' || mesaAssumiu || !delegacao) return t('Mesa');
 	return delegacao;
 }
 
@@ -97,12 +121,12 @@ export function lerEsboco(texto: string): ItemEsboco[] {
 export const escreverEsboco = (itens: ItemEsboco[]) =>
 	itens.map((i) => `${'  '.repeat(i.nivel)}${i.texto}`).join('\n');
 
-export const REGRAS_VOTACAO: Record<string, string> = {
+export const REGRAS_VOTACAO: Record<string, string> = bilingue({
 	maioria_simples: 'maioria simples',
 	dois_tercos: 'dois terços',
 	csnu: 'regra do CSNU (9 votos, sem voto contra de permanente)',
 	unanimidade: 'unanimidade das delegações previstas'
-};
+});
 
 /** Assinaturas que a não-confiança pede: a fração das regras, das delegações previstas, para cima. */
 export function assinaturasDesconfianca(fracao: [number, number], delegacoes: { situacao: string }[]) {

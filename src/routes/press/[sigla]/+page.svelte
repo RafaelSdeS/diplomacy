@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { locale, t } from '#lib/i18n.svelte.ts';
 	import { invalidate } from '$app/navigation';
 	import { formatarQuando } from '#lib/cronograma.ts';
 	import { paragrafos } from '#lib/impressao.ts';
@@ -18,8 +19,8 @@
 	const denunciasDaAberta = $derived(data.denuncias.filter((d) => d.noticia_id === data.aberta));
 
 	const SITUACAO: Record<string, { rotulo: string; selo: string } | undefined> = {
-		aguardando: { rotulo: 'Aguardando revisão', selo: 'selo--alerta' },
-		oculta: { rotulo: 'Oculta', selo: 'selo--erro' }
+		aguardando: { rotulo: t('Aguardando revisão'), selo: 'selo--alerta' },
+		oculta: { rotulo: t('Oculta'), selo: 'selo--erro' }
 	};
 
 	let motivo = $state('');
@@ -56,23 +57,23 @@
 	}
 
 	const dataDaSimulacao = (d: string) =>
-		new Date(`${d}T12:00:00`).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
+		new Date(`${d}T12:00:00`).toLocaleDateString(locale(), { day: 'numeric', month: 'long', year: 'numeric' });
 </script>
 
 <svelte:head>
-	<title>{data.veiculo.nome} · Press · UFRGSMUN</title>
+	<title>{data.veiculo.nome} · {t('Press')} · UFRGSMUN</title>
 </svelte:head>
 
 <p class="rotulo">
-	Press · {data.comite.sigla} · Simulação
+	{t('Press')} · {data.comite.sigla} · {t('Simulação')}
 	<AoVivo comiteId={data.comite.id} tabelas={['noticia']} dependencia="app:press" />
 </p>
 <h1>{data.veiculo.nome}</h1>
 {#if data.veiculo.linha_editorial}<p class="suave">{data.veiculo.linha_editorial}</p>{/if}
 {#if souPress || modero}
 	<p class="acoes">
-		{#if souPress}<a class="botao" href="/press/escrever">Escrever matéria</a>{/if}
-		<a class="botao botao--secundario" href={`/imprimir/edicao/${data.comite.sigla}`}>Edição do dia</a>
+		{#if souPress}<a class="botao" href="/press/escrever">{t('Escrever matéria')}</a>{/if}
+		<a class="botao botao--secundario" href={`/imprimir/edicao/${data.comite.sigla}`}>{t('Edição do dia')}</a>
 	</p>
 {/if}
 
@@ -96,26 +97,26 @@
 			{#if noticia.imagem}<img class="materia-imagem" src={noticia.imagem} alt={noticia.imagem_descricao ?? ''} />{/if}
 			{#each paragrafos(noticia.texto) as p, i (i)}<p>{p}</p>{/each}
 			{#if noticia.citacoes.length}
-				<p class="detalhe">Cita: {noticia.citacoes.map((c) => c.delegacao?.nome).join(', ')}</p>
+				<p class="detalhe">{t('Cita')}: {noticia.citacoes.map((c) => c.delegacao?.nome).join(', ')}</p>
 			{/if}
 			<p class="detalhe">
-				{noticia.autor?.nome ? `Por ${noticia.autor.nome} · ` : ''}{formatarQuando(noticia.publicada_em, agora)}
+				{noticia.autor?.nome ? `${t('Por')} ${noticia.autor.nome} · ` : ''}{formatarQuando(noticia.publicada_em, agora)}
 			</p>
 			{#if souPress && noticia.status === 'publicada'}
 				<div class="acoes">
-					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => compartilhar('post')}>Imagem para post</button>
-					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => compartilhar('story')}>Imagem para story</button>
+					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => compartilhar('post')}>{t('Imagem para post')}</button>
+					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => compartilhar('story')}>{t('Imagem para story')}</button>
 				</div>
-				{#if legenda}<p class="detalhe">Legenda: {legenda}</p>{/if}
+				{#if legenda}<p class="detalhe">{t('Legenda')}: {legenda}</p>{/if}
 			{/if}
 			{#if noticia.motivo_ocultacao}
-				<p class="telegrama" role="note" aria-label="Motivo da ocultação">{noticia.motivo_ocultacao}</p>
+				<p class="telegrama" role="note" aria-label={t('Motivo da ocultação')}>{noticia.motivo_ocultacao}</p>
 			{/if}
 
 			{#if modero}
 				{#if denunciasDaAberta.length}
 					<section aria-labelledby="t-denuncias">
-						<h3 id="t-denuncias">Denúncias ({denunciasDaAberta.length})</h3>
+						<h3 id="t-denuncias">{t('Denúncias')} ({denunciasDaAberta.length})</h3>
 						<ul class="lista">
 							{#each denunciasDaAberta as d (d.id)}<li>{d.motivo}</li>{/each}
 						</ul>
@@ -123,37 +124,37 @@
 				{/if}
 				<div class="formulario formulario--largo">
 					{#if noticia.status === 'aguardando'}
-						<button class="botao" type="button" onclick={() => executar(supabase.rpc('aprovar_noticia', { p_noticia: noticia.id }), 'Notícia publicada.')}
-							>Aprovar e publicar</button
+						<button class="botao" type="button" onclick={() => executar(supabase.rpc('aprovar_noticia', { p_noticia: noticia.id }), t('Notícia publicada.'))}
+							>{t('Aprovar e publicar')}</button
 						>
 					{/if}
 					{#if noticia.status !== 'oculta'}
 						<label class="campo">
-							Motivo da ocultação
+							{t('Motivo da ocultação')}
 							<textarea rows="2" maxlength="500" bind:value={motivo}></textarea>
 						</label>
 						<button
 							class="botao botao--secundario"
 							type="button"
-							onclick={() => executar(supabase.rpc('ocultar_noticia', { p_noticia: noticia.id, p_motivo: motivo }), 'Notícia ocultada.')}
-							>Ocultar notícia</button
+							onclick={() => executar(supabase.rpc('ocultar_noticia', { p_noticia: noticia.id, p_motivo: motivo }), t('Notícia ocultada.'))}
+							>{t('Ocultar notícia')}</button
 						>
 					{/if}
 				</div>
 			{:else if !souPress}
 				<details class="denunciar">
-					<summary>Denunciar</summary>
+					<summary>{t('Denunciar')}</summary>
 					<div class="formulario">
 						<label class="campo">
-							Motivo da denúncia
+							{t('Motivo da denúncia')}
 							<textarea rows="2" maxlength="500" bind:value={motivo}></textarea>
 						</label>
 						<button
 							class="botao botao--secundario"
 							type="button"
 							onclick={() =>
-								executar(supabase.rpc('denunciar_noticia', { p_noticia: noticia.id, p_motivo: motivo }), 'Denúncia enviada à Diretoria da Press.')}
-							>Enviar denúncia</button
+								executar(supabase.rpc('denunciar_noticia', { p_noticia: noticia.id, p_motivo: motivo }), t('Denúncia enviada à Diretoria da Press.'))}
+							>{t('Enviar denúncia')}</button
 						>
 					</div>
 				</details>
@@ -162,7 +163,7 @@
 	{/if}
 
 	<section aria-labelledby="t-feed">
-		<h2 id="t-feed">Matérias</h2>
+		<h2 id="t-feed">{t('Matérias')}</h2>
 		<ol class="lista">
 			{#each data.noticias as n (n.id)}
 				<li>
@@ -177,7 +178,7 @@
 					</a>
 				</li>
 			{:else}
-				<li class="suave">Nenhuma matéria ainda.</li>
+				<li class="suave">{t('Nenhuma matéria ainda.')}</li>
 			{/each}
 		</ol>
 	</section>

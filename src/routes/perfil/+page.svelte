@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/i18n.svelte.ts';
 	import { esquecerConta } from '#lib/conta.ts';
 	import { untrack } from 'svelte';
 	import { invalidate } from '$app/navigation';
@@ -12,6 +13,7 @@
 
 	let nome = $state(untrack(() => data.pessoa.nome));
 	let bio = $state(untrack(() => data.pessoa.bio ?? ''));
+	let idiomaEscolhido = $state(untrack(() => data.pessoa.idioma ?? ''));
 	let fotoUrl = $state(untrack(() => data.fotoUrl));
 	let mensagem = $state('');
 	let erro = $state('');
@@ -22,13 +24,13 @@
 		mensagem = erro = '';
 		const { error } = await supabase
 			.from('pessoa')
-			.update({ nome: nome.trim(), bio: bio.trim() || null })
+			.update({ nome: nome.trim(), bio: bio.trim() || null, idioma: idiomaEscolhido || null })
 			.eq('id', data.usuario!.id);
 		if (error) {
-			erro = 'Não foi possível salvar o perfil.';
+			erro = t('Não foi possível salvar o perfil.');
 			return;
 		}
-		mensagem = 'Perfil salvo.';
+		mensagem = t('Perfil salvo.');
 		esquecerConta();
 		await invalidate('app:sessao'); // o nome do cabeçalho
 	}
@@ -49,9 +51,9 @@
 			if (atualizacao.error) throw atualizacao.error;
 			const assinada = await supabase.storage.from('fotos').createSignedUrl(caminho, 3600);
 			fotoUrl = assinada.data?.signedUrl ?? null;
-			mensagem = 'Foto atualizada.';
+			mensagem = t('Foto atualizada.');
 		} catch {
-			erro = 'Não foi possível enviar a foto. Tente outra imagem.';
+			erro = t('Não foi possível enviar a foto. Tente outra imagem.');
 		} finally {
 			enviandoFoto = false;
 		}
@@ -59,15 +61,15 @@
 </script>
 
 <svelte:head>
-	<title>Perfil · UFRGSMUN</title>
+	<title>{t('Perfil · UFRGSMUN')}</title>
 </svelte:head>
 
-<p class="rotulo">Conta</p>
-<h1>Perfil</h1>
-<p class="acoes"><a class="botao botao--secundario" href="/perfil/meus-dados">Meus dados (LGPD)</a> <a class="botao botao--secundario" href="/pesquisa">Pesquisa de satisfação</a></p>
+<p class="rotulo">{t('Conta')}</p>
+<h1>{t('Perfil')}</h1>
+<p class="acoes"><a class="botao botao--secundario" href="/perfil/meus-dados">{t('Meus dados (LGPD)')}</a> <a class="botao botao--secundario" href="/pesquisa">{t('Pesquisa de satisfação')}</a></p>
 
 <section aria-labelledby="t-participacao">
-	<h2 id="t-participacao">Sua participação</h2>
+	<h2 id="t-participacao">{t('Sua participação')}</h2>
 	<ul class="lista">
 		{#each data.participacoes as p (p.id)}
 			<li>
@@ -81,22 +83,30 @@
 </section>
 
 <section aria-labelledby="t-dados">
-	<h2 id="t-dados">Seus dados</h2>
+	<h2 id="t-dados">{t('Seus dados')}</h2>
 	{#if fotoUrl}
-		<img class="foto" src={fotoUrl} alt="Sua foto" width="96" height="96" />
+		<img class="foto" src={fotoUrl} alt={t('Sua foto')} width="96" height="96" />
 	{/if}
 	<form class="formulario" onsubmit={salvar}>
 		<label class="campo">
-			Foto
+			{t('Foto')}
 			<input type="file" accept="image/*" disabled={enviandoFoto} onchange={enviarFoto} />
 		</label>
 		<label class="campo">
-			Nome
+			{t('Nome')}
 			<input required maxlength="80" autocomplete="name" bind:value={nome} />
 		</label>
 		<label class="campo">
-			Minibiografia
+			{t('Minibiografia')}
 			<textarea maxlength="500" bind:value={bio}></textarea>
+		</label>
+		<label class="campo">
+			{t('Idioma do app')}
+			<select bind:value={idiomaEscolhido}>
+				<option value="">{t('O do meu comitê')}</option>
+				<option value="pt">Português</option>
+				<option value="en">English</option>
+			</select>
 		</label>
 		{#if mensagem}
 			<p class="sucesso" role="status">{mensagem}</p>
@@ -104,12 +114,12 @@
 		{#if erro}
 			<p class="erro" role="alert">{erro}</p>
 		{/if}
-		<button class="botao">Salvar perfil</button>
+		<button class="botao">{t('Salvar perfil')}</button>
 	</form>
 
 {#if data.recortes.length}
 	<section aria-labelledby="t-recortes">
-		<h2 id="t-recortes">Recortes da sua delegação</h2>
+		<h2 id="t-recortes">{t('Recortes da sua delegação')}</h2>
 		<ul class="lista">
 			{#each data.recortes as n (n.id)}
 				<li>

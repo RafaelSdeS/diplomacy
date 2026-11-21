@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/i18n.svelte.ts';
 	import { invalidate } from '$app/navigation';
 	import Check from '@lucide/svelte/icons/check';
 	import { agruparPorDia, formatarHora, instanteNoFuso, itensAtuais } from '#lib/cronograma.ts';
@@ -40,10 +41,10 @@
 		if (error) {
 			erro =
 				error.code === '23514'
-					? 'O fim precisa ser depois do início.'
+					? t('O fim precisa ser depois do início.')
 					: error.code === '23505'
-						? 'Já existe um item com esse título nesse horário.'
-						: 'Não foi possível adicionar o item.';
+						? t('Já existe um item com esse título nesse horário.')
+						: t('Não foi possível adicionar o item.');
 			return;
 		}
 		titulo = local = inicio = fim = comite = '';
@@ -54,7 +55,7 @@
 		erro = '';
 		const { error } = await supabase.from('cronograma_item').delete().eq('id', id);
 		if (error) {
-			erro = 'Não foi possível remover o item.';
+			erro = t('Não foi possível remover o item.');
 			return;
 		}
 		await invalidate('app:cronograma');
@@ -62,11 +63,11 @@
 </script>
 
 <svelte:head>
-	<title>Cronograma · UFRGSMUN</title>
+	<title>{t('Cronograma · UFRGSMUN')}</title>
 </svelte:head>
 
-<p class="rotulo">Evento</p>
-<h1>Cronograma</h1>
+<p class="rotulo">{t('Evento')}</p>
+<h1>{t('Cronograma')}</h1>
 
 {#each grupos as grupo (grupo.chave)}
 	<section aria-labelledby={`dia-${grupo.chave}`}>
@@ -78,7 +79,7 @@
 						<span class="hora">{formatarHora(item.inicio)}–{formatarHora(item.fim)}</span>
 						{item.titulo}
 						{#if atuais.has(item.id)}
-							<span class="selo selo--ok"><Check aria-hidden="true" size={14} /> Agora</span>
+							<span class="selo selo--ok"><Check aria-hidden="true" size={14} /> {t('Agora')}</span>
 						{/if}
 						<span class="detalhe">{[item.local, siglaDe(item.comite_id)].filter(Boolean).join(' · ')}</span>
 					</span>
@@ -87,7 +88,7 @@
 							class="botao botao--secundario botao--pequeno"
 							type="button"
 							aria-label={`Remover ${item.titulo}`}
-							onclick={() => remover(item.id)}>Remover</button
+							onclick={() => remover(item.id)}>{t('Remover')}</button
 						>
 					{/if}
 				</li>
@@ -95,33 +96,33 @@
 		</ul>
 	</section>
 {:else}
-	<p class="suave">O cronograma ainda está vazio.</p>
+	<p class="suave">{t('O cronograma ainda está vazio.')}</p>
 {/each}
 
 {#if data.eventoDaSecretaria}
 	<section aria-labelledby="t-novo-item">
-		<h2 id="t-novo-item">Novo item</h2>
+		<h2 id="t-novo-item">{t('Novo item')}</h2>
 		<form class="formulario" onsubmit={adicionar}>
 			<label class="campo">
-				Título
+				{t('Título')}
 				<input required maxlength="120" bind:value={titulo} />
 			</label>
 			<label class="campo">
-				Local
+				{t('Local')}
 				<input maxlength="120" bind:value={local} />
 			</label>
 			<label class="campo">
-				Início
+				{t('Início')}
 				<input type="datetime-local" required bind:value={inicio} />
 			</label>
 			<label class="campo">
-				Fim
+				{t('Fim')}
 				<input type="datetime-local" required bind:value={fim} />
 			</label>
 			<label class="campo">
-				Para
+				{t('Para')}
 				<select bind:value={comite}>
-					<option value="">Todos</option>
+					<option value="">{t('Todos')}</option>
 					{#each data.comites as c (c.id)}
 						<option value={c.id}>{c.sigla}</option>
 					{/each}
@@ -130,7 +131,7 @@
 			{#if erro}
 				<p class="erro" role="alert">{erro}</p>
 			{/if}
-			<button class="botao">Adicionar ao cronograma</button>
+			<button class="botao">{t('Adicionar ao cronograma')}</button>
 		</form>
 	</section>
 {/if}

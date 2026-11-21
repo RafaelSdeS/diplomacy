@@ -1145,14 +1145,14 @@ isOneToOne: false
                   ]
                 },"pessoa": {
                   Row: {
-                    "avisos_vistos_em": string | null,"bio": string | null,"foto_path": string | null,"id": string,"nome": string
+                    "avisos_vistos_em": string | null,"bio": string | null,"foto_path": string | null,"id": string,"idioma": string | null,"nome": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "avisos_vistos_em"?: string | null,"bio"?: string | null,"foto_path"?: string | null,"id": string,"nome": string
+                    "avisos_vistos_em"?: string | null,"bio"?: string | null,"foto_path"?: string | null,"id": string,"idioma"?: string | null,"nome": string
                   }
                   Update: {
-                    "avisos_vistos_em"?: string | null,"bio"?: string | null,"foto_path"?: string | null,"id"?: string,"nome"?: string
+                    "avisos_vistos_em"?: string | null,"bio"?: string | null,"foto_path"?: string | null,"id"?: string,"idioma"?: string | null,"nome"?: string
                   }
                   Relationships: [
                     

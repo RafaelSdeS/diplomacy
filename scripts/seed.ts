@@ -158,6 +158,23 @@ const ESPECIAIS = [
 			['Espanha', 'Kingdom of Spain', 'es', 'membro'],
 			['Portugal', 'Portuguese Republic', 'pt', 'membro']
 		]
+	},
+	{
+		// Um comitê em inglês (passo 18), como o UNOCT de 2026.
+		sigla: 'UNOCT-T',
+		nome: 'UN Office of Counter-Terrorism (test)',
+		nome_oficial: 'The United Nations Office of Counter-Terrorism',
+		tecnologia_restrita: false,
+		regras: {},
+		idioma: 'en',
+		topicos: ['Countering the financing of terrorism', 'Protecting critical infrastructure'],
+		delegacoes: [
+			['France', 'French Republic', 'fr', 'membro'],
+			['Brazil', 'Federative Republic of Brazil', 'br', 'membro'],
+			['Nigeria', 'Federal Republic of Nigeria', 'ng', 'membro'],
+			['Indonesia', 'Republic of Indonesia', 'id', 'membro'],
+			['Japan', 'Japan', 'jp', 'membro']
+		]
 	}
 ] as const;
 const delegacaoDoEspecial = new Map<string, Map<string, string>>();
@@ -172,10 +189,13 @@ for (const especial of ESPECIAIS) {
 					sigla: especial.sigla,
 					nome: especial.nome,
 					nome_oficial: especial.nome_oficial,
-					idioma: 'pt',
+					idioma: 'idioma' in especial ? especial.idioma : 'pt',
 					tecnologia_restrita: especial.tecnologia_restrita,
 					regras: especial.regras,
-					topicos: ['A crise dos mísseis (cenário de teste)', 'Cooperação regional (cenário de teste)']
+					topicos:
+						'topicos' in especial
+							? [...especial.topicos]
+							: ['A crise dos mísseis (cenário de teste)', 'Cooperação regional (cenário de teste)']
 				},
 				{ onConflict: 'evento_id,sigla' }
 			)
@@ -236,7 +256,10 @@ const contas: Conta[] = [
 	{ email: 'crise-treino@exemplo.test', nome: 'Crise do Treino', papel: 'crise', treino: true },
 	// A OEA de teste, com tecnologia restrita: a mesa e um delegado.
 	{ email: 'mesa-oea@exemplo.test', nome: 'Mesa da OEA', papel: 'mesa', especial: 'OEA-T' },
-	{ email: 'oea-brasil@exemplo.test', nome: 'Delegado da OEA', papel: 'delegado', delegacao: 'Brasil', especial: 'OEA-T' }
+	{ email: 'oea-brasil@exemplo.test', nome: 'Delegado da OEA', papel: 'delegado', delegacao: 'Brasil', especial: 'OEA-T' },
+	// O comitê em inglês: uma delegada e a mesa.
+	{ email: 'unoct-france@exemplo.test', nome: 'Delegate of France', papel: 'delegado', delegacao: 'France', especial: 'UNOCT-T' },
+	{ email: 'unoct-mesa@exemplo.test', nome: 'UNOCT Dais', papel: 'mesa', especial: 'UNOCT-T' }
 ];
 
 verificar(

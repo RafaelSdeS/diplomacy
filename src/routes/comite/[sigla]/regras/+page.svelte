@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/i18n.svelte.ts';
 	import { regrasLegiveis } from '#lib/regras.ts';
 	import type { PageProps } from './$types';
 
@@ -9,14 +10,14 @@
 </script>
 
 <svelte:head>
-	<title>Regras · {data.comite.sigla} · UFRGSMUN</title>
+	<title>{t('Regras')} · {data.comite.sigla} · UFRGSMUN</title>
 </svelte:head>
 
-<p class="rotulo">Comitê · {data.comite.sigla}</p>
-<h1>Regras de procedimento</h1>
+<p class="rotulo">{t('Comitê')} · {data.comite.sigla}</p>
+<h1>{t('Regras de procedimento')}</h1>
 <p class="suave">
-	Do Guia de Regras do UFRGSMUN, com os ajustes deste comitê.
-	<a href={`/comite/${data.comite.sigla}`}>Voltar ao comitê</a>
+	{t('Do Guia de Regras do UFRGSMUN, com os ajustes deste comitê.')}
+	<a href={`/comite/${data.comite.sigla}`}>{t('Voltar ao comitê')}</a>
 </p>
 
 {#each grupos as grupo (grupo)}
@@ -28,8 +29,8 @@
 					<dt>{regra.rotulo}</dt>
 					<dd>
 						{regra.texto}
-						{#if regra.rotulo === 'Quórum'}
-							<span class="detalhe">Hoje: {data.quorum} de {data.previstas} delegações.</span>
+						{#if regra.rotulo === t('Quórum')}
+							<span class="detalhe">{t('Hoje: {n} de {total} delegações.', { n: data.quorum, total: data.previstas })}</span>
 						{/if}
 					</dd>
 				</div>

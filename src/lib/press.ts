@@ -1,12 +1,13 @@
 import { supabase } from './supabase.ts';
+import { bilingue } from './i18n.svelte.ts';
 
-export const TIPOS_NOTICIA: Record<string, string> = {
+export const TIPOS_NOTICIA: Record<string, string> = bilingue({
 	nota_urgente: 'Nota urgente',
 	reportagem: 'Reportagem',
 	entrevista: 'Entrevista',
 	opiniao: 'Opinião',
 	charge: 'Charge'
-};
+});
 
 /** As imagens ficam num bucket privado: cada notícia ganha um link assinado (1 h). */
 export async function comImagens<T extends { imagem_path: string | null }>(noticias: T[]) {

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { bilingue, t } from '#lib/i18n.svelte.ts';
 	import { untrack } from 'svelte';
 	import { invalidate } from '$app/navigation';
 	import { mensagemDeErro } from '#lib/sessao.ts';
@@ -10,7 +11,7 @@
 	let { data }: PageProps = $props();
 
 	type Ponto = (typeof data.propostas)[number]['pontos'][number];
-	const ANDAMENTO = { pendente: 'Pendente', em_debate: 'Em debate', debatido: 'Debatido' } as const;
+	const ANDAMENTO = bilingue({ pendente: 'Pendente', em_debate: 'Em debate', debatido: 'Debatido' } as const);
 	const PROXIMO = { pendente: 'em_debate', em_debate: 'debatido', debatido: 'pendente' } as const;
 
 	const eu = $derived(data.participacoes.find((p) => p.comite_id === data.comite.id && p.papel === 'delegado'));
@@ -53,7 +54,7 @@
 		evento.preventDefault();
 		void executar(
 			supabase.rpc('salvar_proposta_agenda', { p_comite: data.comite.id, p_topico: topico, p_itens: lerEsboco(esboco) }),
-			'Proposta salva.'
+			t('Proposta salva.')
 		);
 	}
 </script>
@@ -94,23 +95,23 @@
 {/snippet}
 
 <svelte:head>
-	<title>Agenda · {data.comite.sigla} · UFRGSMUN</title>
+	<title>{t('Agenda')} · {data.comite.sigla} · UFRGSMUN</title>
 </svelte:head>
 
-<p class="rotulo">Comitê · {data.comite.sigla}</p>
-<h1>Agenda</h1>
+<p class="rotulo">{t('Comitê')} · {data.comite.sigla}</p>
+<h1>{t('Agenda')}</h1>
 
 <section aria-labelledby="t-topicos">
-	<h2 id="t-topicos">Tópicos</h2>
+	<h2 id="t-topicos">{t('Tópicos')}</h2>
 	<ol class="lista">
-		{#each data.topicos as t (t.numero)}
-			<li aria-current={t.numero === data.topicoAtual ? 'step' : undefined}>
-				<span>{t.titulo}</span>
-				{#if t.numero === data.topicoAtual}<span class="selo selo--info">Em debate</span>{/if}
+		{#each data.topicos as tp (tp.numero)}
+			<li aria-current={tp.numero === data.topicoAtual ? 'step' : undefined}>
+				<span>{tp.titulo}</span>
+				{#if tp.numero === data.topicoAtual}<span class="selo selo--info">{t('Em debate')}</span>{/if}
 			</li>
 		{/each}
 	</ol>
-	<p class="suave">A ordem sai da moção de introdução do tópico no topo da agenda, no fim da plenária de abertura.</p>
+	<p class="suave">{t('A ordem sai da moção de introdução do tópico no topo da agenda, no fim da plenária de abertura.')}</p>
 </section>
 
 {#if erro}
@@ -120,18 +121,18 @@
 	<p class="sucesso" role="status">{mensagem}</p>
 {/if}
 
-{#each data.topicos as t (t.numero)}
-	{@const propostas = data.propostas.filter((p) => p.topico === t.numero)}
-	<section aria-labelledby={`t-agenda-${t.numero}`}>
-		<h2 id={`t-agenda-${t.numero}`}>Agenda informal · tópico {t.numero}</h2>
+{#each data.topicos as tp (tp.numero)}
+	{@const propostas = data.propostas.filter((p) => p.topico === tp.numero)}
+	<section aria-labelledby={`t-agenda-${tp.numero}`}>
+		<h2 id={`t-agenda-${tp.numero}`}>{t('Agenda informal · tópico {n}', { n: tp.numero })}</h2>
 		{#if propostas.length}
 			<div class="propostas">
 				{#each propostas as proposta (proposta.id)}
-					{@const autor = proposta.delegacao?.nome ?? 'Mesa'}
-					<article class="cartao" aria-label={`Proposta de ${autor}`}>
+					{@const autor = proposta.delegacao?.nome ?? t('Mesa')}
+					<article class="cartao" aria-label={t('Proposta de {delegacao}', { delegacao: autor })}>
 						<div class="cartao-timbre">
 							<span class="com-bandeira"><Bandeira codigo={proposta.delegacao?.bandeira} /> {autor}</span>
-							{#if proposta.adotada}<span class="selo selo--ok">Adotada</span>{/if}
+							{#if proposta.adotada}<span class="selo selo--ok">{t('Adotada')}</span>{/if}
 						</div>
 						{@render arvore(proposta.pontos, null, proposta.adotada)}
 						{#if ehMesa && !proposta.adotada}
@@ -139,39 +140,39 @@
 								class="botao botao--secundario botao--pequeno"
 								type="button"
 								aria-label={`Adotar a proposta de ${autor}`}
-								onclick={() => executar(supabase.rpc('adotar_proposta', { p_proposta: proposta.id }), 'Agenda adotada.')}
-								>Adotar esta proposta</button
+								onclick={() => executar(supabase.rpc('adotar_proposta', { p_proposta: proposta.id }), t('Agenda adotada.'))}
+								>{t('Adotar esta proposta')}</button
 							>
 						{/if}
 					</article>
 				{/each}
 			</div>
 		{:else}
-			<p class="suave">Ainda não há propostas para este tópico.</p>
+			<p class="suave">{t('Ainda não há propostas para este tópico.')}</p>
 		{/if}
 	</section>
 {/each}
 
 {#if podePropor}
 	<section aria-labelledby="t-propor">
-		<h2 id="t-propor">{eu ? `Proposta de ${eu.delegacao_nome}` : 'Sugestão da mesa'}</h2>
+		<h2 id="t-propor">{eu ? t('Proposta de {delegacao}', { delegacao: eu.delegacao_nome ?? '' }) : t('Sugestão da mesa')}</h2>
 		<form class="formulario formulario--largo" onsubmit={salvar}>
 			<label class="campo">
-				Tópico
+				{t('Tópico')}
 				<select bind:value={topico}>
-					{#each data.topicos as t (t.numero)}
-						<option value={t.numero}>{t.numero}. {t.titulo}</option>
+					{#each data.topicos as tp (tp.numero)}
+						<option value={tp.numero}>{tp.numero}. {tp.titulo}</option>
 					{/each}
 				</select>
 			</label>
 			<label class="campo">
-				Agenda em tópicos
+				{t('Agenda em tópicos')}
 				<textarea rows="8" required bind:value={esboco} aria-describedby="ajuda-esboco"></textarea>
 			</label>
 			<p class="suave" id="ajuda-esboco">
-				Um item por linha. Dois espaços (ou um traço) no começo põem o item dentro do anterior: subtópico, ponto e subponto.
+				{t('Um item por linha. Dois espaços (ou um traço) no começo põem o item dentro do anterior: subtópico, ponto e subponto.')}
 			</p>
-			<button class="botao">Salvar proposta</button>
+			<button class="botao">{t('Salvar proposta')}</button>
 		</form>
 	</section>
 {/if}

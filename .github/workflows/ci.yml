@@ -41,7 +41,9 @@ jobs:
 
       - name: Checagem de tipos
         run: npm run check
-      - name: Testes de unidade
+      - name: Nenhum texto fixo nas telas de comitê
+        run: npm run textos
+      - name: Testes de unidade (inclui as chaves de tradução)
         run: npm run test:unit
       - run: npm run build
       - name: Tamanho da primeira abertura

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { bilingue, t } from '#lib/i18n.svelte.ts';
 	import { invalidate } from '$app/navigation';
 	import { formatarQuando } from '#lib/cronograma.ts';
 	import { mensagemDeErro } from '#lib/sessao.ts';
@@ -13,7 +14,7 @@
 	let erro = $state('');
 	let mensagem = $state('');
 
-	const SITUACAO: Record<string, string> = { pedida: 'Esperando a delegação', aceita: 'Aceita', recusada: 'Recusada' };
+	const SITUACAO: Record<string, string> = bilingue({ pedida: 'Esperando a delegação', aceita: 'Aceita', recusada: 'Recusada' });
 
 	async function pedir(evento: SubmitEvent) {
 		evento.preventDefault();
@@ -21,7 +22,7 @@
 		const { error } = await supabase.rpc('pedir_entrevista', { p_delegacao: delegacao, p_tema: tema });
 		if (error) erro = mensagemDeErro(error);
 		else {
-			mensagem = 'Pedido enviado à delegação.';
+			mensagem = t('Pedido enviado à delegação.');
 			tema = '';
 		}
 		await invalidate('app:entrevistas');
@@ -29,15 +30,15 @@
 </script>
 
 <svelte:head>
-	<title>Entrevistas · Press · UFRGSMUN</title>
+	<title>{t('Entrevistas · Press · UFRGSMUN')}</title>
 </svelte:head>
 
 <p class="rotulo">
-	Press · Simulação
+	{t('Press · Simulação')}
 	<AoVivo comiteId={data.comites[0]} tabelas={['entrevista']} dependencia="app:entrevistas" />
 </p>
-<h1>Entrevistas</h1>
-<p class="suave">Peça pelo app; a delegação aceita e escolhe o horário.</p>
+<h1>{t('Entrevistas')}</h1>
+<p class="suave">{t('Peça pelo app; a delegação aceita e escolhe o horário.')}</p>
 
 {#if erro}
 	<p class="erro" role="alert">{erro}</p>
@@ -46,22 +47,22 @@
 	<p class="sucesso" role="status">{mensagem}</p>
 {/if}
 
-<form class="formulario" aria-label="Pedir entrevista" onsubmit={pedir}>
+<form class="formulario" aria-label={t('Pedir entrevista')} onsubmit={pedir}>
 	<label class="campo">
-		Delegação
+		{t('Delegação')}
 		<select required bind:value={delegacao}>
 			{#each data.delegacoes as d (d.id)}<option value={d.id}>{d.nome}</option>{/each}
 		</select>
 	</label>
 	<label class="campo">
-		Tema
+		{t('Tema')}
 		<input required maxlength="300" bind:value={tema} />
 	</label>
-	<button class="botao">Pedir entrevista</button>
+	<button class="botao">{t('Pedir entrevista')}</button>
 </form>
 
 <section aria-labelledby="t-pedidos">
-	<h2 id="t-pedidos">Pedidos</h2>
+	<h2 id="t-pedidos">{t('Pedidos')}</h2>
 	<ul class="lista">
 		{#each data.entrevistas as e (e.id)}
 			<li>
@@ -73,7 +74,7 @@
 				</span>
 			</li>
 		{:else}
-			<li class="suave">Nenhum pedido ainda.</li>
+			<li class="suave">{t('Nenhum pedido ainda.')}</li>
 		{/each}
 	</ul>
 </section>

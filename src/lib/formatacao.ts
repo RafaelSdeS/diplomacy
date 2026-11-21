@@ -1,5 +1,7 @@
 // Formatação de working papers, projetos e resoluções no formato dos documentos do
 // UNOCT (funções puras, testadas em formatacao.test.ts).
+import { bilingue, t } from './i18n.svelte.ts';
+import { EN } from './i18n-en.ts';
 
 export type ClausulaParaFormatar = { id: string; tipo: string; pai_id: string | null; ordem: number; texto: string };
 export type Idioma = 'pt' | 'en';
@@ -61,21 +63,31 @@ export function linhaDeSignatarios(nomes: string[], idioma: Idioma) {
 	return `${idioma === 'en' ? 'Signatories' : 'Signatários'}: ${lista}.`;
 }
 
-export const TIPOS_DOCUMENTO: Record<string, string> = {
+const TIPOS: Record<string, string> = {
 	working_paper: 'Working paper',
 	projeto: 'Projeto de resolução',
 	resolucao_crise: 'Resolução de crise'
 };
+export const TIPOS_DOCUMENTO = bilingue(TIPOS);
 
+const situacao = (rotulo: string, selo: string) => ({
+	get rotulo() {
+		return t(rotulo);
+	},
+	selo
+});
 export const STATUS_DOCUMENTO: Record<string, { rotulo: string; selo: string }> = {
-	rascunho: { rotulo: 'Rascunho', selo: '' },
-	enviado: { rotulo: 'Enviado à mesa', selo: 'selo--info' },
-	aprovado_mesa: { rotulo: 'Aprovado pela mesa', selo: 'selo--ok' },
-	em_votacao: { rotulo: 'Em votação', selo: 'selo--alerta' },
-	aprovado: { rotulo: 'Aprovado', selo: 'selo--ok' },
-	rejeitado: { rotulo: 'Rejeitado', selo: 'selo--erro' }
+	rascunho: situacao('Rascunho', ''),
+	enviado: situacao('Enviado à mesa', 'selo--info'),
+	aprovado_mesa: situacao('Aprovado pela mesa', 'selo--ok'),
+	em_votacao: situacao('Em votação', 'selo--alerta'),
+	aprovado: situacao('Aprovado', 'selo--ok'),
+	rejeitado: situacao('Rejeitado', 'selo--erro')
 };
 
 /** "Projeto de resolução 2: Financiamento" (o número vem no envio à mesa). */
-export const nomeDoDocumento = (d: { tipo: string; numero: number | null; titulo: string }) =>
-	`${TIPOS_DOCUMENTO[d.tipo] ?? d.tipo}${d.numero ? ` ${d.numero}` : ''}: ${d.titulo}`;
+/** No idioma da tela; com `idioma`, no do comitê (os documentos impressos). */
+export function nomeDoDocumento(d: { tipo: string; numero: number | null; titulo: string }, idioma?: Idioma) {
+	const tipo = idioma ? (idioma === 'en' ? EN[TIPOS[d.tipo]] : TIPOS[d.tipo]) : TIPOS_DOCUMENTO[d.tipo];
+	return `${tipo ?? d.tipo}${d.numero ? ` ${d.numero}` : ''}: ${d.titulo}`;
+}

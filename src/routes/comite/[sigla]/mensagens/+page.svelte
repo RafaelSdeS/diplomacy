@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/i18n.svelte.ts';
 	import { invalidate } from '$app/navigation';
 	import { caixa, mensagemDoEnvio } from '#lib/caixa.ts';
 	import { formatarQuando } from '#lib/cronograma.ts';
@@ -19,7 +20,7 @@
 		...(ehMesa ? [`mesa:${data.comite.id}`] : []),
 		...(ehCrise ? [`crise:${data.comite.id}`] : [])
 	]);
-	const nome = (id: string | null) => data.delegacoes.find((d) => d.id === id)?.nome ?? 'Mesa';
+	const nome = (id: string | null) => data.delegacoes.find((d) => d.id === id)?.nome ?? t('Mesa');
 	const do_tipo = (tipo: string) => data.mensagens.filter((m) => m.tipo === tipo);
 
 	let erro = $state('');
@@ -35,7 +36,7 @@
 			id,
 			rpc: 'enviar_mensagem',
 			args: { p_id: id, p_comite: data.comite.id, p_tipo: tipo, p_texto: texto[campo], p_para: destino ?? undefined },
-			rotulo: tipo === 'bilhete' ? `Bilhete para ${nome(destino)}` : 'Mensagem'
+			rotulo: tipo === 'bilhete' ? t('Bilhete para {delegacao}', { delegacao: nome(destino) }) : t('Mensagem')
 		});
 		({ erro, mensagem } = mensagemDoEnvio(resultado, enviado));
 		if (!erro) texto[campo] = '';
@@ -63,23 +64,23 @@
 </script>
 
 <svelte:head>
-	<title>Mensagens · {data.comite.sigla} · UFRGSMUN</title>
+	<title>{t('Mensagens')} · {data.comite.sigla} · UFRGSMUN</title>
 </svelte:head>
 
 <p class="rotulo">
-	Comitê · {data.comite.sigla}
+	{t('Comitê')} · {data.comite.sigla}
 	<AoVivo comiteId={data.comite.id} {canais} tabelas={['mensagem', 'entrevista']} dependencia="app:mensagens" />
 </p>
-<h1>Mensagens</h1>
+<h1>{t('Mensagens')}</h1>
 <p class="suave">
-	Só mensagens da simulação: bilhetes entre delegações, em personagem, e conversas com a mesa. Não há grupo geral.
+	{t('Só mensagens da simulação: bilhetes entre delegações, em personagem, e conversas com a mesa. Não há grupo geral.')}
 </p>
-<p class="telegrama" role="note" aria-label="Regra dos bilhetes">
+<p class="telegrama" role="note" aria-label={t('Regra dos bilhetes')}>
 	{data.regras.bilhetes_bloqueados
-		? 'A mesa bloqueou os bilhetes neste comitê.'
+		? t('A mesa bloqueou os bilhetes neste comitê.')
 		: data.regras.mesa_le_bilhetes
-			? 'A mesa pode ler os bilhetes deste comitê.'
-			: 'Os bilhetes deste comitê só são lidos por quem envia e por quem recebe.'}
+			? t('A mesa pode ler os bilhetes deste comitê.')
+			: t('Os bilhetes deste comitê só são lidos por quem envia e por quem recebe.')}
 </p>
 
 {#if erro}
@@ -91,7 +92,7 @@
 
 {#if eu}
 	<section aria-labelledby="t-bilhetes">
-		<h2 id="t-bilhetes">Bilhetes</h2>
+		<h2 id="t-bilhetes">{t('Bilhetes')}</h2>
 		<ul class="lista">
 			{#each do_tipo('bilhete') as m (m.id)}
 				<li>
@@ -101,86 +102,86 @@
 						<span class="detalhe">{formatarQuando(m.criado_em, agora)}</span>
 					</span>
 					<details class="denunciar">
-						<summary>Denunciar</summary>
+						<summary>{t('Denunciar')}</summary>
 						<button
 							class="botao botao--secundario botao--pequeno"
 							type="button"
 							onclick={() =>
-								executar(supabase.rpc('denunciar_mensagem', { p_mensagem: m.id, p_motivo: 'Fora do personagem ou ofensivo' }), 'Bilhete denunciado à mesa.')}
-							>Denunciar à mesa</button
+								executar(supabase.rpc('denunciar_mensagem', { p_mensagem: m.id, p_motivo: t('Fora do personagem ou ofensivo') }), t('Bilhete denunciado à mesa.'))}
+							>{t('Denunciar à mesa')}</button
 						>
 					</details>
 				</li>
 			{:else}
-				<li class="suave">Nenhum bilhete.</li>
+				<li class="suave">{t('Nenhum bilhete.')}</li>
 			{/each}
 		</ul>
 		{#if !data.regras.bilhetes_bloqueados}
 			<form
 				class="formulario"
-				aria-label="Novo bilhete"
+				aria-label={t('Novo bilhete')}
 				onsubmit={(e) => {
 					e.preventDefault();
-					void enviar('bilhete', 'bilhete', para, 'Bilhete enviado.');
+					void enviar('bilhete', 'bilhete', para, t('Bilhete enviado.'));
 				}}
 			>
 				<label class="campo">
-					Para
+					{t('Para')}
 					<select required bind:value={para}>
 						{#each data.delegacoes.filter((d) => d.id !== eu.delegacao_id) as d (d.id)}<option value={d.id}>{d.nome}</option>{/each}
 					</select>
 				</label>
 				<label class="campo">
-					Bilhete
+					{t('Bilhete')}
 					<textarea required rows="3" maxlength="1000" bind:value={texto.bilhete}></textarea>
 				</label>
-				<button class="botao">Enviar bilhete</button>
+				<button class="botao">{t('Enviar bilhete')}</button>
 			</form>
 		{/if}
 	</section>
 
 	<section aria-labelledby="t-com-mesa">
-		<h2 id="t-com-mesa">Com a mesa</h2>
+		<h2 id="t-com-mesa">{t('Com a mesa')}</h2>
 		<ul class="lista">
 			{#each do_tipo('mesa') as m (m.id)}
-				<li><span><strong>{m.de_delegacao_id ? 'Sua delegação' : 'Mesa'}:</strong> {m.texto} <span class="detalhe">{formatarQuando(m.criado_em, agora)}</span></span></li>
+				<li><span><strong>{m.de_delegacao_id ? t('Sua delegação') : t('Mesa')}:</strong> {m.texto} <span class="detalhe">{formatarQuando(m.criado_em, agora)}</span></span></li>
 			{:else}
-				<li class="suave">Dúvidas e pedidos privados à mesa aparecem aqui.</li>
+				<li class="suave">{t('Dúvidas e pedidos privados à mesa aparecem aqui.')}</li>
 			{/each}
 		</ul>
 		<form
 			class="formulario"
-			aria-label="Mensagem à mesa"
+			aria-label={t('Mensagem à mesa')}
 			onsubmit={(e) => {
 				e.preventDefault();
-				void enviar('mesa', 'mesa', null, 'Mensagem enviada à mesa.');
+				void enviar('mesa', 'mesa', null, t('Mensagem enviada à mesa.'));
 			}}
 		>
 			<label class="campo">
-				Mensagem à mesa
+				{t('Mensagem à mesa')}
 				<textarea required rows="2" maxlength="1000" bind:value={texto.mesa}></textarea>
 			</label>
-			<button class="botao botao--secundario">Enviar à mesa</button>
+			<button class="botao botao--secundario">{t('Enviar à mesa')}</button>
 		</form>
 	</section>
 
 	{@const minhas = data.entrevistas.filter((e) => e.delegacao_id === eu.delegacao_id)}
 	{#if minhas.length}
 		<section aria-labelledby="t-entrevistas">
-			<h2 id="t-entrevistas">Pedidos de entrevista</h2>
+			<h2 id="t-entrevistas">{t('Pedidos de entrevista')}</h2>
 			<ul class="lista">
 				{#each minhas as e (e.id)}
 					<li>
 						<span>
 							<strong>{e.veiculo?.nome}</strong>: {e.tema}
 							<span class="detalhe">
-								{e.status === 'aceita' && e.horario ? `Aceita para ${formatarQuando(e.horario, agora)}` : e.status === 'recusada' ? 'Recusada' : 'Esperando a sua resposta'}
+								{e.status === 'aceita' && e.horario ? `${t('Aceita para')} ${formatarQuando(e.horario, agora)}` : e.status === 'recusada' ? t('Recusada') : t('Esperando a sua resposta')}
 							</span>
 						</span>
 						{#if e.status === 'pedida'}
 							<span class="acoes">
 								<label class="campo campo--curto">
-									Horário
+									{t('Horário')}
 									<input type="datetime-local" bind:value={horario[e.id]} />
 								</label>
 								<button
@@ -194,14 +195,14 @@
 												p_aceitar: true,
 												p_horario: new Date(horario[e.id]).toISOString()
 											}),
-											'Entrevista aceita.'
-										)}>Aceitar</button
+											t('Entrevista aceita.')
+										)}>{t('Aceitar')}</button
 								>
 								<button
 									class="botao botao--secundario botao--pequeno"
 									type="button"
-									onclick={() => executar(supabase.rpc('responder_entrevista', { p_entrevista: e.id, p_aceitar: false }), 'Entrevista recusada.')}
-									>Recusar</button
+									onclick={() => executar(supabase.rpc('responder_entrevista', { p_entrevista: e.id, p_aceitar: false }), t('Entrevista recusada.'))}
+									>{t('Recusar')}</button
 								>
 							</span>
 						{/if}
@@ -214,68 +215,68 @@
 
 {#if ehMesa}
 	<section aria-labelledby="t-regra">
-		<h2 id="t-regra">Regra dos bilhetes</h2>
+		<h2 id="t-regra">{t('Regra dos bilhetes')}</h2>
 		<form
 			class="formulario"
 			onsubmit={(e) => {
 				e.preventDefault();
-				void executar(supabase.rpc('definir_bilhetes', { p_comite: data.comite.id, p_mesa_le: mesaLe, p_bloqueados: bloqueados }), 'Regra salva.');
+				void executar(supabase.rpc('definir_bilhetes', { p_comite: data.comite.id, p_mesa_le: mesaLe, p_bloqueados: bloqueados }), t('Regra salva.'));
 			}}
 		>
-			<label class="opcao"><input type="checkbox" bind:checked={mesaLe} /> A mesa pode ler os bilhetes</label>
-			<label class="opcao"><input type="checkbox" bind:checked={bloqueados} /> Bloquear os bilhetes</label>
-			<button class="botao botao--secundario">Salvar a regra</button>
+			<label class="opcao"><input type="checkbox" bind:checked={mesaLe} /> {t('A mesa pode ler os bilhetes')}</label>
+			<label class="opcao"><input type="checkbox" bind:checked={bloqueados} /> {t('Bloquear os bilhetes')}</label>
+			<button class="botao botao--secundario">{t('Salvar a regra')}</button>
 		</form>
 	</section>
 
 	<section aria-labelledby="t-delegacoes">
-		<h2 id="t-delegacoes">Com as delegações</h2>
+		<h2 id="t-delegacoes">{t('Com as delegações')}</h2>
 		<ul class="lista">
 			{#each do_tipo('mesa') as m (m.id)}
-				<li><span><strong>{m.de_delegacao_id ? nome(m.de_delegacao_id) : `Mesa → ${nome(m.para_delegacao_id)}`}:</strong> {m.texto}</span></li>
+				<li><span><strong>{m.de_delegacao_id ? nome(m.de_delegacao_id) : `${t('Mesa')} → ${nome(m.para_delegacao_id)}`}:</strong> {m.texto}</span></li>
 			{:else}
-				<li class="suave">Nenhuma mensagem das delegações.</li>
+				<li class="suave">{t('Nenhuma mensagem das delegações.')}</li>
 			{/each}
 		</ul>
 		<form
 			class="formulario"
-			aria-label="Resposta da mesa"
+			aria-label={t('Resposta da mesa')}
 			onsubmit={(e) => {
 				e.preventDefault();
-				void enviar('mesa', 'resposta', responderA, 'Resposta enviada.');
+				void enviar('mesa', 'resposta', responderA, t('Resposta enviada.'));
 			}}
 		>
 			<label class="campo">
-				Para a delegação
+				{t('Para a delegação')}
 				<select required bind:value={responderA}>
 					{#each data.delegacoes as d (d.id)}<option value={d.id}>{d.nome}</option>{/each}
 				</select>
 			</label>
 			<label class="campo">
-				Resposta
+				{t('Resposta')}
 				<textarea required rows="2" maxlength="1000" bind:value={texto.resposta}></textarea>
 			</label>
-			<button class="botao botao--secundario">Responder</button>
+			<button class="botao botao--secundario">{t('Responder')}</button>
 		</form>
 	</section>
 
 	{#if do_tipo('bilhete').length}
 		<section aria-labelledby="t-bilhetes-mesa">
-			<h2 id="t-bilhetes-mesa">Bilhetes do comitê</h2>
+			<h2 id="t-bilhetes-mesa">{t('Bilhetes do comitê')}</h2>
 			<ul class="lista">
 				{#each do_tipo('bilhete') as m (m.id)}
 					<li>
 						<span>
 							<strong>{nome(m.de_delegacao_id)} → {nome(m.para_delegacao_id)}</strong>
 							{m.texto}
-							{#if m.oculta}<span class="selo selo--erro">Oculto</span>{/if}
+							{#if m.oculta}<span class="selo selo--erro">{t('Oculto')}</span>{/if}
 						</span>
 						{#if !m.oculta}
 							<button
 								class="botao botao--secundario botao--pequeno"
 								type="button"
-								onclick={() => executar(supabase.rpc('ocultar_mensagem', { p_mensagem: m.id, p_motivo: 'Fora do personagem' }), 'Bilhete ocultado.')}
-								>Ocultar</button
+								onclick={() => executar(supabase.rpc('ocultar_mensagem', { p_mensagem: m.id, p_motivo: t('Fora do personagem') }), t('Bilhete ocultado.'))}
+								>{t('Ocultar')}</button
 							>
 						{/if}
 					</li>
@@ -287,27 +288,27 @@
 
 {#if ehMesa || ehCrise}
 	<section aria-labelledby="t-interno">
-		<h2 id="t-interno">{ehMesa ? 'Com a equipe de crise' : 'Com a mesa'}</h2>
+		<h2 id="t-interno">{ehMesa ? t('Com a equipe de crise') : t('Com a mesa')}</h2>
 		<ul class="lista">
 			{#each do_tipo('interno') as m (m.id)}
 				<li><span><strong>{m.autor?.nome ?? ''}:</strong> {m.texto} <span class="detalhe">{formatarQuando(m.criado_em, agora)}</span></span></li>
 			{:else}
-				<li class="suave">O canal interno entre a mesa e a crise começa aqui.</li>
+				<li class="suave">{t('O canal interno entre a mesa e a crise começa aqui.')}</li>
 			{/each}
 		</ul>
 		<form
 			class="formulario"
-			aria-label="Canal interno"
+			aria-label={t('Canal interno')}
 			onsubmit={(e) => {
 				e.preventDefault();
-				void enviar('interno', 'interno', null, 'Mensagem enviada.');
+				void enviar('interno', 'interno', null, t('Mensagem enviada.'));
 			}}
 		>
 			<label class="campo">
-				Mensagem do canal interno
+				{t('Mensagem do canal interno')}
 				<textarea required rows="2" maxlength="1000" bind:value={texto.interno}></textarea>
 			</label>
-			<button class="botao botao--secundario">Enviar</button>
+			<button class="botao botao--secundario">{t('Enviar')}</button>
 		</form>
 	</section>
 {/if}

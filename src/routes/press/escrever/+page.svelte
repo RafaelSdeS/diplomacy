@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/i18n.svelte.ts';
 	import { goto } from '$app/navigation';
 	import { caixa, mensagemDoEnvio } from '#lib/caixa.ts';
 	import { paragrafos } from '#lib/impressao.ts';
@@ -88,63 +89,62 @@
 </script>
 
 <svelte:head>
-	<title>Escrever matéria · Press · UFRGSMUN</title>
+	<title>{t('Escrever matéria · Press · UFRGSMUN')}</title>
 </svelte:head>
 
-<p class="rotulo">Press · Simulação</p>
-<h1>Escrever matéria</h1>
+<p class="rotulo">{t('Press · Simulação')}</p>
+<h1>{t('Escrever matéria')}</h1>
 
 <div class="escrever">
 	<form class="formulario formulario--largo" onsubmit={publicar}>
 		{#if data.veiculos.length > 1}
 			<label class="campo">
-				Veículo
+				{t('Veículo')}
 				<select bind:value={veiculoId}>
 					{#each data.veiculos as v (v.id)}<option value={v.id}>{v.nome}</option>{/each}
 				</select>
 			</label>
 		{/if}
 		<label class="campo">
-			Tipo
+			{t('Tipo')}
 			<select bind:value={tipo}>
 				{#each Object.entries(TIPOS_NOTICIA) as [valor, rotulo] (valor)}<option value={valor}>{rotulo}</option>{/each}
 			</select>
 		</label>
 		<label class="campo">
-			Título
+			{t('Título')}
 			<input required maxlength="200" bind:value={titulo} />
 		</label>
 		<label class="campo">
-			Linha fina (opcional)
+			{t('Linha fina (opcional)')}
 			<input maxlength="300" bind:value={linhaFina} />
 		</label>
 		<label class="campo">
-			Texto (parágrafos separados por uma linha em branco)
+			{t('Texto (parágrafos separados por uma linha em branco)')}
 			<textarea required rows="10" maxlength="10000" bind:value={texto}></textarea>
 		</label>
 		<p class="aviso-palavrao" aria-live="polite">
 			{#if achados.length}
-				Atenção: o texto tem {achados.length === 1 ? 'uma palavra' : 'palavras'} que pode{achados.length === 1 ? '' : 'm'} ferir o decoro
-				({achados.join(', ')}). Você ainda pode publicar.
+				{t('Atenção: o texto tem palavras que podem ferir o decoro ({palavras}). Você ainda pode publicar.', { palavras: achados.join(', ') })}
 			{/if}
 		</p>
 		<label class="campo">
-			Data na simulação (opcional, para comitês históricos)
+			{t('Data na simulação (opcional, para comitês históricos)')}
 			<input type="date" bind:value={dataSimulacao} />
 		</label>
 		<label class="campo">
-			Imagem (opcional)
+			{t('Imagem (opcional)')}
 			<input type="file" accept="image/*" bind:files={arquivos} />
 		</label>
 		{#if arquivos?.[0]}
 			<label class="campo">
-				Descrição da imagem (para quem usa leitor de tela)
+				{t('Descrição da imagem (para quem usa leitor de tela)')}
 				<input required maxlength="300" bind:value={descricao} />
 			</label>
 		{/if}
 		{#if delegacoes.length}
 			<fieldset class="opcoes voluntarias">
-				<legend>Delegações citadas</legend>
+				<legend>{t('Delegações citadas')}</legend>
 				{#each delegacoes as d (d.id)}
 					<label class="opcao"><input type="checkbox" value={d.id} bind:group={citadas} /> {d.nome}</label>
 				{/each}
@@ -156,13 +156,13 @@
 		{#if aviso}
 			<p class="sucesso" role="status">{aviso}</p>
 		{/if}
-		<button class="botao" disabled={enviando}>{enviando ? 'Publicando…' : 'Publicar'}</button>
+		<button class="botao" disabled={enviando}>{enviando ? t('Publicando…') : t('Publicar')}</button>
 	</form>
 
 	<section class="cartao materia previa" aria-labelledby="t-previa">
-		<h2 id="t-previa" class="rotulo">Prévia · {veiculo.nome}</h2>
+		<h2 id="t-previa" class="rotulo">{t('Prévia')} · {veiculo.nome}</h2>
 		<p class="rotulo">{TIPOS_NOTICIA[tipo]}</p>
-		<p class="previa-titulo">{titulo || 'Título da matéria'}</p>
+		<p class="previa-titulo">{titulo || t('Título da matéria')}</p>
 		{#if linhaFina}<p class="linha-fina">{linhaFina}</p>{/if}
 		{#if previa}<img class="materia-imagem" src={previa} alt={descricao} />{/if}
 		{#each paragrafos(texto) as p, i (i)}<p>{p}</p>{/each}

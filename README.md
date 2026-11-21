@@ -2,7 +2,7 @@
 
 App web tudo em um para simulações da ONU (MUNs), começando pelo [UFRGSMUN](https://www.ufrgs.br/ufrgsmun/). Funciona no celular e no computador, sem instalar nada.
 
-> **Status:** passo 18 de 19, idiomas (o último a fazer). Os passos 01 a 17 e o 19 estão prontos (a sessão de teste com pessoas segue o roteiro em `docs/piloto.md`), e o piloto está publicado.
+> **Status:** os 19 passos estão prontos, e o piloto está publicado. Os comitês funcionam em português e em inglês; a secretaria, só em português. A sessão de teste com pessoas segue o roteiro em `docs/piloto.md`.
 
 ## O problema
 

@@ -12,5 +12,5 @@ export const load: PageLoad = async ({ params }) => {
 	if (dpo.error) throw dpo.error;
 	if (!dpo.data?.delegacao?.comite) error(404, 'DPO não encontrado.');
 	const { delegacao } = dpo.data;
-	return { sigla: delegacao.comite!.sigla, modelo: modeloDpo(dpo.data, delegacao, delegacao.comite!) };
+	return { sigla: delegacao.comite!.sigla, idioma: delegacao.comite!.idioma, modelo: modeloDpo(dpo.data, delegacao, delegacao.comite!) };
 };

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/i18n.svelte.ts';
 	import { onMount } from 'svelte';
 	import { invalidate } from '$app/navigation';
 	import { medirRelogio } from '#lib/sessao.ts';
@@ -69,5 +70,5 @@
 </script>
 
 <span class="selo {conectado ? 'selo--ok' : 'selo--alerta'}" data-ao-vivo={conectado ? 'sim' : 'nao'}>
-	{conectado ? 'Ao vivo' : 'Conectando…'}
+	{conectado ? t('Ao vivo') : t('Conectando…')}
 </span>

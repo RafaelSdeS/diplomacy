@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/i18n.svelte.ts';
 	import { invalidate } from '$app/navigation';
 	import { caixa, mensagemDoEnvio } from '#lib/caixa.ts';
 	import { formatarEspera, minutosDesde, SELO_NOTA, STATUS_NOTA, type StatusNota } from '#lib/crise.ts';
@@ -36,10 +37,10 @@
 			id,
 			rpc: 'enviar_nota',
 			args: { p_id: id, p_comite: data.comite.id, p_tipo: tipo, p_titulo: titulo, p_texto: texto },
-			rotulo: `${tipo === 'nota' ? 'Nota' : 'Diretiva'}: ${titulo}`
+			rotulo: `${tipo === 'nota' ? t('Nota') : t('Diretiva')}: ${titulo}`
 		});
 		enviando = false;
-		({ erro, mensagem } = mensagemDoEnvio(resultado, `${tipo === 'nota' ? 'Nota' : 'Diretiva'} enviada à crise.`));
+		({ erro, mensagem } = mensagemDoEnvio(resultado, tipo === 'nota' ? t('Nota enviada à crise.') : t('Diretiva enviada à crise.')));
 		if (erro) return;
 		titulo = texto = '';
 		id = crypto.randomUUID();
@@ -48,11 +49,11 @@
 </script>
 
 <svelte:head>
-	<title>Crise · {data.comite.sigla} · UFRGSMUN</title>
+	<title>{t('Crise')} · {data.comite.sigla} · UFRGSMUN</title>
 </svelte:head>
 
 <p class="rotulo">
-	Comitê · {data.comite.sigla}
+	{t('Comitê')} · {data.comite.sigla}
 	<AoVivo
 		comiteId={data.comite.id}
 		canais={eu?.delegacao_id ? [`delegacao:${eu.delegacao_id}`] : []}
@@ -60,14 +61,14 @@
 		dependencia="app:crise"
 	/>
 </p>
-<h1>Crise</h1>
+<h1>{t('Crise')}</h1>
 
 {#if !data.comite.crise_ligada}
-	<p class="suave">Este comitê não tem crise.</p>
+	<p class="suave">{t('Este comitê não tem crise.')}</p>
 {:else}
 	{#if data.atualizacoes.length}
 		<section aria-labelledby="t-plantao">
-			<h2 id="t-plantao">Atualizações de crise</h2>
+			<h2 id="t-plantao">{t('Atualizações de crise')}</h2>
 			<ul class="lista">
 				{#each data.atualizacoes as a (a.id)}
 					<li>
@@ -83,19 +84,19 @@
 
 	{#if eu}
 		<section aria-labelledby="t-escrever">
-			<h2 id="t-escrever">Escrever à crise</h2>
+			<h2 id="t-escrever">{t('Escrever à crise')}</h2>
 			<form class="formulario formulario--largo" onsubmit={enviar}>
 				<fieldset class="opcoes">
-					<legend>Tipo</legend>
-					<label class="opcao"><input type="radio" value="nota" bind:group={tipo} /> Nota (pergunta ou pedido)</label>
-					<label class="opcao"><input type="radio" value="diretiva" bind:group={tipo} /> Diretiva (ação da delegação)</label>
+					<legend>{t('Tipo')}</legend>
+					<label class="opcao"><input type="radio" value="nota" bind:group={tipo} /> {t('Nota (pergunta ou pedido)')}</label>
+					<label class="opcao"><input type="radio" value="diretiva" bind:group={tipo} /> {t('Diretiva (ação da delegação)')}</label>
 				</fieldset>
 				<label class="campo">
-					Título
+					{t('Título')}
 					<input required maxlength="120" bind:value={titulo} />
 				</label>
 				<label class="campo">
-					Texto
+					{t('Texto')}
 					<textarea required maxlength="2000" rows="6" bind:value={texto}></textarea>
 				</label>
 				{#if erro}
@@ -104,34 +105,35 @@
 				{#if mensagem}
 					<p class="sucesso" role="status">{mensagem}</p>
 				{/if}
-				<button class="botao" disabled={enviando}>Enviar à crise</button>
+				<button class="botao" disabled={enviando}>{t('Enviar à crise')}</button>
 			</form>
 			<p class="suave">
-				Cada delegação pode ter até {data.regras.limite_notas_pendentes} notas esperando resposta. Só a sua delegação e a
-				equipe de crise leem as suas notas.
+				{t('Cada delegação pode ter até {n} notas esperando resposta. Só a sua delegação e a equipe de crise leem as suas notas.', {
+					n: data.regras.limite_notas_pendentes
+				})}
 			</p>
 		</section>
 
 		<section aria-labelledby="t-minhas">
-			<h2 id="t-minhas">Notas de {eu.delegacao_nome}</h2>
+			<h2 id="t-minhas">{t('Notas de {delegacao}', { delegacao: eu.delegacao_nome ?? '' })}</h2>
 			<ul class="lista">
 				{#each data.notas as nota (nota.id)}
 					{@const status = nota.status as StatusNota}
 					<li class="nota">
 						<span>
 							<span class="selo {SELO_NOTA[status]}">{STATUS_NOTA[status]}</span>
-							{#if nota.posicao}<span class="selo">{nota.posicao}ª na fila</span>{/if}
+							{#if nota.posicao}<span class="selo">{t('{n}ª na fila', { n: nota.posicao })}</span>{/if}
 							<strong>{nota.titulo}</strong>
 							<span class="detalhe"
-								>{nota.tipo === 'nota' ? 'Nota' : 'Diretiva'} · {formatarEspera(minutosDesde(nota.criado_em, agora))}</span
+								>{nota.tipo === 'nota' ? t('Nota') : t('Diretiva')} · {formatarEspera(minutosDesde(nota.criado_em, agora))}</span
 							>
 							{#if nota.resposta}
-								<span class="telegrama" role="note" aria-label="Resposta da crise">{nota.resposta}</span>
+								<span class="telegrama" role="note" aria-label={t('Resposta da crise')}>{nota.resposta}</span>
 							{/if}
 						</span>
 					</li>
 				{:else}
-					<li class="suave">Nenhuma nota ainda.</li>
+					<li class="suave">{t('Nenhuma nota ainda.')}</li>
 				{/each}
 			</ul>
 		</section>

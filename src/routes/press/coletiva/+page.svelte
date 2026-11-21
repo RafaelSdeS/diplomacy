@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/i18n.svelte.ts';
 	import { invalidate } from '$app/navigation';
 	import { mensagemDeErro } from '#lib/sessao.ts';
 	import { supabase } from '#lib/supabase.ts';
@@ -31,17 +32,16 @@
 </script>
 
 <svelte:head>
-	<title>Coletiva · Press · UFRGSMUN</title>
+	<title>{t('Coletiva · Press · UFRGSMUN')}</title>
 </svelte:head>
 
 <p class="rotulo">
-	Press · Simulação
+	{t('Press · Simulação')}
 	<AoVivo eventoId={data.evento} tabelas={['coletiva', 'coletiva_pergunta']} dependencia="app:coletiva" />
 </p>
-<h1>Coletiva de imprensa</h1>
+<h1>{t('Coletiva de imprensa')}</h1>
 <p class="suave">
-	Cada jornalista escolhe até 4 delegações do próprio comitê, com uma pergunta para cada. Depois da coletiva, a
-	resposta vira matéria.
+	{t('Cada jornalista escolhe até 4 delegações do próprio comitê, com uma pergunta para cada. Depois da coletiva, a resposta vira matéria.')}
 </p>
 
 {#if erro}
@@ -54,23 +54,23 @@
 {#if data.diretoria}
 	<form
 		class="formulario"
-		aria-label="Abrir coletiva"
+		aria-label={t('Abrir coletiva')}
 		onsubmit={(e) => {
 			e.preventDefault();
-			void executar(supabase.rpc('abrir_coletiva', { p_evento: data.evento, p_titulo: titulo }), 'Coletiva aberta.');
+			void executar(supabase.rpc('abrir_coletiva', { p_evento: data.evento, p_titulo: titulo }), t('Coletiva aberta.'));
 		}}
 	>
 		<label class="campo">
-			Título da coletiva
+			{t('Título da coletiva')}
 			<input required maxlength="200" bind:value={titulo} />
 		</label>
-		<button class="botao">Abrir uma coletiva</button>
+		<button class="botao">{t('Abrir uma coletiva')}</button>
 		{#if data.coletiva?.aberta}
 			<button
 				class="botao botao--secundario"
 				type="button"
-				onclick={() => executar(supabase.rpc('encerrar_coletiva', { p_coletiva: data.coletiva!.id }), 'Coletiva encerrada.')}
-				>Encerrar a coletiva</button
+				onclick={() => executar(supabase.rpc('encerrar_coletiva', { p_coletiva: data.coletiva!.id }), t('Coletiva encerrada.'))}
+				>{t('Encerrar a coletiva')}</button
 			>
 		{/if}
 	</form>
@@ -82,24 +82,24 @@
 		{#if data.souPress && data.coletiva.aberta}
 			<form
 				class="formulario"
-				aria-label="Nova pergunta"
+				aria-label={t('Nova pergunta')}
 				onsubmit={async (e) => {
 					e.preventDefault();
-					if (await executar(supabase.rpc('perguntar_na_coletiva', { p_coletiva: data.coletiva!.id, p_delegacao: delegacao, p_pergunta: pergunta }), 'Pergunta na pauta.'))
+					if (await executar(supabase.rpc('perguntar_na_coletiva', { p_coletiva: data.coletiva!.id, p_delegacao: delegacao, p_pergunta: pergunta }), t('Pergunta na pauta.')))
 						pergunta = '';
 				}}
 			>
 				<label class="campo">
-					Delegação
+					{t('Delegação')}
 					<select required bind:value={delegacao}>
 						{#each data.delegacoes as d (d.id)}<option value={d.id}>{d.nome}</option>{/each}
 					</select>
 				</label>
 				<label class="campo">
-					Pergunta
+					{t('Pergunta')}
 					<input required maxlength="300" bind:value={pergunta} />
 				</label>
-				<button class="botao">Pôr na pauta</button>
+				<button class="botao">{t('Pôr na pauta')}</button>
 			</form>
 		{/if}
 		{#each porVeiculo as [veiculo, perguntas] (veiculo)}
@@ -108,9 +108,9 @@
 				{#each perguntas as p (p.id)}<li><span><strong>{p.delegacao?.nome}:</strong> {p.pergunta}</span></li>{/each}
 			</ol>
 		{:else}
-			<p class="suave">Nenhuma pergunta na pauta ainda.</p>
+			<p class="suave">{t('Nenhuma pergunta na pauta ainda.')}</p>
 		{/each}
 	</section>
 {:else}
-	<p class="suave">Nenhuma coletiva aberta.</p>
+	<p class="suave">{t('Nenhuma coletiva aberta.')}</p>
 {/if}

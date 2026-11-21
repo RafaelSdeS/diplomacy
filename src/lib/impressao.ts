@@ -1,6 +1,7 @@
 // Modelos de impressão no formato dos documentos do UNOCT 2026 (funções puras,
 // testadas em impressao.test.ts). O HTML e o CSS de impressão ficam nas rotas
 // /imprimir/*.
+import { t } from './i18n.svelte.ts';
 
 const EN = (idioma: string) => idioma === 'en';
 
@@ -60,9 +61,15 @@ export function modeloCarta(
 	};
 }
 
+const situacao = (rotulo: string, selo: string) => ({
+	get rotulo() {
+		return t(rotulo);
+	},
+	selo
+});
 export const STATUS_DPO: Record<string, { rotulo: string; selo: string }> = {
-	rascunho: { rotulo: 'Rascunho', selo: '' },
-	enviado: { rotulo: 'Enviado à mesa', selo: 'selo--info' },
-	aprovado: { rotulo: 'Aprovado', selo: 'selo--ok' },
-	pede_ajustes: { rotulo: 'A mesa pede ajustes', selo: 'selo--alerta' }
+	rascunho: situacao('Rascunho', ''),
+	enviado: situacao('Enviado à mesa', 'selo--info'),
+	aprovado: situacao('Aprovado', 'selo--ok'),
+	pede_ajustes: situacao('A mesa pede ajustes', 'selo--alerta')
 };

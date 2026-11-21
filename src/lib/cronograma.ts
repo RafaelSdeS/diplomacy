@@ -1,5 +1,6 @@
 // Lógica do cronograma, sem dependências: testada em cronograma.test.ts.
 // Todos os horários aparecem no fuso do evento, qualquer que seja o do aparelho.
+import { idioma, locale } from './i18n.svelte.ts';
 
 export const FUSO = 'America/Sao_Paulo';
 
@@ -40,16 +41,16 @@ const chaveDoDia = (iso: string) =>
 	);
 
 export const formatarHora = (iso: string) =>
-	new Intl.DateTimeFormat('pt-BR', { timeZone: FUSO, hour: '2-digit', minute: '2-digit' }).format(new Date(iso));
+	new Intl.DateTimeFormat(locale(), { timeZone: FUSO, hour: '2-digit', minute: '2-digit' }).format(new Date(iso));
 
 export const formatarDia = (iso: string) =>
-	new Intl.DateTimeFormat('pt-BR', { timeZone: FUSO, weekday: 'long', day: 'numeric', month: 'long' }).format(
+	new Intl.DateTimeFormat(locale(), { timeZone: FUSO, weekday: 'long', day: 'numeric', month: 'long' }).format(
 		new Date(iso)
 	);
 
 /** "às 12:30" no mesmo dia; senão "quinta-feira, 11 de novembro, às 09:00". */
 export function formatarQuando(iso: string, agora: Date): string {
-	const hora = `às ${formatarHora(iso)}`;
+	const hora = `${idioma.atual === 'en' ? 'at' : 'às'} ${formatarHora(iso)}`;
 	return chaveDoDia(iso) === chaveDoDia(agora.toISOString()) ? hora : `${formatarDia(iso)}, ${hora}`;
 }
 

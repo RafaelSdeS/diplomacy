@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/i18n.svelte.ts';
 	import { invalidate } from '$app/navigation';
 	import type { Database } from '#lib/database.types.ts';
 	import { nomeDoDocumento, STATUS_DOCUMENTO } from '#lib/formatacao.ts';
@@ -75,7 +76,7 @@
 		if (votacao?.aberta && votacao.nominal) chamadaAberta = true;
 	});
 	let parte = $state<string[]>([]);
-	const ACOES_EMENDA: Record<string, string> = { acrescentar: 'Acrescenta', suprimir: 'Suprime', modificar: 'Modifica' };
+	const ACOES_EMENDA: Record<string, string> = { acrescentar: t('Acrescenta'), suprimir: t('Suprime'), modificar: t('Modifica') };
 	const rpc = <F extends keyof Funcoes>(funcao: F, args: Funcoes[F]['Args']) => executar(supabase.rpc(funcao, args));
 
 	// Sem delegação (null), encerra a fala. Os tipos gerados não sabem que o argumento aceita null.
@@ -110,26 +111,26 @@
 <svelte:window onkeydown={data.podePresidir && sessao ? atalho : undefined} />
 
 <svelte:head>
-	<title>Presidência · {data.comite.sigla} · UFRGSMUN</title>
+	<title>{t('Presidência')} · {data.comite.sigla} · UFRGSMUN</title>
 </svelte:head>
 
-<p class="rotulo">Comitê · {data.comite.sigla} <AoVivo comiteId={data.comite.id} bind:diferenca /></p>
-<h1>Presidência</h1>
+<p class="rotulo">{t('Comitê')} · {data.comite.sigla} <AoVivo comiteId={data.comite.id} bind:diferenca /></p>
+<h1>{t('Presidência')}</h1>
 
 {#if !data.podePresidir}
-	<p class="suave">Você não preside esta sessão. Quando for a vez da sua delegação, o painel aparece aqui.</p>
+	<p class="suave">{t('Você não preside esta sessão. Quando for a vez da sua delegação, o painel aparece aqui.')}</p>
 {:else if !data.estado || !sessao}
-	<p class="suave">Nenhuma sessão aberta. A mesa abre a sessão na chamada.</p>
+	<p class="suave">{t('Nenhuma sessão aberta. A mesa abre a sessão na chamada.')}</p>
 {:else}
 	<p class="suave">
-		Sessão {sessao.numero} · {FASES[data.fase]} · {FORMAS[data.estado.forma]} · Presidência: {presidenciaEmVigor(
+		{t('Sessão {n}', { n: sessao.numero })} · {FASES[data.fase]} · {FORMAS[data.estado.forma]} · {t('Presidência')}: {presidenciaEmVigor(
 			data.fase,
 			data.estado.mesa_assumiu,
 			sessao.presidencia?.nome
 		)}
 	</p>
 	<p class="suave atalhos-ajuda">
-		Atalhos: <kbd>Espaço</kbd> pausa ou retoma; <kbd>Enter</kbd> dá a palavra ao próximo da lista ou da fila.
+		{t('Atalhos:')} <kbd>{t('Espaço')}</kbd> {t('pausa ou retoma;')} <kbd>{t('Enter')}</kbd> {t('dá a palavra ao próximo da lista ou da fila.')}
 	</p>
 
 	{#if erro}
@@ -138,7 +139,7 @@
 
 	{#if ehMesa && data.fase === 'plenaria'}
 		<section class="cartao cartao--destaque" aria-labelledby="t-plenaria">
-			<h2 id="t-plenaria">Plenária de abertura</h2>
+			<h2 id="t-plenaria">{t('Plenária de abertura')}</h2>
 			<p class="destaque">{ETAPAS[data.estado.etapa_plenaria].rotulo}</p>
 			{#if ETAPAS[data.estado.etapa_plenaria].proxima}
 				<button
@@ -154,7 +155,7 @@
 					{ETAPAS[data.estado.etapa_plenaria].proxima}
 				</button>
 			{:else}
-				<p class="suave">Uma delegação propõe o tópico no topo; a votação dessa moção encerra a plenária.</p>
+				<p class="suave">{t('Uma delegação propõe o tópico no topo; a votação dessa moção encerra a plenária.')}</p>
 			{/if}
 		</section>
 	{/if}
@@ -165,7 +166,7 @@
 				type="button"
 				onclick={() => rpc('assumir_presidencia', { p_comite: comite, p_assumir: !data.estado?.mesa_assumiu })}
 			>
-				{data.estado.mesa_assumiu ? 'Devolver a presidência à delegação' : 'Mesa assume a presidência'}
+				{data.estado.mesa_assumiu ? t('Devolver a presidência à delegação') : t('Mesa assume a presidência')}
 			</button>
 		</p>
 	{/if}
@@ -174,28 +175,28 @@
 		<div class="painel-coluna">
 			{#if lista.length}
 				<section class="cartao" aria-labelledby="t-lista">
-					<h2 id="t-lista">{emDiscussao ? 'Lista especial' : 'Lista de oradores'}</h2>
+					<h2 id="t-lista">{emDiscussao ? t('Lista especial') : t('Lista de oradores')}</h2>
 					<ol class="lista">
 						{#each lista as inscricao (inscricao.id)}
 							<li aria-current={inscricao.id === proximo?.id ? 'step' : undefined}>
 								<span class="com-bandeira"
 									><Bandeira codigo={inscricao.delegacao?.bandeira} /> {inscricao.delegacao?.nome}</span
 								>
-								{#if inscricao.lado}<span class="selo">{inscricao.lado === 'a_favor' ? 'A favor' : 'Contra'}</span>{/if}
-								{#if inscricao.falou}<span class="selo selo--ok">Falou</span>{/if}
+								{#if inscricao.lado}<span class="selo">{inscricao.lado === 'a_favor' ? t('A favor') : t('Contra')}</span>{/if}
+								{#if inscricao.falou}<span class="selo selo--ok">{t('Falou')}</span>{/if}
 							</li>
 						{/each}
 					</ol>
 					{#if proximo}
 						<button class="botao" type="button" onclick={() => darPalavra(proximo.delegacao!.id)}>
-							Dar a palavra a {proximo.delegacao?.nome}
+							{t('Dar a palavra a {delegacao}', { delegacao: proximo.delegacao?.nome ?? '' })}
 						</button>
 					{/if}
 				</section>
 			{/if}
 
 			<section class="cartao" aria-labelledby="t-fila">
-				<h2 id="t-fila">Pedidos de fala</h2>
+				<h2 id="t-fila">{t('Pedidos de fala')}</h2>
 				<ol class="lista">
 					{#each fila as pedido (pedido.id)}
 						<li>
@@ -204,83 +205,83 @@
 								class="botao botao--pequeno"
 								type="button"
 								aria-label={`Dar a palavra a ${pedido.delegacao?.nome}`}
-								onclick={() => darPalavra(pedido.delegacao!.id)}>Dar a palavra</button
+								onclick={() => darPalavra(pedido.delegacao!.id)}>{t('Dar a palavra')}</button
 							>
 						</li>
 					{:else}
-						<li class="suave">Nenhuma placa levantada.</li>
+						<li class="suave">{t('Nenhuma placa levantada.')}</li>
 					{/each}
 				</ol>
 				{#if ehMesa && data.comite.tecnologia_restrita}
 					<form
 						class="acoes"
-						aria-label="Registrar pedido de fala"
+						aria-label={t('Registrar pedido de fala')}
 						onsubmit={(e) => {
 							e.preventDefault();
 							if (pedidoDe) void rpc('registrar_pedido_fala', { p_comite: comite, p_delegacao: pedidoDe });
 						}}
 					>
 						<label class="campo">
-							Delegação que levantou a placa
+							{t('Delegação que levantou a placa')}
 							<select bind:value={pedidoDe}>
 								{#each data.delegacoes as d (d.id)}<option value={d.id}>{d.nome}</option>{/each}
 							</select>
 						</label>
-						<button class="botao botao--secundario botao--pequeno">Registrar pedido de fala</button>
+						<button class="botao botao--secundario botao--pequeno">{t('Registrar pedido de fala')}</button>
 					</form>
 				{/if}
 			</section>
 		</div>
 
 		<section class="cartao" aria-labelledby="t-palavra">
-			<h2 id="t-palavra">Com a palavra</h2>
+			<h2 id="t-palavra">{t('Com a palavra')}</h2>
 			{#if data.estado.orador}
 				<p class="destaque com-bandeira"><Bandeira codigo={data.estado.orador.bandeira} /> {data.estado.orador.nome}</p>
 			{:else}
-				<p class="suave">Ninguém com a palavra.</p>
+				<p class="suave">{t('Ninguém com a palavra.')}</p>
 			{/if}
 			<Cronometro cronometro={data.estado} avisoSeg={data.regras.aviso_fala_seg} {diferenca} grande />
 			<div class="acoes">
 				<button class="botao" type="button" disabled={!pausado && !correndo} onclick={pausarOuRetomar}>
-					{pausado ? 'Retomar' : 'Pausar'}
+					{pausado ? t('Retomar') : t('Pausar')}
 				</button>
 				<button
 					class="botao botao--secundario"
 					type="button"
 					disabled={!data.estado.cronometro_inicio}
-					onclick={() => rpc('somar_segundos', { p_comite: comite, p_seg: 30 })}>+30 s</button
+					onclick={() => rpc('somar_segundos', { p_comite: comite, p_seg: 30 })}>{t('+30 s')}</button
 				>
 				<button
 					class="botao botao--secundario"
 					type="button"
 					disabled={!data.estado.cronometro_inicio}
-					onclick={() => rpc('somar_segundos', { p_comite: comite, p_seg: -10 })}>−10 s</button
+					onclick={() => rpc('somar_segundos', { p_comite: comite, p_seg: -10 })}>{t('−10 s')}</button
 				>
 				<button class="botao botao--secundario" type="button" disabled={!data.estado.orador} onclick={() => darPalavra(null)}
-					>Encerrar fala</button
+					>{t('Encerrar fala')}</button
 				>
 			</div>
 			<label class="campo campo--curto">
-				Tempo de fala (segundos)
+				{t('Tempo de fala (segundos)')}
 				<input type="number" min="1" max="3600" bind:value={tempoFala} />
 			</label>
 
 			{#if data.fase !== 'plenaria'}
-				<form class="formulario" onsubmit={mudarForma} aria-label="Forma de debate">
+				<form class="formulario" onsubmit={mudarForma} aria-label={t('Forma de debate')}>
 					<label class="campo">
-						Forma de debate
+						{t('Forma de debate')}
 						<select bind:value={forma}>
 							<option value="formal_informal">{FORMAS.formal_informal}</option>
 							<option value="informal_informal">{FORMAS.informal_informal}</option>
 						</select>
 					</label>
 					<label class="campo campo--curto">
-						Minutos {forma === 'informal_informal'
-							? `(até ${data.regras.informal_informal_max_min} por sessão)`
-							: '(opcional)'}
+						{forma === 'informal_informal'
+							? t('Minutos (até {n} por sessão)', { n: data.regras.informal_informal_max_min })
+							: t('Minutos (opcional)')}
 						<input type="number" min="1" max="120" bind:value={minutos} required={forma === 'informal_informal'} />
 					</label>
-					<button class="botao botao--secundario">Mudar a forma de debate</button>
+					<button class="botao botao--secundario">{t('Mudar a forma de debate')}</button>
 				</form>
 			{/if}
 		</section>
@@ -288,7 +289,7 @@
 		<div class="painel-coluna">
 			{#if ehMesa && data.projetos.length}
 				<section class="cartao" aria-labelledby="t-projetos">
-					<h2 id="t-projetos">Projetos de resolução</h2>
+					<h2 id="t-projetos">{t('Projetos de resolução')}</h2>
 					<ul class="lista">
 						{#each data.projetos as p (p.id)}
 							<li>
@@ -296,7 +297,7 @@
 									{nomeDoDocumento(p)}
 									<span class="detalhe">
 										<span class="selo {STATUS_DOCUMENTO[p.status].selo}">{STATUS_DOCUMENTO[p.status].rotulo}</span>
-										{#if p.status === 'aprovado_mesa'}· os signatários pedem {p.aprovacao === 'consenso' ? 'consenso' : 'votação'}{/if}
+										{#if p.status === 'aprovado_mesa'}· {p.aprovacao === 'consenso' ? t('os signatários pedem consenso') : t('os signatários pedem votação')}{/if}
 									</span>
 								</span>
 								{#if p.status === 'aprovado_mesa' || (p.status === 'em_votacao' && !votacao?.aberta)}
@@ -306,7 +307,7 @@
 												class="botao botao--secundario botao--pequeno"
 												type="button"
 												aria-label={`Iniciar a votação (sala fechada): ${nomeDoDocumento(p)}`}
-												onclick={() => rpc('iniciar_votacao_projeto', { p_documento: p.id })}>Iniciar a votação</button
+												onclick={() => rpc('iniciar_votacao_projeto', { p_documento: p.id })}>{t('Iniciar a votação')}</button
 											>
 										{/if}
 										<button
@@ -314,14 +315,14 @@
 											type="button"
 											aria-label={`Abrir a votação: ${nomeDoDocumento(p)}`}
 											onclick={() => rpc('abrir_votacao_projeto', { p_documento: p.id })}
-											>{p.status === 'em_votacao' ? 'Abrir a votação final' : 'Abrir votação'}</button
+											>{p.status === 'em_votacao' ? t('Abrir a votação final') : t('Abrir votação')}</button
 										>
 										{#if p.status === 'aprovado_mesa'}
 										<button
 											class="botao botao--secundario botao--pequeno"
 											type="button"
 											aria-label={`Aprovar por consenso: ${nomeDoDocumento(p)}`}
-											onclick={() => rpc('aprovar_por_consenso', { p_documento: p.id })}>Aprovar por consenso</button
+											onclick={() => rpc('aprovar_por_consenso', { p_documento: p.id })}>{t('Aprovar por consenso')}</button
 										>
 										{/if}
 									</span>
@@ -331,7 +332,7 @@
 								{@const ops = data.operativas.filter((o) => o.documento_id === p.id)}
 								<li>
 									<fieldset class="opcoes">
-										<legend>Divisão da questão: operativas votadas em separado</legend>
+										<legend>{t('Divisão da questão: operativas votadas em separado')}</legend>
 										{#each ops as o, i (o.id)}
 											<label class="opcao"><input type="checkbox" value={o.id} bind:group={parte} /> {i + 1}. {o.texto}</label>
 										{/each}
@@ -340,7 +341,7 @@
 											type="button"
 											disabled={!parte.length}
 											onclick={() => rpc('abrir_votacao_parte', { p_documento: p.id, p_clausulas: parte }).then(() => (parte = []))}
-											>Votar esta parte</button
+											>{t('Votar esta parte')}</button
 										>
 									</fieldset>
 								</li>
@@ -351,20 +352,20 @@
 			{/if}
 			{#if ehMesa && data.emendas.length && !votacao?.aberta}
 				<section class="cartao" aria-labelledby="t-emendas">
-					<h2 id="t-emendas">Emendas</h2>
+					<h2 id="t-emendas">{t('Emendas')}</h2>
 					<ul class="lista">
 						{#each data.emendas as e (e.id)}
 							<li>
 								<span>
 									{ACOES_EMENDA[e.acao]}{e.clausula ? `: "${e.clausula.texto}"` : ''}{e.texto ? ` → "${e.texto}"` : ''}
-									<span class="detalhe">{e.delegacao?.nome} · {e.assinaturas.length} de {data.regras.assinaturas_emenda} assinaturas</span>
+									<span class="detalhe">{e.delegacao?.nome} · {t('{n} de {total} assinaturas', { n: e.assinaturas.length, total: data.regras.assinaturas_emenda })}</span>
 								</span>
 								<button
 									class="botao botao--pequeno"
 									type="button"
 									disabled={e.assinaturas.length < data.regras.assinaturas_emenda}
 									aria-label={`Votar a emenda de ${e.delegacao?.nome}`}
-									onclick={() => rpc('abrir_votacao_emenda', { p_emenda: e.id })}>Votar a emenda</button
+									onclick={() => rpc('abrir_votacao_emenda', { p_emenda: e.id })}>{t('Votar a emenda')}</button
 								>
 							</li>
 						{/each}
@@ -373,19 +374,19 @@
 			{/if}
 			{#if votacao}
 				<section class="cartao cartao--destaque" aria-labelledby="t-votacao">
-					<h2 id="t-votacao">{votacao.aberta ? 'Votação aberta' : 'Última votação'}</h2>
+					<h2 id="t-votacao">{votacao.aberta ? t('Votação aberta') : t('Última votação')}</h2>
 					<p class="destaque">{votacao.objeto}</p>
 					{#if votacao.aberta}
 						<p>
-							{votacao.votos.length} de {votantes.length} votaram · {votacao.tipo === 'substantiva'
-								? 'substantiva'
-								: 'procedimental'}, {REGRAS_VOTACAO[votacao.regra]}
-							{#if votacao.nominal}· <strong>votação nominal</strong>, em ordem alfabética{/if}
+							{t('{n} de {total} votaram', { n: votacao.votos.length, total: votantes.length })} · {votacao.tipo === 'substantiva'
+								? t('substantiva')
+								: t('procedimental')}, {REGRAS_VOTACAO[votacao.regra]}
+							{#if votacao.nominal}· <strong>{t('votação nominal')}</strong>, {t('em ordem alfabética')}{/if}
 						</p>
 						<GradeVotos delegacoes={votantes} votos={votacao.votos} />
 						{#if ehMesa}
 							<details bind:open={chamadaAberta}>
-								<summary>{votacao.nominal ? 'Chamada nominal' : 'Registrar votos de placa'}</summary>
+								<summary>{votacao.nominal ? t('Chamada nominal') : t('Registrar votos de placa')}</summary>
 								<ul class="lista">
 									{#each votantes as d (d.id)}
 										{@const passou = votacao.passes.some((x) => x.delegacao_id === d.id)}
@@ -393,8 +394,8 @@
 										<li>
 											<span>
 												{d.nome}
-												{#if passou}<span class="selo">Passou a vez</span>{/if}
-												{#if parteNaDisputa}<span class="selo selo--alerta">Parte na disputa</span>{/if}
+												{#if passou}<span class="selo">{t('Passou a vez')}</span>{/if}
+												{#if parteNaDisputa}<span class="selo selo--alerta">{t('Parte na disputa')}</span>{/if}
 											</span>
 											<span class="acoes">
 												{#if votacao.nominal && !passou && !votacao.votos.some((v) => v.delegacao_id === d.id)}
@@ -402,16 +403,16 @@
 														class="botao botao--secundario botao--pequeno"
 														type="button"
 														aria-label={`Passou a vez: ${d.nome}`}
-														onclick={() => rpc('passar_vez', { p_votacao: votacao.id, p_delegacao: d.id })}>Passou</button
+														onclick={() => rpc('passar_vez', { p_votacao: votacao.id, p_delegacao: d.id })}>{t('Passou')}</button
 													>
 												{/if}
 												{#if votacao.regra === 'csnu'}
 													<button
 														class="botao botao--secundario botao--pequeno"
 														type="button"
-														aria-label={`${parteNaDisputa ? 'Não é parte' : 'Parte na disputa'}: ${d.nome}`}
+														aria-label={`${parteNaDisputa ? t('Não é parte') : t('Parte na disputa')}: ${d.nome}`}
 														onclick={() => rpc('marcar_parte', { p_votacao: votacao.id, p_delegacao: d.id, p_parte: !parteNaDisputa })}
-														>{parteNaDisputa ? 'Não é parte' : 'Parte'}</button
+														>{parteNaDisputa ? t('Não é parte') : t('Parte')}</button
 													>
 												{/if}
 												{#each escolhasPermitidas(votacao.tipo, d.situacao, sessao.presenca.find((p) => p.delegacao_id === d.id)?.situacao) as escolha (escolha)}
@@ -429,7 +430,7 @@
 							</details>
 						{/if}
 						<button class="botao" type="button" onclick={() => rpc('encerrar_votacao', { p_votacao: votacao.id })}>
-							Encerrar a votação
+							{t('Encerrar a votação')}
 						</button>
 					{:else}
 						<p>{textoResultado(votacao)}</p>
@@ -438,7 +439,7 @@
 			{/if}
 
 			<section class="cartao" aria-labelledby="t-pontos">
-				<h2 id="t-pontos">Pontos e moções</h2>
+				<h2 id="t-pontos">{t('Pontos e moções')}</h2>
 				<ul class="lista">
 					{#each pontosAbertos as ponto (ponto.id)}
 						{@const nome = descreverPonto(ponto)}
@@ -447,7 +448,7 @@
 								{nome}
 								<span class="detalhe"
 									>{ponto.delegacao?.nome}{ponto.detalhe ? ` · ${ponto.detalhe}` : ''}{ponto.tipo === 'voto_desconfianca'
-										? ` · ${ponto.assinaturas.length} de ${assinaturasDesconfianca(data.regras.assinaturas_desconfianca_fracao, data.delegacoes)} assinaturas`
+										? ` · ${t('{n} de {total} assinaturas', { n: ponto.assinaturas.length, total: assinaturasDesconfianca(data.regras.assinaturas_desconfianca_fracao, data.delegacoes) })}`
 										: ''}</span
 								>
 							</span>
@@ -457,14 +458,14 @@
 										class="botao botao--pequeno"
 										type="button"
 										aria-label={`Reconhecer: ${nome}`}
-										onclick={() => rpc('responder_ponto', { p_ponto: ponto.id, p_status: 'aceito' })}>Reconhecer</button
+										onclick={() => rpc('responder_ponto', { p_ponto: ponto.id, p_status: 'aceito' })}>{t('Reconhecer')}</button
 									>
 								{:else if ehPonto(ponto.tipo)}
 									<button
 										class="botao botao--pequeno"
 										type="button"
 										aria-label={`Aceitar: ${nome}, ${ponto.delegacao?.nome}`}
-										onclick={() => rpc('responder_ponto', { p_ponto: ponto.id, p_status: 'aceito' })}>Aceitar</button
+										onclick={() => rpc('responder_ponto', { p_ponto: ponto.id, p_status: 'aceito' })}>{t('Aceitar')}</button
 									>
 								{:else if ponto.status !== 'em_votacao'}
 									{#if ponto.status === 'aberto' && MOCOES_COM_LISTA.includes(ponto.tipo as TipoPonto)}
@@ -472,34 +473,34 @@
 											class="botao botao--pequeno"
 											type="button"
 											aria-label={`Abrir lista especial: ${nome}`}
-											onclick={() => rpc('abrir_lista_especial', { p_ponto: ponto.id })}>Abrir lista especial</button
+											onclick={() => rpc('abrir_lista_especial', { p_ponto: ponto.id })}>{t('Abrir lista especial')}</button
 										>
 									{/if}
 									<button
 										class="botao botao--pequeno"
 										type="button"
 										aria-label={`Votar: ${nome}`}
-										onclick={() => rpc('abrir_votacao', { p_ponto: ponto.id })}>Votar</button
+										onclick={() => rpc('abrir_votacao', { p_ponto: ponto.id })}>{t('Votar')}</button
 									>
 								{/if}
 								{#if ponto.status !== 'em_votacao'}
 									<button
 										class="botao botao--secundario botao--pequeno"
 										type="button"
-										aria-label={`${ehPonto(ponto.tipo) ? 'Recusar' : 'Fora de ordem'}: ${nome}, ${ponto.delegacao?.nome}`}
+										aria-label={`${ehPonto(ponto.tipo) ? t('Recusar') : t('Fora de ordem')}: ${nome}, ${ponto.delegacao?.nome}`}
 										onclick={() => rpc('responder_ponto', { p_ponto: ponto.id, p_status: 'recusado' })}
-										>{ehPonto(ponto.tipo) ? 'Recusar' : 'Fora de ordem'}</button
+										>{ehPonto(ponto.tipo) ? t('Recusar') : t('Fora de ordem')}</button
 									>
 								{/if}
 							</span>
 						</li>
 					{:else}
-						<li class="suave">Nenhum ponto ou moção.</li>
+						<li class="suave">{t('Nenhum ponto ou moção.')}</li>
 					{/each}
 				</ul>
 				{#if data.fase === 'debate'}
 					<button class="botao botao--secundario" type="button" onclick={() => rpc('passar_presidencia', { p_comite: comite })}
-						>Passar a presidência</button
+						>{t('Passar a presidência')}</button
 					>
 				{/if}
 			</section>

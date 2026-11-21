@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/i18n.svelte.ts';
 	import { STATUS_DPO as STATUS } from '#lib/impressao.ts';
 	import { untrack } from 'svelte';
 	import { invalidate } from '$app/navigation';
@@ -54,7 +55,7 @@
 				p_texto: rascunhos[topico].texto,
 				p_referencias: rascunhos[topico].referencias.split('\n')
 			}),
-			'DPO salvo.'
+			t('DPO salvo.')
 		);
 
 	// Avaliado, o DPO fecha o painel da mesa.
@@ -66,19 +67,19 @@
 	}
 
 	async function enviar(topico: number) {
-		if (await salvar(topico)) await executar(supabase.rpc('enviar_dpo', { p_dpo: meu(topico)!.id }), 'DPO enviado à mesa.');
+		if (await salvar(topico)) await executar(supabase.rpc('enviar_dpo', { p_dpo: meu(topico)!.id }), t('DPO enviado à mesa.'));
 	}
 </script>
 
 <svelte:head>
-	<title>DPO · {data.comite.sigla} · UFRGSMUN</title>
+	<title>{t('DPO')} · {data.comite.sigla} · UFRGSMUN</title>
 </svelte:head>
 
 <p class="rotulo">
-	Comitê · {data.comite.sigla}
+	{t('Comitê')} · {data.comite.sigla}
 	<AoVivo comiteId={data.comite.id} tabelas={['dpo']} dependencia="app:dpo" />
 </p>
-<h1>Documento de posição oficial</h1>
+<h1>{t('Documento de posição oficial')}</h1>
 
 {#if erro}
 	<p class="erro" role="alert">{erro}</p>
@@ -93,28 +94,28 @@
 		{@const d = meu(topico)}
 		{@const editavel = !d || d.status === 'rascunho' || d.status === 'pede_ajustes'}
 		<section class="cartao dpo-editor" aria-labelledby={`t-dpo-${topico}`}>
-			<h2 id={`t-dpo-${topico}`}>Tópico {topico}: {titulo}</h2>
+			<h2 id={`t-dpo-${topico}`}>{t('Tópico')} {topico}: {titulo}</h2>
 			<p class="cabecalho-documento">
 				<span class="selo {STATUS[d?.status ?? 'rascunho'].selo}">{STATUS[d?.status ?? 'rascunho'].rotulo}</span>
-				{#if d}<a href={`/imprimir/dpo/${d.id}`}>Imprimir ou salvar como PDF</a>{/if}
+				{#if d}<a href={`/imprimir/dpo/${d.id}`}>{t('Imprimir ou salvar como PDF')}</a>{/if}
 			</p>
 			{#if d?.comentario_mesa}
-				<p class="telegrama" role="note" aria-label="Comentário da mesa">{d.comentario_mesa}</p>
+				<p class="telegrama" role="note" aria-label={t('Comentário da mesa')}>{d.comentario_mesa}</p>
 			{/if}
 			{#if rascunhos[topico]}
 				<label class="campo">
-					Texto (parágrafos separados por uma linha em branco)
+					{t('Texto (parágrafos separados por uma linha em branco)')}
 					<textarea rows="12" maxlength="12000" disabled={!editavel} bind:value={rascunhos[topico].texto}></textarea>
 				</label>
 				<label class="campo">
-					Referências (uma por linha)
+					{t('Referências (uma por linha)')}
 					<textarea rows="4" disabled={!editavel} bind:value={rascunhos[topico].referencias}></textarea>
 				</label>
 			{/if}
 			{#if editavel}
 				<div class="acoes">
-					<button class="botao botao--secundario" type="button" onclick={() => salvar(topico)}>Salvar rascunho</button>
-					<button class="botao" type="button" onclick={() => enviar(topico)}>Enviar à mesa</button>
+					<button class="botao botao--secundario" type="button" onclick={() => salvar(topico)}>{t('Salvar rascunho')}</button>
+					<button class="botao" type="button" onclick={() => enviar(topico)}>{t('Enviar à mesa')}</button>
 				</div>
 			{/if}
 		</section>
@@ -123,12 +124,12 @@
 
 {#if ehMesa || outros.length}
 	<section aria-labelledby="t-dpos">
-		<h2 id="t-dpos">{ehMesa ? 'DPOs do comitê' : 'DPOs abertos do comitê'}</h2>
+		<h2 id="t-dpos">{ehMesa ? t('DPOs do comitê') : t('DPOs abertos do comitê')}</h2>
 		{#if ehMesa}
 			<p class="suave">
 				{data.regras.dpos_publicos
-					? 'Os DPOs aprovados estão abertos para as outras delegações.'
-					: 'Os DPOs ficam fechados: só a delegação e a mesa leem.'}
+					? t('Os DPOs aprovados estão abertos para as outras delegações.')
+					: t('Os DPOs ficam fechados: só a delegação e a mesa leem.')}
 			</p>
 		{/if}
 		<ul class="lista">
@@ -136,16 +137,16 @@
 				<li>
 					<span>
 						<span class="com-bandeira"><Bandeira codigo={d.delegacao?.bandeira} /> {d.delegacao?.nome}</span>
-						<span class="detalhe">Tópico {d.topico} · <span class="selo {STATUS[d.status].selo}">{STATUS[d.status].rotulo}</span></span>
+						<span class="detalhe">{t('Tópico')} {d.topico} · <span class="selo {STATUS[d.status].selo}">{STATUS[d.status].rotulo}</span></span>
 					</span>
 					<span class="acoes">
-						<a href={`/imprimir/dpo/${d.id}`} aria-label={`Imprimir o DPO de ${d.delegacao?.nome}, tópico ${d.topico}`}>Imprimir</a>
+						<a href={`/imprimir/dpo/${d.id}`} aria-label={`Imprimir o DPO de ${d.delegacao?.nome}, tópico ${d.topico}`}>{t('Imprimir')}</a>
 						{#if ehMesa && (d.status === 'enviado' || d.status === 'aprovado')}
 							<button
 								class="botao botao--pequeno"
 								type="button"
 								aria-label={`Avaliar o DPO de ${d.delegacao?.nome}, tópico ${d.topico}`}
-								onclick={() => (aberto = aberto === d.id ? null : d.id)}>Avaliar</button
+								onclick={() => (aberto = aberto === d.id ? null : d.id)}>{t('Avaliar')}</button
 							>
 						{/if}
 					</span>
@@ -155,28 +156,28 @@
 						<div class="formulario formulario--largo">
 							<p class="texto-nota">{d.texto}</p>
 							<label class="campo">
-								Comentário para a delegação
+								{t('Comentário para a delegação')}
 								<textarea rows="3" maxlength="1000" bind:value={comentario}></textarea>
 							</label>
 							<div class="acoes">
 								<button
 									class="botao"
 									type="button"
-									onclick={() => avaliar(d.id, 'aprovado', 'DPO aprovado.')}
-									>Aprovar</button
+									onclick={() => avaliar(d.id, 'aprovado', t('DPO aprovado.'))}
+									>{t('Aprovar')}</button
 								>
 								<button
 									class="botao botao--secundario"
 									type="button"
-									onclick={() => avaliar(d.id, 'pede_ajustes', 'Ajustes pedidos.')}
-									>Pedir ajustes</button
+									onclick={() => avaliar(d.id, 'pede_ajustes', t('Ajustes pedidos.'))}
+									>{t('Pedir ajustes')}</button
 								>
 							</div>
 						</div>
 					</li>
 				{/if}
 			{:else}
-				<li class="suave">Nenhum DPO por aqui ainda.</li>
+				<li class="suave">{t('Nenhum DPO por aqui ainda.')}</li>
 			{/each}
 		</ul>
 	</section>

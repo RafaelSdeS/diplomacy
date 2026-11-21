@@ -2,6 +2,7 @@ import { error } from '@sveltejs/kit';
 import { diferencaRelogio } from './cronometro.ts';
 import type { Regras } from './regras.ts';
 import { supabase } from './supabase.ts';
+import { bilingue, t, traduzirMensagem } from './i18n.svelte.ts';
 
 /** O comitê pela sigla; 404 se não existe ou a pessoa não participa do evento (RLS). */
 export async function comitePorSigla(sigla: string) {
@@ -85,17 +86,17 @@ export async function medirRelogio(): Promise<number> {
 export function mensagemDeErro(erro: { code?: string; message?: string } | null, padrao = 'Não foi possível. Tente de novo.') {
 	if (!erro) return '';
 	return ['P0001', 'P0002', '42501', '22023', '23505', '23514'].includes(erro.code ?? '') && erro.message
-		? erro.message
-		: padrao;
+		? traduzirMensagem(erro.message)
+		: t(padrao);
 }
 
-export const FORMAS = {
+export const FORMAS = bilingue({
 	formal_formal: 'Formal-formal (lista de oradores)',
 	formal_informal: 'Formal-informal',
 	informal_informal: 'Informal-informal'
-} as const;
+} as const);
 
-export const PONTOS = {
+export const PONTOS = bilingue({
 	ponto_ordem: 'Ponto de ordem',
 	ponto_duvida: 'Ponto de dúvida',
 	privilegio_pessoal: 'Ponto de privilégio pessoal',
@@ -106,7 +107,7 @@ export const PONTOS = {
 	voto_desconfianca: 'Moção de não-confiança',
 	divisao_questao: 'Moção de divisão da questão',
 	votacao_nominal: 'Moção de votação nominal'
-} as const;
+} as const);
 export type TipoPonto = keyof typeof PONTOS;
 
 /** Os pontos e moções em ordem em cada fase (o banco confere de novo). */
@@ -122,18 +123,18 @@ export function pontosEmOrdem(fase: string, etapa: string | null | undefined, sa
 export const MOCOES_COM_LISTA: TipoPonto[] = ['topico_no_topo', 'adiamento_debate', 'divisao_questao'];
 export const ehPonto = (tipo: string) => tipo.startsWith('ponto_') || tipo === 'privilegio_pessoal';
 
-export const SITUACAO_PONTO = {
+export const SITUACAO_PONTO = bilingue({
 	aberto: 'Aguardando',
 	em_discussao: 'Lista especial aberta',
 	em_votacao: 'Em votação',
 	aceito: 'Aceito',
 	recusado: 'Recusado'
-} as const;
+} as const);
 
 /** O nome de uma moção com o detalhe que ela carrega (tópico ou minutos). */
 export function descreverPonto(p: { tipo: string; topico?: number | null; minutos?: number | null }) {
 	const nome = PONTOS[p.tipo as TipoPonto] ?? p.tipo;
-	if (p.tipo === 'topico_no_topo' && p.topico) return `${nome}: tópico ${p.topico}`;
-	if (p.tipo === 'informal_informal' && p.minutos) return `${nome}: ${p.minutos} minutos`;
+	if (p.tipo === 'topico_no_topo' && p.topico) return `${nome}: ${t('tópico')} ${p.topico}`;
+	if (p.tipo === 'informal_informal' && p.minutos) return `${nome}: ${p.minutos} ${t('minutos')}`;
 	return nome;
 }

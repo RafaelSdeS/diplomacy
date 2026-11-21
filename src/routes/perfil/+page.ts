@@ -3,7 +3,7 @@ import type { PageLoad } from './$types';
 
 export const load: PageLoad = async ({ parent }) => {
 	const { usuario, participacoes } = await parent();
-	const pessoa = await supabase.from('pessoa').select('nome, bio, foto_path').eq('id', usuario!.id).single();
+	const pessoa = await supabase.from('pessoa').select('nome, bio, foto_path, idioma').eq('id', usuario!.id).single();
 	if (pessoa.error) throw pessoa.error;
 
 	let fotoUrl: string | null = null;

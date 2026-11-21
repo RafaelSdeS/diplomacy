@@ -130,7 +130,8 @@ test('os crachás do comitê saem com QR, e o QR de um deles entra no app', asyn
 	await page.getByRole('combobox', { name: 'Comitê' }).selectOption({ label: 'TREINO' });
 	await page.getByRole('button', { name: 'Emitir e montar os crachás' }).click();
 	const cracha = page.getByRole('article', { name: `Crachá de Importado ${RODADA} 001` });
-	await expect(cracha).toContainText('Bolívia · TREINO');
+	// Emitir gera um código por pessoa do comitê: leva alguns segundos num banco cheio.
+	await expect(cracha).toContainText('Bolívia · TREINO', { timeout: 20_000 });
 	await expect(cracha.locator('svg')).toBeVisible();
 	expect(await page.getByRole('article', { name: /^Crachá de / }).count()).toBeGreaterThanOrEqual(IMPORTADOS);
 

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/i18n.svelte.ts';
 	import { tick, untrack } from 'svelte';
 	import { invalidate } from '$app/navigation';
 	import {
@@ -6,7 +7,7 @@
 		formatarEspera,
 		minutosDesde,
 		ordenarFila,
-		RESPOSTAS_PRONTAS,
+		respostasProntas,
 		resumoDaFila,
 		SELO_NOTA,
 		STATUS_NOTA,
@@ -79,7 +80,7 @@
 	async function responder(status: StatusNota) {
 		const ok = await executar(
 			supabase.rpc('responder_notas', { p_ids: alvos, p_status: status, p_resposta: resposta }),
-			alvos.length > 1 ? `${alvos.length} notas respondidas.` : 'Nota respondida.'
+			alvos.length > 1 ? `${alvos.length} notas respondidas.` : t('Nota respondida.')
 		);
 		if (ok) {
 			resposta = '';
@@ -91,18 +92,18 @@
 		evento.preventDefault();
 		const ok = await executar(
 			supabase.rpc('publicar_atualizacao', { p_comites: comitesDaAtualizacao, p_texto: atualizacao }),
-			'Atualização publicada.'
+			t('Atualização publicada.')
 		);
 		if (ok) atualizacao = '';
 	}
 </script>
 
 <svelte:head>
-	<title>Crise · {data.comite.sigla} · UFRGSMUN</title>
+	<title>{t('Crise')} · {data.comite.sigla} · UFRGSMUN</title>
 </svelte:head>
 
 <p class="rotulo">
-	Equipe de crise · {data.comite.sigla}
+	{t('Equipe de crise')} · {data.comite.sigla}
 	<AoVivo
 		comiteId={data.comite.id}
 		canais={[`crise:${data.comite.id}`]}
@@ -111,17 +112,17 @@
 		bind:diferenca
 	/>
 </p>
-<h1>Fila da crise</h1>
-<p><a href={`/comite/${data.comite.sigla}/mensagens`}>Canal interno com a mesa</a></p>
+<h1>{t('Fila da crise')}</h1>
+<p><a href={`/comite/${data.comite.sigla}/mensagens`}>{t('Canal interno com a mesa')}</a></p>
 
 {#if !ehCrise}
-	<p class="suave">Só a equipe de crise do comitê vê esta fila.</p>
+	<p class="suave">{t('Só a equipe de crise do comitê vê esta fila.')}</p>
 {:else}
 	<p class="contador-crise" aria-live="polite">
-		<span class="selo {resumo.pendentes ? 'selo--info' : 'selo--ok'}">Pendentes: {resumo.pendentes}</span>
+		<span class="selo {resumo.pendentes ? 'selo--info' : 'selo--ok'}">{t('Pendentes: {n}', { n: resumo.pendentes })}</span>
 		{#if resumo.pendentes}
 			<span class="selo {resumo.alerta ? 'selo--erro' : ''}">
-				Mais antiga: {formatarEspera(resumo.esperaMin)}{resumo.alerta ? ' (acima do limite)' : ''}
+				{t('Mais antiga')}: {formatarEspera(resumo.esperaMin)}{resumo.alerta ? ` (${t('acima do limite')})` : ''}
 			</span>
 		{/if}
 	</p>
@@ -135,18 +136,18 @@
 
 	<div class="crise">
 		<section class="cartao" aria-labelledby="t-fila">
-			<h2 id="t-fila">Notas</h2>
+			<h2 id="t-fila">{t('Notas')}</h2>
 			<div class="acoes">
 				<label class="campo">
-					Delegação
+					{t('Delegação')}
 					<select bind:value={filtro}>
-						<option value="">Todas</option>
+						<option value="">{t('Todas')}</option>
 						{#each delegacoes as d (d.id)}
 							<option value={d.id}>{d.nome}</option>
 						{/each}
 					</select>
 				</label>
-				<label class="opcao"><input type="checkbox" bind:checked={soEsperando} /> Só as que esperam</label>
+				<label class="opcao"><input type="checkbox" bind:checked={soEsperando} /> {t('Só as que esperam')}</label>
 			</div>
 			<ol class="lista fila-crise">
 				{#each fila as nota (nota.id)}
@@ -163,19 +164,19 @@
 							<strong>{nota.titulo}</strong>
 							<span class="detalhe">
 								<span class="selo {SELO_NOTA[status]}">{STATUS_NOTA[status]}</span>
-								{nota.tipo === 'nota' ? 'Nota' : 'Diretiva'} ·
+								{nota.tipo === 'nota' ? t('Nota') : t('Diretiva')} ·
 								<span class="idade">{formatarEspera(minutosDesde(nota.criado_em, agora + diferenca))}</span>
 							</span>
 						</button>
 					</li>
 				{:else}
-					<li class="suave">Nenhuma nota.</li>
+					<li class="suave">{t('Nenhuma nota.')}</li>
 				{/each}
 			</ol>
 		</section>
 
 		<section class="cartao" id="nota-aberta" aria-labelledby="t-aberta">
-			<h2 id="t-aberta">{selecionadas.length > 1 ? `${selecionadas.length} notas selecionadas` : 'Nota aberta'}</h2>
+			<h2 id="t-aberta">{selecionadas.length > 1 ? t('{n} notas selecionadas', { n: selecionadas.length }) : t('Nota aberta')}</h2>
 			{#if selecionadas.length > 1}
 				<ul class="lista">
 					{#each data.notas.filter((n) => selecionadas.includes(n.id)) as n (n.id)}
@@ -184,42 +185,42 @@
 				</ul>
 			{:else if notaAberta}
 				<p class="com-bandeira destaque"><Bandeira codigo={notaAberta.delegacao?.bandeira} /> {notaAberta.delegacao?.nome}</p>
-				<p><strong>{notaAberta.titulo}</strong> · {notaAberta.tipo === 'nota' ? 'Nota' : 'Diretiva'}</p>
+				<p><strong>{notaAberta.titulo}</strong> · {notaAberta.tipo === 'nota' ? t('Nota') : t('Diretiva')}</p>
 				<p class="texto-nota">{notaAberta.texto}</p>
 				{#if notaAberta.resposta}
-					<p class="telegrama" role="note" aria-label="Resposta enviada">{notaAberta.resposta}</p>
+					<p class="telegrama" role="note" aria-label={t('Resposta enviada')}>{notaAberta.resposta}</p>
 				{/if}
 				{#if notaAberta.status === 'pendente'}
 					<button
 						class="botao botao--secundario"
 						type="button"
-						onclick={() => executar(supabase.rpc('assumir_nota', { p_id: notaAberta.id }), 'Nota assumida.')}
-						>Assumir esta nota</button
+						onclick={() => executar(supabase.rpc('assumir_nota', { p_id: notaAberta.id }), t('Nota assumida.'))}
+						>{t('Assumir esta nota')}</button
 					>
 				{/if}
 			{:else}
-				<p class="suave">Abra uma nota da fila, ou selecione várias parecidas para responder de uma vez.</p>
+				<p class="suave">{t('Abra uma nota da fila, ou selecione várias parecidas para responder de uma vez.')}</p>
 			{/if}
 
 			{#if alvos.length}
 				<div class="formulario formulario--largo">
 					<label class="campo">
-						Resposta
+						{t('Resposta')}
 						<textarea rows="4" maxlength="2000" bind:value={resposta}></textarea>
 					</label>
-					<div class="acoes" role="group" aria-label="Respostas prontas">
-						{#each RESPOSTAS_PRONTAS as pronta (pronta)}
+					<div class="acoes" role="group" aria-label={t('Respostas prontas')}>
+						{#each respostasProntas() as pronta (pronta)}
 							<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => (resposta = pronta)}
 								>{pronta.split(/[.:]/)[0]}</button
 							>
 						{/each}
 					</div>
 					<div class="acoes">
-						<button class="botao" type="button" onclick={() => responder('aprovada')}>Aprovar</button>
+						<button class="botao" type="button" onclick={() => responder('aprovada')}>{t('Aprovar')}</button>
 						<button class="botao botao--secundario" type="button" onclick={() => responder('pede_ajuste')}
-							>Pedir ajuste</button
+							>{t('Pedir ajuste')}</button
 						>
-						<button class="botao botao--secundario" type="button" onclick={() => responder('rejeitada')}>Rejeitar</button>
+						<button class="botao botao--secundario" type="button" onclick={() => responder('rejeitada')}>{t('Rejeitar')}</button>
 					</div>
 				</div>
 			{/if}
@@ -227,24 +228,24 @@
 	</div>
 
 	<section aria-labelledby="t-atualizacao">
-		<h2 id="t-atualizacao">Atualização de crise</h2>
+		<h2 id="t-atualizacao">{t('Atualização de crise')}</h2>
 		<form class="formulario formulario--largo" onsubmit={publicar}>
 			<label class="campo">
-				Texto da atualização
+				{t('Texto da atualização')}
 				<textarea required maxlength="3000" rows="4" bind:value={atualizacao}></textarea>
 			</label>
 			{#if meusComites.length > 1}
 				<fieldset class="opcoes">
-					<legend>Comitês (crise conjunta)</legend>
+					<legend>{t('Comitês (crise conjunta)')}</legend>
 					{#each meusComites as c (c.id)}
 						<label class="opcao"><input type="checkbox" value={c.id} bind:group={comitesDaAtualizacao} /> {c.sigla}</label>
 					{/each}
 				</fieldset>
 			{/if}
-			<button class="botao">Publicar atualização</button>
+			<button class="botao">{t('Publicar atualização')}</button>
 		</form>
 		{#if data.atualizacoes.length}
-			<ul class="lista" aria-label="Atualizações publicadas">
+			<ul class="lista" aria-label={t('Atualizações publicadas')}>
 				{#each data.atualizacoes as a (a.id)}
 					<li>{a.texto}</li>
 				{/each}

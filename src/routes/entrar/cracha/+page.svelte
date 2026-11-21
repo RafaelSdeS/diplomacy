@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/i18n.svelte.ts';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { entrarComCodigo } from '#lib/credenciais.ts';
@@ -11,7 +12,7 @@
 		const codigo = decodeURIComponent(location.hash.slice(1));
 		history.replaceState(null, '', location.pathname);
 		if (!codigo) {
-			erro = 'Este endereço não tem o código do crachá. Leia o QR de novo ou entre de outro jeito.';
+			erro = t('Este endereço não tem o código do crachá. Leia o QR de novo ou entre de outro jeito.');
 			return;
 		}
 		const falha = await entrarComCodigo(codigo);
@@ -21,14 +22,14 @@
 </script>
 
 <svelte:head>
-	<title>Entrar pelo crachá · UFRGSMUN</title>
+	<title>{t('Entrar pelo crachá · UFRGSMUN')}</title>
 </svelte:head>
 
-<p class="rotulo">Acesso</p>
-<h1>Entrar pelo crachá</h1>
+<p class="rotulo">{t('Acesso')}</p>
+<h1>{t('Entrar pelo crachá')}</h1>
 {#if erro}
 	<p class="erro" role="alert">{erro}</p>
-	<p><a href="/entrar">Entrar de outro jeito</a></p>
+	<p><a href="/entrar">{t('Entrar de outro jeito')}</a></p>
 {:else}
-	<p class="suave" role="status">Entrando…</p>
+	<p class="suave" role="status">{t('Entrando…')}</p>
 {/if}
