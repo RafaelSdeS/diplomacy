@@ -53,6 +53,7 @@ Cada passo só começa quando os passos de que ele depende estão prontos. As re
 | [41](41-pendencias.md) | Pendências: logo, ícones do cronograma, filtro dos próximos e capturas da crise | 39 |
 | **Aparência** | | |
 | [42](42-estilo-chancelaria.md) | Estilo chancelaria: faixa marinho, fio dourado, cantos retos e Spectral | 39 (depois de 40 e 41) |
+| [43](43-facil-de-achar-e-voltar.md) | Fácil de achar e de voltar: painel sem rolagem, país na faixa, menu por tarefa, Documentos, "Ir para…" e CSNU completo na demonstração | 42 |
 
 ## Melhorias depois da revisão
 
@@ -198,6 +199,7 @@ Cada passo tem uma seção "Testes" com os testes que provam que ele funciona e 
 | 40 | — | sim | sim (consumo) | sim (3G e cabeçalhos) |
 | 41 | sim | — | sim | — |
 | 42 | — | — | capturas e axe | sim |
+| 43 | — | sim | sim (por tarefa) | sim |
 
 ## Aparência
 
