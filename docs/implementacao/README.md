@@ -1,6 +1,6 @@
 # Plano de implementação
 
-Ordem dos passos para construir o app. Os passos 01 a 12 formam o **piloto**: planos gratuitos, poucos usuários e dados fictícios. Os passos 13 a 19 levam o app à **escala do evento**. Os passos 20 a 38 são as **melhorias depois da revisão** do app, explicadas e priorizadas em [melhorias-pos-revisao.pdf](../melhorias-pos-revisao.pdf). Os passos 39 a 41 deixam o desenvolvimento mais rápido, o app mais leve na internet móvel e fecham as pendências.
+Ordem dos passos para construir o app. Os passos 01 a 12 formam o **piloto**: planos gratuitos, poucos usuários e dados fictícios. Os passos 13 a 19 levam o app à **escala do evento**. Os passos 20 a 38 são as **melhorias depois da revisão** do app, explicadas e priorizadas em [melhorias-pos-revisao.pdf](../melhorias-pos-revisao.pdf). Os passos 39 a 41 deixam o desenvolvimento mais rápido, o app mais leve na internet móvel e fecham as pendências. O passo 42 aplica o estilo "chancelaria", escolhido entre os protótipos de `docs/estilos/`.
 
 Cada passo só começa quando os passos de que ele depende estão prontos. As regras de procedimento que o app segue estão resumidas em [regras-de-procedimento.md](../regras-de-procedimento.md).
 
@@ -51,6 +51,8 @@ Cada passo só começa quando os passos de que ele depende estão prontos. As re
 | [39](39-testes-e-ci-rapidos.md) | Testes e CI mais rápidos: um comitê por arquivo, capturas no contêiner, CI em paralelo | 38 |
 | [40](40-menos-dados-no-celular.md) | Menos dados no celular: service worker, tempo real e imagens | 39 |
 | [41](41-pendencias.md) | Pendências: logo, ícones do cronograma, filtro dos próximos e capturas da crise | 39 |
+| **Aparência** | | |
+| [42](42-estilo-chancelaria.md) | Estilo chancelaria: faixa marinho, fio dourado, cantos retos e Spectral | 39 (depois de 40 e 41) |
 
 ## Melhorias depois da revisão
 
@@ -195,6 +197,7 @@ Cada passo tem uma seção "Testes" com os testes que provam que ele funciona e 
 | 39 | — | — | a suíte inteira, em paralelo | — |
 | 40 | — | sim | sim (consumo) | sim (3G e cabeçalhos) |
 | 41 | sim | — | sim | — |
+| 42 | — | — | capturas e axe | sim |
 
 ## Aparência
 
@@ -206,13 +209,19 @@ Leve, profissional, diplomática, limpa e com cara de oficial. A referência é 
   - rótulos curtos em versalete;
   - selos de situação no estilo carimbo ("APROVADA", "CONFIDENCIAL"), usados com moderação.
 
-- **Cores:** fundo branco e cinzas muito claros, texto grafite e uma cor de destaque azul-marinho. Um dourado discreto aparece só em destaques especiais, como a presidência (o UFRGSMUN não tem premiação). As bandeiras são o único elemento muito colorido.
+- **Cores (estilo chancelaria, passo 42):**
+  - fundo branco e cinzas neutros, texto quase preto e destaque azul-marinho;
+  - a barra do app é uma faixa marinho profundo com um fio dourado embaixo;
+  - o dourado aparece só no fio, no item atual do menu e na presidência (o UFRGSMUN não tem premiação);
+  - o vermelho vivo só marca o que está ao vivo: "Com a palavra", sessão em andamento e plantão do telão;
+  - as bandeiras são o único elemento muito colorido.
+  - Protótipos de referência em `docs/estilos/b-*.html`.
 - **Cores de situação:** verde, vermelho e âmbar só para situação (voto, prazo, fila), sempre com ícone e texto.
-- **Tipografia:** títulos e documentos com serifa (Source Serif 4, um único arquivo `woff2` reduzido aos caracteres latinos, servido pelo próprio app e contado no limite de 300 KB). A interface usa a fonte do sistema, que não precisa ser baixada.
-- **Espaço e linhas:** bastante espaço em branco, linhas finas de 1 px em vez de sombras e cantos levemente arredondados (4 a 8 px).
+- **Tipografia:** títulos e documentos com serifa (Spectral, servida pelo próprio app). Os títulos usam o arquivo 600, contado no limite de 300 KB. O 400 e o itálico só são baixados nas telas de documento e na impressão. A interface usa a fonte do sistema, que não precisa ser baixada.
+- **Espaço e linhas:** bastante espaço em branco, linhas finas de 1 px em vez de sombras e cantos retos (`--raio: 0`).
 - **Ícones:** traço fino, de um único conjunto (Lucide), só os usados.
 - **Movimento:** só transições curtas (até 150 ms) e nenhuma animação decorativa. Respeita a opção de reduzir movimento.
 - **Tom dos textos:** formal e simples, como "A palavra está com a delegação da França".
 - **Tema escuro:** azul-marinho profundo, com o mesmo contraste.
-- **Telão:** fundo claro e letras grandes por padrão, que funcionam melhor em salas iluminadas; tema escuro opcional.
+- **Telão:** fundo marinho profundo, letras grandes e o fio dourado sob o topo; o plantão é uma faixa vermelha com texto branco.
 - **Marca:** logo e cores do evento são configuráveis. O emblema da ONU nunca é usado.

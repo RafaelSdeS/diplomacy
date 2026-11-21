@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>B · Crise</title>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script src="b-comum.js"></script>
+</head>
+<body class="font-sans antialiased text-sm">
+
+<header class="bg-faixa text-white border-b-2 border-vermelho">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-5 flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <p class="text-[11px] uppercase tracking-[0.2em] text-ouro">Gabinete de crise · CSNU</p>
+      <h1 class="mt-1 font-serif font-semibold text-3xl">Notas das delegações</h1>
+    </div>
+    <p class="text-white/80 tabular-nums">4 aguardando · 1 com você · 9 respondidas</p>
+  </div>
+</header>
+
+<div class="bg-vermelho-fundo border-b border-linha">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-baseline gap-x-4 gap-y-1">
+    <span class="text-[11px] uppercase tracking-[0.12em] text-vermelho-texto font-semibold">Atualização vigente · 14h20</span>
+    <p class="font-serif text-base">Comboio humanitário é atacado perto de Ménaka; 3 trabalhadores desaparecidos.</p>
+    <span class="ml-auto text-cinza">Resposta das delegações até <strong class="tabular-nums">14h50</strong></span>
+  </div>
+</div>
+
+<main class="max-w-6xl mx-auto px-4 sm:px-6 py-6 grid gap-6 lg:grid-cols-[22rem_minmax(0,1fr)]">
+
+  <section class="bg-papel border border-linha self-start" aria-labelledby="t-fila">
+    <h2 id="t-fila" class="font-serif font-semibold text-lg text-marinho px-4 py-3 border-b border-linha">Fila</h2>
+    <ul id="fila" class="divide-y divide-linha"></ul>
+  </section>
+
+  <div class="space-y-6 min-w-0">
+    <section class="bg-papel border border-linha border-l-4 border-l-marinho" aria-labelledby="t-nota">
+      <div class="px-5 py-3 border-b border-linha flex flex-wrap items-center justify-between gap-2">
+        <h2 id="t-nota" class="font-serif font-semibold text-lg text-marinho flex items-center gap-2"><span class="fi fi-fr ring-1 ring-black/10"></span>Nota da França</h2>
+        <span class="text-xs text-mudo">Recebida 14h31 · assumida por você 14h33</span>
+      </div>
+      <blockquote class="px-5 py-4 font-serif text-base leading-relaxed">
+        A delegação francesa solicita informações sobre o paradeiro do comboio e autoriza, em caráter reservado, o envio de uma
+        equipe de inteligência a Gao para apoiar as buscas, sem comunicação prévia ao governo de transição.
+      </blockquote>
+      <form class="px-5 py-4 border-t border-linha space-y-3" onsubmit="return false">
+        <label class="block text-[11px] uppercase tracking-[0.12em] text-mudo" for="resp">Resposta da equipe de crise</label>
+        <textarea id="resp" rows="4" class="w-full border border-linha bg-papel px-3 py-2 font-serif text-base">A equipe chega a Gao às 15h. Fontes locais indicam que o comboio foi levado para o norte. O governo de transição detectou o voo.</textarea>
+        <div class="flex flex-wrap gap-2">
+          <button class="bg-marinho text-sobre-marinho px-4 py-2 font-medium hover:bg-marinho2">Responder à França</button>
+          <button class="border border-linha px-4 py-2 hover:border-marinho">Devolver à fila</button>
+          <label class="ml-auto flex items-center gap-2 text-cinza"><input type="checkbox" class="accent-[var(--marinho)]"> Virar atualização pública</label>
+        </div>
+      </form>
+    </section>
+
+    <section class="bg-papel border border-linha" aria-labelledby="t-pub">
+      <h2 id="t-pub" class="font-serif font-semibold text-lg text-marinho px-5 py-3 border-b border-linha">Publicar atualização</h2>
+      <form class="px-5 py-4 space-y-3" onsubmit="return false">
+        <input class="w-full border border-linha bg-papel px-3 py-2 font-serif text-base" placeholder="Título da atualização">
+        <textarea rows="3" class="w-full border border-linha bg-papel px-3 py-2" placeholder="O que aconteceu"></textarea>
+        <fieldset class="flex flex-wrap items-center gap-x-5 gap-y-2">
+          <legend class="text-[11px] uppercase tracking-[0.12em] text-mudo mb-1">Comitês</legend>
+          <label class="flex items-center gap-2"><input type="checkbox" checked class="accent-[var(--marinho)]"> CSNU</label>
+          <label class="flex items-center gap-2"><input type="checkbox" class="accent-[var(--marinho)]"> ACEG-UA</label>
+          <label class="flex items-center gap-2"><input type="checkbox" class="accent-[var(--marinho)]"> UNOCT</label>
+          <label class="flex items-center gap-2">Prazo <input value="30" class="w-12 border border-linha bg-papel px-2 py-1 tabular-nums"> min</label>
+        </fieldset>
+        <button class="border border-vermelho-texto text-vermelho-texto px-4 py-2 font-medium hover:bg-vermelho-fundo">Publicar no telão</button>
+      </form>
+    </section>
+  </div>
+</main>
+
+<script>
+  const notas = [
+    ['fr', '14h31', 'com você', 'Solicita informações sobre o comboio e autoriza equipe de inteligência…'],
+    ['ru', '14h32', 'aguardando', 'Oferece, em sigilo, apoio logístico ao governo de transição…'],
+    ['so', '14h34', 'aguardando', 'Pede reunião reservada com o Reino Unido e a Dinamarca…'],
+    ['pk', '14h35', 'aguardando', 'Propõe enviar observadores militares sob bandeira própria…'],
+    ['us', '14h36', 'aguardando', 'Pergunta se há imagens de satélite da rota do comboio…'],
+    ['cn', '14h12', 'respondida', 'Questiona o impacto do ataque sobre as obras na ferrovia…'],
+  ];
+  const estado = { 'com você': 'text-marinho font-semibold', aguardando: 'text-ouro-texto font-semibold', respondida: 'text-mudo' };
+  document.getElementById('fila').innerHTML = notas.map(([iso, hora, s, resumo]) => `
+    <li class="px-4 py-3 ${s === 'com você' ? 'bg-destaque shadow-[inset_4px_0_0_var(--marinho)]' : ''} ${s === 'respondida' ? 'opacity-70' : ''}">
+      <p class="flex items-center gap-2">${bandeira(iso)}<span class="font-medium flex-1">${NOME[iso]}</span><span class="text-xs text-mudo tabular-nums">${hora}</span></p>
+      <p class="mt-1 text-cinza line-clamp-2">${resumo}</p>
+      <p class="mt-1 text-[11px] uppercase tracking-[0.12em] ${estado[s]}">${s}</p>
+    </li>`).join('');
+</script>
+</body>
+</html>

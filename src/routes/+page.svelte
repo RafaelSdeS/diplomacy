@@ -97,7 +97,7 @@
 	{/if}
 
 	{#if data.principal === 'delegado' && data.aoVivo}
-		<article class="cartao cartao--destaque cartao--largo" aria-labelledby="c-ao-vivo">
+		<article class="cartao cartao--ao-vivo cartao--largo" aria-labelledby="c-ao-vivo">
 			<h2 id="c-ao-vivo">{t('Sessão ao vivo')} · {sigla}</h2>
 			{#if !sessao || !estado}
 				<p class="suave">{t('Nenhuma sessão aberta.')}</p>

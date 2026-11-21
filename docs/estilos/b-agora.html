@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>B · Agora (celular)</title>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script src="b-comum.js"></script>
+</head>
+<body class="font-sans antialiased">
+
+<!-- Moldura de celular: no computador, a tela fica com 390px para simular o aparelho. -->
+<div class="mx-auto max-w-[390px] min-h-screen bg-fundo sm:border-x sm:border-linha flex flex-col">
+
+  <header class="bg-faixa text-white border-b-2 border-ouro px-4 pt-5 pb-4">
+    <p class="text-[11px] uppercase tracking-[0.2em] text-ouro">UFRGSMUN 2027 · CSNU</p>
+    <div class="mt-1 flex items-end justify-between gap-3">
+      <h1 class="font-serif font-semibold text-3xl">Agora</h1>
+      <p class="flex items-center gap-2 text-sm text-white/80"><span class="fi fi-dk ring-1 ring-white/20"></span>Dinamarca</p>
+    </div>
+  </header>
+
+  <main class="flex-1 px-4 py-4 space-y-3">
+
+    <a href="b-sessao.html" class="block bg-papel border border-linha border-l-4 border-l-vermelho">
+      <div class="px-4 py-3 border-b border-linha flex items-center justify-between">
+        <h2 class="font-serif font-semibold text-lg text-marinho">Sessão 3 · ao vivo</h2>
+        <span class="text-[11px] uppercase tracking-[0.12em] text-vermelho-texto font-semibold">Debate formal</span>
+      </div>
+      <div class="px-4 py-3 flex items-center justify-between">
+        <p class="flex items-center gap-2"><span class="text-xs text-mudo">Com a palavra</span> <span class="fi fi-fr ring-1 ring-black/10"></span> <span class="font-medium">França</span></p>
+        <p class="text-2xl font-semibold text-marinho tabular-nums">01:12</p>
+      </div>
+      <p class="px-4 pb-3 text-sm text-cinza">Sua delegação é a <strong class="text-tinta">6ª</strong> na lista de oradores.</p>
+    </a>
+
+    <section class="bg-papel border border-linha">
+      <h2 class="px-4 py-2.5 border-b border-linha text-[11px] uppercase tracking-[0.12em] text-mudo">Precisa de você</h2>
+      <ul class="divide-y divide-linha text-sm">
+        <li class="px-4 py-3 flex gap-3">
+          <span class="mt-1.5 w-2 h-2 bg-ouro shrink-0"></span>
+          <div><p><a href="b-documento.html" class="font-medium text-marinho2 underline underline-offset-2">S/PR/2027/3</a>: rodada 2 de 3 fecha às <strong>15h10</strong></p>
+            <p class="text-mudo">Sua delegação assinou · 1 proposta aguarda resposta</p></div>
+        </li>
+        <li class="px-4 py-3 flex gap-3">
+          <span class="mt-1.5 w-2 h-2 bg-ouro shrink-0"></span>
+          <div><p class="font-medium">Entrega do DPO até hoje, 18h</p><p class="text-mudo">Rascunho salvo há 2 h</p></div>
+        </li>
+      </ul>
+    </section>
+
+    <section class="bg-papel border border-linha">
+      <h2 class="px-4 py-2.5 border-b border-linha text-[11px] uppercase tracking-[0.12em] text-mudo flex justify-between"><span>Crise</span><span class="text-vermelho-texto font-semibold">14h20</span></h2>
+      <div class="px-4 py-3 text-sm space-y-2">
+        <p class="font-serif text-base leading-snug">Comboio humanitário é atacado perto de Ménaka; 3 trabalhadores desaparecidos.</p>
+        <p class="text-cinza">Nota da sua delegação: <span class="font-medium text-tinta">na fila, posição 3</span></p>
+      </div>
+    </section>
+
+    <section class="bg-papel border border-linha">
+      <h2 class="px-4 py-2.5 border-b border-linha text-[11px] uppercase tracking-[0.12em] text-mudo">Avisos</h2>
+      <ul class="divide-y divide-linha text-sm">
+        <li class="px-4 py-3"><p class="font-medium">Sessão 4 muda para a sala 204</p><p class="text-mudo">Secretaria · há 12 min</p></li>
+        <li class="px-4 py-3 text-cinza"><p>Coletiva de imprensa às 17h no auditório</p><p class="text-mudo">Press · há 1 h</p></li>
+      </ul>
+    </section>
+
+    <section class="bg-papel border border-linha">
+      <h2 class="px-4 py-2.5 border-b border-linha text-[11px] uppercase tracking-[0.12em] text-mudo">Cronograma de hoje</h2>
+      <ol class="text-sm divide-y divide-linha tabular-nums">
+        <li class="px-4 py-2.5 flex gap-4 bg-destaque"><span class="w-12 font-semibold text-marinho">14h00</span><span>Sessão 3 <span class="text-mudo">· agora</span></span></li>
+        <li class="px-4 py-2.5 flex gap-4"><span class="w-12 text-mudo">15h30</span><span>Intervalo</span></li>
+        <li class="px-4 py-2.5 flex gap-4"><span class="w-12 text-mudo">16h00</span><span>Sessão 4 <span class="text-mudo">· sala 204</span></span></li>
+        <li class="px-4 py-2.5 flex gap-4"><span class="w-12 text-mudo">17h00</span><span>Coletiva de imprensa</span></li>
+      </ol>
+    </section>
+
+    <a href="b-press.html" class="block bg-papel border border-linha px-4 py-3">
+      <p class="text-[11px] uppercase tracking-[0.12em] text-mudo">Na press · Al Jazeera</p>
+      <p class="mt-1 font-serif text-lg leading-snug text-marinho">França pede corredor humanitário e isola Moscou no debate sobre o Sahel</p>
+    </a>
+  </main>
+
+  <nav class="sticky bottom-0 bg-papel border-t border-linha grid grid-cols-5 text-[11px] text-center" aria-label="Navegação principal">
+    <a href="#" aria-current="page" class="py-3 font-semibold text-marinho shadow-[inset_0_2px_0_var(--ouro)]">Agora</a>
+    <a href="b-sessao.html" class="py-3 text-cinza">Comitê</a>
+    <a href="b-documento.html" class="py-3 text-cinza">Documentos</a>
+    <a href="b-press.html" class="py-3 text-cinza">Press</a>
+    <a href="#" class="py-3 text-cinza">Perfil</a>
+  </nav>
+</div>
+</body>
+</html>

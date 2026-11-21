@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>B · Telão</title>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script src="b-comum.js"></script>
+</head>
+<body class="font-sans antialiased bg-faixa">
+
+<!-- Telão: tamanhos em vw para simular o projetor; aperte F11 para tela cheia. -->
+<div class="bg-faixa text-white min-h-[calc(100vh-2.6rem)] flex flex-col">
+  <header class="px-[3vw] py-[1.5vw] border-b-2 border-ouro flex items-end justify-between gap-6">
+    <div>
+      <p class="text-[1vw] uppercase tracking-[0.25em] text-ouro">UFRGSMUN 2027 · Sessão 3 · Debate formal</p>
+      <h1 class="font-serif font-semibold text-[3vw] leading-tight">Conselho de Segurança</h1>
+    </div>
+    <p id="relogio" class="text-[2.4vw] font-semibold tabular-nums text-white/80">14:36</p>
+  </header>
+
+  <main class="flex-1 grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+    <section class="px-[3vw] py-[2.5vw] flex flex-col justify-center border-r border-white/15">
+      <p class="text-[1.3vw] uppercase tracking-[0.2em] text-ouro">Com a palavra</p>
+      <p class="mt-[1vw] flex items-center gap-[1.5vw] font-serif text-[6vw] leading-none"><span class="fi fi-fr ring-1 ring-white/20 text-[4.5vw]"></span>França</p>
+      <p id="tempo" role="timer" class="mt-[2vw] text-[13vw] leading-none font-semibold tabular-nums">01:12</p>
+      <div class="mt-[2vw] h-[0.5vw] bg-white/15"><div id="barra" class="h-full bg-ouro"></div></div>
+    </section>
+
+    <section class="px-[2.5vw] py-[2.5vw]">
+      <h2 class="text-[1.3vw] uppercase tracking-[0.2em] text-ouro">Próximos oradores</h2>
+      <ol id="proximos" class="mt-[1.2vw] divide-y divide-white/15"></ol>
+      <dl class="mt-[2.5vw] grid grid-cols-2 gap-[1vw] text-[1.2vw]">
+        <div><dt class="uppercase tracking-[0.15em] text-white/60 text-[0.9vw]">Quórum</dt><dd class="font-semibold tabular-nums">14 / 15</dd></div>
+        <div><dt class="uppercase tracking-[0.15em] text-white/60 text-[0.9vw]">Presidência</dt><dd class="font-semibold">Panamá</dd></div>
+      </dl>
+    </section>
+  </main>
+
+  <footer class="bg-[#C9191E] text-white px-[3vw] py-[1vw] flex items-baseline gap-[2vw]">
+    <span class="text-[1.1vw] uppercase tracking-[0.2em] font-semibold whitespace-nowrap">Crise · 14h20</span>
+    <p class="font-serif text-[1.8vw] leading-tight">Comboio humanitário é atacado perto de Ménaka; 3 trabalhadores desaparecidos.</p>
+  </footer>
+</div>
+
+<script>
+  document.getElementById('proximos').innerHTML = ['so', 'us', 'pk', 'gr', 'dk'].map((iso, i) => `
+    <li class="py-[0.9vw] flex items-center gap-[1vw] text-[2vw] ${i ? 'text-white/75' : ''}">
+      <span class="w-[2.5vw] text-white/50 tabular-nums">${i + 2}</span><span class="fi fi-${iso} ring-1 ring-white/20"></span>${NOME[iso]}</li>`).join('');
+  cronometro({ rodando: true });
+  const relogio = () => { document.getElementById('relogio').textContent = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); };
+  relogio(); setInterval(relogio, 10000);
+</script>
+</body>
+</html>

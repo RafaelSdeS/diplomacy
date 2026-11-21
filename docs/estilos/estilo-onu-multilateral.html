@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A · ONU multilateral</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css">
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script>
+  // Valores extraídos de un.org / main.un.org/securitycouncil (variáveis --bs-un-*)
+  tailwind.config = { theme: { extend: {
+    colors: { onu: '#009EDB', escuro: '#1C4969', info: '#0A5A82', claro: '#F2FAFD', claro25: '#BFE6F6',
+              texto: '#404040', mudo: '#525252', linha: '#DDDDDD', fundo: '#F5F5F5', erro: '#FD3C2D' },
+    fontFamily: { sans: ['Roboto', 'Arial', 'sans-serif'], cond: ['"Roboto Condensed"', 'Arial Narrow', 'sans-serif'] },
+    borderRadius: { DEFAULT: '0.3125rem' },
+  } } };
+</script>
+<style>.aviso { color: #FD3C2D !important; } .aviso-barra { background: #FD3C2D !important; }</style>
+</head>
+<body class="bg-white text-texto font-sans antialiased">
+
+<nav class="bg-fundo border-b border-linha text-sm" aria-label="Comparar estilos">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-2 flex flex-wrap gap-x-6 gap-y-1">
+    <span class="font-cond uppercase tracking-wide text-mudo">Comparar estilos</span>
+    <a href="estilo-onu-multilateral.html" aria-current="page" class="font-medium text-escuro underline decoration-onu decoration-2 underline-offset-4">A · ONU multilateral</a>
+    <a href="estilo-chancelaria-oficial.html" class="text-info hover:underline">B · Chancelaria oficial</a>
+    <a href="estilo-editorial-diplomatico.html" class="text-info hover:underline">C · Editorial diplomático</a>
+  </div>
+</nav>
+
+<header class="border-b border-linha">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 pt-8 pb-10">
+    <p class="text-sm text-mudo">UFRGSMUN 2027 <span class="mx-1">/</span> Comitês <span class="mx-1">/</span> CSNU</p>
+    <div class="mt-5 flex flex-wrap items-end justify-between gap-8">
+      <div class="max-w-2xl">
+        <h1 class="text-4xl sm:text-5xl font-light text-escuro tracking-tight">Conselho de Segurança</h1>
+        <p class="mt-3 text-lg text-mudo">Sessão 3 · A situação no Sahel: proteção de civis e o futuro das operações de paz</p>
+      </div>
+      <dl class="grid grid-cols-2 sm:grid-cols-4 gap-x-10 gap-y-4 text-sm">
+        <div><dt class="font-cond uppercase tracking-wide text-mudo text-xs">Fase</dt><dd class="mt-1 font-medium">Debate formal</dd></div>
+        <div><dt class="font-cond uppercase tracking-wide text-mudo text-xs">Presidência</dt><dd class="mt-1 font-medium">Panamá</dd></div>
+        <div><dt class="font-cond uppercase tracking-wide text-mudo text-xs">Quórum</dt><dd class="mt-1 font-medium">14 de 15</dd></div>
+        <div><dt class="font-cond uppercase tracking-wide text-mudo text-xs">Maioria</dt><dd class="mt-1 font-medium">9 votos, sem veto P5</dd></div>
+      </dl>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-4 sm:px-6 py-12 grid gap-12 lg:grid-cols-[19rem_minmax(0,1fr)]">
+
+  <section aria-labelledby="t-paises">
+    <h2 id="t-paises" class="font-cond uppercase tracking-wide text-escuro text-sm font-bold">Delegações <span class="font-normal text-mudo">· 15 membros</span></h2>
+    <ul id="paises" class="mt-4 divide-y divide-[#EEEEEE] border-y border-[#EEEEEE]"></ul>
+  </section>
+
+  <div class="space-y-12 min-w-0">
+
+    <section aria-labelledby="t-fala" class="bg-fundo rounded p-6 sm:p-8">
+      <h2 id="t-fala" class="font-cond uppercase tracking-wide text-escuro text-sm font-bold">Com a palavra</h2>
+      <div class="mt-4 flex flex-wrap items-center justify-between gap-6">
+        <p class="flex items-center gap-3 text-2xl text-escuro"><span class="fi fi-fr rounded-sm ring-1 ring-black/10"></span>França</p>
+        <p id="tempo" role="timer" class="text-6xl sm:text-7xl font-light text-escuro tabular-nums">01:12</p>
+      </div>
+      <div class="mt-5 h-1.5 bg-white rounded overflow-hidden"><div id="barra" class="h-full bg-onu transition-[width]"></div></div>
+      <div class="mt-6 flex flex-wrap items-center gap-3">
+        <button id="alternar" class="rounded bg-info text-white px-5 py-2.5 font-medium hover:bg-escuro">Retomar</button>
+        <button id="zerar" class="rounded border border-info text-info px-5 py-2.5 font-medium hover:bg-claro">Zerar (1:30)</button>
+        <p class="text-sm text-mudo sm:ml-auto">Próximos: Somália · Estados Unidos · Paquistão · Grécia</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="t-res">
+      <div class="flex flex-wrap items-baseline justify-between gap-3">
+        <h2 id="t-res" class="text-2xl font-normal text-escuro">Projeto de resolução: proteção de civis no Sahel</h2>
+        <span class="text-sm text-mudo">S/PR/2027/3 · Em revisão, rodada 2 de 3</span>
+      </div>
+      <p class="mt-1 text-sm text-mudo">Redação: França e Dinamarca · Signatários: França, Dinamarca, Grécia, Letônia, Panamá</p>
+
+      <article class="mt-6 border-l-2 border-onu pl-6 space-y-4 leading-relaxed max-w-3xl">
+        <p class="font-medium">O Conselho de Segurança,</p>
+        <p><em>Reafirmando</em> seu compromisso com a soberania, a independência e a integridade territorial dos Estados do Sahel,</p>
+        <p><em>Profundamente preocupado</em> com o aumento de ataques contra civis e trabalhadores humanitários na região do Liptako-Gourma,</p>
+        <p><em>Recordando</em> suas resoluções anteriores sobre a proteção de civis em conflitos armados,</p>
+        <ol class="space-y-3 list-decimal pl-5 marker:text-onu marker:font-medium">
+          <li><u>Exige</u> que todas as partes cessem imediatamente os ataques contra civis e permitam o acesso humanitário seguro e desimpedido; <span class="ml-1 text-xs rounded bg-claro text-info px-2 py-0.5 whitespace-nowrap">acordada</span></li>
+          <li><u>Solicita</u> ao Secretário-Geral que apresente, em 90 dias, um relatório sobre opções para uma presença regional de proteção de civis; <span class="ml-1 text-xs rounded border border-linha text-mudo px-2 py-0.5 whitespace-nowrap">em discussão</span></li>
+          <li><u>Encoraja</u> os Estados-membros a apoiar financeiramente mecanismos regionais de mediação, com participação efetiva de mulheres;</li>
+          <li><u>Decide</u> permanecer ativamente ocupado da questão.</li>
+        </ol>
+      </article>
+    </section>
+  </div>
+</main>
+
+<footer class="border-t border-linha">
+  <p class="max-w-6xl mx-auto px-4 sm:px-6 py-6 text-sm text-mudo">Simulação acadêmica. Não é documento oficial das Nações Unidas.</p>
+</footer>
+
+<script>
+  const paises = [['cn','China','P5','votante'],['us','Estados Unidos','P5','votante'],['ru','Federação Russa','P5','presente'],
+    ['fr','França','P5','falando'],['gb','Reino Unido','P5','votante'],['bh','Bahrein','','presente'],['co','Colômbia','','presente'],
+    ['dk','Dinamarca','','votante'],['gr','Grécia','','presente'],['lv','Letônia','','presente'],['lr','Libéria','','ausente'],
+    ['pa','Panamá','','presidencia'],['pk','Paquistão','','votante'],['cd','RD Congo','','presente'],['so','Somália','','presente']];
+  const rotulo = { votante: 'Presente e votante', presente: 'Presente', ausente: 'Ausente', falando: 'Com a palavra', presidencia: 'Presidência' };
+  const cor = { votante: 'text-texto', presente: 'text-mudo', ausente: 'text-mudo italic',
+    falando: 'rounded bg-claro text-info font-medium px-2 py-0.5', presidencia: 'rounded border border-claro25 text-info px-2 py-0.5' };
+  document.getElementById('paises').innerHTML = paises.map(([iso, nome, p5, s]) => `
+    <li class="flex items-center gap-3 py-2.5 ${s === 'falando' ? 'bg-claro -mx-3 px-3 shadow-[inset_3px_0_0_#009EDB]' : ''} ${s === 'ausente' ? 'opacity-60' : ''}">
+      <span class="fi fi-${iso} rounded-sm ring-1 ring-black/10 shrink-0"></span>
+      <span class="min-w-0 truncate">${nome}${p5 ? ' <span class="font-cond text-xs text-mudo">P5</span>' : ''}</span>
+      <span class="ml-auto text-xs whitespace-nowrap ${cor[s]}">${rotulo[s]}</span>
+    </li>`).join('');
+
+  // ponytail: cronômetro de demonstração, sem sincronia com servidor
+  const total = 90, el = document.getElementById('tempo'), barra = document.getElementById('barra'), bt = document.getElementById('alternar');
+  let resta = 72, id = null;
+  function mostra() {
+    el.textContent = `${String(Math.floor(resta / 60)).padStart(2, '0')}:${String(resta % 60).padStart(2, '0')}`;
+    barra.style.width = `${resta / total * 100}%`;
+    el.classList.toggle('aviso', resta <= 10); barra.classList.toggle('aviso-barra', resta <= 10);
+  }
+  bt.onclick = () => {
+    if (id) { clearInterval(id); id = null; } else id = setInterval(() => { resta = Math.max(0, resta - 1); mostra(); if (!resta) bt.click(); }, 1000);
+    bt.textContent = id ? 'Pausar' : 'Retomar';
+  };
+  document.getElementById('zerar').onclick = () => { resta = total; mostra(); };
+  mostra();
+</script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>B · Sessão</title>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script src="b-comum.js"></script>
+</head>
+<body class="font-sans antialiased">
+
+<header class="bg-faixa text-white border-b-2 border-ouro">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex flex-wrap items-end justify-between gap-6">
+    <div>
+      <p class="text-xs uppercase tracking-[0.2em] text-ouro">Simulação · UFRGSMUN 2027</p>
+      <h1 class="mt-2 font-serif font-semibold text-4xl sm:text-5xl">Conselho de Segurança</h1>
+      <p class="mt-2 font-serif italic text-lg text-white/80">A situação no Sahel: proteção de civis e o futuro das operações de paz</p>
+    </div>
+    <p class="text-sm text-white/70 tabular-nums">CSNU · Sessão 3 · 14/11/2027 · 14h00</p>
+  </div>
+</header>
+
+<div class="bg-papel border-b border-linha">
+  <dl class="max-w-6xl mx-auto px-4 sm:px-6 grid grid-cols-2 md:grid-cols-4 md:divide-x divide-linha">
+    <div class="px-4 py-3"><dt class="text-[11px] uppercase tracking-[0.12em] text-mudo">Fase</dt><dd class="font-semibold">Debate formal</dd></div>
+    <div class="px-4 py-3"><dt class="text-[11px] uppercase tracking-[0.12em] text-mudo">Presidência da sessão</dt><dd class="font-semibold">Panamá</dd></div>
+    <div class="px-4 py-3"><dt class="text-[11px] uppercase tracking-[0.12em] text-mudo">Quórum</dt><dd class="font-semibold tabular-nums">14 / 15</dd></div>
+    <div class="px-4 py-3"><dt class="text-[11px] uppercase tracking-[0.12em] text-mudo">Maioria</dt><dd class="font-semibold">9 votos, sem veto P5</dd></div>
+  </dl>
+</div>
+
+<main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 grid gap-6 lg:grid-cols-[22rem_minmax(0,1fr)]">
+
+  <section aria-labelledby="t-paises" class="bg-papel border border-linha self-start">
+    <h2 id="t-paises" class="font-serif font-semibold text-xl text-marinho px-5 py-3 border-b border-linha">Delegações</h2>
+    <table class="w-full text-sm">
+      <thead><tr class="text-[11px] uppercase tracking-[0.12em] text-mudo text-left border-b border-linha">
+        <th class="px-5 py-2 font-medium">Estado-membro</th><th class="px-5 py-2 font-medium text-right">Condição</th></tr></thead>
+      <tbody id="paises" class="divide-y divide-linha"></tbody>
+    </table>
+  </section>
+
+  <div class="space-y-6 min-w-0">
+    <section aria-labelledby="t-fala" class="bg-papel border border-linha border-l-4 border-l-vermelho">
+      <div class="px-6 py-4 border-b border-linha flex flex-wrap items-center justify-between gap-2">
+        <h2 id="t-fala" class="font-serif font-semibold text-xl text-marinho">Com a palavra</h2>
+        <span class="text-[11px] uppercase tracking-[0.12em] text-mudo">Tempo de fala 1:30 · aviso aos 10 s</span>
+      </div>
+      <div class="px-6 py-6 flex flex-wrap items-center justify-between gap-6">
+        <p class="flex items-center gap-3 font-serif text-3xl text-marinho"><span class="fi fi-fr ring-1 ring-black/10"></span>França</p>
+        <p id="tempo" role="timer" class="text-6xl sm:text-7xl font-semibold text-marinho tabular-nums">01:12</p>
+      </div>
+      <div class="mx-6 h-1 bg-linha"><div id="barra" class="h-full bg-marinho transition-[width]"></div></div>
+      <div class="px-6 py-5 flex flex-wrap items-center gap-3">
+        <button id="alternar" class="bg-marinho text-sobre-marinho px-5 py-2.5 font-medium hover:bg-marinho2">Retomar</button>
+        <button id="zerar" class="border border-marinho text-marinho px-5 py-2.5 font-medium hover:bg-destaque">Zerar</button>
+        <p class="text-sm text-cinza sm:ml-auto"><span class="text-mudo">Próximos:</span> 2. Somália · 3. Estados Unidos · 4. Paquistão</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="t-res" class="bg-papel border border-linha">
+      <div class="px-6 py-4 border-b border-linha flex flex-wrap items-baseline justify-between gap-3">
+        <h2 id="t-res" class="font-serif font-semibold text-xl text-marinho">Projeto de resolução</h2>
+        <p class="text-sm tabular-nums"><a href="b-documento.html" class="font-semibold text-marinho2 underline underline-offset-2">S/PR/2027/3</a> <span class="text-mudo">· Em revisão · Rodada 2 de 3</span></p>
+      </div>
+      <article class="px-6 sm:px-10 py-8 font-serif text-[1.075rem] leading-relaxed max-w-3xl space-y-4">
+        <p class="text-center text-sm uppercase tracking-[0.2em] font-sans text-mudo">Proteção de civis no Sahel</p>
+        <p class="font-semibold">O Conselho de Segurança,</p>
+        <p class="pl-8"><em>Reafirmando</em> seu compromisso com a soberania, a independência e a integridade territorial dos Estados do Sahel,</p>
+        <p class="pl-8"><em>Profundamente preocupado</em> com o aumento de ataques contra civis e trabalhadores humanitários na região do Liptako-Gourma,</p>
+        <ol class="space-y-3 list-decimal pl-8 marker:font-sans marker:font-semibold marker:text-marinho">
+          <li><u>Exige</u> que todas as partes cessem imediatamente os ataques contra civis e permitam o acesso humanitário seguro e desimpedido; <span class="font-sans text-[11px] uppercase tracking-[0.12em] border border-marinho text-marinho px-1.5 py-0.5 whitespace-nowrap">Acordada</span></li>
+          <li><u>Solicita</u> ao Secretário-Geral que apresente, em 90 dias, um relatório sobre opções para uma presença regional de proteção de civis; <span class="font-sans text-[11px] uppercase tracking-[0.12em] border border-ouro text-ouro-texto px-1.5 py-0.5 whitespace-nowrap">Em discussão</span></li>
+          <li><u>Decide</u> permanecer ativamente ocupado da questão.</li>
+        </ol>
+      </article>
+    </section>
+  </div>
+</main>
+
+<footer class="bg-faixa text-white/70">
+  <p class="max-w-6xl mx-auto px-4 sm:px-6 py-5 text-sm">Simulação acadêmica. Não é documento oficial das Nações Unidas.</p>
+</footer>
+
+<script>
+  const rotulo = { votante: 'Presente e votante', presente: 'Presente', ausente: 'Ausente', falando: 'Com a palavra', presidencia: 'Presidência' };
+  const cor = { votante: 'text-tinta', presente: 'text-cinza', ausente: 'text-mudo', falando: 'text-vermelho-texto font-semibold', presidencia: 'text-ouro-texto font-semibold' };
+  const faixa = { falando: 'shadow-[inset_4px_0_0_var(--vermelho)]', presidencia: 'shadow-[inset_4px_0_0_var(--ouro)]', ausente: 'text-mudo' };
+  document.getElementById('paises').innerHTML = PAISES.map(([iso, nome, p5, s]) => `
+    <tr class="${faixa[s] ?? ''}">
+      <td class="px-5 py-2"><span class="flex items-center gap-3">${bandeira(iso)}${nome}${p5 ? ' <span class="text-[10px] tracking-[0.12em] text-mudo">P5</span>' : ''}</span></td>
+      <td class="px-5 py-2 text-right text-xs whitespace-nowrap ${cor[s]}">${rotulo[s]}</td>
+    </tr>`).join('');
+  cronometro();
+</script>
+</body>
+</html>

@@ -473,7 +473,7 @@
 			</section>
 		</div>
 
-		<section class="cartao cartao--destaque" aria-labelledby="t-palavra">
+		<section class="cartao cartao--ao-vivo" aria-labelledby="t-palavra">
 			<h2 id="t-palavra">{t('Com a palavra')}</h2>
 			{#if data.estado.orador}
 				<p class="destaque com-bandeira"><Bandeira codigo={data.estado.orador.bandeira} /> {data.estado.orador.nome}</p>

@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>B · Presidência</title>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script src="b-comum.js"></script>
+</head>
+<body class="font-sans antialiased text-sm">
+
+<header class="bg-faixa text-white border-b-2 border-ouro">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-5 flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <p class="text-[11px] uppercase tracking-[0.2em] text-ouro">Painel da presidência · CSNU · Sessão 3</p>
+      <h1 class="mt-1 font-serif font-semibold text-3xl">Presidência: Panamá</h1>
+    </div>
+    <div class="flex items-center gap-4 text-white/80">
+      <span class="tabular-nums">Quórum 14/15</span>
+      <span class="border border-white/30 px-2 py-1 text-[11px] uppercase tracking-[0.12em]">Mesa acompanhando</span>
+      <span class="flex items-center gap-2 text-[11px] uppercase tracking-[0.12em]"><span class="w-2 h-2 bg-vermelho"></span>Ao vivo</span>
+    </div>
+  </div>
+</header>
+
+<div class="bg-papel border-b border-linha">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center gap-x-6 gap-y-3">
+    <label class="flex items-center gap-2"><span class="text-[11px] uppercase tracking-[0.12em] text-mudo">Fase</span>
+      <select class="border border-linha bg-papel px-2 py-1.5 font-medium"><option>Debate formal</option><option>Caucus moderado</option><option>Caucus não moderado</option></select></label>
+    <label class="flex items-center gap-2"><span class="text-[11px] uppercase tracking-[0.12em] text-mudo">Tempo de fala</span>
+      <input value="1:30" class="w-16 border border-linha bg-papel px-2 py-1.5 font-medium tabular-nums"></label>
+    <p><span class="text-[11px] uppercase tracking-[0.12em] text-mudo">Maioria simples</span> <strong class="tabular-nums">8</strong></p>
+    <p><span class="text-[11px] uppercase tracking-[0.12em] text-mudo">Dois terços</span> <strong class="tabular-nums">10</strong></p>
+    <button class="ml-auto border border-vermelho-texto text-vermelho-texto px-3 py-1.5 font-medium hover:bg-vermelho-fundo">Encerrar sessão</button>
+  </div>
+</div>
+
+<main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] xl:grid-cols-[minmax(0,5fr)_minmax(0,4fr)_minmax(0,5fr)]">
+
+  <section class="bg-papel border border-linha self-start" aria-labelledby="t-lista">
+    <h2 id="t-lista" class="font-serif font-semibold text-lg text-marinho px-4 py-3 border-b border-linha">Lista de oradores</h2>
+    <div class="px-4 py-4 border-b border-linha border-l-4 border-l-vermelho">
+      <p class="text-[11px] uppercase tracking-[0.12em] text-vermelho-texto font-semibold">Com a palavra</p>
+      <div class="mt-1 flex items-center justify-between gap-3">
+        <p class="flex items-center gap-2 font-serif text-xl"><span class="fi fi-fr ring-1 ring-black/10"></span>França</p>
+        <p id="tempo" role="timer" class="text-3xl font-semibold text-marinho tabular-nums">01:12</p>
+      </div>
+      <div class="mt-3 h-1 bg-linha"><div id="barra" class="h-full bg-marinho"></div></div>
+      <div class="mt-3 flex gap-2">
+        <button id="alternar" class="bg-marinho text-sobre-marinho px-3 py-1.5 font-medium hover:bg-marinho2">Retomar</button>
+        <button id="zerar" class="border border-marinho text-marinho px-3 py-1.5 font-medium hover:bg-destaque">Zerar</button>
+        <button class="ml-auto border border-linha px-3 py-1.5 hover:border-marinho">Próximo orador</button>
+      </div>
+    </div>
+    <ol id="oradores" class="divide-y divide-linha"></ol>
+    <form class="px-4 py-3 border-t border-linha flex gap-2" onsubmit="return false">
+      <select class="flex-1 min-w-0 border border-linha bg-papel px-2 py-1.5" aria-label="Delegação"><option>Adicionar delegação…</option><option>China</option><option>Bahrein</option><option>RD Congo</option></select>
+      <button class="border border-marinho text-marinho px-3 py-1.5 font-medium hover:bg-destaque">Adicionar</button>
+    </form>
+  </section>
+
+  <section class="bg-papel border border-linha self-start" aria-labelledby="t-pontos">
+    <h2 id="t-pontos" class="font-serif font-semibold text-lg text-marinho px-4 py-3 border-b border-linha flex justify-between items-baseline">Pontos e moções <span class="font-sans text-xs font-normal text-mudo">3 na fila</span></h2>
+    <ul class="divide-y divide-linha">
+      <li class="px-4 py-3 shadow-[inset_4px_0_0_var(--ouro)]">
+        <p class="text-[11px] uppercase tracking-[0.12em] text-ouro-texto font-semibold">Ponto de ordem · prioridade</p>
+        <p class="mt-1 flex items-center gap-2"><span class="fi fi-ru ring-1 ring-black/10"></span>Federação Russa</p>
+        <p class="mt-1 text-cinza">“A França excedeu o tempo na rodada anterior.”</p>
+        <div class="mt-2 flex gap-2"><button class="bg-marinho text-sobre-marinho px-3 py-1 font-medium">Atender</button><button class="border border-linha px-3 py-1">Indeferir</button></div>
+      </li>
+      <li class="px-4 py-3">
+        <p class="text-[11px] uppercase tracking-[0.12em] text-mudo">Moção · caucus moderado</p>
+        <p class="mt-1 flex items-center gap-2"><span class="fi fi-us ring-1 ring-black/10"></span>Estados Unidos</p>
+        <dl class="mt-1 grid grid-cols-[auto_1fr] gap-x-3 text-cinza">
+          <dt class="text-mudo">Duração</dt><dd>20 min, 1 min por fala</dd>
+          <dt class="text-mudo">Objetivo</dt><dd>Corredores humanitários em Liptako-Gourma</dd>
+        </dl>
+        <div class="mt-2 flex gap-2"><button class="bg-marinho text-sobre-marinho px-3 py-1 font-medium">Pôr em votação</button><button class="border border-linha px-3 py-1">Fora de ordem</button></div>
+      </li>
+      <li class="px-4 py-3">
+        <p class="text-[11px] uppercase tracking-[0.12em] text-mudo">Ponto de privilégio pessoal</p>
+        <p class="mt-1 flex items-center gap-2"><span class="fi fi-gr ring-1 ring-black/10"></span>Grécia</p>
+        <p class="mt-1 text-cinza">Não é possível ouvir o orador no fundo da sala.</p>
+        <div class="mt-2 flex gap-2"><button class="bg-marinho text-sobre-marinho px-3 py-1 font-medium">Atender</button></div>
+      </li>
+    </ul>
+  </section>
+
+  <section class="bg-papel border border-linha self-start lg:col-span-2 xl:col-span-1" aria-labelledby="t-voto">
+    <div class="px-4 py-3 border-b border-linha">
+      <h2 id="t-voto" class="font-serif font-semibold text-lg text-marinho">Votação em andamento</h2>
+      <p class="text-cinza">Moção de caucus moderado · procedimental, sem abstenção · precisa de 8</p>
+    </div>
+    <div class="px-4 py-3 grid grid-cols-3 border-b border-linha text-center tabular-nums">
+      <p><span class="block text-3xl font-semibold text-ok">7</span><span class="text-[11px] uppercase tracking-[0.12em] text-mudo">Sim</span></p>
+      <p class="border-x border-linha"><span class="block text-3xl font-semibold text-vermelho-texto">3</span><span class="text-[11px] uppercase tracking-[0.12em] text-mudo">Não</span></p>
+      <p><span class="block text-3xl font-semibold text-mudo">4</span><span class="text-[11px] uppercase tracking-[0.12em] text-mudo">Faltam</span></p>
+    </div>
+    <ul id="votos" class="grid grid-cols-1 sm:grid-cols-2 gap-px bg-linha border-b border-linha"></ul>
+    <div class="px-4 py-3 flex flex-wrap gap-2">
+      <button class="bg-marinho text-sobre-marinho px-3 py-1.5 font-medium hover:bg-marinho2">Encerrar votação</button>
+      <button class="border border-linha px-3 py-1.5 hover:border-marinho">Chamar quem falta</button>
+    </div>
+  </section>
+</main>
+
+<script>
+  document.getElementById('oradores').innerHTML = ['so', 'us', 'pk', 'gr', 'dk', 'co'].map((iso, i) => `
+    <li class="px-4 py-2 flex items-center gap-3">
+      <span class="w-5 text-right text-mudo tabular-nums">${i + 2}</span>${bandeira(iso)}<span class="flex-1 min-w-0 truncate">${NOME[iso]}</span>
+      <button class="text-mudo hover:text-marinho px-1" aria-label="Subir ${NOME[iso]}">↑</button>
+      <button class="text-mudo hover:text-marinho px-1" aria-label="Descer ${NOME[iso]}">↓</button>
+      <button class="text-mudo hover:text-vermelho-texto px-1" aria-label="Retirar ${NOME[iso]}">×</button>
+    </li>`).join('');
+
+  const voto = { cn: 'Não', us: 'Sim', ru: 'Não', fr: 'Sim', gb: 'Sim', bh: '', co: 'Sim', dk: 'Sim', gr: 'Sim', lv: 'Sim', lr: 'Ausente', pa: '', pk: 'Não', cd: '', so: '' };
+  const estilo = { Sim: 'text-ok font-semibold', 'Não': 'text-vermelho-texto font-semibold', Ausente: 'text-mudo italic', '': 'text-mudo' };
+  document.getElementById('votos').innerHTML = PAISES.map(([iso, nome]) => `
+    <li class="bg-papel px-4 py-2 flex items-center gap-2 ${voto[iso] === 'Ausente' ? 'opacity-60' : ''}">
+      ${bandeira(iso)}<span class="flex-1 min-w-0 truncate">${nome}</span>
+      <span class="text-xs ${estilo[voto[iso]]}">${voto[iso] || 'aguardando'}</span>
+    </li>`).join('');
+  cronometro();
+</script>
+</body>
+</html>

@@ -44,17 +44,17 @@ export function desenhar(
 ) {
 	const { largura, altura } = FORMATOS[formato];
 	const margem = 80;
-	ctx.fillStyle = '#1b365d';
+	ctx.fillStyle = '#071d41';
 	ctx.fillRect(0, 0, largura, altura);
 	ctx.textAlign = 'left';
 	ctx.textBaseline = 'top';
 
-	ctx.fillStyle = '#c8a45c';
+	ctx.fillStyle = '#c3992a';
 	ctx.font = '600 40px system-ui, sans-serif';
 	ctx.fillText(materia.veiculo.toUpperCase(), margem, margem);
 
 	ctx.fillStyle = '#ffffff';
-	ctx.font = '600 76px Georgia, serif';
+	ctx.font = '600 76px Spectral, Georgia, serif';
 	let y = formato === 'story' ? altura * 0.3 : 220;
 	for (const linha of quebrar(ctx, materia.titulo, largura - 2 * margem).slice(0, 6)) {
 		ctx.fillText(linha, margem, y);
@@ -69,7 +69,7 @@ export function desenhar(
 		}
 	}
 
-	ctx.fillStyle = '#c8a45c';
+	ctx.fillStyle = '#c3992a';
 	ctx.fillRect(margem, altura - margem - 70, largura - 2 * margem, 4);
 	ctx.fillStyle = '#ffffff';
 	ctx.font = '600 36px system-ui, sans-serif';

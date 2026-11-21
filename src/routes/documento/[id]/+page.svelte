@@ -1,4 +1,7 @@
 <script lang="ts">
+	// A folha usa o peso 400 e o itálico; só esta rota baixa os arquivos.
+	import '@fontsource/spectral/latin-400.css';
+	import '@fontsource/spectral/latin-400-italic.css';
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { contador } from '#lib/contador.ts';
 	import { locale, t } from '#lib/i18n.svelte.ts';

@@ -14,7 +14,10 @@
 		['--cor-texto', 'Texto'],
 		['--cor-texto-suave', 'Texto suave'],
 		['--cor-marinho', 'Marinho'],
-		['--cor-dourado', 'Dourado']
+		['--cor-dourado', 'Dourado'],
+		['--cor-faixa', 'Faixa'],
+		['--cor-fio-dourado', 'Fio dourado'],
+		['--cor-vivo', 'Ao vivo']
 	];
 </script>
 

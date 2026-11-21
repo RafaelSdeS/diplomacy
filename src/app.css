@@ -9,30 +9,39 @@
 
 	/* Superfícies (passo 37): o papel (cartões, campos, cabeçalho), a mesa (o fundo das
 	   telas) e o destaque (--cor-marinho-suave). */
+	/* Estilo chancelaria (passo 42): marinho do DS gov.br, vermelho, mostarda e cinzas do DSFR.
+	   Protótipos em docs/estilos/b-*.html. */
 	--cor-fundo: #ffffff;
-	--cor-superficie: #f3f4f6;
-	--cor-linha: #d9dee5;
-	--cor-texto: #1f2933;
-	--cor-texto-suave: #52606d;
-	--cor-marinho: #1b365d;
-	--cor-marinho-suave: #e9eef5;
+	--cor-superficie: #f6f6f6;
+	--cor-linha: #dddddd;
+	--cor-texto: #161616;
+	--cor-texto-suave: #666666;
+	--cor-marinho: #0c326f;
+	--cor-marinho-suave: #eef1f7;
 	--cor-sobre-marinho: #ffffff;
-	--cor-dourado: #8c6d2c; /* só presidência */
-	--cor-foco: #1b365d;
+	--cor-dourado: #695240; /* texto dourado: presidência */
+	--cor-foco: #0c326f;
+
+	/* A faixa do timbre e do telão, o fio dourado (só enfeite no papel) e o vermelho do que
+	   está ao vivo (com a palavra, aviso dos 10 s, plantão de crise), sempre com texto. */
+	--cor-faixa: #071d41;
+	--cor-sobre-faixa: #ffffff;
+	--cor-fio-dourado: #c3992a;
+	--cor-vivo: #e1000f;
 
 	/* Situação: sempre com ícone e texto, nunca só a cor. */
 	--cor-ok: #1e6b3a;
 	--cor-ok-fundo: #e7f3eb;
 	--cor-alerta: #7a5000;
 	--cor-alerta-fundo: #fbf1dc;
-	--cor-erro: #a1231b;
-	--cor-erro-fundo: #fbe9e7;
+	--cor-erro: #c9191e;
+	--cor-erro-fundo: #fef4f4;
 
 	--fonte-ui: system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans', sans-serif;
-	--fonte-titulo: 'Source Serif 4', Georgia, 'Noto Serif', serif;
+	--fonte-titulo: 'Spectral', Georgia, 'Noto Serif', serif;
 	--fonte-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', 'Noto Sans Mono', monospace;
 
-	--raio: 4px;
+	--raio: 0;
 	--linha: 1px solid var(--cor-linha);
 	--transicao: 150ms ease;
 	--altura-nav: 3.5rem;
@@ -42,45 +51,49 @@
 /* Tema escuro: o do sistema, a não ser que a pessoa escolha no perfil (passo 38). */
 @media (prefers-color-scheme: dark) {
 	:root:not([data-theme='light']) {
-		--cor-fundo: #15243a; /* no escuro, o papel fica acima da mesa */
-		--cor-superficie: #0e1a2b;
-		--cor-linha: #2b3d57;
-		--cor-texto: #e7ecf3;
-		--cor-texto-suave: #a7b4c6;
+		--cor-fundo: #121a29; /* no escuro, o papel fica acima da mesa */
+		--cor-superficie: #0b111c;
+		--cor-linha: #2a3448;
+		--cor-texto: #e8ecf2;
+		--cor-texto-suave: #98a2b3;
 		--cor-marinho: #a9c1e6;
-		--cor-marinho-suave: #1c2f4b;
-		--cor-sobre-marinho: #0e1a2b;
-		--cor-dourado: #d2b26a;
+		--cor-marinho-suave: #1a2740;
+		--cor-sobre-marinho: #071d41;
+		--cor-dourado: #ddbb62;
 		--cor-foco: #a9c1e6;
+		--cor-faixa: #050c1a;
+		--cor-vivo: #ff5c5c;
 
 		--cor-ok: #8fd0a6;
 		--cor-ok-fundo: #15301f;
 		--cor-alerta: #e8c27a;
 		--cor-alerta-fundo: #33270f;
-		--cor-erro: #f0a39b;
-		--cor-erro-fundo: #3a1714;
+		--cor-erro: #ff8a80;
+		--cor-erro-fundo: #3a1517;
 	}
 }
 
 :root[data-theme='dark'] {
 	color-scheme: dark;
-	--cor-fundo: #15243a; /* no escuro, o papel fica acima da mesa */
-	--cor-superficie: #0e1a2b;
-	--cor-linha: #2b3d57;
-	--cor-texto: #e7ecf3;
-	--cor-texto-suave: #a7b4c6;
+	--cor-fundo: #121a29; /* no escuro, o papel fica acima da mesa */
+	--cor-superficie: #0b111c;
+	--cor-linha: #2a3448;
+	--cor-texto: #e8ecf2;
+	--cor-texto-suave: #98a2b3;
 	--cor-marinho: #a9c1e6;
-	--cor-marinho-suave: #1c2f4b;
-	--cor-sobre-marinho: #0e1a2b;
-	--cor-dourado: #d2b26a;
+	--cor-marinho-suave: #1a2740;
+	--cor-sobre-marinho: #071d41;
+	--cor-dourado: #ddbb62;
 	--cor-foco: #a9c1e6;
+	--cor-faixa: #050c1a;
+	--cor-vivo: #ff5c5c;
 
 	--cor-ok: #8fd0a6;
 	--cor-ok-fundo: #15301f;
 	--cor-alerta: #e8c27a;
 	--cor-alerta-fundo: #33270f;
-	--cor-erro: #f0a39b;
-	--cor-erro-fundo: #3a1714;
+	--cor-erro: #ff8a80;
+	--cor-erro-fundo: #3a1517;
 }
 
 :root[data-theme='light'] {
@@ -221,9 +234,18 @@ a {
 	justify-content: space-between;
 	gap: 0.5rem 1rem;
 	padding: 0.75rem 1rem;
-	border-top: 3px solid var(--cor-marinho);
-	border-bottom: var(--linha);
-	background: var(--cor-fundo);
+	border-bottom: 2px solid var(--cor-fio-dourado);
+	background: var(--cor-faixa);
+	color: var(--cor-sobre-faixa);
+
+	/* A faixa marinho (passo 42): o que fica nela (marca, nome, botões, foco) usa as cores
+	   para fundo escuro. O logo é marinho com o "D" branco: o quadrado some na faixa. */
+	--cor-fundo: var(--cor-faixa);
+	--cor-marinho: var(--cor-sobre-faixa);
+	--cor-marinho-suave: rgb(255 255 255 / 0.12);
+	--cor-sobre-marinho: var(--cor-faixa);
+	--cor-texto-suave: #d5deea;
+	--cor-foco: var(--cor-sobre-faixa);
 }
 
 .conta {
@@ -253,7 +275,7 @@ a {
 
 .marca-logo {
 	flex: none;
-	border-radius: 6px;
+	border-radius: var(--raio);
 }
 
 .marca-texto {
@@ -273,7 +295,7 @@ a {
 	font-size: 0.9rem;
 	font-variant-caps: all-small-caps;
 	letter-spacing: 0.08em;
-	color: var(--cor-texto-suave);
+	color: var(--cor-fio-dourado);
 }
 
 main {
@@ -341,6 +363,7 @@ main.main-sem-moldura {
 .navegacao a[aria-current] {
 	color: var(--cor-marinho);
 	font-weight: 600;
+	box-shadow: inset 0 2px 0 var(--cor-fio-dourado);
 }
 
 /* Notebook: navegação na lateral. */
@@ -385,6 +408,7 @@ main.main-sem-moldura {
 
 	.navegacao a[aria-current] {
 		background: var(--cor-marinho-suave);
+		box-shadow: inset 3px 0 0 var(--cor-fio-dourado);
 	}
 
 	main {
@@ -569,7 +593,7 @@ main.main-sem-moldura {
 	width: 12px;
 	height: 12px;
 	border: 2px solid var(--cor-marinho);
-	border-radius: 50%;
+	border-radius: var(--raio);
 	background: var(--cor-fundo);
 }
 
@@ -587,7 +611,7 @@ main.main-sem-moldura {
 	margin-left: 0.35rem;
 	padding: 0 0.4rem;
 	border: var(--linha);
-	border-radius: 2px;
+	border-radius: var(--raio);
 	font-size: 0.8rem;
 	font-weight: 600;
 	letter-spacing: 0.04em;
@@ -668,7 +692,7 @@ main.main-sem-moldura {
 	width: 1.5rem;
 	height: auto;
 	border: 1px solid var(--cor-linha);
-	border-radius: 2px;
+	border-radius: var(--raio);
 	vertical-align: -0.2em;
 }
 
@@ -689,7 +713,7 @@ main.main-sem-moldura {
 	width: 6rem;
 	height: 6rem;
 	border: var(--linha);
-	border-radius: 50%;
+	border-radius: var(--raio);
 	object-fit: cover;
 }
 
@@ -707,7 +731,7 @@ main.main-sem-moldura {
 	padding: 0.6rem 1rem;
 	border: var(--linha);
 	border-bottom: 3px solid var(--cor-linha);
-	border-radius: 2px;
+	border-radius: var(--raio);
 	background: var(--cor-fundo);
 	font-family: var(--fonte-titulo);
 	font-size: 1.5rem;
@@ -726,8 +750,14 @@ main.main-sem-moldura {
 	border-top-width: 3px;
 }
 
-.cartao--destaque .destaque {
+.cartao--destaque .destaque,
+.cartao--ao-vivo .destaque {
 	font-size: 1.5rem;
+}
+
+/* Ao vivo (passo 42): "Com a palavra" e a sessão em andamento, com a listra vermelha. */
+.cartao--ao-vivo {
+	border-left: 4px solid var(--cor-vivo);
 }
 
 .cartao--discreto {
@@ -752,7 +782,7 @@ main.main-sem-moldura {
 	align-items: center;
 	gap: 0.35rem;
 	padding: 0.2rem 0.6rem;
-	border-radius: 999px;
+	border-radius: var(--raio);
 	font-size: 0.875rem;
 	font-weight: 600;
 }
@@ -786,7 +816,7 @@ main.main-sem-moldura {
 	display: inline-block;
 	padding: 0.15rem 0.6rem;
 	border: 3px double currentColor;
-	border-radius: 2px;
+	border-radius: var(--raio);
 	color: var(--cor-ok);
 	font-family: var(--fonte-titulo);
 	font-size: 0.85rem;
@@ -860,7 +890,7 @@ dialog h3 {
 kbd {
 	padding: 0.05rem 0.35rem;
 	border: var(--linha);
-	border-radius: 4px;
+	border-radius: var(--raio);
 	font-family: var(--fonte-mono);
 	font-size: 0.85em;
 }
@@ -1043,10 +1073,10 @@ kbd {
 
 /* Telão: projetor 1920 × 1080, lido do fundo da sala. Sempre azul-marinho e branco. */
 .telao {
-	--cor-fundo: #1b365d;
+	--cor-fundo: #071d41;
 	--cor-texto: #ffffff;
 	--cor-texto-suave: #d5deea;
-	--cor-linha: #4a6386;
+	--cor-linha: #3a5078;
 	--cor-alerta: #ffd479;
 	--cor-erro: #ffb4ab;
 	--cor-ok: #b6e3c4;
@@ -1078,7 +1108,7 @@ kbd {
 	align-items: flex-start;
 	gap: 2rem;
 	padding-bottom: 2vh;
-	border-bottom: 4px double var(--cor-linha);
+	border-bottom: 2px solid var(--cor-fio-dourado);
 }
 
 .telao-comite {
@@ -1456,8 +1486,9 @@ kbd {
 	grid-area: plantao;
 	margin: 0;
 	padding: 1.2vh 1.5vw;
-	border-left: 6px solid var(--cor-alerta);
-	background: var(--cor-alerta-fundo);
+	--cor-texto-suave: #ffffff;
+	background: #c9191e; /* faixa de plantão (passo 42): branco sobre vermelho, 5,8 */
+	color: #ffffff;
 	font-size: clamp(1.1rem, 1.8vw, 2.25rem);
 	font-weight: 600;
 }
@@ -1537,22 +1568,22 @@ kbd {
 .folha {
 	max-width: 46rem;
 	padding: 2.5rem 2.75rem;
-	border: 1px solid #d9dee5;
+	border: 1px solid #dddddd;
 	background: #ffffff;
-	color: #1f2933;
+	color: #161616;
 	font-family: var(--fonte-titulo);
 	line-height: 1.6;
 }
 
 .folha h2,
 .folha h1 {
-	color: #1b365d;
+	color: #071d41;
 	border: 0;
 	text-align: center;
 }
 
 .folha .rotulo {
-	color: #52606d;
+	color: #666666;
 	text-align: center;
 }
 
@@ -1619,7 +1650,7 @@ kbd {
 	width: 100%;
 	max-height: 24rem;
 	object-fit: cover;
-	border-radius: 0.25rem;
+	border-radius: var(--raio);
 }
 
 .manchete img {
@@ -1664,7 +1695,7 @@ kbd {
 
 .aviso-palavrao:not(:empty) {
 	padding: 0.5rem 0.75rem;
-	border-radius: 0.25rem;
+	border-radius: var(--raio);
 	background: var(--cor-alerta-fundo);
 	color: var(--cor-alerta);
 }
@@ -1713,9 +1744,9 @@ kbd {
 	max-width: 100%;
 	min-height: 297mm;
 	padding: 18mm 16mm;
-	border: 1px solid #d9dee5;
+	border: 1px solid #dddddd;
 	background: #ffffff;
-	color: #1f2933;
+	color: #161616;
 	font-family: var(--fonte-titulo);
 	font-weight: 400;
 	line-height: 1.55;
@@ -1735,12 +1766,12 @@ kbd {
 
 .a4 h1,
 .a4 h2 {
-	color: #1b365d;
+	color: #071d41;
 	border: 0;
 }
 
 .a4 .rotulo {
-	color: #52606d;
+	color: #666666;
 }
 
 .dpo-cabecalho {
@@ -1765,14 +1796,17 @@ kbd {
 	letter-spacing: 0.08em;
 }
 
+/* Faixa do tópico (passo 42): fios marinho e dourado em vez de fundo chapado, para gastar
+   menos tinta e sair bem em preto e branco. */
 .faixa {
 	margin: 1rem 0;
 	padding: 0.4rem 0.8rem;
-	background: #1b365d;
-	color: #ffffff;
+	border-top: 2px solid #071d41;
+	border-bottom: 1px solid #071d41;
+	border-left: 4px solid #c3992a;
+	color: #071d41;
+	font-family: var(--fonte-titulo);
 	font-weight: 600;
-	print-color-adjust: exact;
-	-webkit-print-color-adjust: exact;
 }
 
 .dpo-texto {
@@ -1817,14 +1851,14 @@ kbd {
 .carta-cabecalho {
 	margin-bottom: 1.5rem;
 	padding-bottom: 0.5rem;
-	border-bottom: 1px solid #d9dee5;
+	border-bottom: 1px solid #dddddd;
 }
 
 .carta-remetente {
 	margin: 0;
 	font-size: 1.3rem;
 	font-weight: 600;
-	color: #1b365d;
+	color: #071d41;
 }
 
 @media (max-width: 640px) {
@@ -1883,7 +1917,7 @@ kbd {
 .leitor-qr {
 	width: 100%;
 	max-width: 24rem;
-	border-radius: 0.5rem;
+	border-radius: var(--raio);
 }
 
 .verificacao {
@@ -1915,9 +1949,9 @@ kbd {
 	height: 66mm;
 	padding: 4mm;
 	overflow: hidden;
-	border: 1px dashed #9aa5b1;
+	border: 1px dashed #929292;
 	background: #ffffff;
-	color: #1f2933;
+	color: #161616;
 	break-inside: avoid;
 }
 
@@ -1926,14 +1960,14 @@ kbd {
 }
 
 .cracha .rotulo {
-	color: #52606d;
+	color: #666666;
 }
 
 .cracha-nome {
 	font-family: var(--fonte-titulo);
 	font-size: 1.25rem;
 	font-weight: 600;
-	color: #1b365d;
+	color: #071d41;
 }
 
 .cracha-qr {
@@ -1973,7 +2007,7 @@ kbd {
 .certificado-codigo {
 	margin-top: 3rem;
 	font-size: 0.85rem;
-	color: #52606d;
+	color: #666666;
 }
 
 @media print {
@@ -1987,7 +2021,7 @@ kbd {
 .edicao-cabecalho {
 	margin-bottom: 1.5rem;
 	padding-bottom: 0.75rem;
-	border-bottom: 3px double #1b365d;
+	border-bottom: 3px double #071d41;
 	text-align: center;
 }
 
@@ -2000,7 +2034,7 @@ kbd {
 	break-inside: avoid;
 	margin-bottom: 1.25rem;
 	padding-bottom: 1rem;
-	border-bottom: 1px solid #d9dee5;
+	border-bottom: 1px solid #dddddd;
 }
 
 /* Arquivo da edição (passo 19): cada comitê começa numa página. */
@@ -2120,7 +2154,7 @@ kbd {
 .credencial .foto--iniciais,
 .delegados .foto,
 .delegados .foto--iniciais {
-	border-radius: 2px;
+	border-radius: var(--raio);
 	outline: 1px solid var(--cor-linha);
 	outline-offset: 3px;
 }
@@ -2154,7 +2188,7 @@ kbd {
 	justify-content: center;
 	width: 64px;
 	height: 64px;
-	border-radius: 50%;
+	border-radius: var(--raio);
 	background: var(--cor-marinho-suave);
 	color: var(--cor-marinho);
 	font-family: var(--fonte-titulo);
@@ -2371,7 +2405,7 @@ kbd {
 .entrada-logo {
 	display: block;
 	margin-bottom: 1rem;
-	border-radius: 8px;
+	border-radius: var(--raio);
 }
 
 @media (max-width: 639px) {
