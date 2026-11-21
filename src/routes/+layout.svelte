@@ -15,6 +15,8 @@
 	import { caixa } from '#lib/caixa.ts';
 	import { esquecerConta } from '#lib/conta.ts';
 	import { desativarPush } from '#lib/push.ts';
+	import { trilha } from '#lib/trilha.ts';
+	import Trilha from '#lib/ui/Trilha.svelte';
 	import { supabase, type Papel } from '#lib/supabase.ts';
 	import { assinarAvisos } from '#lib/tempo-real.ts';
 	import type { LayoutProps } from './$types';
@@ -54,6 +56,7 @@
 			.filter((h) => page.url.pathname === h || (h !== '/' && page.url.pathname.startsWith(`${h}/`)))
 			.sort((a, b) => b.length - a.length)[0]
 	);
+	const elos = $derived(trilha(page.route.id, page.params, page.data));
 	const atual = (href: string) => (href !== marcado ? undefined : href === page.url.pathname ? 'page' : 'true');
 
 	// Avisos chegam na hora para quem está no app.
@@ -151,6 +154,7 @@
 		{/if}
 
 		<main id="conteudo">
+			{#if elos.length}<Trilha {elos} />{/if}
 			{@render children()}
 		</main>
 	</div>

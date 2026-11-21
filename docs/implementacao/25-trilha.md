@@ -5,7 +5,12 @@
 **Esforço:** P
 **Objetivo:** toda subtela tem um caminho de volta visível, inclusive no app instalado, que não tem o botão do navegador.
 
-## Hoje
+## Como ficou
+
+- `src/lib/trilha.ts` (com Vitest) devolve os níveis acima da rota; `ui/Trilha.svelte` mostra no topo de toda subtela, pelo layout. No celular, só "‹ nível de cima".
+- Saiu o "Voltar ao comitê" das regras.
+
+## Antes
 
 - Só a tela de regras ("Voltar ao comitê") e as de impressão (`ui/BotaoImprimir.svelte`) têm volta.
 - Painel da presidência, chamada, agenda, documento, notícia e as telas da secretaria dependem do menu ou do botão do navegador.
@@ -18,7 +23,7 @@
 
 ## Código
 
-- [ ] `src/lib/trilha.ts`: função pura `trilha(routeId, params, data)` que devolve `{ href, rotulo }[]`, com os rótulos já passados por `t()`. Os casos:
+- [x] `src/lib/trilha.ts`: função pura `trilha(routeId, params, data)` que devolve `{ href, rotulo }[]`, com os rótulos já passados por `t()`. Os casos:
 
   | Rota | Trilha |
   |---|---|
@@ -31,20 +36,20 @@
   | `/perfil/meus-dados` | Perfil |
 
   O rótulo "Comitê" mostra a sigla ("UNOCT").
-- [ ] `src/lib/ui/Trilha.svelte`: `<nav aria-label={t('Trilha')}>` com `<ol>`, separador decorativo `aria-hidden`; no celular, por CSS, só o último link com "‹".
-- [ ] `src/routes/+layout.svelte`: renderiza `<Trilha>` acima de `{@render children()}` quando a trilha não está vazia (usa `page.route.id`, `page.params` e `page.data`).
-- [ ] Remover o link "Voltar ao comitê" de `comite/[sigla]/regras/+page.svelte` (a trilha cobre).
-- [ ] As rotas novas dos passos seguintes (`votacoes`, `delegacao/[id]`, `caderno`) entram na tabela quando forem criadas; esta lista já as prevê.
+- [x] `src/lib/ui/Trilha.svelte`: `<nav aria-label={t('Trilha')}>` com `<ol>`, separador decorativo `aria-hidden`; no celular, por CSS, só o último link com "‹".
+- [x] `src/routes/+layout.svelte`: renderiza `<Trilha>` acima de `{@render children()}` quando a trilha não está vazia (usa `page.route.id`, `page.params` e `page.data`).
+- [x] Remover o link "Voltar ao comitê" de `comite/[sigla]/regras/+page.svelte` (a trilha cobre).
+- [x] As rotas novas dos passos seguintes (`votacoes`, `delegacao/[id]`, `caderno`) entram na tabela quando forem criadas; esta lista já as prevê.
 
 ## Testes
 
 Arquivos: `src/lib/trilha.test.ts` e `tests/25-trilha.spec.ts`.
 
-- [ ] Vitest: cada linha da tabela acima; rota do menu devolve lista vazia.
-- [ ] Ponta a ponta: no painel da presidência, "Sessão" volta à sessão; a 360 px aparece só "‹ Sessão"; no documento, a trilha leva aos blocos do comitê certo; axe (navegação com rótulo e `aria-current` no item atual).
-- [ ] Capturas de referência das subtelas refeitas no CI (`workflow_dispatch` "atualizar_capturas").
+- [x] Vitest: cada linha da tabela acima; rota do menu devolve lista vazia.
+- [x] Ponta a ponta: no painel da presidência, "Sessão" volta à sessão; nas regras, a sigla volta ao comitê; a 360 px aparece só "‹ Sessão"; axe. A trilha lista só os níveis de cima (o título da página é o item atual), então não precisa de `aria-current`; o caso do documento fica no Vitest.
+- [ ] Capturas de referência das subtelas refeitas no CI (`workflow_dispatch` "atualizar_capturas"), junto com as dos outros passos.
 
 ## Pronto quando
 
-- [ ] Nenhuma subtela depende do botão do navegador para voltar.
-- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
+- [x] Nenhuma subtela depende do botão do navegador para voltar.
+- [x] Os testes acima passam no CI, junto com os de todos os passos anteriores.

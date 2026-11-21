@@ -731,7 +731,6 @@ export const EN: Record<string, string> = {
 	'Você não preside esta sessão. Quando for a vez da sua delegação, o painel aparece aqui.': 'You are not chairing this session. When it is your delegation\'s turn, the panel appears here.',
 	'Você usaria o app no evento? Por quê?': 'Would you use the app at the event? Why?',
 	'Voltar': 'Back',
-	'Voltar ao comitê': 'Back to the committee',
 	'Voltar ao início': 'Back to start',
 	'Votar': 'Vote',
 	'Votar a emenda': 'Vote on the amendment',
@@ -885,6 +884,8 @@ export const EN: Record<string, string> = {
 	'Bloqueios no comitê': 'Blocks in the committee',
 	'{delegacao} não recebe bilhetes de {bloqueada}': '{delegacao} does not receive notes from {bloqueada}',
 	'Só delegações bloqueiam bilhetes.': 'Only delegations block notes.',
+	// Passo 25
+	'Trilha': 'Breadcrumb',
 };
 
 /** Mensagens do banco com partes variáveis: [padrão em português, tradução]. */

@@ -17,7 +17,6 @@
 <h1>{t('Regras de procedimento')}</h1>
 <p class="suave">
 	{t('Do Guia de Regras do UFRGSMUN, com os ajustes deste comitê.')}
-	<a href={`/comite/${data.comite.sigla}`}>{t('Voltar ao comitê')}</a>
 </p>
 
 {#each grupos as grupo (grupo)}
