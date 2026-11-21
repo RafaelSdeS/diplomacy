@@ -147,8 +147,10 @@ select lives_ok($$select public.criar_documento(pg_temp.id('bloco'), 'working_pa
 select throws_ok($$select public.criar_documento(pg_temp.id('bloco'), 'projeto', 'Projeto da observadora')$$,
 	'P0001', null, 'mas não apresenta projeto');
 
--- Projeto: fusão, 5 signatários e envio
+-- Projeto: fusão, 5 signatários e envio (a agenda do tópico já foi adotada, passo 22)
 
+reset role;
+insert into public.proposta_agenda (comite_id, topico, adotada) values ('00000000-0000-0000-0000-0000000000c1', 1, true);
 select pg_temp.entrar(1);
 insert into ids values ('projeto', public.criar_documento(pg_temp.id('bloco'), 'projeto', 'Projeto de resolução', 1));
 select public.importar_clausulas(pg_temp.id('projeto'),

@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { clienteComo, CONTAS, entrar } from './ajuda.ts';
+import { adotarAgenda, clienteComo, CONTAS, entrar } from './ajuda.ts';
 
 // Passo 18: um comitê em inglês (UNOCT-T, do seed) funciona em inglês, inclusive o
 // projeto impresso; as datas seguem o idioma; o perfil troca o idioma da pessoa. A
@@ -65,6 +65,7 @@ test('o editor sugere verbos em inglês, e o projeto impresso sai em inglês', a
 	const comite = (await franca.from('comite').select('id').eq('sigla', 'UNOCT-T').single()).data!.id;
 	const bloco = await franca.rpc('criar_bloco', { p_comite: comite, p_nome: `Bloc ${Date.now()}` });
 	expect(bloco.error).toBeNull();
+	await adotarAgenda('unoct-mesa@exemplo.test', 'UNOCT-T', 1);
 	const documento = await franca.rpc('criar_documento', {
 		p_bloco: bloco.data!,
 		p_tipo: 'projeto',

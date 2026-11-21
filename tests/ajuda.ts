@@ -42,3 +42,23 @@ export async function clienteComo(email: string) {
 	if (error) throw error;
 	return cliente;
 }
+
+/**
+ * Garante a agenda adotada do tópico (passo 22: projeto de resolução só depois dela),
+ * com uma sugestão da mesa quando ainda não há nenhuma adotada.
+ */
+export async function adotarAgenda(contaMesa: string, sigla: string, topico: number) {
+	const mesa = await clienteComo(contaMesa);
+	const comite = (await mesa.from('comite').select('id').eq('sigla', sigla).single()).data!.id;
+	const adotada = await mesa.rpc('agenda_adotada', { p_comite: comite, p_topico: topico });
+	if (adotada.error) throw adotada.error;
+	if (adotada.data) return;
+	const proposta = await mesa.rpc('salvar_proposta_agenda', {
+		p_comite: comite,
+		p_topico: topico,
+		p_itens: [{ texto: 'A. Contexto', nivel: 0 }]
+	});
+	if (proposta.error) throw proposta.error;
+	const { error } = await mesa.rpc('adotar_proposta', { p_proposta: proposta.data });
+	if (error) throw error;
+}

@@ -33,6 +33,10 @@ create temp table ids (nome text primary key, id uuid);
 grant all on ids to authenticated;
 create function pg_temp.id(p_nome text) returns uuid language sql as $$ select id from ids where nome = p_nome $$;
 
+-- A agenda dos dois tópicos já foi adotada (passo 22: projeto só depois dela).
+insert into public.proposta_agenda (comite_id, topico, adotada) values
+	('00000000-0000-0000-0000-0000000000c1', 1, true), ('00000000-0000-0000-0000-0000000000c1', 2, true);
+
 -- Um projeto com 5 signatários, enviado e aprovado pela mesa.
 create function pg_temp.projeto(p_nome text, p_topico int default 1) returns void language plpgsql as $$
 begin

@@ -34,6 +34,8 @@ export const load: PageLoad = async ({ parent, depends }) => {
 		subtopicos: agenda.data!.flatMap((a) =>
 			a.pontos.filter((p) => p.pai_id === null).map((p) => ({ topico: a.topico, id: p.id, texto: p.texto }))
 		),
+		// Projeto de resolução só nos tópicos com a agenda adotada (passo 22).
+		topicosAdotados: agenda.data!.map((a) => a.topico),
 		atualizacoes: atualizacoes.data!.map((a) => a.atualizacao).filter((a) => a !== null)
 	};
 };

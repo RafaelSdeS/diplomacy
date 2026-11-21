@@ -29,6 +29,11 @@
 	let topico = $state(1);
 	let subtopico = $state('');
 	let atualizacao = $state('');
+	// Projeto de resolução: se o tópico escolhido não tem agenda adotada, vai para um que tem.
+	$effect(() => {
+		if (tipo === 'projeto' && !data.topicosAdotados.includes(topico) && data.topicosAdotados.length)
+			topico = data.topicosAdotados[0];
+	});
 
 	async function executar(acao: PromiseLike<{ error: { code?: string; message?: string } | null }>) {
 		erro = '';
@@ -145,10 +150,14 @@
 				{t('Tópico')}
 				<select bind:value={topico}>
 					{#each data.comite.topicos as tp, i (tp)}
-						<option value={i + 1}>{i + 1}. {tp}</option>
+						{@const semAgenda = tipo === 'projeto' && !data.topicosAdotados.includes(i + 1)}
+						<option value={i + 1} disabled={semAgenda}>{i + 1}. {tp}{semAgenda ? ` · ${t('agenda ainda não adotada')}` : ''}</option>
 					{/each}
 				</select>
 			</label>
+			{#if tipo === 'projeto' && !data.topicosAdotados.length}
+				<p class="suave" role="note">{t('A agenda vem antes das resoluções: adote a agenda de um tópico para apresentar um projeto.')}</p>
+			{/if}
 			{#if tipo === 'working_paper' && data.subtopicos.some((s) => s.topico === topico)}
 				<label class="campo">
 					{t('Subtópico da agenda')}

@@ -1,7 +1,7 @@
 import { expect, test, type Browser, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { contaDaDelegacao } from '../scripts/delegacoes.ts';
-import { clienteComo, CONTAS, entrar } from './ajuda.ts';
+import { adotarAgenda, clienteComo, CONTAS, entrar } from './ajuda.ts';
 
 const DPO = '/comite/CSNU-T/dpo';
 const CARTAS = '/comite/CSNU-T/cartas';
@@ -110,6 +110,7 @@ test('o projeto impresso tem a linha do comitê e os signatários', async ({ pag
 		const cliente = await clienteComo(contaDaDelegacao(nome));
 		expect((await cliente.rpc('entrar_bloco', { p_bloco: bloco.data! })).error).toBeNull();
 	}
+	await adotarAgenda(CONTAS.mesa, 'CSNU-T', 1);
 	const documento = await eua.rpc('criar_documento', {
 		p_bloco: bloco.data!,
 		p_tipo: 'projeto',
