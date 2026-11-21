@@ -99,11 +99,31 @@ Depois, para testar com várias pessoas:
 
 Como o cadastro livre está desligado, o Google só entra em contas que já existem: crie a conta antes (passo 1.6), com o mesmo e-mail da conta Google. O Supabase liga as duas pelo e-mail.
 
-## 4. E-mail (SMTP): só no passo 14
+## 4. E-mail (SMTP): para entrar com link ou código por e-mail
 
-O piloto não envia e-mails. O link e o código por e-mail do passo 14 vão precisar de um SMTP gratuito (por exemplo, Brevo), configurado em **Authentication → Emails → SMTP Settings**. O e-mail embutido do Supabase serve só para testes: manda poucas mensagens por hora. Depois do SMTP, suba o limite de e-mails em **Authentication → Rate Limits** (o padrão é 30 por hora).
+Só quem entra **por e-mail** recebe mensagens (o link e o código de 6 dígitos da tela de entrar). Quem entra pelo crachá, pelo código da secretaria, com senha ou com o Google não recebe nada. O e-mail embutido do Supabase serve só para testes: manda poucas mensagens por hora e pode não chegar a endereços de fora da equipe do projeto. Para o evento, use um serviço de envio gratuito, como o Brevo (300 e-mails por dia no plano gratuito).
 
-O login por e-mail só entra em contas que já existem. A conta nasce no primeiro login pelo crachá ou pelo código da secretaria.
+**No Brevo** ([brevo.com](https://www.brevo.com)):
+
+1. Crie a conta gratuita.
+2. Cadastre o remetente em **Senders, domains & dedicated IPs → Senders** e confirme pelo e-mail que chega. O ideal é um endereço de domínio próprio (da UFRGSMUN), com o domínio autenticado na aba **Domains**; com um endereço do Gmail, as mensagens tendem a cair no spam.
+3. Em **SMTP & API → SMTP**, gere uma chave SMTP (**Generate a new SMTP key**). A página mostra o servidor (`smtp-relay.brevo.com`), a porta (587) e o login. Copie a chave na hora: ela não aparece de novo.
+
+**No Supabase:**
+
+4. Em **Authentication → Emails → SMTP Settings**, ligue **Enable Custom SMTP** e preencha: o e-mail do remetente (o do passo 2), o nome do remetente (`UFRGSMUN`), o servidor, a porta 587, o login e, como senha, a chave SMTP. Salve. A chave fica só no Supabase: nunca no repositório nem no `.env`.
+5. Em **Authentication → Emails → Templates → Magic Link**, troque o modelo para trazer também o código, que a tela de entrar pede (o modelo padrão só tem o link):
+   - **Subject:** `Seu código para entrar no UFRGSMUN / Your sign-in code`
+   - **Body:**
+     ```html
+     <h2>UFRGSMUN</h2>
+     <p>Seu código / Your code: <strong>{{ .Token }}</strong></p>
+     <p>Ou toque no link / Or tap the link: <a href="{{ .ConfirmationURL }}">entrar / sign in</a></p>
+     <p>Se não foi você, ignore este e-mail. / If this wasn't you, ignore this email.</p>
+     ```
+6. Em **Authentication → Rate Limits**, suba o limite de envio de e-mails (o padrão é 30 por hora) para algo como 200 por hora, dentro da cota diária do Brevo. Antes do credenciamento, suba também **Token verifications** (veja a seção 5).
+
+**Teste:** em **Entrar → Por e-mail**, digite o e-mail de uma conta que já existe. Devem chegar o link e o código, e os dois devem entrar. O login por e-mail só vale para contas que já existem: a conta nasce no primeiro login pelo crachá ou pelo código da secretaria.
 
 ## 5. Login pelo crachá (passo 14)
 
