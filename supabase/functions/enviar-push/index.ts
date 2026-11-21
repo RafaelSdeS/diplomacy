@@ -43,7 +43,7 @@ Deno.serve(async (req) => {
 		// corpo inválido: cai no pedido inválido abaixo
 	}
 	ids = ids.filter((id) => /^[0-9a-f-]{36}$/i.test(id));
-	if ((tipo !== 'aviso' && tipo !== 'nota') || !ids.length) return responder(400, { erro: 'Pedido inválido.' });
+	if (!['aviso', 'nota', 'crise'].includes(tipo) || !ids.length) return responder(400, { erro: 'Pedido inválido.' });
 
 	let enviadas = 0;
 	let falhas = 0;

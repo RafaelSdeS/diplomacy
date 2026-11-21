@@ -6,6 +6,8 @@
 	import { mensagemDeErro } from '#lib/sessao.ts';
 	import { supabase } from '#lib/supabase.ts';
 	import Bandeira from '#lib/ui/Bandeira.svelte';
+	import { caixa, mensagemDoEnvio } from '#lib/caixa.ts';
+	import { invalidate } from '$app/navigation';
 	import { ESCOLHAS } from '#lib/votacao.ts';
 	import type { PageProps } from './$types';
 
@@ -27,6 +29,24 @@
 	const quando = (iso: string) => new Date(iso).toLocaleDateString(locale(), { day: 'numeric', month: 'short' });
 
 	let erro = $state('');
+	let mensagem = $state('');
+	// Passo 34: as anotações da sua delegação sobre esta.
+	const minhasSobre = $derived(data.anotacoes.filter((a) => a.delegacao_id === eu?.delegacao_id));
+	let nota = $state('');
+	async function anotar(evento: SubmitEvent) {
+		evento.preventDefault();
+		erro = mensagem = '';
+		const id = crypto.randomUUID();
+		const resultado = await caixa.enviar({
+			id,
+			rpc: 'salvar_anotacao',
+			args: { p_id: id, p_comite: data.comite.id, p_tipo: 'sobre', p_texto: nota, p_sobre: d.id },
+			rotulo: t('Anotação')
+		});
+		({ erro, mensagem } = mensagemDoEnvio(resultado, t('Anotado no caderno.')));
+		if (!erro) nota = '';
+		await invalidate('app:caderno');
+	}
 	async function bloquear() {
 		erro = '';
 		const { error } = await supabase.rpc('bloquear_bilhetes', { p_comite: data.comite.id, p_delegacao: d.id, p_bloquear: !bloqueei });
@@ -52,6 +72,9 @@
 {#if erro}
 	<p class="erro" role="alert">{erro}</p>
 {/if}
+{#if mensagem}
+	<p class="sucesso" role="status">{mensagem}</p>
+{/if}
 
 {#if outra}
 	<div class="acoes">
@@ -60,6 +83,26 @@
 			{bloqueei ? t('Desbloquear bilhetes') : t('Bloquear bilhetes')}
 		</button>
 	</div>
+{/if}
+
+{#if outra}
+	<section aria-labelledby="t-anotacoes">
+		<h2 id="t-anotacoes">{t('Suas anotações sobre {delegacao}', { delegacao: d.nome })}</h2>
+		<ul class="lista">
+			{#each minhasSobre as a (a.id)}
+				<li><p class="texto-nota">{a.texto}</p></li>
+			{:else}
+				<li class="suave">{t('Só a sua delegação lê o que anotar aqui.')}</li>
+			{/each}
+		</ul>
+		<form class="formulario" onsubmit={anotar} aria-label={t('Nova anotação')}>
+			<label class="campo">
+				{t('Anotação')}
+				<textarea required rows="2" maxlength="4000" bind:value={nota}></textarea>
+			</label>
+			<button class="botao botao--secundario botao--pequeno">{t('Guardar no caderno')}</button>
+		</form>
+	</section>
 {/if}
 
 <section aria-labelledby="t-delegados">

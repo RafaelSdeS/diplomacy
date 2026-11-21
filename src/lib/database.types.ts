@@ -23,7 +23,71 @@ export type Database = {
           }
         },"public": {
           Tables: {
-            "assinatura": {
+            "anotacao": {
+                  Row: {
+                    "atualizado_em": string,"autor_id": string | null,"comite_id": string,"criado_em": string,"delegacao_id": string,"id": string,"orador_delegacao_id": string | null,"sobre_delegacao_id": string | null,"texto": string,"tipo": string,"titulo": string | null,"topico": number | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "atualizado_em"?: string,"autor_id"?: string | null,"comite_id": string,"criado_em"?: string,"delegacao_id": string,"id": string,"orador_delegacao_id"?: string | null,"sobre_delegacao_id"?: string | null,"texto": string,"tipo": string,"titulo"?: string | null,"topico"?: number | null
+                  }
+                  Update: {
+                    "atualizado_em"?: string,"autor_id"?: string | null,"comite_id"?: string,"criado_em"?: string,"delegacao_id"?: string,"id"?: string,"orador_delegacao_id"?: string | null,"sobre_delegacao_id"?: string | null,"texto"?: string,"tipo"?: string,"titulo"?: string | null,"topico"?: number | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "anotacao_autor_id_fkey"
+      columns: ["autor_id"]
+isOneToOne: false
+      referencedRelation: "pessoa"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "anotacao_delegacao_id_comite_id_fkey"
+      columns: ["delegacao_id","comite_id"]
+isOneToOne: false
+      referencedRelation: "delegacao"
+      referencedColumns: ["id","comite_id"]
+    },{
+      foreignKeyName: "anotacao_orador_delegacao_id_comite_id_fkey"
+      columns: ["orador_delegacao_id","comite_id"]
+isOneToOne: false
+      referencedRelation: "delegacao"
+      referencedColumns: ["id","comite_id"]
+    },{
+      foreignKeyName: "anotacao_sobre_delegacao_id_comite_id_fkey"
+      columns: ["sobre_delegacao_id","comite_id"]
+isOneToOne: false
+      referencedRelation: "delegacao"
+      referencedColumns: ["id","comite_id"]
+    }
+                  ]
+                },"anotacao_compartilhada": {
+                  Row: {
+                    "anotacao_id": string,"comite_id": string,"delegacao_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "anotacao_id": string,"comite_id": string,"delegacao_id": string
+                  }
+                  Update: {
+                    "anotacao_id"?: string,"comite_id"?: string,"delegacao_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "anotacao_compartilhada_anotacao_id_comite_id_fkey"
+      columns: ["anotacao_id","comite_id"]
+isOneToOne: false
+      referencedRelation: "anotacao"
+      referencedColumns: ["id","comite_id"]
+    },{
+      foreignKeyName: "anotacao_compartilhada_delegacao_id_comite_id_fkey"
+      columns: ["delegacao_id","comite_id"]
+isOneToOne: false
+      referencedRelation: "delegacao"
+      referencedColumns: ["id","comite_id"]
+    }
+                  ]
+                },"assinatura": {
                   Row: {
                     "comite_id": string,"criado_em": string,"delegacao_id": string,"documento_id": string
                   }
@@ -905,6 +969,84 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"incidente_comite": {
+                  Row: {
+                    "comite_id": string,"encerrado_em": string | null,"evento_id": string,"incidente_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "comite_id": string,"encerrado_em"?: string | null,"evento_id": string,"incidente_id": string
+                  }
+                  Update: {
+                    "comite_id"?: string,"encerrado_em"?: string | null,"evento_id"?: string,"incidente_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "incidente_comite_comite_id_fkey"
+      columns: ["comite_id"]
+isOneToOne: false
+      referencedRelation: "comite"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "incidente_comite_incidente_id_evento_id_fkey"
+      columns: ["incidente_id","evento_id"]
+isOneToOne: false
+      referencedRelation: "incidente_crise"
+      referencedColumns: ["id","evento_id"]
+    }
+                  ]
+                },"incidente_crise": {
+                  Row: {
+                    "autor_id": string | null,"criado_em": string,"desfecho": string | null,"desfecho_texto": string | null,"encerrado_em": string | null,"evento_id": string,"id": string,"prazo": string,"texto": string,"titulo": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "autor_id"?: string | null,"criado_em"?: string,"desfecho"?: string | null,"desfecho_texto"?: string | null,"encerrado_em"?: string | null,"evento_id": string,"id"?: string,"prazo": string,"texto": string,"titulo": string
+                  }
+                  Update: {
+                    "autor_id"?: string | null,"criado_em"?: string,"desfecho"?: string | null,"desfecho_texto"?: string | null,"encerrado_em"?: string | null,"evento_id"?: string,"id"?: string,"prazo"?: string,"texto"?: string,"titulo"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "incidente_crise_autor_id_fkey"
+      columns: ["autor_id"]
+isOneToOne: false
+      referencedRelation: "pessoa"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "incidente_crise_evento_id_fkey"
+      columns: ["evento_id"]
+isOneToOne: false
+      referencedRelation: "evento"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"incidente_efeito": {
+                  Row: {
+                    "ate": string | null,"comite_id": string,"delegacao_id": string,"incidente_id": string,"texto": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "ate"?: string | null,"comite_id": string,"delegacao_id": string,"incidente_id": string,"texto": string
+                  }
+                  Update: {
+                    "ate"?: string | null,"comite_id"?: string,"delegacao_id"?: string,"incidente_id"?: string,"texto"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "incidente_efeito_delegacao_id_comite_id_fkey"
+      columns: ["delegacao_id","comite_id"]
+isOneToOne: false
+      referencedRelation: "delegacao"
+      referencedColumns: ["id","comite_id"]
+    },{
+      foreignKeyName: "incidente_efeito_incidente_id_fkey"
+      columns: ["incidente_id"]
+isOneToOne: false
+      referencedRelation: "incidente_crise"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"lista_oradores": {
                   Row: {
                     "comite_id": string,"delegacao_id": string,"falou": boolean,"id": string,"lado": string | null,"ordem": number,"ponto_mocao_id": string | null
@@ -1710,7 +1852,19 @@ isOneToOne: false
 "agora":
 { Args: Record<PropertyKey, never>; Returns: string
                            },
+"anotacoes_compartilhadas_comigo":
+{ Args: Record<PropertyKey, never>; Returns: string[]
+                           },
+"anotacoes_minhas":
+{ Args: Record<PropertyKey, never>; Returns: string[]
+                           },
+"apagar_anotacao":
+{ Args: { "p_id": string }; Returns: undefined
+                           },
 "apagar_dados_pessoais":
+{ Args: { "p_evento": string }; Returns: number
+                           },
+"apagar_dados_pessoais_ate_o_passo_33":
 { Args: { "p_evento": string }; Returns: number
                            },
 "apagar_pessoa":
@@ -1794,6 +1948,9 @@ isOneToOne: false
 "comites_onde_a_mesa_le_bilhetes":
 { Args: Record<PropertyKey, never>; Returns: string[]
                            },
+"compartilhar_anotacao":
+{ Args: { "p_delegacoes": (string)[],"p_id": string }; Returns: undefined
+                           },
 "copiar_evento":
 { Args: { "p_ano": number,"p_nome": string,"p_origem": string }; Returns: string
                            },
@@ -1817,6 +1974,9 @@ isOneToOne: false
                            },
 "definir_redator":
 { Args: { "p_bloco": string,"p_delegacao": string,"p_redator": boolean }; Returns: undefined
+                           },
+"delegacao_sem_voz":
+{ Args: { "p_delegacao": string }; Returns: boolean
                            },
 "denunciar_mensagem":
 { Args: { "p_mensagem": string,"p_motivo": string }; Returns: undefined
@@ -1855,6 +2015,9 @@ isOneToOne: false
                            },
 "encerrar_coletiva":
 { Args: { "p_coletiva": string }; Returns: undefined
+                           },
+"encerrar_incidente":
+{ Args: { "p_desfecho": string,"p_id": string,"p_texto": string }; Returns: undefined
                            },
 "encerrar_pausa":
 { Args: { "p_comite": string }; Returns: undefined
@@ -1937,6 +2100,27 @@ isOneToOne: false
 "exigir_mesa":
 { Args: { "p_comite": string }; Returns: undefined
                            },
+"exigir_minha_anotacao":
+{ Args: { "p_id": string }; Returns: {
+              "atualizado_em": string,
+"autor_id": string | null,
+"comite_id": string,
+"criado_em": string,
+"delegacao_id": string,
+"id": string,
+"orador_delegacao_id": string | null,
+"sobre_delegacao_id": string | null,
+"texto": string,
+"tipo": string,
+"titulo": string | null,
+"topico": number | null
+            }
+                          SetofOptions: {
+        from: "*"
+        to: "anotacao"
+        isOneToOne: true
+        isSetofReturn: false
+      } },
 "exigir_moderacao":
 { Args: { "p_noticia": string }; Returns: {
               "autor_id": string | null,
@@ -1999,6 +2183,9 @@ isOneToOne: false
 "julgar_ponto":
 { Args: { "p_em_ordem": boolean,"p_motivo"?: string,"p_ponto": string }; Returns: undefined
                            },
+"lancar_incidente":
+{ Args: { "p_comites": (string)[],"p_efeitos"?: Json,"p_minutos": number,"p_texto": string,"p_titulo": string }; Returns: string
+                           },
 "levantar_placa":
 { Args: { "p_comite": string }; Returns: undefined
                            },
@@ -2030,6 +2217,9 @@ isOneToOne: false
 { Args: Record<PropertyKey, never>; Returns: Json
                            },
 "meus_dados_ate_o_passo_19":
+{ Args: Record<PropertyKey, never>; Returns: Json
+                           },
+"meus_dados_ate_o_passo_33":
 { Args: Record<PropertyKey, never>; Returns: Json
                            },
 "minha_delegacao":
@@ -2127,6 +2317,11 @@ isOneToOne: false
               "auth": string,"corpo": string,"endpoint": string,"p256dh": string,"titulo": string,"url": string
             }[]
                            },
+"push_a_enviar_ate_o_passo_34":
+{ Args: { "p_id": string,"p_tipo": string }; Returns: {
+              "auth": string,"corpo": string,"endpoint": string,"p256dh": string,"titulo": string,"url": string
+            }[]
+                           },
 "quorum":
 { Args: { "p_comite": string }; Returns: number
                            },
@@ -2194,6 +2389,9 @@ isOneToOne: false
                            },
 "sair_bloco":
 { Args: { "p_bloco": string }; Returns: undefined
+                           },
+"salvar_anotacao":
+{ Args: { "p_comite": string,"p_id": string,"p_orador"?: string,"p_sobre"?: string,"p_texto": string,"p_tipo": string,"p_titulo"?: string,"p_topico"?: number }; Returns: undefined
                            },
 "salvar_assinatura_push":
 { Args: { "p_auth": string,"p_endpoint": string,"p_p256dh": string }; Returns: undefined

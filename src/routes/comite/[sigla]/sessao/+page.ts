@@ -1,3 +1,4 @@
+import { carregarIncidentes } from '#lib/crise.ts';
 import { carregarSessao } from '#lib/sessao.ts';
 import { supabase } from '#lib/supabase.ts';
 import type { PageLoad } from './$types';
@@ -5,7 +6,7 @@ import type { PageLoad } from './$types';
 export const load: PageLoad = async ({ parent, depends }) => {
 	depends('app:sessao-ao-vivo');
 	const { comite } = await parent();
-	const dados = await carregarSessao(comite.id);
+	const [dados, incidentes] = await Promise.all([carregarSessao(comite.id), carregarIncidentes(comite.id)]);
 	// As votações encerradas desta sessão, com os votos de cada delegação (passo 23).
 	const sessao = dados.estado?.sessao?.id;
 	const votacoes = sessao
@@ -17,5 +18,5 @@ export const load: PageLoad = async ({ parent, depends }) => {
 				.order('encerrada_em', { ascending: false })
 		: { data: [], error: null };
 	if (votacoes.error) throw votacoes.error;
-	return { ...dados, votacoes: votacoes.data };
+	return { ...dados, votacoes: votacoes.data, incidentes };
 };

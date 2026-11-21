@@ -22,6 +22,9 @@
 	import Contagem from '#lib/ui/Contagem.svelte';
 	import BotaoPlaca from '#lib/ui/BotaoPlaca.svelte';
 	import Votar from '#lib/ui/Votar.svelte';
+	import AlertaCrise from '#lib/ui/AlertaCrise.svelte';
+	import { semVoz } from '#lib/crise.ts';
+	import { caixa, mensagemDoEnvio } from '#lib/caixa.ts';
 	import { assinaturasDesconfianca, escolhasPermitidas, ETAPAS, FASES, listaAtiva, presidenciaEmVigor, textoResultado } from '#lib/votacao.ts';
 	import type { PageProps } from './$types';
 
@@ -64,7 +67,32 @@
 		return () => clearInterval(relogio);
 	});
 	const momento = $derived(data.estado ? momentoDoDebate(data.estado, agora + diferenca) : null);
+	// Passo 35: a delegação atingida pela crise fica sem voz.
+	const impedida = $derived(semVoz(data.incidentes, eu?.delegacao_id, agora + diferenca));
 	const naListaCurta = $derived((sessao?.proximos ?? []).findIndex((p) => p.delegacao?.id === eu?.delegacao_id));
+	// Passo 34: anotar sem sair da sessão; a nota guarda o tópico e quem falava.
+	let nota = $state('');
+	async function anotar(evento: SubmitEvent) {
+		evento.preventDefault();
+		erro = mensagem = '';
+		const id = crypto.randomUUID();
+		const resultado = await caixa.enviar({
+			id,
+			rpc: 'salvar_anotacao',
+			args: {
+				p_id: id,
+				p_comite: data.comite.id,
+				p_tipo: 'nota',
+				p_texto: nota,
+				p_topico: data.estado?.topico_atual ?? undefined,
+				p_orador: data.estado?.orador?.id ?? undefined
+			},
+			rotulo: t('Anotação')
+		});
+		({ erro, mensagem } = mensagemDoEnvio(resultado, t('Anotado no caderno.')));
+		if (!erro) nota = '';
+	}
+
 	function irAoPonto() {
 		const campo = document.getElementById('tipo-ponto');
 		campo?.scrollIntoView({ block: 'center' });
@@ -149,8 +177,13 @@
 		<p class="telegrama" role="note">{t('Tecnologia restrita: durante a sessão, a mesa registra as falas e os votos.')}</p>
 	{/if}
 
+	{#if impedida}
+		<p class="erro" role="alert">{t('Sua delegação está impedida pela crise: {motivo}', { motivo: impedida })}</p>
+	{/if}
+
 	<div class="cartoes">
-		{#if momento === 'pausa' && eu && !restrita}
+		<AlertaCrise incidentes={data.incidentes} {diferenca} />
+		{#if momento === 'pausa' && eu && !restrita && !impedida}
 			<article class="cartao cartao--destaque pausa-pontos" aria-labelledby="c-pausa">
 				<h2 id="c-pausa">{t('Há pontos ou moções?')}</h2>
 				<button class="botao" type="button" onclick={irAoPonto}>{t('Fazer um ponto ou moção')}</button>
@@ -207,6 +240,8 @@
 				{#if !data.votacao.aberta}
 					<p>{textoResultado(data.votacao)}</p>
 					<ListaVotos sigla={data.comite.sigla} delegacoes={data.delegacoes} votos={data.votacao.votos} tipo={data.votacao.tipo} {presentes} />
+				{:else if impedida}
+					<p class="suave">{t('Sua delegação está impedida pela crise.')}</p>
 				{:else if meuVoto || posso.length}
 					<Votar votacaoId={data.votacao.id} escolhas={posso} {meuVoto} representada={representada?.id} onerro={(m) => (erro = m)} />
 				{:else if eu}
@@ -261,7 +296,7 @@
 			</article>
 		{/if}
 
-		{#if eu && !restrita && data.fase !== 'plenaria'}
+		{#if eu && !restrita && !impedida && data.fase !== 'plenaria'}
 			<article class="cartao" aria-labelledby="c-placa">
 				<h2 id="c-placa">{t('Sua placa')}</h2>
 				{#if naListaCurta >= 0}
@@ -288,6 +323,19 @@
 		{/if}
 	</div>
 
+	{#if eu && !restrita && !representada}
+		<details class="anotar">
+			<summary>{t('Anotar')}</summary>
+			<form class="formulario" onsubmit={anotar} aria-label={t('Anotar no caderno')}>
+				<label class="campo">
+					{t('Nota rápida')}
+					<textarea required rows="2" maxlength="4000" bind:value={nota}></textarea>
+				</label>
+				<button class="botao botao--secundario botao--pequeno">{t('Guardar no caderno')}</button>
+			</form>
+		</details>
+	{/if}
+
 	{#if data.votacoes.length}
 		<section aria-labelledby="t-votacoes">
 			<h2 id="t-votacoes">{t('Votações desta sessão')}</h2>
@@ -304,7 +352,7 @@
 		</section>
 	{/if}
 
-	{#if eu && !restrita}
+	{#if eu && !restrita && !impedida}
 		<section aria-labelledby="t-ponto">
 			<h2 id="t-ponto">{t('Ponto ou moção')}</h2>
 			<form class="formulario" onsubmit={enviarPonto}>
@@ -369,6 +417,7 @@
 	{/if}
 	<a class="botao botao--secundario" href={`/comite/${data.comite.sigla}/sessao/agenda`}>{t('Agenda')}</a>
 	<a class="botao botao--secundario" href={`/comite/${data.comite.sigla}/votacoes`}>{t('Votações')}</a>
+	{#if eu}<a class="botao botao--secundario" href={`/comite/${data.comite.sigla}/caderno`}>{t('Caderno')}</a>{/if}
 	<a class="botao botao--secundario" href={`/comite/${data.comite.sigla}/blocos`}>{t('Blocos e documentos')}</a>
 	<a class="botao botao--secundario" href={`/comite/${data.comite.sigla}/cartas`}>{t('Cartas')}</a>
 	<a class="botao botao--secundario" href={`/comite/${data.comite.sigla}/mensagens`}>{t('Mensagens')}</a>

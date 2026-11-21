@@ -13,13 +13,15 @@ export const TABELAS_SESSAO = [
 	'ponto_mocao',
 	'presenca',
 	'aviso_chegada',
+	'incidente_comite',
+	'incidente_efeito',
 	'lista_oradores',
 	'votacao',
 	'voto',
 	'documento'
 ];
 /** O que muda ao vivo na crise do comitê. */
-export const TABELAS_CRISE = ['nota_crise', 'atualizacao_comite'];
+export const TABELAS_CRISE = ['nota_crise', 'atualizacao_comite', 'incidente_comite', 'incidente_efeito'];
 /** Blocos e documentos do comitê. */
 export const TABELAS_BLOCOS = ['bloco_membro', 'documento'];
 

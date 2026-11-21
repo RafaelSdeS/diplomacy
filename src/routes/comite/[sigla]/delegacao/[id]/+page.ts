@@ -4,9 +4,10 @@ import type { PageLoad } from './$types';
 
 // Passo 26: a página da delegação. A RLS decide o que aparece: delegados para quem é do
 // comitê, DPOs conforme a regra do comitê, cartas públicas, matérias publicadas.
-export const load: PageLoad = async ({ params, parent }) => {
+export const load: PageLoad = async ({ params, parent, depends }) => {
 	const { comite } = await parent();
-	const [delegacao, delegados, dpos, cartas, citacoes, votos, bloqueios] = await Promise.all([
+	depends('app:caderno');
+	const [delegacao, delegados, dpos, cartas, citacoes, votos, bloqueios, anotacoes] = await Promise.all([
 		supabase
 			.from('delegacao')
 			.select('id, nome, nome_oficial, bandeira, situacao')
@@ -35,9 +36,11 @@ export const load: PageLoad = async ({ params, parent }) => {
 			.not('votacao.encerrada_em', 'is', null)
 			.order('votacao(encerrada_em)', { ascending: false })
 			.limit(10),
-		supabase.from('bloqueio_bilhete').select('delegacao_id, bloqueada_id').or(`delegacao_id.eq.${params.id},bloqueada_id.eq.${params.id}`)
+		supabase.from('bloqueio_bilhete').select('delegacao_id, bloqueada_id').or(`delegacao_id.eq.${params.id},bloqueada_id.eq.${params.id}`),
+		// Passo 34: as anotações sobre esta delegação que a pessoa pode ler (a RLS decide).
+		supabase.from('anotacao').select('id, texto, criado_em, delegacao_id').eq('sobre_delegacao_id', params.id).order('criado_em', { ascending: false })
 	]);
-	for (const r of [delegacao, delegados, dpos, cartas, citacoes, votos, bloqueios]) if (r.error) throw r.error;
+	for (const r of [delegacao, delegados, dpos, cartas, citacoes, votos, bloqueios, anotacoes]) if (r.error) throw r.error;
 	if (!delegacao.data) error(404, 'Delegação não encontrada.');
 
 	// Fotos num bucket privado: um link assinado (1 h) para cada uma.
@@ -56,6 +59,7 @@ export const load: PageLoad = async ({ params, parent }) => {
 		cartas: cartas.data!,
 		citacoes: citacoes.data!.map((c) => c.noticia),
 		votos: votos.data!,
-		bloqueios: bloqueios.data!
+		bloqueios: bloqueios.data!,
+		anotacoes: anotacoes.data!
 	};
 };

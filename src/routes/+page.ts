@@ -1,12 +1,13 @@
 import { papelPrincipal } from '#lib/papeis.ts';
+import { carregarIncidentes } from '#lib/crise.ts';
 import { carregarSessao } from '#lib/sessao.ts';
 import { supabase } from '#lib/supabase.ts';
 import type { PageLoad } from './$types';
 
+// Contagens são extras: sem rede (o pedido HEAD não fica no cache), o Agora abre sem elas.
 const contar = async (consulta: PromiseLike<{ count: number | null; error: unknown }>) => {
 	const { count, error } = await consulta;
-	if (error) throw error;
-	return count ?? 0;
+	return error ? null : (count ?? 0);
 };
 
 export const load: PageLoad = async ({ parent, depends }) => {
@@ -17,6 +18,8 @@ export const load: PageLoad = async ({ parent, depends }) => {
 	const principal = papelPrincipal(participacoes);
 	const minha = participacoes.find((p) => p.papel === principal && p.comite_id);
 	const comiteAoVivo = principal === 'delegado' || principal === 'mesa' ? (minha?.comite_id ?? null) : null;
+	// Sem a hora na consulta: a mesma URL sempre, para a resposta guardada abrir o Agora sem
+	// rede (passo 15). O que já passou sai aqui.
 	const agoraIso = new Date().toISOString();
 	const comites = [...new Set(participacoes.map((p) => p.comite_id).filter((id) => id !== null))];
 
@@ -52,8 +55,9 @@ export const load: PageLoad = async ({ parent, depends }) => {
 		comiteAoVivo
 			? Promise.all([
 					carregarSessao(comiteAoVivo),
-					supabase.from('comite').select('tecnologia_restrita').eq('id', comiteAoVivo).single()
-				]).then(([sessao, comite]) => ({ ...sessao, restrita: !!comite.data?.tecnologia_restrita }))
+					supabase.from('comite').select('tecnologia_restrita').eq('id', comiteAoVivo).single(),
+					carregarIncidentes(comiteAoVivo)
+				]).then(([sessao, comite, incidentes]) => ({ ...sessao, restrita: !!comite.data?.tecnologia_restrita, incidentes }))
 			: null,
 		minhaDelegacao
 			? supabase
@@ -65,7 +69,7 @@ export const load: PageLoad = async ({ parent, depends }) => {
 					.limit(3)
 			: { data: [], error: null },
 		minhaDelegacao
-			? supabase.from('rodada').select('fim, documento!inner(id, titulo)').gt('fim', agoraIso).order('fim')
+			? supabase.from('rodada').select('fim, documento!inner(id, titulo)').order('fim', { ascending: false }).limit(10)
 			: { data: [], error: null },
 		principal === 'mesa' && minha?.comite_id
 			? Promise.all([
@@ -81,9 +85,8 @@ export const load: PageLoad = async ({ parent, depends }) => {
 					.from('entrevista')
 					.select('id, tema, horario, delegacao(nome)')
 					.eq('status', 'aceita')
-					.gte('horario', agoraIso)
-					.order('horario')
-					.limit(3)
+					.order('horario', { ascending: false })
+					.limit(10)
 			: { data: [], error: null }
 	]);
 	for (const r of [bilhetes, rodadas, entrevistas]) if (r.error) throw r.error;
@@ -107,9 +110,9 @@ export const load: PageLoad = async ({ parent, depends }) => {
 		minha: minha ?? null,
 		aoVivo,
 		bilhetes: bilhetes.data ?? [],
-		rodadas: rodadas.data ?? [],
+		rodadas: (rodadas.data ?? []).filter((r) => r.fim > agoraIso).reverse(),
 		mesa,
 		notasPendentes: crise,
-		entrevistas: entrevistas.data ?? []
+		entrevistas: (entrevistas.data ?? []).filter((e) => (e.horario ?? '') >= agoraIso).reverse().slice(0, 3)
 	};
 };

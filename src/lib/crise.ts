@@ -1,5 +1,6 @@
-// Funções puras da crise (testadas em crise.test.ts).
+// Funções da crise (as puras, testadas em crise.test.ts).
 import { bilingue, idioma, t } from './i18n.svelte.ts';
+import { supabase } from './supabase.ts';
 
 export type StatusNota = 'pendente' | 'em_analise' | 'aprovada' | 'rejeitada' | 'pede_ajuste';
 
@@ -67,4 +68,50 @@ export function resumoDaFila(notas: NotaNaFila[], agoraMs: number) {
 	const maisAntiga = espera.reduce<string | null>((m, n) => (!m || n.criado_em < m ? n.criado_em : m), null);
 	const min = maisAntiga ? minutosDesde(maisAntiga, agoraMs) : 0;
 	return { pendentes: espera.length, esperaMin: min, alerta: min >= ESPERA_MAXIMA_MIN };
+}
+
+// Passo 35: crise com prazo.
+
+export type Efeito = { delegacao_id: string; texto: string; ate: string | null; delegacao: { nome: string } | null };
+export type Incidente = {
+	id: string;
+	titulo: string;
+	texto: string;
+	prazo: string;
+	desfecho: string | null;
+	desfecho_texto: string | null;
+	encerrado_em: string | null;
+	efeitos: Efeito[];
+};
+
+/** O desfecho fica na tela por este tempo depois do fim. */
+export const DESFECHO_MS = 60_000;
+
+/** As crises do comitê em andamento, e as que acabaram há menos de um minuto (o desfecho). */
+export async function carregarIncidentes(comiteId: string, agoraMs = Date.now()): Promise<Incidente[]> {
+	const { data, error } = await supabase
+		.from('incidente_comite')
+		.select(
+			'incidente:incidente_crise(id, titulo, texto, prazo, desfecho, desfecho_texto, encerrado_em, efeitos:incidente_efeito(delegacao_id, texto, ate, delegacao(nome)))'
+		)
+		.eq('comite_id', comiteId);
+	if (error) throw error;
+	return (data ?? [])
+		.map((c) => c.incidente as Incidente | null)
+		.filter((i): i is Incidente => !!i && (!i.encerrado_em || agoraMs - Date.parse(i.encerrado_em) < DESFECHO_MS))
+		.sort((a, b) => Date.parse(a.prazo) - Date.parse(b.prazo));
+}
+
+/** Segundos até o prazo (0 quando passou). */
+export const segundosAtePrazo = (prazo: string, agoraMs: number) => Math.max(0, Math.ceil((Date.parse(prazo) - agoraMs) / 1000));
+
+/** O motivo de a delegação estar sem voz agora, ou null. */
+export function semVoz(incidentes: Incidente[], delegacao: string | null | undefined, agoraMs: number) {
+	if (!delegacao) return null;
+	for (const i of incidentes) {
+		if (i.encerrado_em) continue;
+		const e = i.efeitos.find((x) => x.delegacao_id === delegacao && (!x.ate || Date.parse(x.ate) > agoraMs));
+		if (e) return e.texto;
+	}
+	return null;
 }

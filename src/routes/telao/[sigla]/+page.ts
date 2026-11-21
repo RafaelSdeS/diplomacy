@@ -1,3 +1,4 @@
+import { carregarIncidentes } from '#lib/crise.ts';
 import { carregarSessao, comitePorSigla } from '#lib/sessao.ts';
 import { supabase } from '#lib/supabase.ts';
 import type { PageLoad } from './$types';
@@ -5,7 +6,7 @@ import type { PageLoad } from './$types';
 export const load: PageLoad = async ({ params, depends }) => {
 	depends('app:sessao-ao-vivo');
 	const comite = await comitePorSigla(params.sigla);
-	const [sessao, plantoes, urgentes] = await Promise.all([
+	const [sessao, plantoes, urgentes, incidentes] = await Promise.all([
 		carregarSessao(comite.id),
 		supabase.from('atualizacao_comite').select('atualizacao:atualizacao_crise(id, texto, publicada_em)').eq('comite_id', comite.id),
 		supabase
@@ -15,7 +16,8 @@ export const load: PageLoad = async ({ params, depends }) => {
 			.eq('tipo', 'nota_urgente')
 			.eq('status', 'publicada')
 			.order('publicada_em', { ascending: false })
-			.limit(1)
+			.limit(1),
+		carregarIncidentes(comite.id)
 	]);
 	if (plantoes.error) throw plantoes.error;
 	if (urgentes.error) throw urgentes.error;
@@ -33,5 +35,5 @@ export const load: PageLoad = async ({ params, depends }) => {
 				publicada_em: n.publicada_em
 			}))
 		].sort((a, b) => b.publicada_em.localeCompare(a.publicada_em))[0] ?? null;
-	return { comite, ...sessao, plantao };
+	return { comite, ...sessao, plantao, incidentes };
 };

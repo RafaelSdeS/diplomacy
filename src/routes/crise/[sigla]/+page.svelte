@@ -20,6 +20,7 @@
 	import { TABELAS_CRISE } from '#lib/tempo-real.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import Bandeira from '#lib/ui/Bandeira.svelte';
+	import AlertaCrise from '#lib/ui/AlertaCrise.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -48,6 +49,47 @@
 	let mensagem = $state('');
 	let atualizacao = $state('');
 	let comitesDaAtualizacao = $state<string[]>(untrack(() => [data.comite.id]));
+
+	// Passo 35: crise com prazo.
+	const ativos = $derived(data.incidentes.filter((i) => !i.encerrado_em));
+	let crise = $state({ titulo: '', texto: '', minutos: 20 });
+	let comitesDaCrise = $state<string[]>(untrack(() => [data.comite.id]));
+	let efeitos = $state<{ delegacao_id: string; texto: string; minutos: number | null }[]>([]);
+	let desfecho = $state<Record<string, { resultado: string; texto: string }>>({});
+	$effect(() => {
+		for (const i of ativos) if (!desfecho[i.id]) desfecho[i.id] = { resultado: 'resolvido', texto: '' };
+	});
+
+	async function lancar(evento: SubmitEvent) {
+		evento.preventDefault();
+		erro = mensagem = '';
+		const { data: id, error } = await supabase.rpc('lancar_incidente', {
+			p_comites: comitesDaCrise,
+			p_titulo: crise.titulo,
+			p_texto: crise.texto,
+			p_minutos: crise.minutos,
+			p_efeitos: efeitos
+				.filter((e) => e.delegacao_id && e.texto)
+				.map((e) => ({ delegacao_id: e.delegacao_id, texto: e.texto, ...(e.minutos ? { minutos: e.minutos } : {}) }))
+		});
+		if (error) erro = mensagemDeErro(error);
+		else {
+			pedirNotificacao('crise', [id]);
+			mensagem = t('Crise lançada.');
+			crise = { titulo: '', texto: '', minutos: 20 };
+			efeitos = [];
+		}
+		await invalidate('app:crise');
+	}
+
+	async function encerrar(id: string) {
+		erro = mensagem = '';
+		const d = desfecho[id] ?? { resultado: 'resolvido', texto: '' };
+		const { error } = await supabase.rpc('encerrar_incidente', { p_id: id, p_desfecho: d.resultado, p_texto: d.texto });
+		if (error) erro = mensagemDeErro(error);
+		else mensagem = t('Crise encerrada.');
+		await invalidate('app:crise');
+	}
 
 	const fila = $derived(
 		ordenarFila(data.notas).filter(
@@ -229,6 +271,77 @@
 			{/if}
 		</section>
 	</div>
+
+	<section aria-labelledby="t-crise-prazo">
+		<h2 id="t-crise-prazo">{t('Crise com prazo')}</h2>
+		<AlertaCrise incidentes={data.incidentes} {diferenca} />
+		{#each ativos.filter((i) => desfecho[i.id]) as i (i.id)}
+			<form
+				class="formulario"
+				aria-label={t('Encerrar: {crise}', { crise: i.titulo })}
+				onsubmit={(e) => {
+					e.preventDefault();
+					void encerrar(i.id);
+				}}
+			>
+				<fieldset class="opcoes">
+					<legend>{t('Desfecho de {crise}', { crise: i.titulo })}</legend>
+					<label class="opcao"><input type="radio" value="resolvido" bind:group={desfecho[i.id].resultado} /> {t('Resolvida')}</label>
+					<label class="opcao"><input type="radio" value="fracassou" bind:group={desfecho[i.id].resultado} /> {t('Fracassou')}</label>
+				</fieldset>
+				<label class="campo">{t('O que aconteceu')} <textarea rows="2" maxlength="3000" bind:value={desfecho[i.id].texto}></textarea></label>
+				<button class="botao">{t('Encerrar a crise')}</button>
+			</form>
+		{/each}
+
+		<form class="formulario formulario--largo" onsubmit={lancar} aria-label={t('Lançar uma crise')}>
+			<label class="campo">{t('Título')} <input required maxlength="120" bind:value={crise.titulo} /></label>
+			<label class="campo">
+				{t('Briefing')}
+				<textarea required rows="4" maxlength="3000" bind:value={crise.texto}></textarea>
+			</label>
+			<label class="campo campo--curto">
+				{t('Prazo (minutos)')}
+				<input type="number" required min="1" max="240" bind:value={crise.minutos} />
+			</label>
+			{#if meusComites.length > 1}
+				<fieldset class="opcoes">
+					<legend>{t('Comitês (crise conjunta)')}</legend>
+					{#each meusComites as c (c.id)}
+						<label class="opcao"><input type="checkbox" value={c.id} bind:group={comitesDaCrise} /> {c.sigla}</label>
+					{/each}
+				</fieldset>
+			{/if}
+			<fieldset class="opcoes">
+				<legend>{t('Delegações atingidas (ficam sem voz)')}</legend>
+				{#each efeitos as e, i (i)}
+					<div class="acoes efeito">
+						<label class="campo">
+							{t('Delegação')}
+							<select required bind:value={e.delegacao_id}>
+								<option value="">{t('Escolha')}</option>
+								{#each data.delegacoes as d (d.id)}<option value={d.id}>{d.nome}</option>{/each}
+							</select>
+						</label>
+						<label class="campo">{t('O que aconteceu com ela')} <input required maxlength="200" bind:value={e.texto} /></label>
+						<label class="campo campo--curto">
+							{t('Minutos (vazio: até o fim)')}
+							<input type="number" min="1" max="240" bind:value={e.minutos} />
+						</label>
+						<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => (efeitos = efeitos.filter((_, j) => j !== i))}
+							>{t('Tirar')}</button
+						>
+					</div>
+				{/each}
+				<button
+					class="botao botao--secundario botao--pequeno"
+					type="button"
+					onclick={() => (efeitos = [...efeitos, { delegacao_id: '', texto: '', minutos: null }])}>{t('Adicionar uma delegação atingida')}</button
+				>
+			</fieldset>
+			<button class="botao">{t('Lançar a crise')}</button>
+		</form>
+	</section>
 
 	<section aria-labelledby="t-atualizacao">
 		<h2 id="t-atualizacao">{t('Atualização de crise')}</h2>

@@ -1,3 +1,4 @@
+import { carregarIncidentes } from '#lib/crise.ts';
 import { carregarSessao, ultimaSessao } from '#lib/sessao.ts';
 import { supabase } from '#lib/supabase.ts';
 import type { PageLoad } from './$types';
@@ -5,7 +6,7 @@ import type { PageLoad } from './$types';
 export const load: PageLoad = async ({ parent, depends }) => {
 	depends('app:sessao-ao-vivo');
 	const { comite } = await parent();
-	const [sessao, projetos] = await Promise.all([
+	const [sessao, projetos, incidentes] = await Promise.all([
 		carregarSessao(comite.id),
 		// Os projetos que a mesa aprovou: esperam o consenso ou a votação.
 		supabase
@@ -14,7 +15,8 @@ export const load: PageLoad = async ({ parent, depends }) => {
 			.eq('comite_id', comite.id)
 			.neq('tipo', 'working_paper')
 			.in('status', ['aprovado_mesa', 'em_votacao', 'aprovado', 'rejeitado'])
-			.order('numero')
+			.order('numero'),
+		carregarIncidentes(comite.id)
 	]);
 	if (projetos.error) throw projetos.error;
 	// Divisão da questão: as operativas dos projetos em votação. Emendas: as propostas.
@@ -32,5 +34,5 @@ export const load: PageLoad = async ({ parent, depends }) => {
 	if (emendas.error) throw emendas.error;
 	// Sem sessão aberta, o painel mostra o resumo da última.
 	const resumo = sessao.estado ? null : await ultimaSessao(comite.id);
-	return { ...sessao, projetos: projetos.data, operativas: operativas.data, emendas: emendas.data, resumo };
+	return { ...sessao, projetos: projetos.data, operativas: operativas.data, emendas: emendas.data, resumo, incidentes };
 };

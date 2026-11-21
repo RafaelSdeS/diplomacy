@@ -12,6 +12,8 @@
 	import NomeDelegacao from '#lib/ui/NomeDelegacao.svelte';
 	import Cronometro from '#lib/ui/Cronometro.svelte';
 	import Contagem from '#lib/ui/Contagem.svelte';
+	import AlertaCrise from '#lib/ui/AlertaCrise.svelte';
+	import { semVoz } from '#lib/crise.ts';
 	import { relogioDebate, restanteSeg, temDebate } from '#lib/cronometro.ts';
 	import GradeVotos from '#lib/ui/GradeVotos.svelte';
 	import {
@@ -313,6 +315,8 @@
 		{/if}
 	{/if}
 
+	<div class="cartoes"><AlertaCrise incidentes={data.incidentes} {diferenca} /></div>
+
 	{#if momento === 'pausa' && data.estado}
 		<section class="cartao cartao--destaque pausa-pontos" aria-labelledby="t-pausa">
 			<h2 id="t-pausa">{t('Há pontos ou moções?')}</h2>
@@ -411,6 +415,7 @@
 							<span>
 								<NomeDelegacao sigla={data.comite.sigla} delegacao={pedido.delegacao} />
 								{#if pedido.pela_mesa}<span class="selo">{t('pela mesa')}</span>{/if}
+								{#if semVoz(data.incidentes, pedido.delegacao?.id, agora + diferenca)}<span class="selo selo--alerta">{t('impedida')}</span>{/if}
 							</span>
 							<span class="acoes">
 								<button

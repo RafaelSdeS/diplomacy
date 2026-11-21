@@ -13,8 +13,8 @@ const FORA = [
 	'src/routes/imprimir/arquivo/',
 	'src/routes/verificar/'
 ];
-// Não se traduzem: a marca do app, os nomes dos idiomas e teclas.
-const LIVRES = new Set(['Diplomacy', 'Português', 'English', 'Enter', 'Escape', 'Espaço', 'America/Sao_Paulo']);
+// Não se traduzem: a marca do app, nomes de redes, os nomes dos idiomas e teclas.
+const LIVRES = new Set(['Diplomacy', 'WhatsApp', 'Português', 'English', 'Enter', 'Escape', 'Espaço', 'America/Sao_Paulo']);
 
 function svelte(pasta: string): string[] {
 	return readdirSync(pasta, { withFileTypes: true }).flatMap((e) =>

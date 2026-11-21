@@ -50,12 +50,12 @@ export async function desativarPush() {
 }
 
 /**
- * Pede o envio depois de publicar um aviso ou responder notas. O banco decide quem
+ * Pede o envio depois de publicar um aviso, responder notas ou lançar uma crise. O banco decide quem
  * recebe, e cada item sai uma vez só.
  * ponytail: se o app fechar entre publicar e pedir, a notificação não sai (o aviso
  * aparece no app do mesmo jeito). Um gatilho com pg_net resolveria, se fizer falta.
  */
-export function pedirNotificacao(tipo: 'aviso' | 'nota', ids: string[]) {
+export function pedirNotificacao(tipo: 'aviso' | 'nota' | 'crise', ids: string[]) {
 	if (!ids.length) return;
 	void supabase.functions.invoke('enviar-push', { body: { tipo, ids } }).catch(() => {});
 }

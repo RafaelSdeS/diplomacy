@@ -9,6 +9,13 @@ const novaLoja = () => createStore(`teste-${++lojas}`, 'caixa');
 const nota = (id: string) => ({ id, rpc: 'enviar_nota', args: { p_id: id }, rotulo: `Nota ${id}` });
 
 describe('caixa de saída', () => {
+	it('guarda argumentos que vêm de um $state do Svelte (proxies)', async () => {
+		const caixa = criarCaixa(async () => SEM_REDE, novaLoja());
+		const citadas = new Proxy<string[]>([], {});
+		expect(await caixa.enviar({ ...nota('p'), args: { p_id: 'p', p_citadas: citadas } })).toBe('guardado');
+		expect((await caixa.pendentes())[0].args).toEqual({ p_id: 'p', p_citadas: [] });
+	});
+
 	it('guarda o que falhou por falta de rede e reenvia quando a rede volta', async () => {
 		let rede = false;
 		const enviados: string[] = [];

@@ -21,7 +21,7 @@ Números que são só texto: "Presentes: 12 de 15" e o quórum (chamada), "9 de 
 
 ## Código
 
-- [x] `src/lib/ui/Contagem.svelte`: props `rotulo` e `itens` (lista de `{ texto, href?, bandeira? }`), e um snippet opcional para conteúdo próprio. O número aparece como `<summary>`, e a lista abre embaixo. Esc fecha (o `<details>` já responde ao Enter).
+- [x] `src/lib/ui/Contagem.svelte`: props `rotulo`, `itens` (lista de `{ texto, href? }`) e `vazio`. O número aparece como `<summary>`, e a lista abre embaixo. Esc fecha (o `<details>` já responde ao Enter).
 - [x] Onde usar:
 
   | Tela | Número | Abre | Ficou |

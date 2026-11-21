@@ -11,6 +11,8 @@
 	import { ETAPAS, FASES, listaAtiva, presidenciaEmVigor, textoResultado } from '#lib/votacao.ts';
 	import { TABELAS_SESSAO } from '#lib/tempo-real.ts';
 	import { APP, marca } from '#lib/titulo.svelte.ts';
+	import { segundosAtePrazo } from '#lib/crise.ts';
+	import { formatarTempo } from '#lib/cronometro.ts';
 	import type { PageProps } from './$types';
 
 	// O telão roda no notebook do projetor, logado com a conta da mesa, sem botões:
@@ -125,6 +127,23 @@
 		</div>
 	</header>
 
+	{#each data.incidentes as i (i.id)}
+		<section class="telao-crise" aria-label={t('Crise')}>
+			{#if i.encerrado_em}
+				<p class="rotulo">{t('Crise encerrada')}</p>
+				<p class="telao-crise-titulo">{i.titulo}</p>
+				<p>{i.desfecho === 'resolvido' ? t('Resolvida') : t('Fracassou')}{i.desfecho_texto ? `: ${i.desfecho_texto}` : ''}</p>
+			{:else}
+				<p class="rotulo">{t('Urgente')}</p>
+				<p class="telao-crise-titulo">{i.titulo}</p>
+				<p class="telao-crise-prazo">{formatarTempo(segundosAtePrazo(i.prazo, agora + diferenca))}</p>
+				<p>{i.texto}</p>
+				{#each i.efeitos as e (e.delegacao_id)}
+					<p class="telao-crise-efeito"><strong>{e.delegacao?.nome}</strong> · {e.texto}</p>
+				{/each}
+			{/if}
+		</section>
+	{/each}
 	{#if plantao}
 		<p class="telao-plantao" role="status"><span class="rotulo">{plantao.rotulo}</span> {plantao.texto}</p>
 	{/if}

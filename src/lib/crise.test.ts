@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatarEspera, minutosDesde, ordenarFila, resumoDaFila } from './crise.ts';
+import { formatarEspera, minutosDesde, ordenarFila, resumoDaFila, segundosAtePrazo, semVoz, type Incidente } from './crise.ts';
 
 const t = (min: number) => new Date(Date.UTC(2026, 10, 10, 13, min)).toISOString();
 const agora = Date.parse(t(30));
@@ -30,4 +30,32 @@ it('o tempo de espera por extenso', () => {
 	expect(formatarEspera(0)).toBe('agora');
 	expect(formatarEspera(7)).toBe('há 7 min');
 	expect(formatarEspera(75)).toBe('há 1 h 15 min');
+});
+
+describe('crise com prazo (passo 35)', () => {
+	const AGORA = Date.parse('2026-11-10T13:00:00.000Z');
+	const em = (seg: number) => new Date(AGORA + seg * 1000).toISOString();
+	const incidente = (extra: Partial<Incidente> = {}): Incidente => ({
+		id: 'i1',
+		titulo: 'Rebeldes do Sahel',
+		texto: 'O delegado russo foi assassinado.',
+		prazo: em(600),
+		desfecho: null,
+		desfecho_texto: null,
+		encerrado_em: null,
+		efeitos: [{ delegacao_id: 'ru', texto: 'Delegado assassinado', ate: null, delegacao: { nome: 'Rússia' } }],
+		...extra
+	});
+
+	it('conta os segundos até o prazo', () => {
+		expect(segundosAtePrazo(em(600), AGORA)).toBe(600);
+		expect(segundosAtePrazo(em(-5), AGORA)).toBe(0);
+	});
+	it('a delegação atingida fica sem voz até o fim, ou até o prazo do efeito', () => {
+		expect(semVoz([incidente()], 'ru', AGORA)).toBe('Delegado assassinado');
+		expect(semVoz([incidente()], 'fr', AGORA)).toBeNull();
+		expect(semVoz([incidente({ encerrado_em: em(-1) })], 'ru', AGORA)).toBeNull();
+		const comPrazo = incidente({ efeitos: [{ delegacao_id: 'ru', texto: 'Sequestrado', ate: em(-1), delegacao: null }] });
+		expect(semVoz([comPrazo], 'ru', AGORA)).toBeNull();
+	});
 });

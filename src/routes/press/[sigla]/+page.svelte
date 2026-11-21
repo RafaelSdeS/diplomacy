@@ -6,7 +6,7 @@
 	import { paragrafos } from '#lib/impressao.ts';
 	import { gerarImagem, hashtags, type Formato } from '#lib/imagem-redes.ts';
 	import { APP, marca } from '#lib/titulo.svelte.ts';
-	import { TIPOS_NOTICIA } from '#lib/press.ts';
+	import { legendaDaNoticia, linkWhatsApp, linkX, TIPOS_NOTICIA } from '#lib/press.ts';
 	import { mensagemDeErro } from '#lib/sessao.ts';
 	import { supabase } from '#lib/supabase.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
@@ -42,6 +42,17 @@
 
 	// Imagem para as redes: no celular, o botão de compartilhar do sistema; no notebook, o download.
 	let legenda = $state('');
+	// Passo 36: a legenda pronta para WhatsApp, X e para colar no Instagram.
+	const legendaPronta = $derived(noticia ? legendaDaNoticia(noticia, hashtags(marca.evento ?? APP)) : '');
+	let copiada = $state<boolean | null>(null);
+	async function copiarLegenda() {
+		try {
+			await navigator.clipboard.writeText(legendaPronta);
+			copiada = true;
+		} catch {
+			copiada = false; // sem permissão: a legenda aparece num campo, já selecionada
+		}
+	}
 	async function compartilhar(formato: Formato) {
 		if (!noticia) return;
 		const evento = marca.evento ?? APP;
@@ -110,6 +121,20 @@
 					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => compartilhar('post')}>{t('Imagem para post')}</button>
 					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => compartilhar('story')}>{t('Imagem para story')}</button>
 				</div>
+				<div class="acoes">
+					<a class="botao botao--secundario botao--pequeno" href={linkWhatsApp(legendaPronta)} target="_blank" rel="noopener">WhatsApp</a>
+					<a class="botao botao--secundario botao--pequeno" href={linkX(legendaPronta)} target="_blank" rel="noopener">X</a>
+					<button class="botao botao--secundario botao--pequeno" type="button" onclick={copiarLegenda}>{t('Copiar legenda')}</button>
+				</div>
+				{#if copiada}
+					<p class="sucesso" role="status">{t('Legenda copiada.')}</p>
+				{:else if copiada === false}
+					<label class="campo">
+						{t('Copie a legenda')}
+						<textarea readonly rows="4" value={legendaPronta} {@attach (campo) => campo.select()}></textarea>
+					</label>
+				{/if}
+				<p class="suave">{t('Publique a imagem pelo Instagram no celular ou pelo Meta Business Suite.')}</p>
 				{#if legenda}<p class="detalhe">{t('Legenda')}: {legenda}</p>{/if}
 			{/if}
 			{#if noticia.motivo_ocultacao}

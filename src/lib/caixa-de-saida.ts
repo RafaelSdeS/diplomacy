@@ -56,7 +56,9 @@ export function criarCaixa(enviar: (item: Item) => Promise<Falha>, loja: UseStor
 	return {
 		/** Guarda e tenta enviar na hora. */
 		async enviar(item: Omit<Item, 'criadoEm'>): Promise<Resultado> {
-			const completo = { ...item, criadoEm: Date.now() };
+			// Os argumentos vão para o banco em JSON; a cópia em JSON também tira os proxies
+			// do Svelte ($state), que o IndexedDB não sabe guardar.
+			const completo = { ...item, args: JSON.parse(JSON.stringify(item.args)), criadoEm: Date.now() };
 			await set(item.id, completo, loja);
 			avisar();
 			return tentar(completo);

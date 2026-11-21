@@ -14,6 +14,7 @@
 	import BotaoPlaca from '#lib/ui/BotaoPlaca.svelte';
 	import Cronometro from '#lib/ui/Cronometro.svelte';
 	import Votar from '#lib/ui/Votar.svelte';
+	import AlertaCrise from '#lib/ui/AlertaCrise.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -77,6 +78,7 @@
 {#if erro}<p class="erro" role="alert">{erro}</p>{/if}
 
 <div class="cartoes">
+	{#if data.aoVivo}<AlertaCrise incidentes={data.aoVivo.incidentes} {diferenca} />{/if}
 	{#if preside && sessao}
 		<article class="cartao cartao--presidencia" aria-labelledby="c-preside">
 			<h2 id="c-preside">{t('Você preside a sessão {n}', { n: sessao.numero })}</h2>
@@ -112,7 +114,7 @@
 				{#if data.aoVivo.fase !== 'plenaria' && minhaDelegacao && !restrita}
 					<BotaoPlaca comiteId={data.minha!.comite_id!} {posicao} nome={data.minha?.delegacao_nome ?? ''} onerro={(m) => (erro = m)} />
 				{/if}
-				<p><a href={`/comite/${sigla}/sessao`}>{t('Abrir a sessão')}</a></p>
+				<p class="acoes"><a class="botao botao--secundario" href={`/comite/${sigla}/sessao`}>{t('Abrir a sessão')}</a></p>
 			{/if}
 		</article>
 	{/if}

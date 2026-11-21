@@ -2046,3 +2046,92 @@ kbd {
 	min-height: 1.75rem;
 	line-height: 1.75rem;
 }
+
+/* Caderno da delegação (passo 34). */
+.abas {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.25rem;
+	margin: 1rem 0;
+	border-bottom: var(--linha);
+}
+
+.aba {
+	padding: 0.5rem 0.9rem;
+	border: none;
+	border-bottom: 3px solid transparent;
+	background: none;
+	color: var(--cor-texto-suave);
+	font: inherit;
+	cursor: pointer;
+}
+
+.aba[aria-selected='true'] {
+	border-bottom-color: var(--cor-marinho);
+	color: var(--cor-marinho);
+	font-weight: 600;
+}
+
+.anotacoes li {
+	align-items: flex-start;
+}
+
+.leitura-fala {
+	width: min(100vw - 2rem, 60rem);
+	font-family: var(--fonte-titulo);
+	font-size: 1.6rem;
+	line-height: 1.5;
+}
+
+.anotar > summary {
+	margin: 1rem 0 0.5rem;
+	cursor: pointer;
+	font-weight: 600;
+}
+
+/* Crise com prazo (passo 35): sóbria, sem piscar. */
+.alerta-crise {
+	border-color: var(--cor-erro);
+	border-left-width: 6px;
+}
+
+.alerta-crise .rotulo {
+	color: var(--cor-erro);
+}
+
+.alerta-crise-prazo {
+	margin: 0.25rem 0;
+	font-family: var(--fonte-mono);
+	font-size: 2rem;
+	font-weight: 600;
+}
+
+.telao-crise {
+	margin: 0.5rem 0;
+	padding: 1rem 1.5rem;
+	border-left: 8px solid var(--cor-erro);
+	background: var(--cor-erro-fundo);
+}
+
+.telao-crise .rotulo {
+	color: var(--cor-erro);
+	letter-spacing: 0.2em;
+}
+
+.telao-crise-titulo {
+	margin: 0.25rem 0;
+	font-family: var(--fonte-titulo);
+	font-size: 2.4rem;
+	font-weight: 600;
+}
+
+.telao-crise-prazo {
+	margin: 0;
+	font-family: var(--fonte-mono);
+	font-size: 4rem;
+	font-weight: 600;
+}
+
+.efeito {
+	align-items: end;
+}
