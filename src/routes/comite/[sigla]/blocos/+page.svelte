@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { t } from '#lib/i18n.svelte.ts';
 	import { goto, invalidate } from '$app/navigation';
 	import { nomeDoDocumento, STATUS_DOCUMENTO, TIPOS_DOCUMENTO } from '#lib/formatacao.ts';
@@ -68,7 +69,7 @@
 </script>
 
 <svelte:head>
-	<title>{t('Blocos')} · {data.comite.sigla} · UFRGSMUN</title>
+	<title>{tituloDaAba(t('Blocos'), data.comite.sigla)}</title>
 </svelte:head>
 
 <p class="rotulo">

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { t } from '#lib/i18n.svelte.ts';
 	import { esquecerConta } from '#lib/conta.ts';
 	import { onMount, untrack } from 'svelte';
@@ -92,7 +93,7 @@
 </script>
 
 <svelte:head>
-	<title>{t('Perfil · UFRGSMUN')}</title>
+	<title>{tituloDaAba(t('Perfil'))}</title>
 </svelte:head>
 
 <p class="rotulo">{t('Conta')}</p>
@@ -108,6 +109,9 @@
 					<Bandeira codigo={p.delegacao_bandeira} />
 					{[rotuloPapel(p.papel), p.delegacao_nome, p.comite_sigla, p.evento_nome].filter(Boolean).join(' · ')}
 				</span>
+				{#if p.delegacao_id && p.comite_sigla}
+					<a href={`/comite/${p.comite_sigla}/delegacao/${p.delegacao_id}`}>{t('Página da delegação')}</a>
+				{/if}
 			</li>
 		{/each}
 	</ul>

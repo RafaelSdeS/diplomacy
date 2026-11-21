@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { desenhar, FORMATOS, quebrar, SELO, type Formato } from './imagem-redes.ts';
+import { desenhar, FORMATOS, hashtags, quebrar, selo as seloDo, type Formato } from './imagem-redes.ts';
 
 // Um contexto 2D falso, que anota o que foi desenhado (cada letra mede 30 px).
 function contextoFalso() {
@@ -23,11 +23,15 @@ function contextoFalso() {
 describe('imagem para as redes', () => {
 	it.each(['post', 'story'] as Formato[])('%s: fundo no tamanho certo e o selo de simulação dentro da imagem', (formato) => {
 		const { ctx, textos, retangulos } = contextoFalso();
-		desenhar(ctx, formato, { veiculo: 'Al Jazeera', titulo: 'Brasil propõe trégua no Rio Aurora', linhaFina: 'Proposta divide o conselho' });
+		desenhar(ctx, formato, { veiculo: 'Al Jazeera', titulo: 'Brasil propõe trégua no Rio Aurora', linhaFina: 'Proposta divide o conselho', evento: 'UFRGSMUN' });
 		expect(retangulos[0]).toEqual({ w: FORMATOS[formato].largura, h: FORMATOS[formato].altura });
-		const selo = textos.find((t) => t.texto === SELO);
+		const selo = textos.find((t) => t.texto === seloDo('UFRGSMUN'));
 		expect(selo).toBeDefined();
 		expect(selo!.y).toBeLessThan(FORMATOS[formato].altura);
+	});
+
+	it('a hashtag sai do nome do evento', () => {
+		expect(hashtags('UFRGSMUN 2027')).toBe('#UFRGSMUN #PressUFRGSMUN #SimulaçãoDaONU');
 	});
 
 	it('post tem 1080 × 1080 e story 1080 × 1920', () => {

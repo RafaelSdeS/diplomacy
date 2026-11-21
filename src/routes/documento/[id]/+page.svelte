@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { locale, t } from '#lib/i18n.svelte.ts';
 	import { tick } from 'svelte';
 	import { invalidate } from '$app/navigation';
@@ -184,7 +185,7 @@
 </script>
 
 <svelte:head>
-	<title>{nomeDoDocumento(d)} · UFRGSMUN</title>
+	<title>{tituloDaAba(nomeDoDocumento(d))}</title>
 </svelte:head>
 
 <p class="rotulo">

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { invalidate } from '$app/navigation';
 	import { mensagemDeErro } from '#lib/sessao.ts';
 	import { supabase } from '#lib/supabase.ts';
@@ -18,7 +19,7 @@
 </script>
 
 <svelte:head>
-	<title>Certificados · Secretaria · UFRGSMUN</title>
+	<title>{tituloDaAba('Certificados', 'Secretaria')}</title>
 </svelte:head>
 
 <p class="rotulo">Secretaria</p>

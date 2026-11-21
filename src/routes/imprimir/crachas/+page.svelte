@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { APP, marca } from '#lib/titulo.svelte.ts';
+	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import qrcode from 'qrcode-generator';
 	import { rotuloPapel } from '#lib/papeis.ts';
 	import { mensagemDeErro } from '#lib/sessao.ts';
@@ -49,7 +51,7 @@
 </script>
 
 <svelte:head>
-	<title>Crachás · UFRGSMUN</title>
+	<title>{tituloDaAba('Crachás')}</title>
 </svelte:head>
 
 <div class="impressao">
@@ -60,7 +62,7 @@
 			{#each crachas as c (c.email)}
 				{@const papeis = papeisDe(c.email)}
 				<article class="cracha" aria-label={`Crachá de ${c.nome}`}>
-					<p class="rotulo">UFRGSMUN</p>
+					<p class="rotulo">{marca.evento ?? APP}</p>
 					<p class="cracha-nome">{c.nome}</p>
 					{#each papeis as p, i (i)}
 						<p class="com-bandeira">

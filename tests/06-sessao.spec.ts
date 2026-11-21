@@ -327,6 +327,8 @@ test.describe('telão em 1920 × 1080', () => {
 		await page.goto(TELAO);
 		await aoVivo(page);
 		await expect(page.getByRole('region', { name: 'Com a palavra' })).toContainText(outra);
+		// Depois de uma votação, a grade fica 30 s na tela (passo 23): a captura espera a fila voltar.
+		await expect(page.getByRole('complementary', { name: 'Próximos oradores' })).toBeVisible({ timeout: 45_000 });
 		// A presidência do rodízio depende de quantas vezes o fluxo já rodou: fica invisível.
 		await expect(page).toHaveScreenshot('telao.png', { mask: [page.locator('.cronometro')], stylePath: OCULTAR_RODIZIO });
 	});

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { t } from '#lib/i18n.svelte.ts';
 	import { goto, invalidate } from '$app/navigation';
 	import type { Database } from '#lib/database.types.ts';
@@ -8,6 +9,7 @@
 	import { supabase } from '#lib/supabase.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import Bandeira from '#lib/ui/Bandeira.svelte';
+	import NomeDelegacao from '#lib/ui/NomeDelegacao.svelte';
 	import Cronometro from '#lib/ui/Cronometro.svelte';
 	import GradeVotos from '#lib/ui/GradeVotos.svelte';
 	import {
@@ -122,7 +124,7 @@
 <svelte:window onkeydown={data.podePresidir && sessao ? atalho : undefined} />
 
 <svelte:head>
-	<title>{t('Presidência')} · {data.comite.sigla} · UFRGSMUN</title>
+	<title>{tituloDaAba(t('Presidência'), data.comite.sigla)}</title>
 </svelte:head>
 
 <p class="rotulo">{t('Comitê')} · {data.comite.sigla} <AoVivo comiteId={data.comite.id} bind:diferenca /></p>
@@ -263,9 +265,7 @@
 					<ol class="lista">
 						{#each lista as inscricao (inscricao.id)}
 							<li aria-current={inscricao.id === proximo?.id ? 'step' : undefined}>
-								<span class="com-bandeira"
-									><Bandeira codigo={inscricao.delegacao?.bandeira} /> {inscricao.delegacao?.nome}</span
-								>
+								<NomeDelegacao sigla={data.comite.sigla} delegacao={inscricao.delegacao} />
 								{#if inscricao.lado}<span class="selo">{inscricao.lado === 'a_favor' ? t('A favor') : t('Contra')}</span>{/if}
 								{#if inscricao.falou}<span class="selo selo--ok">{t('Falou')}</span>{/if}
 							</li>
@@ -284,7 +284,7 @@
 				<ol class="lista">
 					{#each fila as pedido (pedido.id)}
 						<li>
-							<span class="com-bandeira"><Bandeira codigo={pedido.delegacao?.bandeira} /> {pedido.delegacao?.nome}</span>
+							<NomeDelegacao sigla={data.comite.sigla} delegacao={pedido.delegacao} />
 							<button
 								class="botao botao--pequeno"
 								type="button"

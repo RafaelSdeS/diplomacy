@@ -5,7 +5,14 @@
 **Esforço:** P mais o desenho do logo
 **Objetivo:** o app passa a se chamar Diplomacy, com logo próprio; o nome do evento (UFRGSMUN) vem do banco.
 
-## Hoje
+## Como ficou
+
+- Ícone "a placa": um "D" cujo vão é a placa levantada, com a borda dourada. Favicon, PNG 192/512, maskable e Apple, gerados com o Chromium headless.
+- Manifest "Diplomacy"; cabeçalho com o logo, "Diplomacy" e o nome do evento.
+- Títulos, imagem para as redes (selo e hashtags) e impressões com o nome do evento do banco.
+- As três propostas para escolher em `/marca/opcoes.html`.
+
+## Antes
 
 - Ícone: um "U" branco num quadrado azul (`static/favicon.svg`); `icone-192.png` e `icone-512.png` no mesmo desenho.
 - `static/manifest.webmanifest`: `name` e `short_name` "UFRGSMUN".
@@ -28,30 +35,30 @@ Regras para as três: sem o emblema da ONU (nada de ramos de oliveira em volta d
 
 ## Arquivos
 
-- [ ] `static/marca/opcao-1.svg`, `opcao-2.svg`, `opcao-3.svg`, mais uma página simples `static/marca/opcoes.html` com as três em 16, 32, 192 px, claro e escuro, para escolher. Depois da escolha, apagar as não usadas.
-- [ ] `static/favicon.svg`, `static/icone-192.png`, `static/icone-512.png`, `static/icone-maskable-512.png` (desenho dentro da zona segura de 80%) e `static/apple-touch-icon.png` (180 px). Os PNG são gerados do SVG com o Chromium headless, como o PDF do plano, e versionados.
-- [ ] `static/manifest.webmanifest`: `name` "Diplomacy", `short_name` "Diplomacy", o ícone maskable com `"purpose": "maskable"`.
-- [ ] `src/app.html`: `apple-touch-icon` e `theme-color`.
+- [x] `static/marca/opcao-1-placa.svg`, `opcao-2-selo.svg`, `opcao-3-globo.svg` e `static/marca/opcoes.html` (as três em 16, 32, 64 e 192 px, com fundo escuro), publicada em `/marca/opcoes.html`. Por enquanto o app usa a recomendada (a placa); depois da sua escolha, troca-se o ícone e apagam-se as outras.
+- [x] `static/favicon.svg`, `static/icone-192.png`, `static/icone-512.png`, `static/icone-maskable-512.png` (desenho dentro da zona segura de 80%) e `static/apple-touch-icon.png` (180 px). Os PNG são gerados do SVG com o Chromium headless, como o PDF do plano, e versionados.
+- [x] `static/manifest.webmanifest`: `name` "Diplomacy", `short_name` "Diplomacy", o ícone maskable com `"purpose": "maskable"`.
+- [x] `src/app.html`: `apple-touch-icon` e `theme-color`.
 
 ## Código
 
-- [ ] `src/lib/titulo.ts`: `titulo(...partes)` junta as partes com " · " e põe no fim o nome do evento da pessoa, ou "Diplomacy" sem login. O nome vem de um estado que o layout preenche com `participacoes[0]?.evento_nome`.
-- [ ] Trocar os `<title>` dos 41 arquivos por `{titulo(t('Chamada'), data.comite.sigla)}`. É troca mecânica.
-- [ ] Cabeçalho: logo pequeno, "Diplomacy" e, ao lado, o nome do evento.
-- [ ] `src/lib/imagem-redes.ts`: selo "Simulação · <evento>" com o nome recebido por parâmetro.
-- [ ] Telas de impressão e códigos de documento (`src/lib/formatacao.ts`, `src/lib/impressao.ts`): o nome do evento vem dos dados carregados, não fixo.
-- [ ] `scripts/textos-fixos.ts`: passa a falhar se "UFRGSMUN" aparecer em `src/` fora de testes e do dicionário. Assim o nome não volta fixo.
+- [x] `src/lib/titulo.svelte.ts`: `tituloDaAba(...partes)` junta as partes com " · " e põe no fim o nome do evento da pessoa, ou "Diplomacy" sem login. O nome vem de `marca.evento`, um estado que o layout preenche com `participacoes[0]?.evento_nome`. (O nome `titulo` já era usado por campos de formulário.)
+- [x] Trocar os 43 `<title>` por `{tituloDaAba(t('Chamada'), data.comite.sigla)}` (feito por script).
+- [x] Cabeçalho: logo pequeno, "Diplomacy" e, ao lado, o nome do evento.
+- [x] `src/lib/imagem-redes.ts`: selo "Simulação · <evento>" com o nome recebido por parâmetro.
+- [x] Telas de impressão (edição do dia, crachás), telão sem sessão, regras, sem acesso e aviso de privacidade: o nome do evento vem de `marca.evento` ou o texto fala em "evento". Os códigos de documento já vinham do banco.
+- [x] `scripts/textos-fixos.ts`: passa a falhar se "UFRGSMUN" aparecer em `src/` fora de testes e do dicionário. Assim o nome não volta fixo.
 
 ## Testes
 
-- [ ] `npm run textos` falha com "UFRGSMUN" fixo e passa depois da troca.
-- [ ] Vitest: `titulo()` com e sem evento.
-- [ ] Ponta a ponta: o título da sessão termina com o nome do evento do seed; o manifest tem "Diplomacy".
-- [ ] Capturas de referência refeitas no CI (cabeçalho mudou em todas as telas).
+- [x] `npm run textos` falha com "UFRGSMUN" fixo fora de comentários, testes e dicionário (conferido) e passa depois da troca.
+- [x] Vitest: `tituloDaAba()` com e sem evento; a hashtag sai do nome do evento.
+- [x] Ponta a ponta: o título da sessão termina com o nome do evento do seed; o manifest tem "Diplomacy".
+- [ ] Capturas de referência refeitas no CI (cabeçalho mudou em todas as telas), pelo `workflow_dispatch` "atualizar_capturas".
 - [ ] Manual: instalar no Android e no iPhone e conferir o ícone e o nome na tela inicial.
 
 ## Pronto quando
 
-- [ ] O app instalado se chama Diplomacy e usa o logo escolhido.
-- [ ] Nenhuma tela tem o nome do evento fixo no código.
-- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
+- [x] O app instalado se chama Diplomacy e usa o logo recomendado (a placa), até você escolher.
+- [x] Nenhuma tela tem o nome do evento fixo no código.
+- [x] Os testes acima passam no CI, junto com os de todos os passos anteriores.

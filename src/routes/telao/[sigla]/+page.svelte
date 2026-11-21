@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { t } from '#lib/i18n.svelte.ts';
 	import { onMount } from 'svelte';
 	import { FORMAS } from '#lib/sessao.ts';
@@ -8,6 +9,7 @@
 	import GradeVotos from '#lib/ui/GradeVotos.svelte';
 	import { ETAPAS, FASES, listaAtiva, presidenciaEmVigor, textoResultado } from '#lib/votacao.ts';
 	import { TABELAS_SESSAO } from '#lib/tempo-real.ts';
+	import { APP, marca } from '#lib/titulo.svelte.ts';
 	import type { PageProps } from './$types';
 
 	// O telão roda no notebook do projetor, logado com a conta da mesa, sem botões:
@@ -80,7 +82,7 @@
 <svelte:window onclick={telaCheia} onkeydown={(e) => e.key.toLowerCase() === 'f' && telaCheia()} />
 
 <svelte:head>
-	<title>{t('Telão')} · {data.comite.sigla} · UFRGSMUN</title>
+	<title>{tituloDaAba(t('Telão'), data.comite.sigla)}</title>
 </svelte:head>
 
 <div class="telao">
@@ -116,7 +118,7 @@
 			<Bandeira codigo={data.estado.orador.bandeira} />
 			<p class="telao-nome">{data.estado.orador.nome}</p>
 		{:else}
-			<p class="telao-nome telao-nome--vazio">{sessao ? t('Aguardando orador') : 'UFRGSMUN'}</p>
+			<p class="telao-nome telao-nome--vazio">{sessao ? t('Aguardando orador') : (marca.evento ?? APP)}</p>
 		{/if}
 		{#if data.estado}
 			<Cronometro cronometro={data.estado} avisoSeg={data.regras.aviso_fala_seg} {diferenca} grande />

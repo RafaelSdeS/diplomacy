@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { t } from '#lib/i18n.svelte.ts';
 	import { rotuloPapel } from '#lib/papeis.ts';
 	import { mensagemDeErro } from '#lib/sessao.ts';
@@ -43,7 +44,7 @@
 </script>
 
 <svelte:head>
-	<title>{t('Pesquisa de satisfação · UFRGSMUN')}</title>
+	<title>{tituloDaAba(t('Pesquisa de satisfação'))}</title>
 </svelte:head>
 
 <p class="rotulo">{t('Pesquisa')}</p>

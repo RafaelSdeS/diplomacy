@@ -1,6 +1,6 @@
 {
-	"name": "UFRGSMUN",
-	"short_name": "UFRGSMUN",
+	"name": "Diplomacy",
+	"short_name": "Diplomacy",
 	"description": "Simulação das Nações Unidas: sessão, crise, documentos e press.",
 	"lang": "pt-BR",
 	"start_url": "/",
@@ -9,8 +9,9 @@
 	"background_color": "#ffffff",
 	"theme_color": "#1b365d",
 	"icons": [
-		{ "src": "/icone-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-		{ "src": "/icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" },
+		{ "src": "/icone-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+		{ "src": "/icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+		{ "src": "/icone-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
 		{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
 	]
 }

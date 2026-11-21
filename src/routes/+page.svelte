@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { t } from '#lib/i18n.svelte.ts';
 	import { formatarHora, formatarQuando, itensAtuais, proximoItem } from '#lib/cronograma.ts';
 	import { rotuloPapel } from '#lib/papeis.ts';
@@ -25,7 +26,7 @@
 </script>
 
 <svelte:head>
-	<title>{t('Agora · UFRGSMUN')}</title>
+	<title>{tituloDaAba(t('Agora'))}</title>
 </svelte:head>
 
 <p class="rotulo">{data.participacoes[0]?.evento_nome}</p>

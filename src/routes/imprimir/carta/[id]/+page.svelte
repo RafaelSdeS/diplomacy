@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { t } from '#lib/i18n.svelte.ts';
 	import BotaoImprimir from '#lib/ui/BotaoImprimir.svelte';
 	import type { PageProps } from './$types';
@@ -13,7 +14,7 @@
 </script>
 
 <svelte:head>
-	<title>{t('Carta')} · {m.titulo} · UFRGSMUN</title>
+	<title>{tituloDaAba(t('Carta'), m.titulo)}</title>
 </svelte:head>
 
 <div class="impressao">

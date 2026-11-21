@@ -72,7 +72,7 @@ sw.addEventListener('push', (evento) => {
 		// mensagem sem JSON: mostra só o nome do app
 	}
 	evento.waitUntil(
-		sw.registration.showNotification(dados.titulo ?? 'UFRGSMUN', {
+		sw.registration.showNotification(dados.titulo ?? 'Diplomacy', {
 			body: dados.corpo,
 			icon: '/icone-192.png',
 			data: { url: dados.url ?? '/' }

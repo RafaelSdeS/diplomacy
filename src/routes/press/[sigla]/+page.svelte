@@ -1,9 +1,11 @@
 <script lang="ts">
+	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { locale, t } from '#lib/i18n.svelte.ts';
 	import { invalidate } from '$app/navigation';
 	import { formatarQuando } from '#lib/cronograma.ts';
 	import { paragrafos } from '#lib/impressao.ts';
-	import { gerarImagem, HASHTAGS, type Formato } from '#lib/imagem-redes.ts';
+	import { gerarImagem, hashtags, type Formato } from '#lib/imagem-redes.ts';
+	import { APP, marca } from '#lib/titulo.svelte.ts';
 	import { TIPOS_NOTICIA } from '#lib/press.ts';
 	import { mensagemDeErro } from '#lib/sessao.ts';
 	import { supabase } from '#lib/supabase.ts';
@@ -42,8 +44,9 @@
 	let legenda = $state('');
 	async function compartilhar(formato: Formato) {
 		if (!noticia) return;
-		legenda = `${noticia.titulo} ${HASHTAGS}`;
-		const png = await gerarImagem(formato, { veiculo: data.veiculo.nome, titulo: noticia.titulo, linhaFina: noticia.linha_fina });
+		const evento = marca.evento ?? APP;
+		legenda = `${noticia.titulo} ${hashtags(evento)}`;
+		const png = await gerarImagem(formato, { veiculo: data.veiculo.nome, titulo: noticia.titulo, linhaFina: noticia.linha_fina, evento });
 		const arquivo = new File([png], `${data.veiculo.nome}-${formato}.png`.replace(/\s+/g, '-'), { type: 'image/png' });
 		if (navigator.canShare?.({ files: [arquivo] })) {
 			await navigator.share({ files: [arquivo], text: legenda }).catch(() => {});
@@ -61,7 +64,7 @@
 </script>
 
 <svelte:head>
-	<title>{data.veiculo.nome} · {t('Press')} · UFRGSMUN</title>
+	<title>{tituloDaAba(data.veiculo.nome, t('Press'))}</title>
 </svelte:head>
 
 <p class="rotulo">

@@ -1,11 +1,15 @@
+<script lang="ts">
+	import { tituloDaAba } from '#lib/titulo.svelte.ts';
+</script>
+
 <svelte:head>
-	<title>Aviso de privacidade · UFRGSMUN</title>
+	<title>{tituloDaAba('Aviso de privacidade')}</title>
 </svelte:head>
 
 <p class="rotulo">LGPD</p>
 <h1>Aviso de privacidade</h1>
 <p class="telegrama" role="note">
-	Rascunho. O texto final é combinado com a organização do UFRGSMUN, que é a controladora dos dados.
+	Rascunho. O texto final é combinado com a organização do evento, que é a controladora dos dados.
 </p>
 
 <section aria-labelledby="t-o-que">

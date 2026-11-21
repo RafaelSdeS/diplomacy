@@ -209,9 +209,20 @@ a {
 
 .marca {
 	display: inline-flex;
-	flex-direction: column;
+	align-items: center;
+	gap: 0.6rem;
 	color: inherit;
 	text-decoration: none;
+}
+
+.marca-logo {
+	flex: none;
+	border-radius: 6px;
+}
+
+.marca-texto {
+	display: inline-flex;
+	flex-direction: column;
 }
 
 .marca-sigla {

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { t } from '#lib/i18n.svelte.ts';
 	import { regrasLegiveis } from '#lib/regras.ts';
 	import type { PageProps } from './$types';
@@ -10,13 +11,13 @@
 </script>
 
 <svelte:head>
-	<title>{t('Regras')} · {data.comite.sigla} · UFRGSMUN</title>
+	<title>{tituloDaAba(t('Regras'), data.comite.sigla)}</title>
 </svelte:head>
 
 <p class="rotulo">{t('Comitê')} · {data.comite.sigla}</p>
 <h1>{t('Regras de procedimento')}</h1>
 <p class="suave">
-	{t('Do Guia de Regras do UFRGSMUN, com os ajustes deste comitê.')}
+	{t('Do guia de regras do evento, com os ajustes deste comitê.')}
 </p>
 
 {#each grupos as grupo (grupo)}

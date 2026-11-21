@@ -15,6 +15,7 @@
 	import { caixa } from '#lib/caixa.ts';
 	import { esquecerConta } from '#lib/conta.ts';
 	import { desativarPush } from '#lib/push.ts';
+	import { APP, marca } from '#lib/titulo.svelte.ts';
 	import { trilha } from '#lib/trilha.ts';
 	import Trilha from '#lib/ui/Trilha.svelte';
 	import { supabase, type Papel } from '#lib/supabase.ts';
@@ -57,6 +58,11 @@
 			.sort((a, b) => b.length - a.length)[0]
 	);
 	const elos = $derived(trilha(page.route.id, page.params, page.data));
+	// O nome do evento da pessoa, para os títulos e o cabeçalho (passo 27).
+	const nomeDoEvento = $derived(data.participacoes[0]?.evento_nome ?? null);
+	$effect.pre(() => {
+		marca.evento = nomeDoEvento;
+	});
 	const atual = (href: string) => (href !== marcado ? undefined : href === page.url.pathname ? 'page' : 'true');
 
 	// Avisos chegam na hora para quem está no app.
@@ -118,8 +124,11 @@
 	<div class="app" class:app--sem-menu={!comMenu}>
 		<header class="timbre">
 			<a class="marca" href="/">
-				<span class="marca-sigla">UFRGSMUN</span>
-				<span class="marca-nome">{t('Simulação das Nações Unidas')}</span>
+				<img class="marca-logo" src="/favicon.svg" alt="" width="32" height="32" />
+				<span class="marca-texto">
+					<span class="marca-sigla">{APP}</span>
+					<span class="marca-nome">{marca.evento ?? t('Simulação das Nações Unidas')}</span>
+				</span>
 			</a>
 			{#if data.usuario}
 				<div class="conta">

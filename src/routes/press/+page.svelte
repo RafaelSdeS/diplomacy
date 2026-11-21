@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { t } from '#lib/i18n.svelte.ts';
 	import { formatarQuando } from '#lib/cronograma.ts';
 	import { TIPOS_NOTICIA } from '#lib/press.ts';
@@ -10,7 +11,7 @@
 </script>
 
 <svelte:head>
-	<title>{t('Press · UFRGSMUN')}</title>
+	<title>{tituloDaAba(t('Press'))}</title>
 </svelte:head>
 
 <p class="rotulo">

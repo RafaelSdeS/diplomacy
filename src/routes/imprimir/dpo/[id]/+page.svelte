@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { t } from '#lib/i18n.svelte.ts';
 	import Bandeira from '#lib/ui/Bandeira.svelte';
 	import BotaoImprimir from '#lib/ui/BotaoImprimir.svelte';
@@ -9,7 +10,7 @@
 </script>
 
 <svelte:head>
-	<title>{t('DPO')} · {m.pais} · UFRGSMUN</title>
+	<title>{tituloDaAba(t('DPO'), m.pais)}</title>
 </svelte:head>
 
 <div class="impressao">

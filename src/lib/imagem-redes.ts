@@ -7,8 +7,14 @@ export const FORMATOS = {
 } as const;
 export type Formato = keyof typeof FORMATOS;
 
-export const SELO = 'Simulação · UFRGSMUN';
-export const HASHTAGS = '#UFRGSMUN #PressUFRGSMUN #SimulaçãoDaONU';
+// O nome do evento vem do banco (passo 27).
+export const selo = (evento: string) => `Simulação · ${evento}`;
+// ponytail: a hashtag usa a primeira palavra do nome do evento ("UFRGSMUN 2027" → #UFRGSMUN);
+// um campo próprio no evento, quando outro evento usar o app.
+export const hashtags = (evento: string) => {
+	const tag = evento.split(/\s+/)[0].replace(/[^\p{L}\p{N}]/gu, '');
+	return `#${tag} #Press${tag} #SimulaçãoDaONU`;
+};
 
 type Contexto = Pick<
 	CanvasRenderingContext2D,
@@ -34,7 +40,7 @@ export function quebrar(ctx: Pick<Contexto, 'measureText'>, texto: string, largu
 export function desenhar(
 	ctx: Contexto,
 	formato: Formato,
-	materia: { veiculo: string; titulo: string; linhaFina?: string | null }
+	materia: { veiculo: string; titulo: string; linhaFina?: string | null; evento: string }
 ) {
 	const { largura, altura } = FORMATOS[formato];
 	const margem = 80;
@@ -67,7 +73,7 @@ export function desenhar(
 	ctx.fillRect(margem, altura - margem - 70, largura - 2 * margem, 4);
 	ctx.fillStyle = '#ffffff';
 	ctx.font = '600 36px system-ui, sans-serif';
-	ctx.fillText(SELO, margem, altura - margem - 40);
+	ctx.fillText(selo(materia.evento), margem, altura - margem - 40);
 }
 
 /** Gera o PNG no navegador. */

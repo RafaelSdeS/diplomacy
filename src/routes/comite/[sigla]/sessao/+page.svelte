@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { t } from '#lib/i18n.svelte.ts';
 	import Hand from '@lucide/svelte/icons/hand';
 	import { invalidate } from '$app/navigation';
@@ -14,6 +15,7 @@
 	import { supabase } from '#lib/supabase.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import Bandeira from '#lib/ui/Bandeira.svelte';
+	import NomeDelegacao from '#lib/ui/NomeDelegacao.svelte';
 	import Cronometro from '#lib/ui/Cronometro.svelte';
 	import ListaVotos from '#lib/ui/ListaVotos.svelte';
 	import { assinaturasDesconfianca, escolhasPermitidas, ESCOLHAS, ETAPAS, FASES, listaAtiva, presidenciaEmVigor, textoResultado, type Escolha } from '#lib/votacao.ts';
@@ -94,7 +96,7 @@
 </script>
 
 <svelte:head>
-	<title>{t('Sessão')} · {data.comite.sigla} · UFRGSMUN</title>
+	<title>{tituloDaAba(t('Sessão'), data.comite.sigla)}</title>
 </svelte:head>
 
 <p class="rotulo">{t('Comitê')} · {data.comite.sigla} <AoVivo comiteId={data.comite.id} bind:diferenca /></p>
@@ -166,7 +168,7 @@
 				{#if data.votacao.aberta && data.votacao.nominal}<p><strong>{t('Votação nominal:')}</strong> {t('a mesa chama as delegações em ordem alfabética.')}</p>{/if}
 				{#if !data.votacao.aberta}
 					<p>{textoResultado(data.votacao)}</p>
-					<ListaVotos delegacoes={data.delegacoes} votos={data.votacao.votos} tipo={data.votacao.tipo} {presentes} />
+					<ListaVotos sigla={data.comite.sigla} delegacoes={data.delegacoes} votos={data.votacao.votos} tipo={data.votacao.tipo} {presentes} />
 				{:else if meuVoto}
 					<p>{t('Voto da sua delegação:')} <strong>{ESCOLHAS[meuVoto]}</strong></p>
 				{:else if posso.length}
@@ -203,7 +205,7 @@
 				<ol class="lista">
 					{#each lista as inscricao (inscricao.id)}
 						<li>
-							<span class="com-bandeira"><Bandeira codigo={inscricao.delegacao?.bandeira} /> {inscricao.delegacao?.nome}</span>
+							<NomeDelegacao sigla={data.comite.sigla} delegacao={inscricao.delegacao} />
 							{#if inscricao.lado}<span class="selo">{inscricao.lado === 'a_favor' ? t('A favor') : t('Contra')}</span>{/if}
 							{#if inscricao.falou}<span class="selo selo--ok">{t('Falou')}</span>{/if}
 						</li>
@@ -248,7 +250,7 @@
 				<h2 id="c-fila">{t('Pedidos de fala')}</h2>
 				<ol class="lista">
 					{#each fila as pedido (pedido.id)}
-						<li><span class="com-bandeira"><Bandeira codigo={pedido.delegacao?.bandeira} /> {pedido.delegacao?.nome}</span></li>
+						<li><NomeDelegacao sigla={data.comite.sigla} delegacao={pedido.delegacao} /></li>
 					{:else}
 						<li class="suave">{t('Nenhuma placa levantada.')}</li>
 					{/each}
@@ -267,7 +269,7 @@
 						<span class="selo {v.aprovada ? 'selo--ok' : 'selo--erro'}">{v.aprovada ? t('Aprovada') : t('Rejeitada')}</span>
 					</summary>
 					<p>{textoResultado(v)}</p>
-					<ListaVotos delegacoes={data.delegacoes} votos={v.votos} tipo={v.tipo} {presentes} />
+					<ListaVotos sigla={data.comite.sigla} delegacoes={data.delegacoes} votos={v.votos} tipo={v.tipo} {presentes} />
 				</details>
 			{/each}
 		</section>

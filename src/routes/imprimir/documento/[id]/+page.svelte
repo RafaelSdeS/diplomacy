@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { t } from '#lib/i18n.svelte.ts';
 	import { nomeDoDocumento } from '#lib/formatacao.ts';
 	import BotaoImprimir from '#lib/ui/BotaoImprimir.svelte';
@@ -9,7 +10,7 @@
 </script>
 
 <svelte:head>
-	<title>{nomeDoDocumento(data.documento, data.idioma)} · UFRGSMUN</title>
+	<title>{tituloDaAba(nomeDoDocumento(data.documento, data.idioma))}</title>
 </svelte:head>
 
 <div class="impressao">

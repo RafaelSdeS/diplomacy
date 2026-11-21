@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { onDestroy } from 'svelte';
 	import { invalidate } from '$app/navigation';
 	import { semAcentos } from '#lib/palavroes.ts';
@@ -84,7 +85,7 @@
 </script>
 
 <svelte:head>
-	<title>Check-in · Secretaria · UFRGSMUN</title>
+	<title>{tituloDaAba('Check-in', 'Secretaria')}</title>
 </svelte:head>
 
 <p class="rotulo">Secretaria</p>

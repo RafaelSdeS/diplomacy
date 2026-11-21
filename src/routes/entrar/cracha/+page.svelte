@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { t } from '#lib/i18n.svelte.ts';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
@@ -22,7 +23,7 @@
 </script>
 
 <svelte:head>
-	<title>{t('Entrar pelo crachá · UFRGSMUN')}</title>
+	<title>{tituloDaAba(t('Entrar pelo crachá'))}</title>
 </svelte:head>
 
 <p class="rotulo">{t('Acesso')}</p>

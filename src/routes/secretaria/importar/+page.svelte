@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { invalidateAll } from '$app/navigation';
 	import { adivinharColunas, CAMPOS, lerCsv, montarConvites, type Campo, type Mapa } from '#lib/importar.ts';
 	import { mensagemDeErro } from '#lib/sessao.ts';
@@ -58,7 +59,7 @@
 </script>
 
 <svelte:head>
-	<title>Importar inscrições · Secretaria · UFRGSMUN</title>
+	<title>{tituloDaAba('Importar inscrições', 'Secretaria')}</title>
 </svelte:head>
 
 <p class="rotulo">Secretaria</p>

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import Check from '@lucide/svelte/icons/check';
 	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
 	import X from '@lucide/svelte/icons/x';
@@ -18,7 +19,7 @@
 </script>
 
 <svelte:head>
-	<title>Estilo · UFRGSMUN</title>
+	<title>{tituloDaAba('Estilo')}</title>
 	<meta name="robots" content="noindex" />
 </svelte:head>
 
@@ -40,7 +41,7 @@
 	<p class="rotulo">Rótulo em versalete</p>
 	<h3>Título de seção com serifa</h3>
 	<p>Texto da interface na fonte do sistema. A palavra está com a delegação da França.</p>
-	<p><span class="codigo-doc">UFRGSMUN/CSNU/RES/3</span></p>
+	<p><span class="codigo-doc">EVENTO/CSNU/RES/3</span></p>
 </section>
 
 <section aria-labelledby="t-botoes">

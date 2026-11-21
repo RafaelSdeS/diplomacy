@@ -13,8 +13,8 @@ const FORA = [
 	'src/routes/imprimir/arquivo/',
 	'src/routes/verificar/'
 ];
-// Não se traduzem: a marca, os nomes dos idiomas e teclas.
-const LIVRES = new Set(['UFRGSMUN', 'Português', 'English', 'Enter', 'Espaço', 'America/Sao_Paulo']);
+// Não se traduzem: a marca do app, os nomes dos idiomas e teclas.
+const LIVRES = new Set(['Diplomacy', 'Português', 'English', 'Enter', 'Espaço', 'America/Sao_Paulo']);
 
 function svelte(pasta: string): string[] {
 	return readdirSync(pasta, { withFileTypes: true }).flatMap((e) =>
@@ -72,6 +72,22 @@ for (const arquivo of [...svelte('src/routes'), ...svelte('src/lib/ui')]) {
 		for (const m of expr.matchAll(/(?<![\w(]|t\(\s*)'([A-ZÀ-Ú][^'\n]*[a-zà-ú][^'\n]*)'/g))
 			if (!LIVRES.has(m[1])) problemas.push(`${arquivo}:${linha}: '${m[1]}'`);
 }
+// Passo 27: o nome do evento vem do banco; nada de "UFRGSMUN" fixo no código (comentários podem citar).
+function arquivos(pasta: string): string[] {
+	return readdirSync(pasta, { withFileTypes: true }).flatMap((e) =>
+		e.isDirectory() ? arquivos(join(pasta, e.name)) : /\.(svelte|ts)$/.test(e.name) ? [join(pasta, e.name)] : []
+	);
+}
+for (const arquivo of arquivos('src')) {
+	if (/\.test\.ts$|i18n-en\.ts$|database\.types\.ts$/.test(arquivo)) continue;
+	const semComentarios = readFileSync(arquivo, 'utf8').replace(/<!--[\s\S]*?-->|\/\*[\s\S]*?\*\/|\/\/[^\n]*/g, (m) =>
+		m.replace(/[^\n]/g, ' ')
+	);
+	semComentarios.split('\n').forEach((l, i) => {
+		if (l.includes('UFRGSMUN')) problemas.push(`${arquivo}:${i + 1}: nome do evento fixo (use tituloDaAba() ou marca.evento)`);
+	});
+}
+
 if (problemas.length) {
 	console.error(`Textos fixos fora de t() nas telas de comitê (${problemas.length}):\n${problemas.join('\n')}`);
 	process.exit(1);

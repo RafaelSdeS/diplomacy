@@ -1,11 +1,12 @@
 <script lang="ts">
+	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 </script>
 
 <svelte:head>
-	<title>Verificar certificado · UFRGSMUN</title>
+	<title>{tituloDaAba('Verificar certificado')}</title>
 </svelte:head>
 
 <p class="rotulo">Certificado · {data.codigo.toUpperCase()}</p>
