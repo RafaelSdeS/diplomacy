@@ -6,6 +6,7 @@
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import Bandeira from '#lib/ui/Bandeira.svelte';
 	import Cronometro from '#lib/ui/Cronometro.svelte';
+	import { relogioDebate, temDebate } from '#lib/cronometro.ts';
 	import GradeVotos from '#lib/ui/GradeVotos.svelte';
 	import { ETAPAS, FASES, listaAtiva, presidenciaEmVigor, textoResultado } from '#lib/votacao.ts';
 	import { TABELAS_SESSAO } from '#lib/tempo-real.ts';
@@ -99,6 +100,12 @@
 				{/if}
 			</h1>
 			{#if topico}<p class="telao-topico">{t('Tópico em debate')}: {topico}</p>{/if}
+			{#if data.estado && temDebate(data.estado)}
+				<div class="telao-debate">
+					<span class="rotulo">{FORMAS[data.estado.forma]} · {t('tempo do debate')}</span>
+					<Cronometro cronometro={relogioDebate(data.estado)} avisoSeg={60} {diferenca} />
+				</div>
+			{/if}
 		</div>
 		<div class="telao-presidencia">
 			{#if sessao}

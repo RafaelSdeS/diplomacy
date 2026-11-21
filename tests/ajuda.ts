@@ -62,3 +62,35 @@ export async function adotarAgenda(contaMesa: string, sigla: string, topico: num
 	const { error } = await mesa.rpc('adotar_proposta', { p_proposta: proposta.data });
 	if (error) throw error;
 }
+
+/**
+ * Deixa o comitê com sessão aberta, todas as delegações presentes e na fase de debate
+ * (passa pela plenária de abertura pela API, se preciso). Devolve a mesa e o comitê.
+ */
+export async function comiteEmDebate(contaMesa: string, sigla: string, contaDelegado: string) {
+	const ok = <T>(r: { data: T; error: { message: string } | null }) => {
+		if (r.error) throw new Error(r.error.message);
+		return r.data;
+	};
+	const mesa = await clienteComo(contaMesa);
+	const comite = ok(await mesa.from('comite').select('id').eq('sigla', sigla).single()).id;
+	const estado = () => mesa.from('estado_sessao').select('sessao_id, fase, etapa_plenaria').eq('comite_id', comite).maybeSingle();
+	if (!ok(await estado())?.sessao_id) ok(await mesa.rpc('abrir_sessao', { p_comite: comite }));
+	ok(await mesa.rpc('marcar_todas_presentes', { p_comite: comite }));
+	const agora = ok(await estado())!;
+	if (agora.fase === 'plenaria') {
+		if (agora.etapa_plenaria === 'briefing') ok(await mesa.rpc('avancar_plenaria', { p_comite: comite }));
+		if (agora.etapa_plenaria !== 'topico') ok(await mesa.rpc('avancar_plenaria', { p_comite: comite }));
+		const delegado = await clienteComo(contaDelegado);
+		ok(await delegado.rpc('enviar_ponto', { p_comite: comite, p_tipo: 'topico_no_topo', p_topico: 1 }));
+		const sessao = ok(await estado())!.sessao_id!;
+		const ponto = ok(
+			await mesa.from('ponto_mocao').select('id').eq('sessao_id', sessao).eq('tipo', 'topico_no_topo').eq('status', 'aberto').limit(1).single()
+		).id;
+		const votacao = ok(await mesa.rpc('abrir_votacao', { p_ponto: ponto }));
+		const presentes = ok(await mesa.from('presenca').select('delegacao_id').eq('sessao_id', sessao));
+		for (const p of presentes) ok(await mesa.rpc('registrar_voto', { p_votacao: votacao, p_delegacao: p.delegacao_id, p_escolha: 'a_favor' }));
+		ok(await mesa.rpc('encerrar_votacao', { p_votacao: votacao }));
+	}
+	return { mesa, comite };
+}

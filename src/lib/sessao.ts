@@ -25,6 +25,7 @@ export async function carregarSessao(comiteId: string) {
 			.select(
 				`forma, fase, etapa_plenaria, topico_atual, ordem_topicos, mesa_assumiu, tempo_fala_seg,
 				cronometro_inicio, cronometro_duracao_seg, cronometro_pausado_restante_seg,
+				debate_inicio, debate_duracao_seg, debate_pausado_restante_seg, debate_total_seg,
 				orador:delegacao(id, nome, bandeira),
 				sessao(id, numero, informal_min_usados,
 					presidencia:delegacao!sessao_presidencia_delegacao_id_comite_id_fkey(id, nome, bandeira),

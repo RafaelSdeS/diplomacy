@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { diferencaRelogio, fase, formatarTempo, restanteSeg, type Cronometro } from './cronometro.ts';
+import { diferencaRelogio, fase, formatarTempo, relogioDebate, restanteSeg, temDebate, type Cronometro } from './cronometro.ts';
 
 const INICIO = '2026-11-10T13:00:00.000Z';
 const t = (seg: number) => Date.parse(INICIO) + seg * 1000;
@@ -71,4 +71,24 @@ it('formatarTempo', () => {
 	expect(formatarTempo(90)).toBe('1:30');
 	expect(formatarTempo(9)).toBe('0:09');
 	expect(formatarTempo(600)).toBe('10:00');
+});
+
+describe('relógio do debate (passo 28)', () => {
+	const estado = {
+		cronometro_inicio: INICIO,
+		cronometro_duracao_seg: 90,
+		cronometro_pausado_restante_seg: null,
+		debate_inicio: '2026-11-10T12:50:00.000Z',
+		debate_duracao_seg: 20 * 60,
+		debate_pausado_restante_seg: null
+	};
+	it('conta os minutos do debate sem depender da fala', () => {
+		expect(restanteSeg(relogioDebate(estado), t(0))).toBe(20 * 60 - 600);
+		expect(restanteSeg(estado, t(0))).toBe(90);
+		expect(temDebate(estado)).toBe(true);
+	});
+	it('pausado, mostra o que restava; sem minutos, não há relógio', () => {
+		expect(restanteSeg(relogioDebate({ ...estado, debate_inicio: null, debate_pausado_restante_seg: 300 }), t(0))).toBe(300);
+		expect(temDebate({ debate_inicio: null, debate_duracao_seg: null, debate_pausado_restante_seg: null })).toBe(false);
+	});
 });

@@ -17,6 +17,7 @@
 	import Bandeira from '#lib/ui/Bandeira.svelte';
 	import NomeDelegacao from '#lib/ui/NomeDelegacao.svelte';
 	import Cronometro from '#lib/ui/Cronometro.svelte';
+	import { relogioDebate, temDebate } from '#lib/cronometro.ts';
 	import ListaVotos from '#lib/ui/ListaVotos.svelte';
 	import { assinaturasDesconfianca, escolhasPermitidas, ESCOLHAS, ETAPAS, FASES, listaAtiva, presidenciaEmVigor, textoResultado, type Escolha } from '#lib/votacao.ts';
 	import type { PageProps } from './$types';
@@ -194,6 +195,10 @@
 				<p class="suave">{t('Ninguém com a palavra.')}</p>
 			{/if}
 			<Cronometro cronometro={data.estado} avisoSeg={data.regras.aviso_fala_seg} {diferenca} />
+			{#if temDebate(data.estado)}
+				<p class="rotulo">{FORMAS[data.estado.forma]} · {t('tempo do debate')}</p>
+				<Cronometro cronometro={relogioDebate(data.estado)} avisoSeg={60} {diferenca} />
+			{/if}
 		</article>
 
 		{#if lista.length}

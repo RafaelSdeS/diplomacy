@@ -1947,3 +1947,26 @@ kbd {
 .nome-delegacao {
 	color: inherit;
 }
+
+/* Dois cronômetros (passo 28): o tempo de fala com valores rápidos e o relógio do debate. */
+.tempo-fala {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: end;
+	gap: 0.5rem;
+	margin: 0.75rem 0;
+}
+
+.relogio-debate,
+.telao-debate {
+	margin-top: 0.75rem;
+	padding-top: 0.75rem;
+	border-top: var(--linha);
+}
+
+.telao-debate {
+	display: flex;
+	align-items: baseline;
+	gap: 1rem;
+	padding-top: 0.5rem;
+}

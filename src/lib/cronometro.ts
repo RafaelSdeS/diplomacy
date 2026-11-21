@@ -10,6 +10,20 @@ export type Cronometro = {
 
 export type Fase = 'parado' | 'correndo' | 'pausado' | 'aviso' | 'esgotado';
 
+/** O relógio do debate (passo 28), no mesmo formato do da fala. */
+export type EstadoDoDebate = {
+	debate_inicio: string | null;
+	debate_duracao_seg: number | null;
+	debate_pausado_restante_seg: number | null;
+};
+export const relogioDebate = (e: EstadoDoDebate): Cronometro => ({
+	cronometro_inicio: e.debate_inicio,
+	cronometro_duracao_seg: e.debate_duracao_seg,
+	cronometro_pausado_restante_seg: e.debate_pausado_restante_seg
+});
+/** Há relógio de debate (correndo ou pausado)? */
+export const temDebate = (e: EstadoDoDebate) => e.debate_inicio !== null || e.debate_pausado_restante_seg !== null;
+
 /** Segundos que faltam, arredondados para cima; null sem cronômetro. */
 export function restanteSeg(c: Cronometro, agoraMs: number): number | null {
 	if (c.cronometro_pausado_restante_seg !== null) return c.cronometro_pausado_restante_seg;

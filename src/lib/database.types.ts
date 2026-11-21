@@ -861,14 +861,14 @@ isOneToOne: false
                   ]
                 },"estado_sessao": {
                   Row: {
-                    "atualizado_em": string,"comite_id": string,"cronometro_duracao_seg": number | null,"cronometro_inicio": string | null,"cronometro_pausado_restante_seg": number | null,"etapa_plenaria": string,"fase": Database["public"]['Enums']["fase_comite"],"forma": Database["public"]['Enums']["forma_debate"],"mesa_assumiu": boolean,"orador_delegacao_id": string | null,"ordem_topicos": (number)[] | null,"sessao_id": string | null,"tempo_fala_seg": number,"topico_atual": number | null
+                    "atualizado_em": string,"comite_id": string,"cronometro_duracao_seg": number | null,"cronometro_inicio": string | null,"cronometro_pausado_restante_seg": number | null,"debate_duracao_seg": number | null,"debate_inicio": string | null,"debate_pausado_restante_seg": number | null,"debate_total_seg": number | null,"etapa_plenaria": string,"fase": Database["public"]['Enums']["fase_comite"],"forma": Database["public"]['Enums']["forma_debate"],"mesa_assumiu": boolean,"orador_delegacao_id": string | null,"ordem_topicos": (number)[] | null,"sessao_id": string | null,"tempo_fala_seg": number,"topico_atual": number | null,"debate_restante_seg": number | null
                   }
-                  ComputedFields: never
+                  ComputedFields: "debate_restante_seg"
                   Insert: {
-                    "atualizado_em"?: string,"comite_id": string,"cronometro_duracao_seg"?: number | null,"cronometro_inicio"?: string | null,"cronometro_pausado_restante_seg"?: number | null,"etapa_plenaria"?: string,"fase"?: Database["public"]['Enums']["fase_comite"],"forma"?: Database["public"]['Enums']["forma_debate"],"mesa_assumiu"?: boolean,"orador_delegacao_id"?: string | null,"ordem_topicos"?: (number)[] | null,"sessao_id"?: string | null,"tempo_fala_seg"?: number,"topico_atual"?: number | null
+                    "atualizado_em"?: string,"comite_id": string,"cronometro_duracao_seg"?: number | null,"cronometro_inicio"?: string | null,"cronometro_pausado_restante_seg"?: number | null,"debate_duracao_seg"?: number | null,"debate_inicio"?: string | null,"debate_pausado_restante_seg"?: number | null,"debate_total_seg"?: number | null,"etapa_plenaria"?: string,"fase"?: Database["public"]['Enums']["fase_comite"],"forma"?: Database["public"]['Enums']["forma_debate"],"mesa_assumiu"?: boolean,"orador_delegacao_id"?: string | null,"ordem_topicos"?: (number)[] | null,"sessao_id"?: string | null,"tempo_fala_seg"?: number,"topico_atual"?: number | null
                   }
                   Update: {
-                    "atualizado_em"?: string,"comite_id"?: string,"cronometro_duracao_seg"?: number | null,"cronometro_inicio"?: string | null,"cronometro_pausado_restante_seg"?: number | null,"etapa_plenaria"?: string,"fase"?: Database["public"]['Enums']["fase_comite"],"forma"?: Database["public"]['Enums']["forma_debate"],"mesa_assumiu"?: boolean,"orador_delegacao_id"?: string | null,"ordem_topicos"?: (number)[] | null,"sessao_id"?: string | null,"tempo_fala_seg"?: number,"topico_atual"?: number | null
+                    "atualizado_em"?: string,"comite_id"?: string,"cronometro_duracao_seg"?: number | null,"cronometro_inicio"?: string | null,"cronometro_pausado_restante_seg"?: number | null,"debate_duracao_seg"?: number | null,"debate_inicio"?: string | null,"debate_pausado_restante_seg"?: number | null,"debate_total_seg"?: number | null,"etapa_plenaria"?: string,"fase"?: Database["public"]['Enums']["fase_comite"],"forma"?: Database["public"]['Enums']["forma_debate"],"mesa_assumiu"?: boolean,"orador_delegacao_id"?: string | null,"ordem_topicos"?: (number)[] | null,"sessao_id"?: string | null,"tempo_fala_seg"?: number,"topico_atual"?: number | null
                   }
                   Relationships: [
                     {
@@ -1664,6 +1664,9 @@ isOneToOne: false
 "aplicar_forma":
 { Args: { "p_comite": string,"p_forma": Database["public"]['Enums']["forma_debate"],"p_minutos": number }; Returns: undefined
                            },
+"aplicar_tempo_fala":
+{ Args: { "p_comite": string,"p_seg": number }; Returns: undefined
+                           },
 "apos_resolucao":
 { Args: { "p_comite": string }; Returns: undefined
                            },
@@ -1738,6 +1741,9 @@ isOneToOne: false
                            },
 "dar_palavra":
 { Args: { "p_comite": string,"p_delegacao": string,"p_seg"?: number }; Returns: undefined
+                           },
+"debate_restante_seg":
+{ Args: { "e": Omit<Database["public"]['Tables']["estado_sessao"]['Row'], Database["public"]['Tables']["estado_sessao"]['ComputedFields']> }; Returns: number
                            },
 "definir_bilhetes":
 { Args: { "p_bloqueados": boolean,"p_comite": string,"p_mesa_le": boolean }; Returns: undefined
@@ -1984,7 +1990,7 @@ isOneToOne: false
 { Args: { "p_delegacao": string,"p_votacao": string }; Returns: undefined
                            },
 "pausar":
-{ Args: { "p_comite": string }; Returns: undefined
+{ Args: { "p_comite": string,"p_relogio"?: string }; Returns: undefined
                            },
 "pedir_entrevista":
 { Args: { "p_delegacao": string,"p_tema": string }; Returns: string
@@ -2105,7 +2111,7 @@ isOneToOne: false
 { Args: { "p_proposta": string }; Returns: undefined
                            },
 "retomar":
-{ Args: { "p_comite": string }; Returns: undefined
+{ Args: { "p_comite": string,"p_relogio"?: string }; Returns: undefined
                            },
 "revogar_credenciais":
 { Args: { "p_email": string,"p_evento": string }; Returns: undefined
@@ -2129,7 +2135,7 @@ isOneToOne: false
 { Args: { "p_comite": string }; Returns: string
                            },
 "somar_segundos":
-{ Args: { "p_comite": string,"p_seg": number }; Returns: undefined
+{ Args: { "p_comite": string,"p_relogio"?: string,"p_seg": number }; Returns: undefined
                            },
 "sortear_presidencia":
 { Args: { "p_comite": string }; Returns: undefined

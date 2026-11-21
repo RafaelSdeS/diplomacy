@@ -19,3 +19,7 @@ playwright-report/
 blob-report/
 
 .DS_Store
+
+# Ferramentas locais
+.vitest/
+.capturas-novas/

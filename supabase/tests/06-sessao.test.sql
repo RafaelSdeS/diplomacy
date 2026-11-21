@@ -149,6 +149,10 @@ select lives_ok(
 select lives_ok(
 	$$select public.mudar_forma('00000000-0000-0000-0000-0000000000c1', 'informal_informal', 30)$$,
 	'30 minutos de informal-informal');
+-- Os minutos contam quando o informal termina (passo 28): os 30 passam inteiros.
+reset role;
+update public.estado_sessao set debate_inicio = debate_inicio - interval '30 minutes';
+select pg_temp.entrar('00000000-0000-0000-0000-0000000000a3');
 select throws_ok(
 	$$select public.mudar_forma('00000000-0000-0000-0000-0000000000c1', 'informal_informal', 20)$$,
 	'23514', null, 'mais 20 passaria de 45 minutos');

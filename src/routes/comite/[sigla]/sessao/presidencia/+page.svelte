@@ -11,6 +11,7 @@
 	import Bandeira from '#lib/ui/Bandeira.svelte';
 	import NomeDelegacao from '#lib/ui/NomeDelegacao.svelte';
 	import Cronometro from '#lib/ui/Cronometro.svelte';
+	import { relogioDebate, restanteSeg, temDebate } from '#lib/cronometro.ts';
 	import GradeVotos from '#lib/ui/GradeVotos.svelte';
 	import {
 		escolhasPermitidas,
@@ -45,6 +46,19 @@
 	const lista = $derived(listaAtiva(data.lista, emDiscussao?.id, data.fase));
 	const proximo = $derived(proximoDaLista(lista));
 	const pausado = $derived(data.estado?.cronometro_pausado_restante_seg !== null);
+	// O relógio do debate (passo 28): minutos da forma de debate, separados da fala.
+	let agora = $state(Date.now());
+	$effect(() => {
+		const relogio = setInterval(() => (agora = Date.now()), 1000);
+		return () => clearInterval(relogio);
+	});
+	const comDebate = $derived(!!data.estado && temDebate(data.estado));
+	const debatePausado = $derived(data.estado?.debate_pausado_restante_seg != null);
+	const debateEsgotado = $derived(
+		!!data.estado && comDebate && data.estado.forma === 'informal_informal'
+			&& restanteSeg(relogioDebate(data.estado), agora + diferenca) === 0
+	);
+	const aplicarTempo = (seg: number) => rpc('aplicar_tempo_fala', { p_comite: comite, p_seg: seg });
 	const correndo = $derived(!!data.estado?.cronometro_inicio && !pausado);
 	const votacao = $derived(data.votacao);
 	// Quem pode votar nesta votação: presentes, menos suspensas (e observadoras, na substantiva).
@@ -223,6 +237,15 @@
 		{/if}
 	{/if}
 
+	{#if debateEsgotado}
+		<section class="cartao cartao--destaque" aria-labelledby="t-esgotado">
+			<h2 id="t-esgotado">{t('Tempo do informal-informal esgotado')}</h2>
+			<button class="botao" type="button" onclick={() => rpc('mudar_forma', { p_comite: comite, p_forma: 'formal_informal' })}
+				>{t('Voltar ao formal-informal')}</button
+			>
+		</section>
+	{/if}
+
 	{#if ehMesa && data.fase === 'plenaria'}
 		<section class="cartao cartao--destaque" aria-labelledby="t-plenaria">
 			<h2 id="t-plenaria">{t('Plenária de abertura')}</h2>
@@ -345,10 +368,52 @@
 					>{t('Encerrar fala')}</button
 				>
 			</div>
-			<label class="campo campo--curto">
-				{t('Tempo de fala (segundos)')}
-				<input type="number" min="1" max="3600" bind:value={tempoFala} />
-			</label>
+			<div class="tempo-fala">
+				<label class="campo campo--curto">
+					{t('Tempo de fala (segundos)')}
+					<input type="number" min="1" max="3600" bind:value={tempoFala} />
+				</label>
+				<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => aplicarTempo(tempoFala)}
+					>{t('Aplicar')}</button
+				>
+				<span class="acoes" role="group" aria-label={t('Tempos rápidos')}>
+					{#each [30, 60, 90, 120] as seg (seg)}
+						<button
+							class="botao botao--secundario botao--pequeno"
+							type="button"
+							onclick={() => {
+								tempoFala = seg;
+								void aplicarTempo(seg);
+							}}>{seg} s</button
+						>
+					{/each}
+				</span>
+			</div>
+
+			{#if comDebate}
+				<div class="relogio-debate">
+					<p class="rotulo">{FORMAS[data.estado.forma]} · {t('tempo do debate')}</p>
+					<Cronometro cronometro={relogioDebate(data.estado)} avisoSeg={60} {diferenca} />
+					<div class="acoes">
+						<button
+							class="botao botao--secundario botao--pequeno"
+							type="button"
+							onclick={() => rpc(debatePausado ? 'retomar' : 'pausar', { p_comite: comite, p_relogio: 'debate' })}
+							>{debatePausado ? t('Retomar o debate') : t('Pausar o debate')}</button
+						>
+						<button
+							class="botao botao--secundario botao--pequeno"
+							type="button"
+							onclick={() => rpc('somar_segundos', { p_comite: comite, p_seg: 60, p_relogio: 'debate' })}>{t('+1 min')}</button
+						>
+						<button
+							class="botao botao--secundario botao--pequeno"
+							type="button"
+							onclick={() => rpc('somar_segundos', { p_comite: comite, p_seg: -60, p_relogio: 'debate' })}>{t('−1 min')}</button
+						>
+					</div>
+				</div>
+			{/if}
 
 			{#if data.fase !== 'plenaria'}
 				<form class="formulario" onsubmit={mudarForma} aria-label={t('Forma de debate')}>
@@ -366,6 +431,12 @@
 						<input type="number" min="1" max="120" bind:value={minutos} required={forma === 'informal_informal'} />
 					</label>
 					<button class="botao botao--secundario">{t('Mudar a forma de debate')}</button>
+					<p class="suave">
+						{t('Informal-informal encerrado nesta sessão: {n} de {total} min', {
+							n: sessao.informal_min_usados,
+							total: data.regras.informal_informal_max_min
+						})}
+					</p>
 				</form>
 			{/if}
 		</section>

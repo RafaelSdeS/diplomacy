@@ -887,6 +887,18 @@ export const EN: Record<string, string> = {
 	'Coletiva': 'Press conference',
 	'Do guia de regras do evento, com os ajustes deste comitê.': 'From the event rules guide, with this committee adjustments.',
 	'Sua conta ainda não tem um convite para este evento. Fale com a secretaria do evento.': 'Your account does not have an invitation to this event yet. Talk to the event secretariat.',
+	// Passo 28
+	'Aplicar': 'Apply',
+	'Tempos rápidos': 'Quick times',
+	'tempo do debate': 'debate time',
+	'Retomar o debate': 'Resume the debate',
+	'Pausar o debate': 'Pause the debate',
+	'+1 min': '+1 min',
+	'−1 min': '−1 min',
+	'Tempo do informal-informal esgotado': 'Unmoderated caucus time is up',
+	'Voltar ao formal-informal': 'Back to moderated debate',
+	'Informal-informal encerrado nesta sessão: {n} de {total} min': 'Unmoderated caucus closed this session: {n} of {total} min',
+	'O tempo de fala vai de 1 a 3600 segundos.': 'Speaking time goes from 1 to 3600 seconds.',
 };
 
 /** Mensagens do banco com partes variáveis: [padrão em português, tradução]. */
