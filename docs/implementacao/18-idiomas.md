@@ -33,6 +33,6 @@ Arquivos: `scripts/textos-fixos.ts`, `src/lib/i18n.test.ts` e `tests/18-idiomas.
 
 ## Pronto quando
 
-- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
+- [x] Os testes acima passam no CI, junto com os de todos os passos anteriores.
 - [x] Um comitê em inglês funciona inteiro em inglês, inclusive os documentos impressos.
 - [x] Nenhum texto fixo sobrou nas telas de comitê.

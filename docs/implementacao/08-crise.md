@@ -37,7 +37,7 @@ Migração `supabase/migrations/20261125090000_crise.sql`.
 
 - [x] "Crise" no menu para a equipe de crise. Os delegados chegam pela tela da sessão ("Notas de crise") e pelo cartão da Agora.
 - [x] **Resolução de crise:** feita no passo 09. Um bloco cria, na tela de blocos, um documento do tipo resolução de crise ligado a uma atualização e o escreve no editor.
-- [ ] Com tecnologia restrita (OEA), os delegados não escrevem notas pelo app. Fica para o passo 16.
+- [x] Com tecnologia restrita (OEA), os delegados não escrevem notas pelo app (feito no passo 16).
 
 ## Testes
 

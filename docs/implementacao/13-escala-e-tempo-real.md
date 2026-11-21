@@ -53,7 +53,7 @@
 Arquivos: `supabase/tests/13-canais.test.sql`, `tests/13-tempo-real.spec.ts` e `scripts/carga.ts`.
 
 - [x] pgTAP: as regras de `realtime.messages` só deixam entrar no canal `crise:<id>` quem é da crise daquele comitê, e no `delegacao:<id>` quem é daquela delegação.
-- [ ] Ponta a ponta: todos os testes de tempo real dos passos 04 a 11 continuam passando com Broadcast.
+- [x] Ponta a ponta: todos os testes de tempo real dos passos 04 a 11 continuam passando com Broadcast.
 - [x] Ponta a ponta: um delegado de outro comitê não recebe as mensagens do canal de um comitê (dois navegadores).
 - [x] Ponta a ponta: ao derrubar e restaurar a rede, o app busca o que perdeu (em `12-piloto.spec.ts`).
 - [ ] Carga: 300 clientes simulados sem erros, com atualizações em menos de 1 segundo.

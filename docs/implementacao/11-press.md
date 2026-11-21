@@ -83,7 +83,7 @@ Arquivos: `supabase/tests/11-press.test.sql`, `src/lib/palavroes.test.ts` e `tes
 
 ## Pronto quando
 
-- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
+- [x] Os testes acima passam no CI, junto com os de todos os passos anteriores.
 - [x] A press do comitê de teste publica do celular, e a matéria chega à capa e ao telão.
 - [x] A delegação citada é avisada.
 - [x] Ocultar uma matéria fica registrado.
