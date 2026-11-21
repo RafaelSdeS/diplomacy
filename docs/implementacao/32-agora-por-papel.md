@@ -20,7 +20,7 @@
 ## Decisões
 
 - Um papel principal por pessoa para montar a tela: secretaria > diretoria da press > mesa > crise > press > delegado. Quem tem mais de um papel vê os cartões extras abaixo.
-- O cartão ao vivo usa uma consulta leve, não a `carregarSessao` inteira.
+- O cartão ao vivo reaproveita a `carregarSessao` da tela de sessão (menos código; o consumo já estava medido).
 - Bilhetes "não lidos" não existem no banco; o cartão mostra os 3 últimos recebidos.
 
 ## Código
