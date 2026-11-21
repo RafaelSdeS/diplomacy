@@ -1,10 +1,13 @@
 <script lang="ts">
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
+	import Quando from '#lib/ui/Quando.svelte';
+	import { contador } from '#lib/contador.ts';
 	import { t } from '#lib/i18n.svelte.ts';
+	import { untrack } from 'svelte';
+	import { guardarRascunho, lerRascunho } from '#lib/rascunho.ts';
 	import { invalidate } from '$app/navigation';
 	import { caixa, mensagemDoEnvio } from '#lib/caixa.ts';
 	import { formatarEspera, minutosDesde, SELO_NOTA, STATUS_NOTA, type StatusNota } from '#lib/crise.ts';
-	import { formatarQuando } from '#lib/cronograma.ts';
 	import { mensagemDeErro } from '#lib/sessao.ts';
 	import { supabase } from '#lib/supabase.ts';
 	import { TABELAS_CRISE } from '#lib/tempo-real.ts';
@@ -16,7 +19,9 @@
 	const eu = $derived(data.participacoes.find((p) => p.comite_id === data.comite.id && p.papel === 'delegado'));
 	let tipo = $state<'nota' | 'diretiva'>('nota');
 	let titulo = $state('');
-	let texto = $state('');
+	const RASCUNHO = `nota-crise:${untrack(() => data.comite.sigla)}`;
+	let texto = $state(lerRascunho(RASCUNHO));
+	$effect(() => guardarRascunho(RASCUNHO, texto));
 	let erro = $state('');
 	let mensagem = $state('');
 	let enviando = $state(false);
@@ -75,7 +80,7 @@
 					<li>
 						<span>
 							{a.texto}
-							<span class="detalhe">{formatarQuando(a.publicada_em, new Date(agora))}</span>
+							<span class="detalhe"><Quando iso={a.publicada_em} /></span>
 						</span>
 					</li>
 				{/each}
@@ -94,11 +99,11 @@
 				</fieldset>
 				<label class="campo">
 					{t('Título')}
-					<input required maxlength="120" bind:value={titulo} />
+					<input required maxlength="120" bind:value={titulo} {@attach contador(titulo)} />
 				</label>
 				<label class="campo">
 					{t('Texto')}
-					<textarea required maxlength="2000" rows="6" bind:value={texto}></textarea>
+					<textarea required maxlength="2000" rows="6" bind:value={texto} {@attach contador(texto)}></textarea>
 				</label>
 				{#if erro}
 					<p class="erro" role="alert">{erro}</p>

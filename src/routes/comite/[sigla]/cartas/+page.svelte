@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
+	import { contador } from '#lib/contador.ts';
 	import { t } from '#lib/i18n.svelte.ts';
+	import { untrack } from 'svelte';
+	import { guardarRascunho, lerRascunho } from '#lib/rascunho.ts';
 	import { invalidate } from '$app/navigation';
 	import { formatarQuando } from '#lib/cronograma.ts';
 	import { mensagemDeErro } from '#lib/sessao.ts';
@@ -19,7 +22,9 @@
 	let delegacoes = $state<string[]>([]);
 	let blocos = $state<string[]>([]);
 	let titulo = $state('');
-	let corpo = $state('');
+	const RASCUNHO = `carta:${untrack(() => data.comite.sigla)}`;
+	let corpo = $state(lerRascunho(RASCUNHO));
+	$effect(() => guardarRascunho(RASCUNHO, corpo));
 	let erro = $state('');
 	let mensagem = $state('');
 
@@ -95,11 +100,11 @@
 			{/if}
 			<label class="campo">
 				{t('Título')}
-				<input required maxlength="200" bind:value={titulo} />
+				<input required maxlength="200" bind:value={titulo} {@attach contador(titulo)} />
 			</label>
 			<label class="campo">
 				{t('Carta')}
-				<textarea required maxlength="8000" rows="8" bind:value={corpo}></textarea>
+				<textarea required maxlength="8000" rows="8" bind:value={corpo} {@attach contador(corpo)}></textarea>
 			</label>
 			{#if erro}
 				<p class="erro" role="alert">{erro}</p>

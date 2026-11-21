@@ -2381,6 +2381,9 @@ isOneToOne: false
 "retirar_adocao":
 { Args: { "p_proposta": string }; Returns: undefined
                            },
+"retirar_ponto":
+{ Args: { "p_ponto": string }; Returns: undefined
+                           },
 "retomar":
 { Args: { "p_comite": string,"p_relogio"?: string }; Returns: undefined
                            },

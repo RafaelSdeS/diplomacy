@@ -149,6 +149,7 @@ test('plenária de abertura: discursos pela lista de oradores e moção do tópi
 	await page.getByRole('button', { name: 'A favor: China' }).click();
 	await expect(grade.getByRole('listitem').filter({ hasText: 'China' })).toContainText('A favor');
 	await page.getByRole('button', { name: 'Encerrar a votação' }).click();
+	await page.getByRole('dialog').getByRole('button', { name: 'Encerrar a votação' }).click();
 	await expect(page.getByRole('region', { name: 'Última votação' })).toContainText(
 		'Aprovada: 3 a favor, 0 contra e 0 abstenções (3 votos necessários)'
 	);
@@ -388,6 +389,7 @@ test('a presidência passada vai para a próxima delegação sorteada', async ({
 	const mesa = await abrir(browser, CONTAS.mesa, SESSAO);
 
 	await painel.getByRole('button', { name: 'Passar a presidência' }).click();
+	await painel.getByRole('dialog').getByRole('button', { name: 'Passar a presidência' }).click();
 	await expect(painel.getByText('Você não preside esta sessão.')).toBeVisible();
 	await expect(mesa.getByText(/Presidência: /)).not.toContainText(`Presidência: ${preside}`);
 	await expect(mesa.getByText(/Presidência: /)).not.toContainText('Presidência: Mesa');

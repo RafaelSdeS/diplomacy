@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
+	import { contador } from '#lib/contador.ts';
 	import { invalidate } from '$app/navigation';
 	import { rotuloPapel } from '#lib/papeis.ts';
 	import { mensagemDeErro } from '#lib/sessao.ts';
@@ -140,7 +141,7 @@
 	<form class="formulario" onsubmit={copiar}>
 		<label class="campo">
 			Nome do evento novo
-			<input required maxlength="120" bind:value={novoNome} />
+			<input required maxlength="120" bind:value={novoNome} {@attach contador(novoNome)} />
 		</label>
 		<label class="campo campo--curto">
 			Ano

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
+	import { contador } from '#lib/contador.ts';
 	import { t } from '#lib/i18n.svelte.ts';
 	import { goto, invalidate } from '$app/navigation';
 	import { nomeDoDocumento, STATUS_DOCUMENTO, TIPOS_DOCUMENTO } from '#lib/formatacao.ts';
@@ -145,7 +146,7 @@
 			</label>
 			<label class="campo">
 				{t('Título')}
-				<input required maxlength="200" bind:value={titulo} />
+				<input required maxlength="200" bind:value={titulo} {@attach contador(titulo)} />
 			</label>
 			<label class="campo">
 				{t('Tópico')}

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
+	import { contador } from '#lib/contador.ts';
 	import { t } from '#lib/i18n.svelte.ts';
 	import { STATUS_DPO as STATUS } from '#lib/impressao.ts';
 	import { untrack } from 'svelte';
@@ -107,7 +108,7 @@
 			{#if rascunhos[topico]}
 				<label class="campo">
 					{t('Texto (parágrafos separados por uma linha em branco)')}
-					<textarea rows="12" maxlength="12000" disabled={!editavel} bind:value={rascunhos[topico].texto}></textarea>
+					<textarea rows="12" maxlength="12000" disabled={!editavel} bind:value={rascunhos[topico].texto} {@attach contador(rascunhos[topico].texto)}></textarea>
 				</label>
 				<label class="campo">
 					{t('Referências (uma por linha)')}
@@ -159,7 +160,7 @@
 							<p class="texto-nota folha">{d.texto}</p>
 							<label class="campo">
 								{t('Comentário para a delegação')}
-								<textarea rows="3" maxlength="1000" bind:value={comentario}></textarea>
+								<textarea rows="3" maxlength="1000" bind:value={comentario} {@attach contador(comentario)}></textarea>
 							</label>
 							<div class="acoes">
 								<button

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
+	import { contador } from '#lib/contador.ts';
 	import { t } from '#lib/i18n.svelte.ts';
 	import { esquecerConta } from '#lib/conta.ts';
 	import { onMount, untrack } from 'svelte';
@@ -16,6 +17,18 @@
 	let nome = $state(untrack(() => data.pessoa.nome));
 	let bio = $state(untrack(() => data.pessoa.bio ?? ''));
 	let idiomaEscolhido = $state(untrack(() => data.pessoa.idioma ?? ''));
+	// Tema deste aparelho (passo 38): vale na hora, sem salvar o perfil.
+	let tema = $state(document.documentElement.dataset.theme ?? '');
+	function mudarTema() {
+		if (tema) document.documentElement.dataset.theme = tema;
+		else delete document.documentElement.dataset.theme;
+		try {
+			if (tema) localStorage.setItem('tema', tema);
+			else localStorage.removeItem('tema');
+		} catch {
+			// sem armazenamento: o tema vale até fechar o app
+		}
+	}
 	let fotoUrl = $state(untrack(() => data.fotoUrl));
 	let mensagem = $state('');
 	let erro = $state('');
@@ -149,7 +162,7 @@
 		</label>
 		<label class="campo">
 			{t('Minibiografia')}
-			<textarea maxlength="500" bind:value={bio}></textarea>
+			<textarea maxlength="500" bind:value={bio} {@attach contador(bio)}></textarea>
 		</label>
 		<label class="campo">
 			{t('Idioma do app')}
@@ -167,6 +180,14 @@
 		{/if}
 		<button class="botao">{t('Salvar perfil')}</button>
 	</form>
+	<label class="campo campo--curto">
+		{t('Tema neste aparelho')}
+		<select bind:value={tema} onchange={mudarTema}>
+			<option value="">{t('Automático (o do sistema)')}</option>
+			<option value="light">{t('Claro')}</option>
+			<option value="dark">{t('Escuro')}</option>
+		</select>
+	</label>
 
 {#if data.recortes.length}
 	<section aria-labelledby="t-recortes">

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
+	import { contador } from '#lib/contador.ts';
 	import { bilingue, locale, t } from '#lib/i18n.svelte.ts';
 	import { invalidateAll } from '$app/navigation';
 	import { STATUS_DPO } from '#lib/impressao.ts';
@@ -98,7 +99,7 @@
 		<form class="formulario" onsubmit={anotar} aria-label={t('Nova anotação')}>
 			<label class="campo">
 				{t('Anotação')}
-				<textarea required rows="2" maxlength="4000" bind:value={nota}></textarea>
+				<textarea required rows="2" maxlength="4000" bind:value={nota} {@attach contador(nota)}></textarea>
 			</label>
 			<button class="botao botao--secundario botao--pequeno">{t('Guardar no caderno')}</button>
 		</form>

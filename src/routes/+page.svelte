@@ -15,6 +15,8 @@
 	import Cronometro from '#lib/ui/Cronometro.svelte';
 	import Votar from '#lib/ui/Votar.svelte';
 	import AlertaCrise from '#lib/ui/AlertaCrise.svelte';
+	import { chamarAtencao } from '#lib/aparelho.ts';
+	import { untrack } from 'svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -49,6 +51,13 @@
 	const preside = $derived(!!minhaDelegacao && sessao?.presidencia?.id === minhaDelegacao && data.aoVivo?.fase === 'debate');
 	const posicao = $derived((sessao?.pedidos ?? []).findIndex((p) => p.delegacao?.id === minhaDelegacao));
 	const votacao = $derived(data.aoVivo?.votacao?.aberta ? data.aoVivo.votacao : null);
+	// Passo 38: a votação que abre depois de a tela estar aberta chama a atenção.
+	let votacaoVista = untrack(() => votacao?.id ?? '');
+	$effect(() => {
+		if (!votacao || votacao.id === votacaoVista) return;
+		votacaoVista = votacao.id;
+		setTimeout(() => chamarAtencao('a-votacao'));
+	});
 	const meuVoto = $derived(votacao?.votos.find((v) => v.delegacao_id === minhaDelegacao)?.escolha);
 	const posso = $derived(
 		votacao
@@ -108,7 +117,7 @@
 					<Cronometro cronometro={relogioDebate(estado)} avisoSeg={60} {diferenca} />
 				{/if}
 				{#if votacao}
-					<p class="destaque">{t('Votação aberta')}: {votacao.objeto}</p>
+					<p class="destaque" id="a-votacao" tabindex="-1">{t('Votação aberta')}: {votacao.objeto}</p>
 					<Votar votacaoId={votacao.id} escolhas={posso} {meuVoto} onerro={(m) => (erro = m)} />
 				{/if}
 				{#if data.aoVivo.fase !== 'plenaria' && minhaDelegacao && !restrita}

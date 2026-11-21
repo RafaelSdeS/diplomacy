@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
+	import { contador } from '#lib/contador.ts';
 	import { t } from '#lib/i18n.svelte.ts';
 	import { goto, invalidate } from '$app/navigation';
 	import type { Database } from '#lib/database.types.ts';
@@ -12,6 +13,9 @@
 	import NomeDelegacao from '#lib/ui/NomeDelegacao.svelte';
 	import Cronometro from '#lib/ui/Cronometro.svelte';
 	import Contagem from '#lib/ui/Contagem.svelte';
+	import Confirmar from '#lib/ui/Confirmar.svelte';
+	import { filtrarDelegacoes, LISTA_LONGA } from '#lib/filtro.ts';
+	import { manterTelaAcesa } from '#lib/aparelho.ts';
 	import AlertaCrise from '#lib/ui/AlertaCrise.svelte';
 	import { semVoz } from '#lib/crise.ts';
 	import { relogioDebate, restanteSeg, temDebate } from '#lib/cronometro.ts';
@@ -44,7 +48,7 @@
 		data.participacoes.some((p) => (p.papel === 'mesa' && p.comite_id === data.comite.id) || p.papel === 'secretaria')
 	);
 	const fila = $derived(sessao?.pedidos ?? []);
-	const pontosAbertos = $derived((sessao?.pontos ?? []).filter((p) => !['aceito', 'recusado'].includes(p.status)));
+	const pontosAbertos = $derived((sessao?.pontos ?? []).filter((p) => !['aceito', 'recusado', 'retirado'].includes(p.status)));
 	const emDiscussao = $derived(pontosAbertos.find((p) => p.status === 'em_discussao'));
 	// Passo 29: com uma delegação presidindo, o bureau aprova antes e a presidência só vê o aprovado.
 	const presidePeloBureau = $derived(bureauPreside(data.fase, data.estado?.mesa_assumiu, sessao?.presidencia?.id));
@@ -137,7 +141,8 @@
 	const rpc = <F extends keyof Funcoes>(funcao: F, args: Funcoes[F]['Args']) => executar(supabase.rpc(funcao, args));
 
 	// Abrir, encerrar e aceitar quem chegou depois (passo 21).
-	let confirmarEncerrar = $state<HTMLDialogElement>();
+	$effect(manterTelaAcesa);
+	let buscaVotos = $state('');
 	const encerrarSessao = () => rpc('encerrar_sessao', { p_comite: comite });
 	const confirmarPresenca = (delegacao: string) =>
 		executar(supabase.from('presenca').upsert({ sessao_id: sessao!.id, comite_id: comite, delegacao_id: delegacao }));
@@ -251,18 +256,14 @@
 	{#if ehMesa}
 		<div class="acoes">
 			<a class="botao botao--secundario botao--pequeno" href={`/comite/${data.comite.sigla}/sessao/chamada`}>{t('Chamada')}</a>
-			<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => confirmarEncerrar?.showModal()}
-				>{t('Encerrar sessão')}</button
-			>
+			<Confirmar
+				classe="botao botao--secundario botao--pequeno"
+				rotulo={t('Encerrar sessão')}
+				pergunta={t('Encerrar a sessão {n}?', { n: sessao.numero })}
+				explicacao={t('As votações abertas são fechadas e o cronômetro para.')}
+				acao={encerrarSessao}
+			/>
 		</div>
-		<dialog bind:this={confirmarEncerrar} aria-labelledby="t-encerrar">
-			<h3 id="t-encerrar">{t('Encerrar a sessão {n}?', { n: sessao.numero })}</h3>
-			<p>{t('As votações abertas são fechadas e o cronômetro para.')}</p>
-			<form method="dialog" class="acoes">
-				<button class="botao" onclick={encerrarSessao}>{t('Encerrar sessão')}</button>
-				<button class="botao botao--secundario">{t('Cancelar')}</button>
-			</form>
-		</dialog>
 		<section class="cartao" aria-labelledby="t-representar">
 			<h2 id="t-representar">{t('Assumir uma delegação')}</h2>
 			{#if representada}
@@ -680,8 +681,11 @@
 						{#if ehMesa}
 							<details bind:open={chamadaAberta}>
 								<summary>{votacao.nominal ? t('Chamada nominal') : t('Registrar votos de placa')}</summary>
+								{#if votantes.length > LISTA_LONGA}
+									<label class="campo">{t('Filtrar')} <input type="search" bind:value={buscaVotos} /></label>
+								{/if}
 								<ul class="lista">
-									{#each votantes as d (d.id)}
+									{#each filtrarDelegacoes(votantes, buscaVotos) as d (d.id)}
 										{@const passou = votacao.passes.some((x) => x.delegacao_id === d.id)}
 										{@const parteNaDisputa = votacao.partes.includes(d.id)}
 										<li>
@@ -722,9 +726,12 @@
 								</ul>
 							</details>
 						{/if}
-						<button class="botao" type="button" onclick={() => rpc('encerrar_votacao', { p_votacao: votacao.id })}>
-							{t('Encerrar a votação')}
-						</button>
+						<Confirmar
+							rotulo={t('Encerrar a votação')}
+							pergunta={t('Encerrar a votação de {objeto}?', { objeto: votacao.objeto })}
+							explicacao={t('Quem não votou fica sem voto, e o resultado sai na hora.')}
+							acao={() => rpc('encerrar_votacao', { p_votacao: votacao.id })}
+						/>
 					{:else}
 						<p>{textoResultado(votacao)}</p>
 					{/if}
@@ -751,7 +758,7 @@
 										maxlength="200"
 										placeholder={t('Motivo (opcional)')}
 										aria-label={t('Motivo da recusa: {pedido}', { pedido: nome })}
-										bind:value={motivo[ponto.id]}
+										bind:value={motivo[ponto.id]} {@attach contador(motivo[ponto.id])}
 									/>
 									<button
 										class="botao botao--secundario botao--pequeno"
@@ -831,9 +838,12 @@
 					{/each}
 				</ul>
 				{#if data.fase === 'debate'}
-					<button class="botao botao--secundario" type="button" onclick={() => rpc('passar_presidencia', { p_comite: comite })}
-						>{t('Passar a presidência')}</button
-					>
+					<Confirmar
+						classe="botao botao--secundario"
+						rotulo={t('Passar a presidência')}
+						pergunta={t('Passar a presidência à próxima delegação?')}
+						acao={() => rpc('passar_presidencia', { p_comite: comite })}
+					/>
 				{/if}
 			</section>
 		</div>

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
+	import { contador } from '#lib/contador.ts';
 	import { t } from '#lib/i18n.svelte.ts';
 	import { invalidate } from '$app/navigation';
 	import {
@@ -17,7 +18,10 @@
 	import Bandeira from '#lib/ui/Bandeira.svelte';
 	import NomeDelegacao from '#lib/ui/NomeDelegacao.svelte';
 	import Cronometro from '#lib/ui/Cronometro.svelte';
-	import { relogioDebate, temDebate } from '#lib/cronometro.ts';
+	import { fase, relogioDebate, restanteSeg, temDebate } from '#lib/cronometro.ts';
+	import { chamarAtencao, manterTelaAcesa, vibrar } from '#lib/aparelho.ts';
+	import { guardarRascunho, lerRascunho } from '#lib/rascunho.ts';
+	import { untrack } from 'svelte';
 	import ListaVotos from '#lib/ui/ListaVotos.svelte';
 	import Contagem from '#lib/ui/Contagem.svelte';
 	import BotaoPlaca from '#lib/ui/BotaoPlaca.svelte';
@@ -34,7 +38,7 @@
 	let erro = $state('');
 	let mensagem = $state('');
 	let tipoPonto = $state<TipoPonto>('ponto_duvida');
-	let detalhe = $state('');
+	let detalhe = $state(lerRascunho(`ponto:${untrack(() => data.comite.sigla)}`));
 	let topico = $state(1);
 	let minutos = $state(10);
 	let placa = $state<HTMLDialogElement>();
@@ -69,6 +73,28 @@
 	const momento = $derived(data.estado ? momentoDoDebate(data.estado, agora + diferenca) : null);
 	// Passo 35: a delegação atingida pela crise fica sem voz.
 	const impedida = $derived(semVoz(data.incidentes, eu?.delegacao_id, agora + diferenca));
+
+	// Passo 38: tela acesa, rascunho do ponto, "a palavra é sua" e a votação que abre.
+	$effect(manterTelaAcesa);
+	$effect(() => guardarRascunho(`ponto:${data.comite.sigla}`, detalhe));
+	const minhaVez = $derived(!!eu?.delegacao_id && data.estado?.orador?.id === eu.delegacao_id);
+	const fimDaFala = $derived(
+		minhaVez && data.estado ? fase(data.estado, restanteSeg(data.estado, agora + diferenca), data.regras.aviso_fala_seg) === 'aviso' : false
+	);
+	$effect(() => {
+		if (minhaVez) vibrar(200);
+	});
+	$effect(() => {
+		if (fimDaFala) vibrar(80);
+	});
+	// A votação que já estava aberta ao entrar não puxa a tela; a que abre depois, sim.
+	let votacaoVista = untrack(() => (data.votacao?.aberta ? data.votacao.id : ''));
+	$effect(() => {
+		const id = data.votacao?.aberta ? data.votacao.id : '';
+		if (!id || id === votacaoVista) return;
+		votacaoVista = id;
+		setTimeout(() => chamarAtencao('c-votacao'));
+	});
 	const naListaCurta = $derived((sessao?.proximos ?? []).findIndex((p) => p.delegacao?.id === eu?.delegacao_id));
 	// Passo 34: anotar sem sair da sessão; a nota guarda o tópico e quem falava.
 	let nota = $state('');
@@ -181,6 +207,8 @@
 		<p class="erro" role="alert">{t('Sua delegação está impedida pela crise: {motivo}', { motivo: impedida })}</p>
 	{/if}
 
+	{#if minhaVez}<p class="sua-vez" role="status">{t('A palavra é sua')}</p>{/if}
+
 	<div class="cartoes">
 		<AlertaCrise incidentes={data.incidentes} {diferenca} />
 		{#if momento === 'pausa' && eu && !restrita && !impedida}
@@ -234,7 +262,7 @@
 		{/each}
 		{#if data.votacao}
 			<article class="cartao cartao--destaque" aria-labelledby="c-votacao">
-				<h2 id="c-votacao">{data.votacao.aberta ? t('Votação aberta') : t('Última votação')}</h2>
+				<h2 id="c-votacao" tabindex="-1">{data.votacao.aberta ? t('Votação aberta') : t('Última votação')}</h2>
 				<p class="destaque">{data.votacao.objeto}</p>
 				{#if data.votacao.aberta && data.votacao.nominal}<p><strong>{t('Votação nominal:')}</strong> {t('a mesa chama as delegações em ordem alfabética.')}</p>{/if}
 				{#if !data.votacao.aberta}
@@ -329,7 +357,7 @@
 			<form class="formulario" onsubmit={anotar} aria-label={t('Anotar no caderno')}>
 				<label class="campo">
 					{t('Nota rápida')}
-					<textarea required rows="2" maxlength="4000" bind:value={nota}></textarea>
+					<textarea required rows="2" maxlength="4000" bind:value={nota} {@attach contador(nota)}></textarea>
 				</label>
 				<button class="botao botao--secundario botao--pequeno">{t('Guardar no caderno')}</button>
 			</form>
@@ -381,7 +409,7 @@
 				{/if}
 				<label class="campo">
 					{t('Detalhe (opcional)')}
-					<textarea maxlength="300" bind:value={detalhe}></textarea>
+					<textarea maxlength="300" bind:value={detalhe} {@attach contador(detalhe)}></textarea>
 				</label>
 				<button class="botao">{t('Enviar à mesa')}</button>
 			</form>
@@ -394,6 +422,14 @@
 								class="selo {ponto.status === 'aceito' ? 'selo--ok' : ponto.status === 'recusado' ? 'selo--erro' : 'selo--info'}"
 								>{situacaoDoPonto(ponto)}</span
 							>
+							{#if ponto.status === 'aberto'}
+								<button
+									class="botao botao--secundario botao--pequeno"
+									type="button"
+									onclick={() => executar(supabase.rpc('retirar_ponto', { p_ponto: ponto.id }), t('Pedido retirado.'))}
+									>{t('Retirar')}</button
+								>
+							{/if}
 						</li>
 					{/each}
 				</ul>

@@ -30,10 +30,10 @@ test('sem agenda adotada não há projeto; a mesa adota, e o projeto é liberado
 	// Banco reaproveitado: começa com a agenda do tópico 1 sem adoção.
 	await entrar(page, MESA);
 	await page.goto(AGENDA);
-	page.on('dialog', (d) => d.accept());
 	const retirar = topico1(page).getByRole('button', { name: 'Retirar adoção' });
 	if (await retirar.isVisible()) {
 		await retirar.click();
+		await page.getByRole('dialog').getByRole('button', { name: 'Retirar adoção' }).click();
 		await expect(page.getByRole('status')).toHaveText('Adoção retirada.');
 	}
 
@@ -65,7 +65,6 @@ test('sem agenda adotada não há projeto; a mesa adota, e o projeto é liberado
 test('editar a agenda adotada mantém o andamento; retirar a adoção volta ao debate', async ({ page }) => {
 	await entrar(page, MESA);
 	await page.goto(AGENDA);
-	page.on('dialog', (d) => d.accept());
 
 	const andamento = topico1(page).getByRole('combobox', { name: 'Andamento de A.1 Atores' });
 	await andamento.selectOption('em_debate');
@@ -80,6 +79,7 @@ test('editar a agenda adotada mantém o andamento; retirar a adoção volta ao d
 	await expect(topico1(page).getByRole('combobox', { name: 'Andamento de A.1 Atores' })).toHaveValue('em_debate');
 
 	await topico1(page).getByRole('button', { name: 'Retirar adoção' }).click();
+	await page.getByRole('dialog').getByRole('button', { name: 'Retirar adoção' }).click();
 	await expect(page.getByRole('status')).toHaveText('Adoção retirada.');
 	await expect(topico1(page).getByRole('list', { name: 'Etapas do tópico 1' }).locator('[aria-current="step"]')).toHaveText(
 		/Debate da agenda/

@@ -78,6 +78,7 @@ test('uma votação nominal completa, do painel da mesa ao telão', async ({ bro
 	await chamada.getByRole('button', { name: 'Contra: Argentina' }).click();
 	await expect(painel.getByText(`${DELEGACOES_TREINO.length} de ${DELEGACOES_TREINO.length} votaram`)).toBeVisible({ timeout: 10_000 });
 	await chamada.getByRole('button', { name: 'Encerrar a votação' }).click();
+	await chamada.getByRole('dialog').getByRole('button', { name: 'Encerrar a votação' }).click();
 	await expect(telao.getByText(new RegExp(`${TITULO}\\. Aprovada: 5 a favor, 1 contra`))).toBeVisible({ timeout: 10_000 });
 	await Promise.all([telao, painel, celular].map((p) => p.context().close()));
 });
@@ -107,6 +108,7 @@ test('com tecnologia restrita, a mesa registra falas e votos, e o telão acompan
 	await expect(painel.getByRole('button', { name: 'A favor: Cuba' })).toHaveCount(0);
 	await expect(telao.getByRole('complementary', { name: 'Votação' }).getByText('A favor')).toHaveCount(5, { timeout: 10_000 });
 	await painel.getByRole('button', { name: 'Encerrar a votação' }).click();
+	await painel.getByRole('dialog').getByRole('button', { name: 'Encerrar a votação' }).click();
 	await expect(delegado.getByRole('article', { name: 'Última votação' })).toContainText('Aprovada', { timeout: 10_000 });
 	await Promise.all([delegado, telao, painel].map((p) => p.context().close()));
 });

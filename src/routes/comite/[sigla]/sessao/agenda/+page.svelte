@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
+	import Confirmar from '#lib/ui/Confirmar.svelte';
 	import { bilingue, t } from '#lib/i18n.svelte.ts';
 	import { untrack } from 'svelte';
 	import { invalidate } from '$app/navigation';
@@ -165,14 +166,12 @@
 								<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => editar(proposta)}
 									>{t('Editar agenda adotada')}</button
 								>
-								<button
-									class="botao botao--secundario botao--pequeno"
-									type="button"
-									onclick={() =>
-										confirm(t('Retirar a adoção da agenda do tópico {n}?', { n: tp.numero })) &&
-										executar(supabase.rpc('retirar_adocao', { p_proposta: proposta.id }), t('Adoção retirada.'))}
-									>{t('Retirar adoção')}</button
-								>
+								<Confirmar
+									classe="botao botao--secundario botao--pequeno"
+									rotulo={t('Retirar adoção')}
+									pergunta={t('Retirar a adoção da agenda do tópico {n}?', { n: tp.numero })}
+									acao={() => executar(supabase.rpc('retirar_adocao', { p_proposta: proposta.id }), t('Adoção retirada.'))}
+								/>
 							</div>
 						{:else if ehMesa}
 							<div class="acoes">

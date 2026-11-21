@@ -1,6 +1,11 @@
 <script lang="ts">
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
+	import Quando from '#lib/ui/Quando.svelte';
+	import { contador } from '#lib/contador.ts';
+	import { filtrarDelegacoes, LISTA_LONGA } from '#lib/filtro.ts';
+	import { guardarRascunho, lerRascunho } from '#lib/rascunho.ts';
 	import { t } from '#lib/i18n.svelte.ts';
+	import { untrack } from 'svelte';
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/state';
 	import { caixa, mensagemDoEnvio } from '#lib/caixa.ts';
@@ -27,7 +32,11 @@
 
 	let erro = $state('');
 	let mensagem = $state('');
-	let texto = $state<Record<string, string>>({ bilhete: '', mesa: '', interno: '', resposta: '' });
+	// O bilhete em edição fica guardado no aparelho (passo 38).
+	const RASCUNHO = `bilhete:${untrack(() => data.comite.sigla)}`;
+	let texto = $state<Record<string, string>>({ bilhete: lerRascunho(RASCUNHO), mesa: '', interno: '', resposta: '' });
+	$effect(() => guardarRascunho(RASCUNHO, texto.bilhete));
+	let busca = $state('');
 	let para = $state(page.url.searchParams.get('para') ?? '');
 	let responderA = $state('');
 	let bloquear = $state('');
@@ -111,7 +120,7 @@
 					<span>
 						<strong>{nome(m.de_delegacao_id)} → {nome(m.para_delegacao_id)}</strong>
 						{m.texto}
-						<span class="detalhe">{formatarQuando(m.criado_em, agora)}</span>
+						<span class="detalhe"><Quando iso={m.criado_em} /></span>
 					</span>
 					<details class="denunciar">
 						<summary>{t('Denunciar')}</summary>
@@ -137,10 +146,13 @@
 					void enviar('bilhete', 'bilhete', para, t('Bilhete enviado.'));
 				}}
 			>
+				{#if data.delegacoes.length > LISTA_LONGA}
+					<label class="campo">{t('Filtrar')} <input type="search" bind:value={busca} /></label>
+				{/if}
 				<label class="campo">
 					{t('Para')}
 					<select required bind:value={para}>
-						{#each data.delegacoes.filter((d) => d.id !== eu.delegacao_id) as d (d.id)}
+						{#each filtrarDelegacoes(data.delegacoes, busca).filter((d) => d.id !== eu.delegacao_id) as d (d.id)}
 							<option value={d.id} disabled={meBloquearam.has(d.id)}
 								>{d.nome}{meBloquearam.has(d.id) ? ` · ${t('não aceita seus bilhetes')}` : ''}</option
 							>
@@ -149,7 +161,7 @@
 				</label>
 				<label class="campo">
 					{t('Bilhete')}
-					<textarea required rows="3" maxlength="1000" bind:value={texto.bilhete}></textarea>
+					<textarea required rows="3" maxlength="1000" bind:value={texto.bilhete} {@attach contador(texto.bilhete)}></textarea>
 				</label>
 				<button class="botao">{t('Enviar bilhete')}</button>
 			</form>
@@ -207,7 +219,7 @@
 		<h2 id="t-com-mesa">{t('Com a mesa')}</h2>
 		<ul class="lista">
 			{#each do_tipo('mesa') as m (m.id)}
-				<li><span><strong>{m.de_delegacao_id ? t('Sua delegação') : t('Mesa')}:</strong> {m.texto} <span class="detalhe">{formatarQuando(m.criado_em, agora)}</span></span></li>
+				<li><span><strong>{m.de_delegacao_id ? t('Sua delegação') : t('Mesa')}:</strong> {m.texto} <span class="detalhe"><Quando iso={m.criado_em} /></span></span></li>
 			{:else}
 				<li class="suave">{t('Dúvidas e pedidos privados à mesa aparecem aqui.')}</li>
 			{/each}
@@ -222,7 +234,7 @@
 		>
 			<label class="campo">
 				{t('Mensagem à mesa')}
-				<textarea required rows="2" maxlength="1000" bind:value={texto.mesa}></textarea>
+				<textarea required rows="2" maxlength="1000" bind:value={texto.mesa} {@attach contador(texto.mesa)}></textarea>
 			</label>
 			<button class="botao botao--secundario">{t('Enviar à mesa')}</button>
 		</form>
@@ -328,7 +340,7 @@
 			</label>
 			<label class="campo">
 				{t('Resposta')}
-				<textarea required rows="2" maxlength="1000" bind:value={texto.resposta}></textarea>
+				<textarea required rows="2" maxlength="1000" bind:value={texto.resposta} {@attach contador(texto.resposta)}></textarea>
 			</label>
 			<button class="botao botao--secundario">{t('Responder')}</button>
 		</form>
@@ -365,7 +377,7 @@
 		<h2 id="t-interno">{ehMesa ? t('Com a equipe de crise') : t('Com a mesa')}</h2>
 		<ul class="lista">
 			{#each do_tipo('interno') as m (m.id)}
-				<li><span><strong>{m.autor?.nome ?? ''}:</strong> {m.texto} <span class="detalhe">{formatarQuando(m.criado_em, agora)}</span></span></li>
+				<li><span><strong>{m.autor?.nome ?? ''}:</strong> {m.texto} <span class="detalhe"><Quando iso={m.criado_em} /></span></span></li>
 			{:else}
 				<li class="suave">{t('O canal interno entre a mesa e a crise começa aqui.')}</li>
 			{/each}
@@ -380,7 +392,7 @@
 		>
 			<label class="campo">
 				{t('Mensagem do canal interno')}
-				<textarea required rows="2" maxlength="1000" bind:value={texto.interno}></textarea>
+				<textarea required rows="2" maxlength="1000" bind:value={texto.interno} {@attach contador(texto.interno)}></textarea>
 			</label>
 			<button class="botao botao--secundario">{t('Enviar')}</button>
 		</form>

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
+	import { contador } from '#lib/contador.ts';
 	import { t } from '#lib/i18n.svelte.ts';
 	import { tick, untrack } from 'svelte';
 	import { invalidate } from '$app/navigation';
@@ -251,7 +252,7 @@
 				<div class="formulario formulario--largo">
 					<label class="campo">
 						{t('Resposta')}
-						<textarea rows="4" maxlength="2000" bind:value={resposta}></textarea>
+						<textarea rows="4" maxlength="2000" bind:value={resposta} {@attach contador(resposta)}></textarea>
 					</label>
 					<div class="acoes" role="group" aria-label={t('Respostas prontas')}>
 						{#each respostasProntas() as pronta (pronta)}
@@ -289,16 +290,16 @@
 					<label class="opcao"><input type="radio" value="resolvido" bind:group={desfecho[i.id].resultado} /> {t('Resolvida')}</label>
 					<label class="opcao"><input type="radio" value="fracassou" bind:group={desfecho[i.id].resultado} /> {t('Fracassou')}</label>
 				</fieldset>
-				<label class="campo">{t('O que aconteceu')} <textarea rows="2" maxlength="3000" bind:value={desfecho[i.id].texto}></textarea></label>
+				<label class="campo">{t('O que aconteceu')} <textarea rows="2" maxlength="3000" bind:value={desfecho[i.id].texto} {@attach contador(desfecho[i.id].texto)}></textarea></label>
 				<button class="botao">{t('Encerrar a crise')}</button>
 			</form>
 		{/each}
 
 		<form class="formulario formulario--largo" onsubmit={lancar} aria-label={t('Lançar uma crise')}>
-			<label class="campo">{t('Título')} <input required maxlength="120" bind:value={crise.titulo} /></label>
+			<label class="campo">{t('Título')} <input required maxlength="120" bind:value={crise.titulo} {@attach contador(crise.titulo)} /></label>
 			<label class="campo">
 				{t('Briefing')}
-				<textarea required rows="4" maxlength="3000" bind:value={crise.texto}></textarea>
+				<textarea required rows="4" maxlength="3000" bind:value={crise.texto} {@attach contador(crise.texto)}></textarea>
 			</label>
 			<label class="campo campo--curto">
 				{t('Prazo (minutos)')}
@@ -323,7 +324,7 @@
 								{#each data.delegacoes as d (d.id)}<option value={d.id}>{d.nome}</option>{/each}
 							</select>
 						</label>
-						<label class="campo">{t('O que aconteceu com ela')} <input required maxlength="200" bind:value={e.texto} /></label>
+						<label class="campo">{t('O que aconteceu com ela')} <input required maxlength="200" bind:value={e.texto} {@attach contador(e.texto)} /></label>
 						<label class="campo campo--curto">
 							{t('Minutos (vazio: até o fim)')}
 							<input type="number" min="1" max="240" bind:value={e.minutos} />
@@ -348,7 +349,7 @@
 		<form class="formulario formulario--largo" onsubmit={publicar}>
 			<label class="campo">
 				{t('Texto da atualização')}
-				<textarea required maxlength="3000" rows="4" bind:value={atualizacao}></textarea>
+				<textarea required maxlength="3000" rows="4" bind:value={atualizacao} {@attach contador(atualizacao)}></textarea>
 			</label>
 			{#if meusComites.length > 1}
 				<fieldset class="opcoes">

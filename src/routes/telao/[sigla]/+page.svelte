@@ -2,6 +2,7 @@
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { t } from '#lib/i18n.svelte.ts';
 	import { onMount } from 'svelte';
+	import { manterTelaAcesa } from '#lib/aparelho.ts';
 	import { descreverPonto, FORMAS, momentoDoDebate } from '#lib/sessao.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import Bandeira from '#lib/ui/Bandeira.svelte';
@@ -70,34 +71,26 @@
 
 	const telaCheia = () => void document.documentElement.requestFullscreen?.().catch(() => {});
 
-	onMount(() => {
-		let trava: WakeLockSentinel | undefined;
-		const pedir = async () => {
-			try {
-				trava = await navigator.wakeLock?.request('screen');
-			} catch {
-				// sem permissão ou sem suporte: a tela pode apagar, nada mais
-			}
-		};
-		const aoVoltar = () => {
-			if (document.visibilityState === 'visible') void pedir();
-		};
-		void pedir();
-		document.addEventListener('visibilitychange', aoVoltar);
-		return () => {
-			document.removeEventListener('visibilitychange', aoVoltar);
-			void trava?.release();
-		};
-	});
+	onMount(manterTelaAcesa);
+
+	// Passo 38: o cursor e a dica somem depois de 3 s com o mouse parado.
+	let mexendo = $state(false);
+	let parar: ReturnType<typeof setTimeout> | undefined;
+	function mexeu() {
+		mexendo = true;
+		clearTimeout(parar);
+		parar = setTimeout(() => (mexendo = false), 3000);
+	}
 </script>
 
-<svelte:window onclick={telaCheia} onkeydown={(e) => e.key.toLowerCase() === 'f' && telaCheia()} />
+<svelte:window onclick={telaCheia} onkeydown={(e) => e.key.toLowerCase() === 'f' && telaCheia()} onmousemove={mexeu} />
 
 <svelte:head>
 	<title>{tituloDaAba(t('Telão'), data.comite.sigla)}</title>
 </svelte:head>
 
-<div class="telao">
+<div class="telao" class:telao--parado={!mexendo}>
+	{#if mexendo}<p class="telao-dica">{t('F: tela cheia')}</p>{/if}
 	<header class="telao-topo">
 		<div>
 			<p class="telao-comite">{data.comite.sigla} · {data.comite.nome}</p>

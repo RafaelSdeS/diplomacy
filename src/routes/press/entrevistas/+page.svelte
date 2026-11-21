@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
+	import { contador } from '#lib/contador.ts';
 	import { bilingue, t } from '#lib/i18n.svelte.ts';
 	import { invalidate } from '$app/navigation';
 	import { formatarQuando } from '#lib/cronograma.ts';
@@ -57,7 +58,7 @@
 	</label>
 	<label class="campo">
 		{t('Tema')}
-		<input required maxlength="300" bind:value={tema} />
+		<input required maxlength="300" bind:value={tema} {@attach contador(tema)} />
 	</label>
 	<button class="botao">{t('Pedir entrevista')}</button>
 </form>

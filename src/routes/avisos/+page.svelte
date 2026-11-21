@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
+	import Quando from '#lib/ui/Quando.svelte';
+	import { contador } from '#lib/contador.ts';
 	import { t } from '#lib/i18n.svelte.ts';
 	import { onMount, untrack } from 'svelte';
 	import { invalidate } from '$app/navigation';
 	import Bell from '@lucide/svelte/icons/bell';
-	import { formatarQuando } from '#lib/cronograma.ts';
 	import { pedirNotificacao } from '#lib/push.ts';
 	import { supabase } from '#lib/supabase.ts';
 	import type { PageProps } from './$types';
@@ -18,7 +19,6 @@
 		void supabase.rpc('marcar_avisos_vistos');
 	});
 
-	const agora = new Date();
 	const destinoDe = (id: string | null) =>
 		id ? t('Para o {sigla}', { sigla: data.comites.find((c) => c.id === id)?.sigla ?? t('comitê') }) : t('Para todos');
 	const podeRemover = (autorId: string | null) => data.secretaria || autorId === data.usuario?.id;
@@ -68,7 +68,7 @@
 		<form class="formulario" onsubmit={publicar}>
 			<label class="campo">
 				{t('Aviso')}
-				<textarea required maxlength="1000" bind:value={texto}></textarea>
+				<textarea required maxlength="1000" bind:value={texto} {@attach contador(texto)}></textarea>
 			</label>
 			<label class="campo">
 				{t('Para')}
@@ -96,7 +96,7 @@
 						<span class="selo selo--info"><Bell aria-hidden="true" size={14} /> {t('Novo')}</span>
 					{/if}
 					{aviso.texto}
-					<span class="detalhe">{destinoDe(aviso.comite_id)} · {formatarQuando(aviso.criado_em, agora)}</span>
+					<span class="detalhe">{destinoDe(aviso.comite_id)} · <Quando iso={aviso.criado_em} /></span>
 				</span>
 				{#if podeRemover(aviso.autor_id)}
 					<button

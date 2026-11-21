@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
+	import { contador } from '#lib/contador.ts';
 	import { locale, t } from '#lib/i18n.svelte.ts';
 	import { tick } from 'svelte';
 	import { invalidate } from '$app/navigation';
@@ -275,7 +276,7 @@
 				{/if}
 				<label class="campo">
 					{t('Texto da cláusula')}
-					<textarea required maxlength="2000" rows="3" bind:value={novoTexto}></textarea>
+					<textarea required maxlength="2000" rows="3" bind:value={novoTexto} {@attach contador(novoTexto)}></textarea>
 				</label>
 				{#if sugestoes.length}
 					<div class="acoes" role="group" aria-label={t('Verbos sugeridos')}>
@@ -307,7 +308,7 @@
 			{#if data.souRedator && editavel && clausula.status !== 'acordada'}
 				<label class="campo">
 					{t('Texto')}
-					<textarea rows="4" maxlength="2000" bind:value={edicao}></textarea>
+					<textarea rows="4" maxlength="2000" bind:value={edicao} {@attach contador(edicao)}></textarea>
 				</label>
 				<div class="acoes">
 					<button class="botao" type="button" onclick={salvarTexto}>{t('Salvar texto')}</button>
@@ -408,7 +409,7 @@
 				<form class="formulario" onsubmit={propor}>
 					<label class="campo">
 						{t('Sua proposta de texto')}
-						<textarea required maxlength="2000" rows="3" bind:value={proposta}></textarea>
+						<textarea required maxlength="2000" rows="3" bind:value={proposta} {@attach contador(proposta)}></textarea>
 					</label>
 					<button class="botao">{t('Propor alteração')}</button>
 				</form>
@@ -447,7 +448,7 @@
 				<form class="formulario" onsubmit={comentar}>
 					<label class="campo">
 						{t('Comentário')}
-						<textarea required maxlength="1000" rows="2" bind:value={comentario}></textarea>
+						<textarea required maxlength="1000" rows="2" bind:value={comentario} {@attach contador(comentario)}></textarea>
 					</label>
 					<button class="botao botao--secundario">{t('Comentar')}</button>
 				</form>
@@ -607,7 +608,7 @@
 				{#if emendaAcao !== 'suprimir'}
 					<label class="campo">
 						{t('Texto da emenda')}
-						<textarea required rows="3" maxlength="2000" bind:value={emendaTexto}></textarea>
+						<textarea required rows="3" maxlength="2000" bind:value={emendaTexto} {@attach contador(emendaTexto)}></textarea>
 					</label>
 				{/if}
 				<button class="botao botao--secundario">{t('Propor emenda')}</button>

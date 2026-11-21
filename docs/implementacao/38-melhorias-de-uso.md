@@ -5,6 +5,22 @@
 **Esforço:** P cada, M no total
 **Objetivo:** tirar pequenos atritos do dia a dia do evento. A lista vem desta análise e cresce com o que aparecer no piloto (questionário em `docs/piloto.md`).
 
+## Como ficou
+
+| # | Melhoria | Como |
+|---|---|---|
+| 1 | Tela acesa | `manterTelaAcesa()` em `src/lib/aparelho.ts`, na sessão, no painel e no telão |
+| 2 | "Sua vez" | faixa "A palavra é sua", vibração ao receber a palavra e outra curta no aviso do relógio |
+| 3 | Votação chama a atenção | `chamarAtencao()`: rola, põe o foco no título do cartão e vibra; só a votação que abre depois de a tela estar aberta, e nunca tira o foco de quem está digitando |
+| 4 | Retirar o ponto | `retirar_ponto` (`20261217090000_retirar_ponto.sql`), status `retirado`, botão "Retirar" em "Seus pontos e moções" |
+| 5 | Rascunhos | `src/lib/rascunho.ts`; ponto (sessão), bilhete, carta, matéria e nota de crise |
+| 6 | Filtro | `src/lib/filtro.ts`; chamada, destinatário do bilhete e votos registrados pela mesa, com mais de 12 delegações. Os "próximos" ficaram sem filtro: a fila de placas raramente passa de 12 |
+| 7 | Contador | `{@attach contador(valor)}` (`src/lib/contador.ts`) nos 43 campos com limite de 100 caracteres ou mais; o contador fica fora do `<label>` e entra no `aria-describedby` |
+| 8 | Confirmar | `src/lib/ui/Confirmar.svelte`: encerrar a sessão, encerrar a votação, passar a presidência e retirar a adoção da agenda |
+| 9 | Hora relativa | `src/lib/tempo.ts` e `src/lib/ui/Quando.svelte` (hora exata no `title`) em avisos, mensagens, matérias e atualizações de crise |
+| 10 | Tema | "Tema neste aparelho" no perfil; `data-theme` aplicado antes da primeira pintura (`src/app.html`) |
+| 11 | Telão | o cursor e a dica "F: tela cheia" somem depois de 3 s com o mouse parado |
+
 ## As melhorias
 
 | # | Melhoria | Onde | Junto de |
@@ -72,17 +88,17 @@ Tecla F alterna a tela cheia (`requestFullscreen`), e o cursor some depois de 3 
 
 Arquivos: `src/lib/rascunho.test.ts`, `src/lib/filtro.test.ts`, `src/lib/tempo.test.ts`, `supabase/tests/38-retirar-ponto.test.sql` e `tests/38-uso.spec.ts`.
 
-- [ ] Vitest das três funções puras.
-- [ ] pgTAP de `retirar_ponto`: só a autora; só antes da lista ou da votação.
-- [ ] Ponta a ponta:
+- [x] Vitest das três funções puras.
+- [x] pgTAP de `retirar_ponto`: só a autora; só antes da lista ou da votação.
+- [x] Ponta a ponta:
   - o rascunho do bilhete volta depois de recarregar a página;
   - o filtro acha "Côte"/"Costa do Marfim" sem acento;
   - a confirmação aparece ao encerrar uma votação;
   - o tema escolhido sobrevive à recarga.
-- [ ] axe nas telas tocadas.
+- [x] axe nas telas tocadas.
 - [ ] Manual: vibração e tela acesa num Android real; no iPhone, sem erro.
 
 ## Pronto quando
 
-- [ ] As 11 melhorias estão no ar, cada uma no passo em que entrou ou aqui.
+- [x] As 11 melhorias estão no ar, cada uma no passo em que entrou ou aqui.
 - [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.

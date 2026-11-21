@@ -2,6 +2,7 @@
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { t } from '#lib/i18n.svelte.ts';
 	import { untrack } from 'svelte';
+	import { filtrarDelegacoes, LISTA_LONGA } from '#lib/filtro.ts';
 	import { invalidate } from '$app/navigation';
 	import { mensagemDeErro } from '#lib/sessao.ts';
 	import { supabase } from '#lib/supabase.ts';
@@ -11,6 +12,7 @@
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
+	let busca = $state('');
 
 	let erro = $state('');
 	// A preparação (sorteio do rodízio) fica recolhida depois que a ordem existe.
@@ -124,8 +126,11 @@
 					>{t('Marcar todas como presentes')}</button
 				>
 			</p>
+			{#if previstas.length > LISTA_LONGA}
+				<label class="campo">{t('Filtrar')} <input type="search" bind:value={busca} /></label>
+			{/if}
 			<ul class="chamada">
-				{#each previstas as d (d.id)}
+				{#each filtrarDelegacoes(previstas, busca) as d (d.id)}
 					{@const presente = presentes.has(d.id)}
 					<li>
 						<button class="chamada-item" type="button" aria-pressed={presente} onclick={() => alternar(d.id)}>

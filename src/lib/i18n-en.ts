@@ -1037,6 +1037,23 @@ export const EN: Record<string, string> = {
 	'Publique a imagem pelo Instagram no celular ou pelo Meta Business Suite.': 'Post the image through Instagram on your phone or through Meta Business Suite.',
 	// Passo 37
 	'Credencial': 'Credential',
+	// Passo 38
+	'A palavra é sua': 'You have the floor',
+	'Pedido retirado.': 'Request withdrawn.',
+	'Retirar': 'Withdraw',
+	'Retirado': 'Withdrawn',
+	'Filtrar': 'Filter',
+	'{n} de {max}': '{n} of {max}',
+	'Encerrar a votação de {objeto}?': 'Close the vote on {objeto}?',
+	'Quem não votou fica sem voto, e o resultado sai na hora.': 'Delegations that have not voted are left out, and the result comes out right away.',
+	'Passar a presidência à próxima delegação?': 'Pass the chair to the next delegation?',
+	'F: tela cheia': 'F: full screen',
+	'Tema neste aparelho': 'Theme on this device',
+	'Automático (o do sistema)': 'Automatic (system setting)',
+	'Claro': 'Light',
+	'Escuro': 'Dark',
+	'Só a delegação que pediu retira o pedido.': 'Only the delegation that made the request can withdraw it.',
+	'O pedido já foi atendido e não pode mais ser retirado.': 'The request has already been handled and can no longer be withdrawn.',
 };
 
 /** Mensagens do banco com partes variáveis: [padrão em português, tradução]. */

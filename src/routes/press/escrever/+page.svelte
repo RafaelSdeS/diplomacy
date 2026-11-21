@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
+	import { contador } from '#lib/contador.ts';
 	import { t } from '#lib/i18n.svelte.ts';
+	import { guardarRascunho, lerRascunho } from '#lib/rascunho.ts';
 	import { goto } from '$app/navigation';
 	import { caixa, mensagemDoEnvio } from '#lib/caixa.ts';
 	import { paragrafos } from '#lib/impressao.ts';
@@ -19,7 +21,8 @@
 	let tipo = $state('reportagem');
 	let titulo = $state('');
 	let linhaFina = $state('');
-	let texto = $state('');
+	let texto = $state(lerRascunho('noticia'));
+	$effect(() => guardarRascunho('noticia', texto));
 	let dataSimulacao = $state('');
 	let citadas = $state<string[]>([]);
 	let arquivos = $state<FileList | undefined>();
@@ -80,6 +83,7 @@
 				citadas = [];
 				return;
 			}
+			guardarRascunho('noticia', '');
 			await goto(`/press/${veiculo.comite?.sigla}?n=${publicada}`);
 		} catch (e) {
 			erro = mensagemDeErro(e as { code?: string; message?: string });
@@ -114,15 +118,15 @@
 		</label>
 		<label class="campo">
 			{t('Título')}
-			<input required maxlength="200" bind:value={titulo} />
+			<input required maxlength="200" bind:value={titulo} {@attach contador(titulo)} />
 		</label>
 		<label class="campo">
 			{t('Linha fina (opcional)')}
-			<input maxlength="300" bind:value={linhaFina} />
+			<input maxlength="300" bind:value={linhaFina} {@attach contador(linhaFina)} />
 		</label>
 		<label class="campo">
 			{t('Texto (parágrafos separados por uma linha em branco)')}
-			<textarea required rows="10" maxlength="10000" bind:value={texto}></textarea>
+			<textarea required rows="10" maxlength="10000" bind:value={texto} {@attach contador(texto)}></textarea>
 		</label>
 		<p class="aviso-palavrao" aria-live="polite">
 			{#if achados.length}
@@ -140,7 +144,7 @@
 		{#if arquivos?.[0]}
 			<label class="campo">
 				{t('Descrição da imagem (para quem usa leitor de tela)')}
-				<input required maxlength="300" bind:value={descricao} />
+				<input required maxlength="300" bind:value={descricao} {@attach contador(descricao)} />
 			</label>
 		{/if}
 		{#if delegacoes.length}

@@ -162,7 +162,8 @@ export const SITUACAO_PONTO = bilingue({
 	em_discussao: 'Lista especial aberta',
 	em_votacao: 'Em votação',
 	aceito: 'Aceito',
-	recusado: 'Recusado'
+	recusado: 'Recusado',
+	retirado: 'Retirado'
 } as const);
 
 /**

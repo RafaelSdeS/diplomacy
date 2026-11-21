@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
+	import { contador } from '#lib/contador.ts';
 	import { t } from '#lib/i18n.svelte.ts';
 	import { rotuloPapel } from '#lib/papeis.ts';
 	import { mensagemDeErro } from '#lib/sessao.ts';
@@ -72,7 +73,7 @@
 		{#each perguntas as pergunta (pergunta)}
 			<label class="campo">
 				{pergunta}
-				<textarea rows="2" maxlength="1000" bind:value={respostas[pergunta]}></textarea>
+				<textarea rows="2" maxlength="1000" bind:value={respostas[pergunta]} {@attach contador(respostas[pergunta])}></textarea>
 			</label>
 		{/each}
 		{#if erro}

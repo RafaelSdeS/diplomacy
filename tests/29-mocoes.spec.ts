@@ -54,6 +54,19 @@ test('o bureau recusa um pedido com motivo, e o delegado vê a etapa e o motivo'
 	await expect(meus.getByRole('listitem').last()).toContainText('Recusado: Fora de hora');
 });
 
+test('a delegação retira o próprio pedido enquanto ele espera (passo 38)', async ({ page }) => {
+	await entrar(page, ALEMANHA);
+	await page.goto('/comite/CE-T/sessao');
+	await aoVivo(page);
+	await page.getByLabel('Tipo').selectOption({ label: 'Ponto de dúvida' });
+	await page.getByRole('button', { name: 'Enviar à mesa' }).click();
+	await expect(page.getByRole('status').filter({ hasText: 'enviado à mesa' })).toBeVisible();
+	const ultimo = page.getByRole('list', { name: 'Seus pontos e moções' }).getByRole('listitem').last();
+	await ultimo.getByRole('button', { name: 'Retirar' }).click();
+	await expect(ultimo).toContainText('Retirado');
+	await expect(ultimo.getByRole('button', { name: 'Retirar' })).toHaveCount(0);
+});
+
 test.afterAll(async ({}, info) => {
 	if (info.project.name !== 'notebook') return;
 	// Deixa a fila do bureau limpa para os outros testes do comitê.

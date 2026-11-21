@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
+	import { contador } from '#lib/contador.ts';
 	import { t } from '#lib/i18n.svelte.ts';
 	import { invalidate } from '$app/navigation';
 	import Check from '@lucide/svelte/icons/check';
@@ -109,11 +110,11 @@
 		<form class="formulario" onsubmit={adicionar}>
 			<label class="campo">
 				{t('Título')}
-				<input required maxlength="120" bind:value={titulo} />
+				<input required maxlength="120" bind:value={titulo} {@attach contador(titulo)} />
 			</label>
 			<label class="campo">
 				{t('Local')}
-				<input maxlength="120" bind:value={local} />
+				<input maxlength="120" bind:value={local} {@attach contador(local)} />
 			</label>
 			<label class="campo">
 				{t('Início')}

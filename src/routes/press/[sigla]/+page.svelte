@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
+	import Quando from '#lib/ui/Quando.svelte';
+	import { contador } from '#lib/contador.ts';
 	import { locale, t } from '#lib/i18n.svelte.ts';
 	import { invalidate } from '$app/navigation';
-	import { formatarQuando } from '#lib/cronograma.ts';
 	import { paragrafos } from '#lib/impressao.ts';
 	import { gerarImagem, hashtags, type Formato } from '#lib/imagem-redes.ts';
 	import { APP, marca } from '#lib/titulo.svelte.ts';
@@ -13,7 +14,6 @@
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
-	const agora = new Date();
 
 	const souPress = $derived(data.participacoes.some((p) => p.papel === 'press' && p.comite_id === data.comite.id));
 	const modero = $derived(data.participacoes.some((p) => p.papel === 'secretaria' || p.papel === 'diretoria_press'));
@@ -116,7 +116,7 @@
 				<p class="detalhe">{t('Cita')}: {noticia.citacoes.map((c) => c.delegacao?.nome).join(', ')}</p>
 			{/if}
 			<p class="detalhe">
-				{noticia.autor?.nome ? `${t('Por')} ${noticia.autor.nome} · ` : ''}{formatarQuando(noticia.publicada_em, agora)}
+				{noticia.autor?.nome ? `${t('Por')} ${noticia.autor.nome} · ` : ''}<Quando iso={noticia.publicada_em} />
 			</p>
 			{#if souPress && noticia.status === 'publicada'}
 				<div class="acoes">
@@ -161,7 +161,7 @@
 					{#if noticia.status !== 'oculta'}
 						<label class="campo">
 							{t('Motivo da ocultação')}
-							<textarea rows="2" maxlength="500" bind:value={motivo}></textarea>
+							<textarea rows="2" maxlength="500" bind:value={motivo} {@attach contador(motivo)}></textarea>
 						</label>
 						<button
 							class="botao botao--secundario"
@@ -177,7 +177,7 @@
 					<div class="formulario">
 						<label class="campo">
 							{t('Motivo da denúncia')}
-							<textarea rows="2" maxlength="500" bind:value={motivo}></textarea>
+							<textarea rows="2" maxlength="500" bind:value={motivo} {@attach contador(motivo)}></textarea>
 						</label>
 						<button
 							class="botao botao--secundario"
@@ -201,7 +201,7 @@
 						<span>
 							<strong>{n.titulo}</strong>
 							<span class="detalhe">
-								{TIPOS_NOTICIA[n.tipo]} · {formatarQuando(n.publicada_em, agora)}
+								{TIPOS_NOTICIA[n.tipo]} · <Quando iso={n.publicada_em} />
 								{#if SITUACAO[n.status]}<span class="selo {SITUACAO[n.status]?.selo}">{SITUACAO[n.status]?.rotulo}</span>{/if}
 							</span>
 						</span>

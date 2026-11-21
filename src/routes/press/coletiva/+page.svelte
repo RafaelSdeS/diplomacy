@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
+	import { contador } from '#lib/contador.ts';
 	import { t } from '#lib/i18n.svelte.ts';
 	import { invalidate } from '$app/navigation';
 	import { mensagemDeErro } from '#lib/sessao.ts';
@@ -63,7 +64,7 @@
 	>
 		<label class="campo">
 			{t('Título da coletiva')}
-			<input required maxlength="200" bind:value={titulo} />
+			<input required maxlength="200" bind:value={titulo} {@attach contador(titulo)} />
 		</label>
 		<button class="botao">{t('Abrir uma coletiva')}</button>
 		{#if data.coletiva?.aberta}
@@ -98,7 +99,7 @@
 				</label>
 				<label class="campo">
 					{t('Pergunta')}
-					<input required maxlength="300" bind:value={pergunta} />
+					<input required maxlength="300" bind:value={pergunta} {@attach contador(pergunta)} />
 				</label>
 				<button class="botao">{t('Pôr na pauta')}</button>
 			</form>

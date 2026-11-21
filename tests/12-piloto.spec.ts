@@ -121,6 +121,8 @@ test('a mesa abre a votação pelo teclado, o celular em 3G lento vota e o telã
 
 	await mesa.getByRole('button', { name: 'Encerrar a votação' }).focus();
 	await mesa.keyboard.press('Enter');
+	await expect(mesa.getByRole('dialog')).toBeVisible();
+	await mesa.keyboard.press('Enter');
 	await expect(telao.getByText(new RegExp(`${TITULO}\\. Aprovada: 5 a favor, 1 contra`))).toBeVisible({ timeout: 10_000 });
 	await expect(mesa.getByRole('region', { name: 'Projetos de resolução' }).getByRole('listitem').filter({ hasText: TITULO })).toContainText(
 		'Aprovado'
