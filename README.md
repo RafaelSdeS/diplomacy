@@ -96,6 +96,11 @@ Cada passo traz os testes que provam que ele funciona. Um passo só termina quan
 | [36](docs/implementacao/36-press-nas-redes.md) | Press nas redes |
 | [37](docs/implementacao/37-visual-geral.md) | Visual geral |
 | [38](docs/implementacao/38-melhorias-de-uso.md) | Melhorias de uso |
+| [39](docs/implementacao/39-testes-e-ci-rapidos.md) | Testes e CI mais rápidos |
+| [40](docs/implementacao/40-menos-dados-no-celular.md) | Menos dados no celular |
+| [41](docs/implementacao/41-pendencias.md) | Pendências |
+| [42](docs/implementacao/42-estilo-chancelaria.md) | Estilo chancelaria |
+| [43](docs/implementacao/43-facil-de-achar-e-voltar.md) | Fácil de achar e de voltar |
 
 As fases do projeto (validação, piloto, evento e crescimento) e o calendário até a edição de 2027 estão na seção 17 do plano completo.
 
@@ -129,7 +134,7 @@ npm run testar       # tipos, unidade, banco, build, tamanho e ponta a ponta
 
 Contas do seed para entrar: `delegado01@exemplo.test` a `delegado16`, `mesa01`, `crise01`, `press01`, `secretaria01` e `semconvite` (sem convite), todas `@exemplo.test` com a senha `senha-de-teste`. No evento de demonstração (`npm run demo`), as contas seguem o padrão `demo.<sigla>.<nn>@exemplo.test` (delegação `nn` do comitê, em ordem; `01b` e `02b` são segundos delegados), `demo.<sigla>.mesa1`, `.press`, `.crise1`, mais `demo.secretaria` e `demo.diretoria-press`. O CSNU da demonstração tem conteúdo completo para testar: `demo.csnu.mesa1` (mesa), `demo.csnu.08` (Dinamarca, primeira presidência do sorteio), `demo.csnu.03` (França). Não há cadastro livre: as contas são criadas pelo seed ou pelo administrador, e os convites da secretaria definem o papel.
 
-Para ver uma sessão funcionando: entre como `mesa01`, abra Sessão › Chamada e rodízio, sorteie o rodízio, abra a sessão e marque as presenças. No Painel da presidência, conduza a plenária de abertura (briefing, discursos e moção do tópico no topo); em outra janela, um delegado propõe o tópico e vota. Depois da plenária, preside a delegação sorteada. O telão fica em `/telao/CSNU-T`.
+Para ver uma sessão funcionando: entre como `mesa01`, abra o Painel e clique em Abrir sessão; na Chamada, sorteie o rodízio, marque as presenças e conclua (volta ao Painel). No Painel, conduza a plenária de abertura (briefing, discursos e moção do tópico no topo); em outra janela, um delegado propõe o tópico e vota. Depois da plenária, preside a delegação sorteada. O telão fica em `/telao/CSNU-T`.
 
 Para parar o Supabase local: `npx supabase stop`. Depois de criar uma migração, rode `npm run db:resetar` (recria o banco), `npm run seed` e `npm run db:tipos`.
 
