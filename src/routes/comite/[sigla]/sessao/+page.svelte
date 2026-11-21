@@ -34,7 +34,14 @@
 	let minutos = $state(10);
 	let placa = $state<HTMLDialogElement>();
 
-	const eu = $derived(data.participacoes.find((p) => p.comite_id === data.comite.id && p.papel === 'delegado'));
+	// Passo 31: a mesa que assumiu uma delegação age como ela nesta tela.
+	const representada = $derived(data.representacoes.find((r) => r.pessoa_id === data.usuario?.id)?.delegacao ?? null);
+	const eu = $derived(
+		data.participacoes.find((p) => p.comite_id === data.comite.id && p.papel === 'delegado') ??
+			(representada
+				? { delegacao_id: representada.id, delegacao_nome: representada.nome, delegacao_bandeira: representada.bandeira }
+				: undefined)
+	);
 	const ehMesa = $derived(
 		data.participacoes.some((p) => (p.papel === 'mesa' && p.comite_id === data.comite.id) || p.papel === 'secretaria')
 	);
@@ -90,7 +97,11 @@
 	const placaAcao = (funcao: 'levantar_placa' | 'baixar_placa') =>
 		executar(supabase.rpc(funcao, { p_comite: data.comite.id }));
 	const votar = (escolha: Escolha) =>
-		executar(supabase.rpc('votar', { p_votacao: data.votacao!.id, p_escolha: escolha }));
+		executar(
+			representada
+				? supabase.rpc('registrar_voto', { p_votacao: data.votacao!.id, p_delegacao: representada.id, p_escolha: escolha })
+				: supabase.rpc('votar', { p_votacao: data.votacao!.id, p_escolha: escolha })
+		);
 	const inscrever = (lado: 'a_favor' | 'contra') =>
 		executar(supabase.rpc('inscrever_lista', { p_ponto: emDiscussao!.id, p_lado: lado }), t('Sua delegação entrou na lista.'));
 
@@ -135,6 +146,9 @@
 		<p class="sucesso" role="status">{mensagem}</p>
 	{/if}
 
+	{#if representada}
+		<p class="telegrama" role="note">{t('Pela mesa: você está no lugar de {delegacao}.', { delegacao: representada.nome })}</p>
+	{/if}
 	{#if restrita}
 		<p class="telegrama" role="note">{t('Tecnologia restrita: durante a sessão, a mesa registra as falas e os votos.')}</p>
 	{/if}

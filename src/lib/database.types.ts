@@ -1119,14 +1119,14 @@ isOneToOne: false
                   ]
                 },"pedido_fala": {
                   Row: {
-                    "comite_id": string,"criado_em": string,"delegacao_id": string,"id": string,"sessao_id": string,"situacao": string
+                    "comite_id": string,"criado_em": string,"delegacao_id": string,"id": string,"pela_mesa": boolean,"sessao_id": string,"situacao": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "comite_id": string,"criado_em"?: string,"delegacao_id": string,"id"?: string,"sessao_id": string,"situacao"?: string
+                    "comite_id": string,"criado_em"?: string,"delegacao_id": string,"id"?: string,"pela_mesa"?: boolean,"sessao_id": string,"situacao"?: string
                   }
                   Update: {
-                    "comite_id"?: string,"criado_em"?: string,"delegacao_id"?: string,"id"?: string,"sessao_id"?: string,"situacao"?: string
+                    "comite_id"?: string,"criado_em"?: string,"delegacao_id"?: string,"id"?: string,"pela_mesa"?: boolean,"sessao_id"?: string,"situacao"?: string
                   }
                   Relationships: [
                     {
@@ -1231,14 +1231,14 @@ isOneToOne: false
                   ]
                 },"ponto_mocao": {
                   Row: {
-                    "aprovado_bureau": boolean | null,"comite_id": string,"criado_em": string,"delegacao_id": string,"detalhe": string | null,"id": string,"julgado_em": string | null,"julgado_por": string | null,"minutos": number | null,"motivo": string | null,"sessao_id": string,"status": string,"tipo": string,"topico": number | null
+                    "aprovado_bureau": boolean | null,"comite_id": string,"criado_em": string,"delegacao_id": string,"detalhe": string | null,"id": string,"julgado_em": string | null,"julgado_por": string | null,"minutos": number | null,"motivo": string | null,"pela_mesa": boolean,"sessao_id": string,"status": string,"tipo": string,"topico": number | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "aprovado_bureau"?: boolean | null,"comite_id": string,"criado_em"?: string,"delegacao_id": string,"detalhe"?: string | null,"id"?: string,"julgado_em"?: string | null,"julgado_por"?: string | null,"minutos"?: number | null,"motivo"?: string | null,"sessao_id": string,"status"?: string,"tipo": string,"topico"?: number | null
+                    "aprovado_bureau"?: boolean | null,"comite_id": string,"criado_em"?: string,"delegacao_id": string,"detalhe"?: string | null,"id"?: string,"julgado_em"?: string | null,"julgado_por"?: string | null,"minutos"?: number | null,"motivo"?: string | null,"pela_mesa"?: boolean,"sessao_id": string,"status"?: string,"tipo": string,"topico"?: number | null
                   }
                   Update: {
-                    "aprovado_bureau"?: boolean | null,"comite_id"?: string,"criado_em"?: string,"delegacao_id"?: string,"detalhe"?: string | null,"id"?: string,"julgado_em"?: string | null,"julgado_por"?: string | null,"minutos"?: number | null,"motivo"?: string | null,"sessao_id"?: string,"status"?: string,"tipo"?: string,"topico"?: number | null
+                    "aprovado_bureau"?: boolean | null,"comite_id"?: string,"criado_em"?: string,"delegacao_id"?: string,"detalhe"?: string | null,"id"?: string,"julgado_em"?: string | null,"julgado_por"?: string | null,"minutos"?: number | null,"motivo"?: string | null,"pela_mesa"?: boolean,"sessao_id"?: string,"status"?: string,"tipo"?: string,"topico"?: number | null
                   }
                   Relationships: [
                     {
@@ -1431,6 +1431,32 @@ isOneToOne: false
       referencedColumns: ["id"]
     },{
       foreignKeyName: "registro_pessoa_id_fkey"
+      columns: ["pessoa_id"]
+isOneToOne: false
+      referencedRelation: "pessoa"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"representacao": {
+                  Row: {
+                    "comite_id": string,"delegacao_id": string,"desde": string,"pessoa_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "comite_id": string,"delegacao_id": string,"desde"?: string,"pessoa_id": string
+                  }
+                  Update: {
+                    "comite_id"?: string,"delegacao_id"?: string,"desde"?: string,"pessoa_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "representacao_delegacao_id_comite_id_fkey"
+      columns: ["delegacao_id","comite_id"]
+isOneToOne: false
+      referencedRelation: "delegacao"
+      referencedColumns: ["id","comite_id"]
+    },{
+      foreignKeyName: "representacao_pessoa_id_fkey"
       columns: ["pessoa_id"]
 isOneToOne: false
       referencedRelation: "pessoa"
@@ -2130,6 +2156,9 @@ isOneToOne: false
                            },
 "remover_clausula":
 { Args: { "p_clausula": string }; Returns: undefined
+                           },
+"representar":
+{ Args: { "p_comite": string,"p_delegacao": string }; Returns: undefined
                            },
 "responder_entrevista":
 { Args: { "p_aceitar": boolean,"p_entrevista": string,"p_horario"?: string }; Returns: undefined

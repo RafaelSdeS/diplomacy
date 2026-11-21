@@ -81,6 +81,11 @@
 	const definirProximos = () =>
 		rpc('definir_proximos', { p_comite: comite, p_delegacoes: escolhidos }).then(() => (escolhidos = []));
 	const baixarTodas = () => rpc('baixar_todas_placas', { p_comite: comite });
+	// Passo 31: a mesa assume a delegação de quem faltou.
+	const representada = $derived(data.representacoes.find((r) => r.pessoa_id === data.usuario?.id)?.delegacao ?? null);
+	const ausentes = $derived(new Set(data.delegacoes.filter((d) => !sessao?.presenca.some((p) => p.delegacao_id === d.id)).map((d) => d.id)));
+	const paraAssumir = $derived([...data.delegacoes].sort((a, b) => Number(ausentes.has(b.id)) - Number(ausentes.has(a.id))));
+	let assumir = $state('');
 	const correndo = $derived(!!data.estado?.cronometro_inicio && !pausado);
 	const votacao = $derived(data.votacao);
 	// Quem pode votar nesta votação: presentes, menos suspensas (e observadoras, na substantiva).
@@ -243,6 +248,38 @@
 				<button class="botao botao--secundario">{t('Cancelar')}</button>
 			</form>
 		</dialog>
+		<section class="cartao" aria-labelledby="t-representar">
+			<h2 id="t-representar">{t('Assumir uma delegação')}</h2>
+			{#if representada}
+				<p>{t('Você está no lugar de {delegacao}.', { delegacao: representada.nome })}</p>
+				<div class="acoes">
+					<a class="botao botao--secundario botao--pequeno" href={`/comite/${data.comite.sigla}/sessao`}>{t('Agir pela delegação')}</a>
+					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => rpc('representar', { p_comite: comite, p_delegacao: null as unknown as string })}
+						>{t('Deixar')}</button
+					>
+				</div>
+			{:else}
+				<form
+					class="acoes"
+					aria-label={t('Assumir uma delegação')}
+					onsubmit={(e) => {
+						e.preventDefault();
+						if (assumir) void rpc('representar', { p_comite: comite, p_delegacao: assumir });
+					}}
+				>
+					<label class="campo">
+						{t('Delegação')}
+						<select bind:value={assumir} required>
+							<option value="">{t('Escolha')}</option>
+							{#each paraAssumir as d (d.id)}
+								<option value={d.id}>{d.nome}{ausentes.has(d.id) ? ` · ${t('ausente')}` : ''}</option>
+							{/each}
+						</select>
+					</label>
+					<button class="botao botao--secundario botao--pequeno">{t('Assumir')}</button>
+				</form>
+			{/if}
+		</section>
 		{#if sessao.avisos.length}
 			<section class="cartao cartao--destaque" aria-labelledby="t-chegadas">
 				<h2 id="t-chegadas">{t('Chegadas')}</h2>
@@ -358,7 +395,10 @@
 					{#each fila as pedido (pedido.id)}
 						{@const ordem = escolhidos.indexOf(pedido.delegacao?.id ?? '')}
 						<li>
-							<NomeDelegacao sigla={data.comite.sigla} delegacao={pedido.delegacao} />
+							<span>
+								<NomeDelegacao sigla={data.comite.sigla} delegacao={pedido.delegacao} />
+								{#if pedido.pela_mesa}<span class="selo">{t('pela mesa')}</span>{/if}
+							</span>
 							<span class="acoes">
 								<button
 									class="botao botao--secundario botao--pequeno"

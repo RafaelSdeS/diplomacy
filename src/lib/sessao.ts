@@ -19,7 +19,7 @@ export async function comitePorSigla(sigla: string) {
 
 /** Tudo o que as telas da sessão mostram: estado, listas, última votação, regras e permissão. */
 export async function carregarSessao(comiteId: string) {
-	const [estado, lista, delegacoes, regras, podePresidir, emVotacao] = await Promise.all([
+	const [estado, lista, delegacoes, regras, podePresidir, emVotacao, representacoes] = await Promise.all([
 		supabase
 			.from('estado_sessao')
 			.select(
@@ -32,8 +32,8 @@ export async function carregarSessao(comiteId: string) {
 					presenca(delegacao_id, situacao),
 					avisos:aviso_chegada(delegacao(id, nome, bandeira)),
 					proximos:proximo_orador(ordem, delegacao(id, nome, bandeira)),
-					pedidos:pedido_fala(id, delegacao(id, nome, bandeira)),
-					pontos:ponto_mocao(id, tipo, detalhe, status, topico, minutos, aprovado_bureau, motivo, delegacao(id, nome), assinaturas:assinatura_mocao(delegacao_id)),
+					pedidos:pedido_fala(id, pela_mesa, delegacao(id, nome, bandeira)),
+					pontos:ponto_mocao(id, tipo, detalhe, status, topico, minutos, aprovado_bureau, motivo, pela_mesa, delegacao(id, nome), assinaturas:assinatura_mocao(delegacao_id)),
 					votacoes:votacao(id, objeto, tipo, regra, aberta, a_favor, contra, abstencoes, necessario,
 						aprovada, encerrada_em, nominal, partes, votos:voto(delegacao_id, escolha, registrado_pela_mesa),
 						passes:passe(delegacao_id)))`
@@ -55,9 +55,11 @@ export async function carregarSessao(comiteId: string) {
 		supabase.rpc('regras', { p_comite: comiteId }, { get: true }),
 		supabase.rpc('pode_presidir', { p_comite: comiteId }, { get: true }),
 		// Um projeto em votação fecha a sala (só divisão da questão e votação nominal).
-		supabase.from('documento').select('id').eq('comite_id', comiteId).eq('status', 'em_votacao').limit(1)
+		supabase.from('documento').select('id').eq('comite_id', comiteId).eq('status', 'em_votacao').limit(1),
+		// A mesa no lugar de delegações ausentes (passo 31).
+		supabase.from('representacao').select('pessoa_id, delegacao(id, nome, bandeira)').eq('comite_id', comiteId)
 	]);
-	for (const r of [estado, lista, delegacoes, regras, podePresidir, emVotacao]) if (r.error) throw r.error;
+	for (const r of [estado, lista, delegacoes, regras, podePresidir, emVotacao, representacoes]) if (r.error) throw r.error;
 
 	const sessao = estado.data?.sessao ?? null;
 	return {
@@ -69,7 +71,8 @@ export async function carregarSessao(comiteId: string) {
 		votacao: sessao?.votacoes[0] ?? null, // a mais recente da sessão
 		regras: regras.data as Regras,
 		podePresidir: podePresidir.data ?? false,
-		salaFechada: (emVotacao.data?.length ?? 0) > 0
+		salaFechada: (emVotacao.data?.length ?? 0) > 0,
+		representacoes: representacoes.data ?? []
 	};
 }
 

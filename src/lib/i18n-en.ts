@@ -926,6 +926,16 @@ export const EN: Record<string, string> = {
 	'Sua delegação é a {n}ª da lista curta.': 'Your delegation is number {n} on the short list.',
 	'A lista curta tem no máximo 4 delegações.': 'The short list has at most 4 delegations.',
 	'Só delegações presentes entram na lista curta.': 'Only present delegations go on the short list.',
+	// Passo 31
+	'Pela mesa: você está no lugar de {delegacao}.': 'For the dais: you are standing in for {delegacao}.',
+	'Assumir uma delegação': 'Stand in for a delegation',
+	'Você está no lugar de {delegacao}.': 'You are standing in for {delegacao}.',
+	'Agir pela delegação': 'Act for the delegation',
+	'Deixar': 'Leave',
+	'ausente': 'absent',
+	'Assumir': 'Stand in',
+	'pela mesa': 'by the dais',
+	'Escolha uma delegação do comitê.': 'Choose a delegation of the committee.',
 };
 
 /** Mensagens do banco com partes variáveis: [padrão em português, tradução]. */

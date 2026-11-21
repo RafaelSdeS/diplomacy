@@ -67,9 +67,9 @@ select results_eq(
 -- Para conferir a sequência, fixamos a ordem: d01, d02, d03...
 reset role;
 update public.rodizio_presidencia r set ordem = 100 + x.n
-from (select delegacao_id, row_number() over (order by delegacao_id) as n from public.rodizio_presidencia) x
+from (select delegacao_id, row_number() over (order by delegacao_id) as n from public.rodizio_presidencia where comite_id = '00000000-0000-0000-0000-0000000000c1') x
 where r.delegacao_id = x.delegacao_id;
-update public.rodizio_presidencia set ordem = ordem - 100;
+update public.rodizio_presidencia set ordem = ordem - 100 where comite_id = '00000000-0000-0000-0000-0000000000c1';
 create temp table ordem as
 	select ordem, delegacao_id from public.rodizio_presidencia
 	where comite_id = '00000000-0000-0000-0000-0000000000c1';
