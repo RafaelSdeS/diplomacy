@@ -29,6 +29,7 @@ export async function carregarSessao(comiteId: string) {
 				sessao(id, numero, informal_min_usados,
 					presidencia:delegacao!sessao_presidencia_delegacao_id_comite_id_fkey(id, nome, bandeira),
 					presenca(delegacao_id, situacao),
+					avisos:aviso_chegada(delegacao(id, nome, bandeira)),
 					pedidos:pedido_fala(id, delegacao(id, nome, bandeira)),
 					pontos:ponto_mocao(id, tipo, detalhe, status, topico, minutos, delegacao(id, nome), assinaturas:assinatura_mocao(delegacao_id)),
 					votacoes:votacao(id, objeto, tipo, regra, aberta, a_favor, contra, abstencoes, necessario,
@@ -70,6 +71,33 @@ export async function carregarSessao(comiteId: string) {
 }
 
 export type DadosSessao = Awaited<ReturnType<typeof carregarSessao>>;
+
+/** O resumo de uma sessão encerrada, como `resumo_sessao` devolve. */
+export type ResumoSessao = {
+	numero: number;
+	inicio: string;
+	fim: string;
+	presentes: number;
+	pontos: Record<string, number>;
+	votacoes: { objeto: string; aprovada: boolean | null }[];
+};
+
+/** O resumo da última sessão encerrada do comitê (null se não houve nenhuma). */
+export async function ultimaSessao(comiteId: string) {
+	const ultima = await supabase
+		.from('sessao')
+		.select('id')
+		.eq('comite_id', comiteId)
+		.not('fim', 'is', null)
+		.order('numero', { ascending: false })
+		.limit(1)
+		.maybeSingle();
+	if (ultima.error) throw ultima.error;
+	if (!ultima.data) return null;
+	const resumo = await supabase.rpc('resumo_sessao', { p_sessao: ultima.data.id }, { get: true });
+	if (resumo.error) throw resumo.error;
+	return resumo.data as ResumoSessao | null;
+}
 
 /** Diferença entre o relógio do servidor e o do aparelho, em ms (0 se falhar). */
 export async function medirRelogio(): Promise<number> {

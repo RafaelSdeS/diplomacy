@@ -12,6 +12,7 @@ export const TABELAS_SESSAO = [
 	'pedido_fala',
 	'ponto_mocao',
 	'presenca',
+	'aviso_chegada',
 	'lista_oradores',
 	'votacao',
 	'voto',

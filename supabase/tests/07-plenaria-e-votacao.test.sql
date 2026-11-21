@@ -210,9 +210,9 @@ select public.encerrar_votacao(pg_temp.votacao());
 select results_eq($$select topico_atual from public.estado_sessao$$, array[2],
 	'com 4 de 6 (dois terços), o debate passa ao outro tópico');
 
--- Votação substantiva: observadora não vota; "presente e votando" não se abstém
+-- Votação substantiva: observadora não vota; quem está presente pode se abster
+-- (no UFRGSMUN, "presente" e "presente e votando" são o mesmo, passo 21)
 
-update public.presenca set situacao = 'presente_e_votando' where delegacao_id = '00000000-0000-0000-0000-000000000002';
 select public.abrir_votacao_livre('00000000-0000-0000-0000-0000000000c1', 'Teste substantivo', 'substantiva');
 select pg_temp.entrar('00000000-0000-0000-0000-0000000000a6');
 select throws_ok($$select public.votar(pg_temp.votacao(), 'a_favor')$$,
@@ -220,8 +220,7 @@ select throws_ok($$select public.votar(pg_temp.votacao(), 'a_favor')$$,
 select pg_temp.entrar('00000000-0000-0000-0000-0000000000a1');
 select lives_ok($$select public.votar(pg_temp.votacao(), 'abstencao')$$, 'em questão substantiva, cabe abstenção');
 select pg_temp.entrar('00000000-0000-0000-0000-0000000000a2');
-select throws_ok($$select public.votar(pg_temp.votacao(), 'abstencao')$$,
-	'P0001', 'Delegação presente e votando não se abstém.', 'quem está presente e votando não se abstém');
+select lives_ok($$select public.votar(pg_temp.votacao(), 'abstencao')$$, 'quem está presente também se abstém');
 select results_eq($$select base from public.resultado(pg_temp.votacao())$$, array[5],
 	'na substantiva, a base são as membros presentes');
 select pg_temp.entrar('00000000-0000-0000-0000-0000000000a3');

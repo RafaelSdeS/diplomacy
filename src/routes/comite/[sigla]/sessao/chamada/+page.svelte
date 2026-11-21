@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { t } from '#lib/i18n.svelte.ts';
+	import { untrack } from 'svelte';
 	import { invalidate } from '$app/navigation';
 	import { mensagemDeErro } from '#lib/sessao.ts';
 	import { supabase } from '#lib/supabase.ts';
@@ -10,22 +11,16 @@
 
 	let { data }: PageProps = $props();
 
-	type Situacao = 'ausente' | 'presente' | 'presente_e_votando';
-	const OPCOES: { valor: Situacao; rotulo: string }[] = [
-		{ valor: 'ausente', rotulo: t('Ausente') },
-		{ valor: 'presente', rotulo: t('Presente') },
-		{ valor: 'presente_e_votando', rotulo: t('Presente e votando') }
-	];
-
 	let erro = $state('');
+	// A preparação (sorteio do rodízio) fica recolhida depois que a ordem existe.
+	let preparacaoAberta = $state(untrack(() => !data.rodizio.length));
 
 	const ehMesa = $derived(
 		data.participacoes.some((p) => (p.papel === 'mesa' && p.comite_id === data.comite.id) || p.papel === 'secretaria')
 	);
 	const previstas = $derived(data.delegacoes.filter((d) => d.situacao !== 'suspensa'));
-	const presencas = $derived(new Map((data.sessao?.presenca ?? []).map((p) => [p.delegacao_id, p.situacao])));
-	const presentes = $derived(presencas.size);
-	const haQuorum = $derived(presentes >= data.quorum);
+	const presentes = $derived(new Set((data.sessao?.presenca ?? []).map((p) => p.delegacao_id)));
+	const haQuorum = $derived(presentes.size >= data.quorum);
 
 	async function executar(acao: PromiseLike<{ error: { code?: string; message?: string } | null }>, falha: string) {
 		erro = '';
@@ -34,20 +29,16 @@
 		await invalidate('app:sessao-ao-vivo');
 	}
 
-	function marcar(delegacao: string, situacao: Situacao) {
+	// Um toque alterna entre ausente e presente (no UFRGSMUN, "presente e votando" é o mesmo).
+	function alternar(delegacao: string) {
 		const sessao = data.sessao!.id;
 		return executar(
-			situacao === 'ausente'
+			presentes.has(delegacao)
 				? supabase.from('presenca').delete().eq('sessao_id', sessao).eq('delegacao_id', delegacao)
-				: supabase
-						.from('presenca')
-						.upsert({ sessao_id: sessao, comite_id: data.comite.id, delegacao_id: delegacao, situacao }),
+				: supabase.from('presenca').upsert({ sessao_id: sessao, comite_id: data.comite.id, delegacao_id: delegacao }),
 			t('Não foi possível marcar a presença.')
 		);
 	}
-
-	const sortear = () =>
-		executar(supabase.rpc('sortear_presidencia', { p_comite: data.comite.id }), t('Não foi possível sortear.'));
 </script>
 
 <svelte:head>
@@ -60,96 +51,95 @@
 {#if !ehMesa}
 	<p class="suave">{t('Só a mesa faz a chamada.')}</p>
 {:else}
+	<p class="suave">{t('Abra a sessão, faça a chamada e conclua: o painel da presidência conduz o resto.')}</p>
 	{#if erro}
 		<p class="erro" role="alert">{erro}</p>
 	{/if}
 
+	<details class="preparacao" bind:open={preparacaoAberta}>
+		<summary>{t('Preparação: rodízio da presidência')}</summary>
+		<section aria-labelledby="t-rodizio">
+			<h2 id="t-rodizio">{t('Rodízio da presidência')}</h2>
+			<p class="suave">
+				{t(
+					'A ordem é sorteada entre todas as delegações membros (observadoras não presidem), e cada uma preside no máximo {n} sessões. O bureau preside a plenária de abertura e a fase de ação; no debate, preside a próxima da ordem, e as que sobram ficam na lista de espera.',
+					{ n: data.regras.max_sessoes_presidencia }
+				)}
+			</p>
+			{#if data.rodizio.length}
+				<ol class="lista" aria-label={t('Ordem sorteada')}>
+					{#each data.rodizio as vez (vez.ordem)}
+						<li>
+							<span class="com-bandeira"><Bandeira codigo={vez.delegacao?.bandeira} /> {vez.delegacao?.nome}</span>
+							{#if vez.vezes}<span class="selo">{vez.vezes === 1 ? t('Presidiu 1 sessão') : t('Presidiu {n} sessões', { n: vez.vezes })}</span>{/if}
+						</li>
+					{/each}
+				</ol>
+			{/if}
+			<button
+				class="botao botao--secundario"
+				type="button"
+				onclick={() => executar(supabase.rpc('sortear_presidencia', { p_comite: data.comite.id }), t('Não foi possível sortear.'))}
+			>
+				{data.rodizio.length ? t('Sortear de novo') : t('Sortear a ordem')}
+			</button>
+		</section>
+	</details>
+
 	<section aria-labelledby="t-sessao">
 		<h2 id="t-sessao">{t('Sessão')}</h2>
-		<p>
-			{#if data.sessao}
+		{#if data.sessao}
+			<p>
 				{t('Sessão {n} aberta', { n: data.sessao.numero })} · {FASES[data.fase]} · {t('Presidência')}: {presidenciaEmVigor(
 					data.fase,
 					false,
 					data.sessao.presidencia?.nome
 				)}.
-			{:else}
-				{t('Nenhuma sessão aberta.')}
-			{/if}
-		</p>
-		<div class="acoes">
+			</p>
+		{:else}
+			<p>{t('Nenhuma sessão aberta.')}</p>
 			<button
 				class="botao"
 				type="button"
-				onclick={() =>
-					executar(
-						supabase.rpc('abrir_sessao', { p_comite: data.comite.id }),
-						t('Não foi possível abrir a sessão.')
-					)}>{data.sessao ? t('Abrir a próxima sessão') : t('Abrir sessão')}</button
+				onclick={() => executar(supabase.rpc('abrir_sessao', { p_comite: data.comite.id }), t('Não foi possível abrir a sessão.'))}
+				>{t('Abrir sessão')}</button
 			>
-			{#if data.sessao}
-				<button
-					class="botao botao--secundario"
-					type="button"
-					onclick={() =>
-						executar(supabase.rpc('encerrar_sessao', { p_comite: data.comite.id }), t('Não foi possível encerrar.'))}
-					>{t('Encerrar sessão')}</button
-				>
-			{/if}
-		</div>
+		{/if}
 	</section>
 
 	{#if data.sessao}
 		<section aria-labelledby="t-chamada">
 			<h2 id="t-chamada">{t('Presença')}</h2>
 			<p class="quorum" aria-live="polite">
-				{t('Presentes: {n} de {total}', { n: presentes, total: previstas.length })} · {t('Quórum')}: {data.quorum}
+				{t('Presentes: {n} de {total}', { n: presentes.size, total: previstas.length })} · {t('Quórum')}: {data.quorum}
 				<span class="selo {haQuorum ? 'selo--ok' : 'selo--alerta'}">{haQuorum ? t('Há quórum') : t('Sem quórum')}</span>
 			</p>
-			<ul class="lista">
+			<p>
+				<button
+					class="botao botao--secundario botao--pequeno"
+					type="button"
+					onclick={() =>
+						executar(supabase.rpc('marcar_todas_presentes', { p_comite: data.comite.id }), t('Não foi possível marcar a presença.'))}
+					>{t('Marcar todas como presentes')}</button
+				>
+			</p>
+			<ul class="chamada">
 				{#each previstas as d (d.id)}
-					{@const atual = presencas.get(d.id) ?? 'ausente'}
+					{@const presente = presentes.has(d.id)}
 					<li>
-						<fieldset class="presenca">
-							<legend class="com-bandeira"><Bandeira codigo={d.bandeira} /> {d.nome}</legend>
-							{#each OPCOES as opcao (opcao.valor)}
-								<label class="opcao">
-									<input
-										type="radio"
-										name={`presenca-${d.id}`}
-										checked={atual === opcao.valor}
-										onchange={() => marcar(d.id, opcao.valor)}
-									/>
-									{opcao.rotulo}
-								</label>
-							{/each}
-						</fieldset>
+						<button class="chamada-item" type="button" aria-pressed={presente} onclick={() => alternar(d.id)}>
+							<span class="com-bandeira"><Bandeira codigo={d.bandeira} /> {d.nome}</span>
+							<span class="selo {presente ? 'selo--ok' : ''}" aria-hidden="true">{presente ? t('Presente') : t('Ausente')}</span>
+						</button>
 					</li>
 				{/each}
 			</ul>
 		</section>
-	{/if}
 
-	<section aria-labelledby="t-rodizio">
-		<h2 id="t-rodizio">{t('Rodízio da presidência')}</h2>
-		<p class="suave">
-			{t(
-				'A ordem é sorteada entre todas as delegações membros (observadoras não presidem), e cada uma preside no máximo {n} sessões. O bureau preside a plenária de abertura e a fase de ação; no debate, preside a próxima da ordem, e as que sobram ficam na lista de espera.',
-				{ n: data.regras.max_sessoes_presidencia }
-			)}
-		</p>
-		{#if data.rodizio.length}
-			<ol class="lista" aria-label={t('Ordem sorteada')}>
-				{#each data.rodizio as vez (vez.ordem)}
-					<li>
-						<span class="com-bandeira"><Bandeira codigo={vez.delegacao?.bandeira} /> {vez.delegacao?.nome}</span>
-						{#if vez.vezes}<span class="selo">{vez.vezes === 1 ? t('Presidiu 1 sessão') : t('Presidiu {n} sessões', { n: vez.vezes })}</span>{/if}
-					</li>
-				{/each}
-			</ol>
-		{/if}
-		<button class="botao" type="button" onclick={sortear}>
-			{data.rodizio.length ? t('Sortear de novo') : t('Sortear a ordem')}
-		</button>
-	</section>
+		<section aria-labelledby="t-concluir">
+			<h2 id="t-concluir">{t('Concluir a chamada')}</h2>
+			<p class="suave">{t('Quem chegar depois avisa pelo app, e a mesa confirma no painel. Esta tela continua aberta para correções.')}</p>
+			<a class="botao" href={`/comite/${data.comite.sigla}/sessao/presidencia`}>{t('Concluir chamada')}</a>
+		</section>
+	{/if}
 {/if}

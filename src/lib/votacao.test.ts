@@ -6,9 +6,8 @@ describe('escolhasPermitidas', () => {
 		expect(escolhasPermitidas('procedimental', 'membro', 'presente')).toEqual(['a_favor', 'contra']);
 		expect(escolhasPermitidas('procedimental', 'observadora', 'presente')).toEqual(['a_favor', 'contra']);
 	});
-	it('questão substantiva: com abstenção, menos para quem está presente e votando', () => {
+	it('questão substantiva: com abstenção para quem está presente', () => {
 		expect(escolhasPermitidas('substantiva', 'membro', 'presente')).toEqual(['a_favor', 'contra', 'abstencao']);
-		expect(escolhasPermitidas('substantiva', 'membro', 'presente_e_votando')).toEqual(['a_favor', 'contra']);
 	});
 	it('observadora na substantiva, suspensa e ausente não votam', () => {
 		expect(escolhasPermitidas('substantiva', 'observadora', 'presente')).toEqual([]);

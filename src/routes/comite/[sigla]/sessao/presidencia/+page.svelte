@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { t } from '#lib/i18n.svelte.ts';
-	import { invalidate } from '$app/navigation';
+	import { goto, invalidate } from '$app/navigation';
 	import type { Database } from '#lib/database.types.ts';
 	import { nomeDoDocumento, STATUS_DOCUMENTO } from '#lib/formatacao.ts';
 	import { assinaturasDesconfianca, REGRAS_VOTACAO } from '#lib/votacao.ts';
-	import { descreverPonto, ehPonto, FORMAS, mensagemDeErro, MOCOES_COM_LISTA, type TipoPonto } from '#lib/sessao.ts';
+	import { descreverPonto, ehPonto, FORMAS, mensagemDeErro, MOCOES_COM_LISTA, SITUACAO_PONTO, type TipoPonto } from '#lib/sessao.ts';
 	import { supabase } from '#lib/supabase.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import Bandeira from '#lib/ui/Bandeira.svelte';
@@ -79,6 +79,17 @@
 	const ACOES_EMENDA: Record<string, string> = { acrescentar: t('Acrescenta'), suprimir: t('Suprime'), modificar: t('Modifica') };
 	const rpc = <F extends keyof Funcoes>(funcao: F, args: Funcoes[F]['Args']) => executar(supabase.rpc(funcao, args));
 
+	// Abrir, encerrar e aceitar quem chegou depois (passo 21).
+	let confirmarEncerrar = $state<HTMLDialogElement>();
+	const encerrarSessao = () => rpc('encerrar_sessao', { p_comite: comite });
+	const confirmarPresenca = (delegacao: string) =>
+		executar(supabase.from('presenca').upsert({ sessao_id: sessao!.id, comite_id: comite, delegacao_id: delegacao }));
+	async function abrirSessao() {
+		await executar(supabase.rpc('abrir_sessao', { p_comite: comite }));
+		if (!erro) await goto(`/comite/${data.comite.sigla}/sessao/chamada`);
+	}
+	const duracaoMin = (r: { inicio: string; fim: string }) => Math.max(1, Math.round((Date.parse(r.fim) - Date.parse(r.inicio)) / 60_000));
+
 	// Sem delegação (null), encerra a fala. Os tipos gerados não sabem que o argumento aceita null.
 	const darPalavra = (delegacao: string | null) =>
 		rpc('dar_palavra', { p_comite: comite, p_delegacao: delegacao as string, p_seg: tempoFala });
@@ -120,7 +131,45 @@
 {#if !data.podePresidir}
 	<p class="suave">{t('Você não preside esta sessão. Quando for a vez da sua delegação, o painel aparece aqui.')}</p>
 {:else if !data.estado || !sessao}
-	<p class="suave">{t('Nenhuma sessão aberta. A mesa abre a sessão na chamada.')}</p>
+	{#if erro}
+		<p class="erro" role="alert">{erro}</p>
+	{/if}
+	{#if data.resumo}
+		{@const r = data.resumo}
+		<section class="cartao" aria-labelledby="t-resumo">
+			<h2 id="t-resumo">{t('Sessão {n} encerrada', { n: r.numero })}</h2>
+			<p>
+				{t('{n} min', { n: duracaoMin(r) })} · {t('Presentes: {n}', { n: r.presentes })} ·
+				{t('Pontos e moções: {n}', { n: Object.values(r.pontos).reduce((a, b) => a + b, 0) })}
+			</p>
+			{#if Object.keys(r.pontos).length}
+				<p class="suave">
+					{Object.entries(r.pontos)
+						.map(([status, n]) => `${SITUACAO_PONTO[status as keyof typeof SITUACAO_PONTO] ?? status}: ${n}`)
+						.join(' · ')}
+				</p>
+			{/if}
+			{#if r.votacoes.length}
+				<ul class="lista" aria-label={t('Votações')}>
+					{#each r.votacoes as v, i (i)}
+						<li>
+							<span>{v.objeto}</span>
+							<span class="selo {v.aprovada ? 'selo--ok' : 'selo--erro'}">{v.aprovada ? t('Aprovada') : t('Rejeitada')}</span>
+						</li>
+					{/each}
+				</ul>
+			{/if}
+		</section>
+	{/if}
+	{#if ehMesa}
+		<p>
+			<button class="botao" type="button" onclick={abrirSessao}>
+				{data.resumo ? t('Abrir a sessão {n}', { n: data.resumo.numero + 1 }) : t('Abrir sessão')}
+			</button>
+		</p>
+	{:else}
+		<p class="suave">{t('Nenhuma sessão aberta. A mesa abre a sessão na chamada.')}</p>
+	{/if}
 {:else}
 	<p class="suave">
 		{t('Sessão {n}', { n: sessao.numero })} · {FASES[data.fase]} · {FORMAS[data.estado.forma]} · {t('Presidência')}: {presidenciaEmVigor(
@@ -135,6 +184,41 @@
 
 	{#if erro}
 		<p class="erro" role="alert">{erro}</p>
+	{/if}
+
+	{#if ehMesa}
+		<div class="acoes">
+			<a class="botao botao--secundario botao--pequeno" href={`/comite/${data.comite.sigla}/sessao/chamada`}>{t('Chamada')}</a>
+			<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => confirmarEncerrar?.showModal()}
+				>{t('Encerrar sessão')}</button
+			>
+		</div>
+		<dialog bind:this={confirmarEncerrar} aria-labelledby="t-encerrar">
+			<h3 id="t-encerrar">{t('Encerrar a sessão {n}?', { n: sessao.numero })}</h3>
+			<p>{t('As votações abertas são fechadas e o cronômetro para.')}</p>
+			<form method="dialog" class="acoes">
+				<button class="botao" onclick={encerrarSessao}>{t('Encerrar sessão')}</button>
+				<button class="botao botao--secundario">{t('Cancelar')}</button>
+			</form>
+		</dialog>
+		{#if sessao.avisos.length}
+			<section class="cartao cartao--destaque" aria-labelledby="t-chegadas">
+				<h2 id="t-chegadas">{t('Chegadas')}</h2>
+				<ul class="lista">
+					{#each sessao.avisos as aviso (aviso.delegacao?.id)}
+						<li>
+							<span class="com-bandeira"><Bandeira codigo={aviso.delegacao?.bandeira} /> {aviso.delegacao?.nome}</span>
+							<button
+								class="botao botao--pequeno"
+								type="button"
+								aria-label={t('Confirmar presença: {delegacao}', { delegacao: aviso.delegacao?.nome ?? '' })}
+								onclick={() => confirmarPresenca(aviso.delegacao!.id)}>{t('Confirmar presença')}</button
+							>
+						</li>
+					{/each}
+				</ul>
+			</section>
+		{/if}
 	{/if}
 
 	{#if ehMesa && data.fase === 'plenaria'}

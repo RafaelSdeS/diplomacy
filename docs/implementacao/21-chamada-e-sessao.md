@@ -5,7 +5,14 @@
 **Esforço:** P–M
 **Objetivo:** transformar o começo e o fim de cada sessão num roteiro guiado, com uma chamada rápida e um jeito simples de aceitar a delegação que chega depois.
 
-## Hoje
+## Como ficou
+
+- Chamada em roteiro: preparação (rodízio, recolhida depois do sorteio), sessão, presença (um botão por delegação, `aria-pressed`, "Marcar todas como presentes") e "Concluir chamada", que leva ao painel.
+- No painel, a mesa tem "Chamada", "Encerrar sessão" (com confirmação) e o cartão "Chegadas". Sem sessão aberta, o painel mostra o resumo da última e "Abrir a sessão N".
+- Na sessão, a delegação ausente vê "Cheguei".
+- Banco (`20261208090000_chamada.sql`): presença com um estado só, `validar_voto` sem a regra de presente e votando, `aviso_chegada`, `avisar_chegada`, `marcar_todas_presentes`, `resumo_sessao`, `presenca.marcada_em`.
+
+## Antes
 
 Em `src/routes/comite/[sigla]/sessao/chamada/+page.svelte`:
 
@@ -26,18 +33,18 @@ Em `src/routes/comite/[sigla]/sessao/chamada/+page.svelte`:
 
 Migração `supabase/migrations/20261208090000_chamada.sql`:
 
-- [ ] `update public.presenca set situacao = 'presente' where situacao = 'presente_e_votando';` e `check (situacao = 'presente')` em `presenca`. O valor fica no enum: tirar valor de enum no Postgres exige recriar o tipo, e não vale a pena.
-- [ ] `create or replace function public.validar_voto`, a partir da versão de `20261203090000_procedimento.sql:175`, sem o bloco que recusa abstenção de quem está presente e votando.
-- [ ] Coluna `presenca.marcada_em timestamptz not null default now()`, a hora da chegada.
-- [ ] Tabela `aviso_chegada` (`sessao_id`, `comite_id`, `delegacao_id`, `criado_em`; chave `(sessao_id, delegacao_id)`; chaves compostas como em `presenca`):
+- [x] `update public.presenca set situacao = 'presente' where situacao = 'presente_e_votando';` e `check (situacao = 'presente')` em `presenca`. O valor fica no enum: tirar valor de enum no Postgres exige recriar o tipo, e não vale a pena.
+- [x] `create or replace function public.validar_voto`, a partir da versão de `20261203090000_procedimento.sql:175`, sem o bloco que recusa abstenção de quem está presente e votando.
+- [x] Coluna `presenca.marcada_em timestamptz not null default now()`, a hora da chegada.
+- [x] Tabela `aviso_chegada` (`sessao_id`, `comite_id`, `delegacao_id`, `criado_em`; chave `(sessao_id, delegacao_id)`; chaves compostas como em `presenca`):
   - RLS: quem está no comitê lê; não há escrita direta.
   - Gatilho de Broadcast `transmitir('comite', 'comite_id')`.
   - Fica fora do bloqueio de tecnologia restrita: avisar a chegada não é escrever durante a sessão.
-- [ ] `avisar_chegada(p_comite)`: usa `exigir_delegacao`; recusa se a delegação já está presente; `on conflict do nothing`.
-- [ ] Gatilho `after insert on presenca` que apaga o aviso da mesma delegação.
-- [ ] `marcar_todas_presentes(p_comite)`: só a mesa; insere todas as delegações não suspensas da sessão atual; `on conflict do nothing`.
-- [ ] `resumo_sessao(p_sessao uuid) returns jsonb` (stable, com as permissões de quem chama): início, fim, presentes, pontos e moções por situação, votações (objeto e resultado). Falas ficam de fora: o app ainda não registra as falas.
-- [ ] Regenerar `src/lib/database.types.ts`.
+- [x] `avisar_chegada(p_comite)`: usa `exigir_delegacao`; recusa se a delegação já está presente; `on conflict do nothing`.
+- [x] Gatilho `after insert on presenca` que apaga o aviso da mesma delegação.
+- [x] `marcar_todas_presentes(p_comite)`: só a mesa; insere todas as delegações não suspensas da sessão atual; `on conflict do nothing`.
+- [x] `resumo_sessao(p_sessao uuid) returns jsonb` (stable, com as permissões de quem chama): início, fim, presentes, pontos e moções por situação, votações (objeto e resultado). Falas ficam de fora: o app ainda não registra as falas.
+- [x] Regenerar `src/lib/database.types.ts`.
 
 ## Telas
 
@@ -55,16 +62,16 @@ A tela continua acessível depois, pelo link "Chamada" no painel, para chegadas 
 
 **Painel da presidência** (só a mesa):
 
-- [ ] Botão "Encerrar sessão", com `<dialog>` de confirmação. Depois de encerrar, o cartão "Sessão 3 encerrada" mostra o resumo (`resumo_sessao`) e o botão "Abrir a sessão 4".
-- [ ] Cartão "Chegadas": "Chegou: França", com "Confirmar presença" (o mesmo upsert da chamada).
+- [x] Botão "Encerrar sessão", com `<dialog>` de confirmação. Depois de encerrar, o cartão "Sessão 3 encerrada" mostra o resumo (`resumo_sessao`) e o botão "Abrir a sessão 4".
+- [x] Cartão "Chegadas": "Chegou: França", com "Confirmar presença" (o mesmo upsert da chamada).
 
 **Sessão** (delegado):
 
-- [ ] Se a delegação está ausente: cartão "Sua delegação está ausente na chamada", com o botão "Cheguei". Depois do aviso: "Aguardando a mesa confirmar".
+- [x] Se a delegação está ausente: cartão "Sua delegação está ausente na chamada", com o botão "Cheguei". Depois do aviso: "Aguardando a mesa confirmar".
 
 **Código:**
 
-- [ ] `src/lib/votacao.ts`: `escolhasPermitidas` deixa de olhar a situação de presença para a abstenção.
+- [x] `src/lib/votacao.ts`: `escolhasPermitidas` deixa de olhar a situação de presença para a abstenção.
 
 ## Textos e idiomas
 
@@ -74,16 +81,16 @@ Todos os rótulos novos e as mensagens de erro novas com tradução em `src/lib/
 
 Arquivos: `supabase/tests/21-chamada.test.sql`, `src/lib/votacao.test.ts` (ajuste) e `tests/21-chamada.spec.ts`.
 
-- [ ] pgTAP: `presenca` só aceita "presente"; abstenção permitida na substantiva para quem está presente.
-- [ ] pgTAP: só a própria delegação ausente avisa a chegada; a confirmação apaga o aviso; `marcar_todas_presentes` é só da mesa; `resumo_sessao` conta as moções e as votações da sessão.
-- [ ] Ajustar `supabase/tests/06-sessao.test.sql:170` e `07-plenaria-e-votacao.test.sql:215`, que usam "presente_e_votando".
-- [ ] Vitest: `escolhasPermitidas('substantiva', 'membro', 'presente')` inclui a abstenção.
-- [ ] Ponta a ponta (notebook, em série, como o 06): abrir; marcar todas; desmarcar uma; concluir; painel; a delegação ausente avisa; a mesa confirma; a delegação vota; encerrar com confirmação; resumo.
-- [ ] Ajustar `tests/06-sessao.spec.ts:78` e `:84`, que marcam a presença pelos botões de opção.
-- [ ] Capturas de referência da chamada e do painel refeitas no CI.
+- [x] pgTAP: `presenca` só aceita "presente"; abstenção permitida na substantiva para quem está presente.
+- [x] pgTAP: só a própria delegação ausente avisa a chegada; a confirmação apaga o aviso; `marcar_todas_presentes` é só da mesa; `resumo_sessao` conta as moções e as votações da sessão.
+- [x] Ajustar `supabase/tests/06-sessao.test.sql:170` e `07-plenaria-e-votacao.test.sql:215`, que usam "presente_e_votando".
+- [x] Vitest: `escolhasPermitidas('substantiva', 'membro', 'presente')` inclui a abstenção.
+- [x] Ponta a ponta (notebook, em série, no CE-T, que ganhou contas no seed): abrir; marcar todas; desmarcar uma; concluir; painel; a delegação ausente avisa; a mesa confirma; encerrar com confirmação (e cancelar); resumo. O voto com abstenção fica no pgTAP.
+- [x] Ajustar `tests/06-sessao.spec.ts:78` e `:84`, que marcam a presença pelos botões de opção.
+- [ ] Capturas de referência da chamada e do painel refeitas no CI (pelo `workflow_dispatch` "atualizar_capturas", junto com as dos próximos passos).
 
 ## Pronto quando
 
-- [ ] Abrir, fazer a chamada, conduzir e encerrar a sessão é um caminho sem volta para trás nem tela escondida.
-- [ ] Uma delegação que chega no meio é aceita em dois toques e passa a votar.
-- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
+- [x] Abrir, fazer a chamada, conduzir e encerrar a sessão é um caminho sem volta para trás nem tela escondida.
+- [x] Uma delegação que chega no meio é aceita em dois toques e passa a votar.
+- [x] Os testes acima passam no CI, junto com os de todos os passos anteriores.

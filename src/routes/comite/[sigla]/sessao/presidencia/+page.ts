@@ -1,4 +1,4 @@
-import { carregarSessao } from '#lib/sessao.ts';
+import { carregarSessao, ultimaSessao } from '#lib/sessao.ts';
 import { supabase } from '#lib/supabase.ts';
 import type { PageLoad } from './$types';
 
@@ -30,5 +30,7 @@ export const load: PageLoad = async ({ parent, depends }) => {
 	]);
 	if (operativas.error) throw operativas.error;
 	if (emendas.error) throw emendas.error;
-	return { ...sessao, projetos: projetos.data, operativas: operativas.data, emendas: emendas.data };
+	// Sem sessão aberta, o painel mostra o resumo da última.
+	const resumo = sessao.estado ? null : await ultimaSessao(comite.id);
+	return { ...sessao, projetos: projetos.data, operativas: operativas.data, emendas: emendas.data, resumo };
 };

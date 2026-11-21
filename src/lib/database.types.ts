@@ -179,6 +179,32 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"aviso_chegada": {
+                  Row: {
+                    "comite_id": string,"criado_em": string,"delegacao_id": string,"sessao_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "comite_id": string,"criado_em"?: string,"delegacao_id": string,"sessao_id": string
+                  }
+                  Update: {
+                    "comite_id"?: string,"criado_em"?: string,"delegacao_id"?: string,"sessao_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "aviso_chegada_delegacao_id_comite_id_fkey"
+      columns: ["delegacao_id","comite_id"]
+isOneToOne: false
+      referencedRelation: "delegacao"
+      referencedColumns: ["id","comite_id"]
+    },{
+      foreignKeyName: "aviso_chegada_sessao_id_comite_id_fkey"
+      columns: ["sessao_id","comite_id"]
+isOneToOne: false
+      referencedRelation: "sessao"
+      referencedColumns: ["id","comite_id"]
+    }
+                  ]
                 },"bloco": {
                   Row: {
                     "comite_id": string,"criado_em": string,"id": string,"nome": string
@@ -1231,14 +1257,14 @@ isOneToOne: false
                   ]
                 },"presenca": {
                   Row: {
-                    "comite_id": string,"delegacao_id": string,"sessao_id": string,"situacao": Database["public"]['Enums']["situacao_presenca"]
+                    "comite_id": string,"delegacao_id": string,"marcada_em": string,"sessao_id": string,"situacao": Database["public"]['Enums']["situacao_presenca"]
                   }
                   ComputedFields: never
                   Insert: {
-                    "comite_id": string,"delegacao_id": string,"sessao_id": string,"situacao"?: Database["public"]['Enums']["situacao_presenca"]
+                    "comite_id": string,"delegacao_id": string,"marcada_em"?: string,"sessao_id": string,"situacao"?: Database["public"]['Enums']["situacao_presenca"]
                   }
                   Update: {
-                    "comite_id"?: string,"delegacao_id"?: string,"sessao_id"?: string,"situacao"?: Database["public"]['Enums']["situacao_presenca"]
+                    "comite_id"?: string,"delegacao_id"?: string,"marcada_em"?: string,"sessao_id"?: string,"situacao"?: Database["public"]['Enums']["situacao_presenca"]
                   }
                   Relationships: [
                     {
@@ -1594,6 +1620,9 @@ isOneToOne: false
 "adotar_proposta":
 { Args: { "p_proposta": string }; Returns: undefined
                            },
+"agenda_adotada":
+{ Args: { "p_comite": string,"p_topico": number }; Returns: boolean
+                           },
 "agora":
 { Args: Record<PropertyKey, never>; Returns: string
                            },
@@ -1648,6 +1677,9 @@ isOneToOne: false
 "avancar_plenaria":
 { Args: { "p_comite": string }; Returns: undefined
                            },
+"avisar_chegada":
+{ Args: { "p_comite": string }; Returns: undefined
+                           },
 "baixar_placa":
 { Args: { "p_comite": string }; Returns: undefined
                            },
@@ -1692,6 +1724,9 @@ isOneToOne: false
                            },
 "dois_tercos":
 { Args: { "p_base": number }; Returns: number
+                           },
+"editar_agenda_adotada":
+{ Args: { "p_itens": Json,"p_proposta": string }; Returns: undefined
                            },
 "editar_clausula":
 { Args: { "p_clausula": string,"p_texto": string,"p_versao": number }; Returns: number
@@ -1877,6 +1912,9 @@ isOneToOne: false
 "marcar_ponto_pauta":
 { Args: { "p_ponto": string,"p_status": string }; Returns: undefined
                            },
+"marcar_todas_presentes":
+{ Args: { "p_comite": string }; Returns: undefined
+                           },
 "meus_comites":
 { Args: { "p_papeis": (Database["public"]['Enums']["papel"])[] }; Returns: string[]
                            },
@@ -2030,6 +2068,12 @@ isOneToOne: false
 { Args: { "p_votacao": string }; Returns: {
               "a_favor": number,"abstencoes": number,"aprovada": boolean,"base": number,"contra": number,"necessario": number
             }[]
+                           },
+"resumo_sessao":
+{ Args: { "p_sessao": string }; Returns: Json
+                           },
+"retirar_adocao":
+{ Args: { "p_proposta": string }; Returns: undefined
                            },
 "retomar":
 { Args: { "p_comite": string }; Returns: undefined

@@ -121,6 +121,23 @@
 	{/if}
 
 	<div class="cartoes">
+		{#if eu && !minhaPresenca && minhaSituacao !== 'suspensa'}
+			{@const avisei = sessao.avisos.some((a) => a.delegacao?.id === eu.delegacao_id)}
+			<article class="cartao cartao--destaque" aria-labelledby="c-chegada">
+				<h2 id="c-chegada">{t('Sua delegação está ausente na chamada')}</h2>
+				{#if avisei}
+					<p>{t('Aguardando a mesa confirmar a presença.')}</p>
+				{:else}
+					<p class="suave">{t('Chegou agora? Avise a mesa para entrar na chamada e votar.')}</p>
+					<button
+						class="botao"
+						type="button"
+						onclick={() => executar(supabase.rpc('avisar_chegada', { p_comite: data.comite.id }), t('A mesa foi avisada.'))}
+						>{t('Cheguei')}</button
+					>
+				{/if}
+			</article>
+		{/if}
 		{#each desconfiancas as p (p.id)}
 			{@const assinou = p.assinaturas.some((a) => a.delegacao_id === eu?.delegacao_id)}
 			<article class="cartao" aria-labelledby={`c-desconfianca-${p.id}`}>

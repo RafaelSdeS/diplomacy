@@ -165,9 +165,9 @@ select ok(
 	public.presentes(public.sessao_atual('00000000-0000-0000-0000-0000000000c1'))
 		< public.quorum('00000000-0000-0000-0000-0000000000c1'),
 	'com 4 presentes, não há quórum');
-insert into public.presenca (sessao_id, comite_id, delegacao_id, situacao)
+insert into public.presenca (sessao_id, comite_id, delegacao_id)
 values (public.sessao_atual('00000000-0000-0000-0000-0000000000c1'), '00000000-0000-0000-0000-0000000000c1',
-	'00000000-0000-0000-0000-00000000000f', 'presente_e_votando');
+	'00000000-0000-0000-0000-00000000000f');
 select ok(
 	public.presentes(public.sessao_atual('00000000-0000-0000-0000-0000000000c1'))
 		>= public.quorum('00000000-0000-0000-0000-0000000000c1'),

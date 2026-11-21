@@ -223,6 +223,11 @@ const contas: Conta[] = [
 	// A OEA de teste, com tecnologia restrita: a mesa e um delegado.
 	{ email: 'mesa-oea@exemplo.test', nome: 'Mesa da OEA', papel: 'mesa', especial: 'OEA-T' },
 	{ email: 'oea-brasil@exemplo.test', nome: 'Delegado da OEA', papel: 'delegado', delegacao: 'Brasil', especial: 'OEA-T' },
+	// O Conselho Europeu de teste: a mesa e duas delegações (passo 21 em diante, sem
+	// disputar a sessão do CSNU-T com os testes do passo 06).
+	{ email: 'mesa-ce@exemplo.test', nome: 'Mesa do Conselho', papel: 'mesa', especial: 'CE-T' },
+	{ email: 'ce-alemanha@exemplo.test', nome: 'Delegada da Alemanha', papel: 'delegado', delegacao: 'Alemanha', especial: 'CE-T' },
+	{ email: 'ce-franca@exemplo.test', nome: 'Delegado da França', papel: 'delegado', delegacao: 'França', especial: 'CE-T' },
 	// O comitê em inglês: uma delegada e a mesa.
 	{ email: 'unoct-france@exemplo.test', nome: 'Delegate of France', papel: 'delegado', delegacao: 'France', especial: 'UNOCT-T' },
 	{ email: 'unoct-mesa@exemplo.test', nome: 'UNOCT Dais', papel: 'mesa', especial: 'UNOCT-T' }

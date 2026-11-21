@@ -62,26 +62,38 @@ test('a mesa sorteia o rodízio, abre a sessão e faz a chamada', async ({ page 
 	await page.goto(CHAMADA);
 	await aoVivo(page);
 
+	// A preparação fica recolhida quando o rodízio já foi sorteado (banco reaproveitado).
+	const preparacao = page.locator('details.preparacao');
+	if ((await preparacao.getAttribute('open')) === null) await preparacao.locator('summary').click();
 	await page.getByRole('button', { name: /^Sortear/ }).click();
 	await expect(page.getByRole('list', { name: 'Ordem sorteada' }).getByRole('listitem')).toHaveCount(15);
 
-	const situacao = page.getByRole('region', { name: 'Sessão' }).locator('p').first();
-	const antes = await situacao.textContent();
-	await page.getByRole('button', { name: /^Abrir/ }).click();
-	await expect(situacao).not.toHaveText(antes!);
-	await expect(situacao).toContainText(/Sessão \d+ aberta/);
+	// Banco reaproveitado: a sessão anterior se encerra no painel (passo 21).
+	const sessao = page.getByRole('region', { name: 'Sessão' });
+	if (await sessao.getByText(/Sessão \d+ aberta/).isVisible()) {
+		await page.goto(PRESIDENCIA);
+		await page.getByRole('button', { name: 'Encerrar sessão' }).click();
+		await page.getByRole('dialog').getByRole('button', { name: 'Encerrar sessão' }).click();
+		await expect(page.getByRole('heading', { name: /Sessão \d+ encerrada/ })).toBeVisible();
+		await page.goto(CHAMADA);
+		await aoVivo(page);
+	}
+	await sessao.getByRole('button', { name: 'Abrir sessão' }).click();
+	await expect(sessao).toContainText(/Sessão \d+ aberta/);
 
-	// 15 delegações: quórum de 5.
+	// 15 delegações: quórum de 5. Um toque alterna entre ausente e presente.
 	const presenca = page.getByRole('region', { name: 'Presença' });
 	await expect(presenca).toContainText('Quórum: 5');
 	for (const nome of PRESENTES) {
-		await presenca.getByRole('group', { name: nome }).getByLabel('Presente', { exact: true }).check();
+		const botao = presenca.getByRole('button', { name: nome, exact: true });
+		await botao.click();
+		await expect(botao).toHaveAttribute('aria-pressed', 'true');
 	}
 	await expect(presenca).toContainText('Presentes: 5 de 15');
 	await expect(presenca).toContainText('Há quórum');
-	await presenca.getByRole('group', { name: 'Rússia' }).getByLabel('Ausente').check();
+	await presenca.getByRole('button', { name: 'Rússia', exact: true }).click();
 	await expect(presenca).toContainText('Sem quórum');
-	await presenca.getByRole('group', { name: 'Rússia' }).getByLabel('Presente', { exact: true }).check();
+	await presenca.getByRole('button', { name: 'Rússia', exact: true }).click();
 	await expect(presenca).toContainText('Há quórum');
 });
 

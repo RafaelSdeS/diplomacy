@@ -45,8 +45,8 @@ export function escolhasPermitidas(
 ): Escolha[] {
 	if (!presenca || situacao === 'suspensa') return [];
 	if (tipo === 'substantiva' && situacao === 'observadora') return [];
-	const podeAbster = tipo === 'substantiva' && presenca !== 'presente_e_votando';
-	return podeAbster ? ['a_favor', 'contra', 'abstencao'] : ['a_favor', 'contra'];
+	// No UFRGSMUN, "presente" e "presente e votando" são o mesmo: a abstenção só depende do tipo.
+	return tipo === 'substantiva' ? ['a_favor', 'contra', 'abstencao'] : ['a_favor', 'contra'];
 }
 
 type Resultado = {

@@ -756,6 +756,44 @@ kbd {
 	font-weight: 600;
 }
 
+/* Chamada: um botão por delegação, que alterna entre ausente e presente. */
+.chamada {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
+	gap: 0.5rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.chamada-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem;
+	width: 100%;
+	min-height: 2.75rem;
+	padding: 0.5rem 0.75rem;
+	border: var(--linha);
+	border-radius: var(--raio);
+	background: var(--cor-fundo);
+	color: var(--cor-texto);
+	font: inherit;
+	text-align: left;
+	cursor: pointer;
+}
+
+.chamada-item[aria-pressed='true'] {
+	border-color: var(--cor-ok);
+	background: var(--cor-ok-fundo);
+}
+
+.preparacao > summary {
+	margin: 1rem 0;
+	cursor: pointer;
+	font-weight: 600;
+}
+
 /* Painel da presidência: fila, cronômetro e pontos lado a lado no notebook. */
 .painel {
 	display: grid;
@@ -1055,6 +1093,41 @@ kbd {
 
 .propostas .cartao {
 	max-width: none;
+}
+
+/* Etapas de cada tópico: a agenda vem antes das resoluções (passo 22). */
+.etapas {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.25rem 1.25rem;
+	margin: 0 0 1rem;
+	padding: 0;
+	list-style: none;
+	counter-reset: etapa;
+	color: var(--cor-texto-suave);
+	font-size: 0.9rem;
+}
+
+.etapas li {
+	counter-increment: etapa;
+}
+
+.etapas li::before {
+	content: counter(etapa) '. ';
+}
+
+.etapas li[aria-current='step'] {
+	color: var(--cor-marinho);
+	font-weight: 600;
+}
+
+.etapas li.feita::after {
+	content: ' ✓';
+}
+
+.andamento {
+	font: inherit;
+	font-size: 0.85rem;
 }
 
 .arvore {
