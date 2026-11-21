@@ -10,7 +10,9 @@ const C = isolado('35');
 const CRISE = C.conta('crise-treino@exemplo.test');
 const MESA = C.conta('mesa-treino@exemplo.test');
 const BRASIL = C.conta(contaDoTreino('Brasil'));
-const TITULO = `Sequestro na fronteira ${Date.now()}`;
+// Nas capturas (banco sempre novo) o título é fixo; fora delas, único a cada execução.
+const TITULO = process.env.CAPTURAS ? 'Sequestro na fronteira' : `Sequestro na fronteira ${Date.now()}`;
+const OCULTAR_RODIZIO = `${import.meta.dirname}/ocultar-rodizio.css`;
 
 test.describe.configure({ mode: 'serial' });
 test.beforeEach(({}, info) => {
@@ -63,6 +65,9 @@ test('a crise deixa o Brasil sem voz, toma o telão e, no fim, devolve a voz', a
 	await expect(modoCrise).toContainText('Urgente');
 	await expect(modoCrise.locator('.telao-crise-prazo')).toHaveText(/^(20:00|19:\d\d)$/);
 	await expect(modoCrise).toContainText('Delegado sequestrado');
+	// Passo 41: a aparência do telão em modo crise (o prazo corre: fica mascarado).
+	const mascaras = [telao.locator('.telao-crise-prazo'), telao.locator('.cronometro')];
+	if (process.env.CAPTURAS) await expect(telao).toHaveScreenshot('telao-crise.png', { mask: mascaras, stylePath: OCULTAR_RODIZIO });
 
 	const brasil = await (await browser.newContext()).newPage();
 	await entrar(brasil, BRASIL);
@@ -78,5 +83,6 @@ test('a crise deixa o Brasil sem voz, toma o telão e, no fim, devolve a voz', a
 	await encerrar.getByRole('button', { name: 'Encerrar a crise' }).click();
 	await expect(page.getByRole('status').filter({ hasText: 'Crise encerrada.' })).toBeVisible();
 	await expect(modoCrise).toContainText('Resolvida: O delegado foi libertado.');
+	if (process.env.CAPTURAS) await expect(telao).toHaveScreenshot('telao-desfecho.png', { mask: mascaras, stylePath: OCULTAR_RODIZIO });
 	await expect(brasil.getByRole('region', { name: 'Ponto ou moção' })).toBeVisible();
 });

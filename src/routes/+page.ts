@@ -30,7 +30,7 @@ export const load: PageLoad = async ({ parent, depends }) => {
 		lerAoVivo(`agora:${usuario!.id}:${nome}`, tabelas, consulta);
 
 	const [cronograma, avisos, pessoa, comitesAoVivo, respostasCrise, dpos, citacoes] = await Promise.all([
-		ler('cronograma', ['cronograma_item'], () => supabase.from('cronograma_item').select('id, titulo, local, inicio, fim, comite_id').order('inicio')),
+		ler('cronograma', ['cronograma_item'], () => supabase.from('cronograma_item').select('id, titulo, local, inicio, fim, comite_id, tipo').order('inicio')),
 		ler('avisos', ['aviso'], () => supabase.from('aviso').select('id, texto, criado_em').order('criado_em', { ascending: false }).limit(20)),
 		ler('avisos-vistos', ['aviso'], () => supabase.from('pessoa').select('avisos_vistos_em').eq('id', usuario!.id).single()),
 		// O andamento de cada comitê da pessoa: plenária, tópico em debate ou fase de ação.

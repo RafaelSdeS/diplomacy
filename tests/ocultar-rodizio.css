@@ -1,11 +1,13 @@
-/* Capturas: o que depende do sorteio da presidência (quem preside, quem fala, a conta
-   logada) fica invisível. O layout continua conferido; uma máscara teria a largura do
+/* Capturas: o que depende do sorteio da presidência (quem preside, quem fala, a fila,
+   a conta logada) fica invisível. O layout continua conferido; uma máscara teria a largura do
    nome, que varia. */
 .telao-presidencia span:not(.rotulo),
 .telao-orador .bandeira,
 .telao-orador .telao-nome,
 .telao-fila li,
 .conta-nome,
+[aria-labelledby='t-palavra'] .com-bandeira,
+[aria-labelledby='t-fila'] li .com-bandeira,
 main > h1 + p.suave {
 	visibility: hidden;
 }

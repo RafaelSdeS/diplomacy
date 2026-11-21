@@ -673,14 +673,14 @@ isOneToOne: false
                   ]
                 },"cronograma_item": {
                   Row: {
-                    "comite_id": string | null,"evento_id": string,"fim": string,"id": string,"inicio": string,"local": string | null,"titulo": string
+                    "comite_id": string | null,"evento_id": string,"fim": string,"id": string,"inicio": string,"local": string | null,"tipo": string,"titulo": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "comite_id"?: string | null,"evento_id": string,"fim": string,"id"?: string,"inicio": string,"local"?: string | null,"titulo": string
+                    "comite_id"?: string | null,"evento_id": string,"fim": string,"id"?: string,"inicio": string,"local"?: string | null,"tipo"?: string,"titulo": string
                   }
                   Update: {
-                    "comite_id"?: string | null,"evento_id"?: string,"fim"?: string,"id"?: string,"inicio"?: string,"local"?: string | null,"titulo"?: string
+                    "comite_id"?: string | null,"evento_id"?: string,"fim"?: string,"id"?: string,"inicio"?: string,"local"?: string | null,"tipo"?: string,"titulo"?: string
                   }
                   Relationships: [
                     {

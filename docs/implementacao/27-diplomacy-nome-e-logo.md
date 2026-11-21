@@ -10,7 +10,7 @@
 - Ícone "a placa": um "D" cujo vão é a placa levantada, com a borda dourada. Favicon, PNG 192/512, maskable e Apple, gerados com o Chromium headless.
 - Manifest "Diplomacy"; cabeçalho com o logo, "Diplomacy" e o nome do evento.
 - Títulos, imagem para as redes (selo e hashtags) e impressões com o nome do evento do banco.
-- As três propostas para escolher em `/marca/opcoes.html`.
+- As três propostas para escolher em `/marca/opcoes.html` (escolhida a placa; a página saiu no passo 41).
 
 ## Antes
 
@@ -35,7 +35,7 @@ Regras para as três: sem o emblema da ONU (nada de ramos de oliveira em volta d
 
 ## Arquivos
 
-- [x] `static/marca/opcao-1-placa.svg`, `opcao-2-selo.svg`, `opcao-3-globo.svg` e `static/marca/opcoes.html` (as três em 16, 32, 64 e 192 px, com fundo escuro), publicada em `/marca/opcoes.html`. Por enquanto o app usa a recomendada (a placa); depois da sua escolha, troca-se o ícone e apagam-se as outras.
+- [x] `static/marca/opcao-1-placa.svg`, `opcao-2-selo.svg`, `opcao-3-globo.svg` e `static/marca/opcoes.html` (as três em 16, 32, 64 e 192 px, com fundo escuro), publicada em `/marca/opcoes.html`. Escolhida em 21/11/2026: a placa (opção 1), que já era o ícone do app. As opções 2 e 3 e a página `opcoes.html` foram apagadas no passo 41.
 - [x] `static/favicon.svg`, `static/icone-192.png`, `static/icone-512.png`, `static/icone-maskable-512.png` (desenho dentro da zona segura de 80%) e `static/apple-touch-icon.png` (180 px). Os PNG são gerados do SVG com o Chromium headless, como o PDF do plano, e versionados.
 - [x] `static/manifest.webmanifest`: `name` "Diplomacy", `short_name` "Diplomacy", o ícone maskable com `"purpose": "maskable"`.
 - [x] `src/app.html`: `apple-touch-icon` e `theme-color`.

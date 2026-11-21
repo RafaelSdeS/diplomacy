@@ -4,7 +4,8 @@
 	import { t } from '#lib/i18n.svelte.ts';
 	import { invalidate } from '$app/navigation';
 	import Check from '@lucide/svelte/icons/check';
-	import { agruparPorDia, formatarHora, instanteNoFuso, itensAtuais } from '#lib/cronograma.ts';
+	import { agruparPorDia, formatarHora, instanteNoFuso, itensAtuais, TIPOS_ITEM } from '#lib/cronograma.ts';
+	import TipoItem from '#lib/ui/TipoItem.svelte';
 	import { supabase } from '#lib/supabase.ts';
 	import type { PageProps } from './$types';
 
@@ -26,6 +27,7 @@
 	let inicio = $state('');
 	let fim = $state('');
 	let comite = $state('');
+	let tipo = $state('sessao');
 	let erro = $state('');
 
 	async function adicionar(evento: SubmitEvent) {
@@ -35,6 +37,7 @@
 			evento_id: data.eventoDaSecretaria!,
 			comite_id: comite || null,
 			titulo: titulo.trim(),
+			tipo,
 			local: local.trim() || null,
 			// O horário digitado é o do evento, mesmo num aparelho em outro fuso.
 			inicio: instanteNoFuso(inicio),
@@ -50,6 +53,7 @@
 			return;
 		}
 		titulo = local = inicio = fim = comite = '';
+		tipo = 'sessao';
 		await invalidate('app:cronograma');
 	}
 
@@ -80,6 +84,7 @@
 					<span>
 						<span class="hora">{formatarHora(item.inicio)}–{formatarHora(item.fim)}</span>
 						{item.titulo}
+						<TipoItem tipo={item.tipo} />
 						{#if atuais.has(item.id)}
 							<span class="selo selo--ok"><Check aria-hidden="true" size={14} /> {t('Agora')}</span>
 						{/if}
@@ -111,6 +116,14 @@
 			<label class="campo">
 				{t('Título')}
 				<input required maxlength="120" bind:value={titulo} {@attach contador(titulo)} />
+			</label>
+			<label class="campo">
+				{t('Tipo')}
+				<select bind:value={tipo}>
+					{#each Object.keys(TIPOS_ITEM) as valor (valor)}
+						<option value={valor}>{TIPOS_ITEM[valor]}</option>
+					{/each}
+				</select>
 			</label>
 			<label class="campo">
 				{t('Local')}

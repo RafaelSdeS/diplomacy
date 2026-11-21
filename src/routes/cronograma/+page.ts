@@ -6,7 +6,7 @@ export const load: PageLoad = async ({ parent, depends }) => {
 	const { participacoes } = await parent();
 
 	const [itens, comites] = await Promise.all([
-		supabase.from('cronograma_item').select('id, titulo, local, inicio, fim, comite_id').order('inicio'),
+		supabase.from('cronograma_item').select('id, titulo, local, inicio, fim, comite_id, tipo').order('inicio'),
 		supabase.from('comite').select('id, sigla').order('sigla')
 	]);
 	if (itens.error) throw itens.error;

@@ -5,7 +5,7 @@
 // cria a pessoa e as participações. Pode rodar várias vezes sem duplicar nada.
 // Só roda no Supabase local, a menos que SEED_PERMITIR_REMOTO=1 (para um projeto
 // de teste, nunca o de produção).
-import { conectarAdmin, criarContas, SENHA, verificar } from './admin.ts';
+import { conectarAdmin, criarContas, SENHA, tipoDoItem, verificar } from './admin.ts';
 import { DELEGACOES, DELEGACOES_TREINO, ISOLADOS, isolado, TOPICOS_TREINO } from './delegacoes.ts';
 
 const { db, url } = await conectarAdmin('SEED_PERMITIR_REMOTO');
@@ -311,6 +311,7 @@ verificar(
 			evento_id: evento.id,
 			comite_id,
 			titulo,
+			tipo: tipoDoItem(titulo),
 			local,
 			inicio: `${inicio}-03:00`,
 			fim: `${fim}-03:00`

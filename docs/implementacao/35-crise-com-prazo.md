@@ -75,7 +75,7 @@ Arquivos: `supabase/tests/35-incidente-crise.test.sql` e `tests/35-crise-com-pra
   - efeito com `ate` vencido libera;
   - encerrar publica a atualização.
 - [x] Ponta a ponta (TREINO): a equipe lança uma crise de 20 minutos que deixa o Brasil sem voz; o telão entra em modo crise com a contagem; o Brasil vê "impedida pela crise" e perde o formulário de ponto ou moção; a equipe encerra como resolvida; o telão mostra o desfecho e o formulário volta.
-- [ ] Capturas do telão em modo crise e com o desfecho: as capturas de referência não incluem o modo crise; o teste de ponta a ponta confere o conteúdo.
+- [x] Capturas do telão em modo crise e com o desfecho (passo 41: `telao-crise.png` e `telao-desfecho.png`).
 
 ## Pronto quando
 

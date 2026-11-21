@@ -10,7 +10,7 @@
 // teste, com SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY e SUPABASE_ANON_KEY).
 import { randomUUID } from 'node:crypto';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-import { conectarAdmin, criarContas, SENHA, usuariosPorEmail, verificar } from './admin.ts';
+import { conectarAdmin, criarContas, SENHA, tipoDoItem, usuariosPorEmail, verificar } from './admin.ts';
 import { bioFicticia, COM_DOIS_DELEGADOS, COMITES, CRONOGRAMA, EVENTO, nomeFicticio, type Comite } from './demonstracao/dados.ts';
 
 const inicio = Date.now();
@@ -132,11 +132,12 @@ if (!itens.count) {
 							evento_id: evento.id,
 							comite_id: idsDe.get(c.sigla)!.comite,
 							titulo,
+							tipo: tipoDoItem(titulo),
 							local: `${local} ${101 + i}`,
 							inicio: quando(d, de),
 							fim: quando(d, ate)
 						}))
-					: [{ evento_id: evento.id, comite_id: null, titulo, local, inicio: quando(d, de), fim: quando(d, ate) }]
+					: [{ evento_id: evento.id, comite_id: null, titulo, tipo: tipoDoItem(titulo), local, inicio: quando(d, de), fim: quando(d, ate) }]
 			)
 		),
 		'cronograma'

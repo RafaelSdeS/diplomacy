@@ -73,3 +73,13 @@ export async function criarContas(db: SupabaseClient, contas: { email: string; n
 		if (error) throw new Error(`conta ${conta.email}: ${error.message}`);
 	}
 }
+
+/** O tipo do item do cronograma pelo título (passo 41), a mesma regra da migração. */
+export const tipoDoItem = (titulo: string) =>
+	/^sess(ão|ao|ion)/i.test(titulo)
+		? 'sessao'
+		: /^(almoço|almoco|intervalo|café|cafe|coffee|lunch|break)/i.test(titulo)
+			? 'intervalo'
+			: /^(cerimônia|cerimonia|ceremony)/i.test(titulo)
+				? 'cerimonia'
+				: 'outro';

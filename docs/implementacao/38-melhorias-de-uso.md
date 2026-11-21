@@ -14,7 +14,7 @@
 | 3 | Votação chama a atenção | `chamarAtencao()`: rola, põe o foco no título do cartão e vibra; só a votação que abre depois de a tela estar aberta, e nunca tira o foco de quem está digitando |
 | 4 | Retirar o ponto | `retirar_ponto` (`20261217090000_retirar_ponto.sql`), status `retirado`, botão "Retirar" em "Seus pontos e moções" |
 | 5 | Rascunhos | `src/lib/rascunho.ts`; ponto (sessão), bilhete, carta, matéria e nota de crise |
-| 6 | Filtro | `src/lib/filtro.ts`; chamada, destinatário do bilhete e votos registrados pela mesa, com mais de 12 delegações. Os "próximos" ficaram sem filtro: a fila de placas raramente passa de 12 |
+| 6 | Filtro | `src/lib/filtro.ts`; chamada, destinatário do bilhete e votos registrados pela mesa, com mais de 12 delegações. Os "próximos" ficaram sem filtro (a fila de placas raramente passa de 12); o filtro entrou no passo 41 |
 | 7 | Contador | `{@attach contador(valor)}` (`src/lib/contador.ts`) nos 43 campos com limite de 100 caracteres ou mais; o contador fica fora do `<label>` e entra no `aria-describedby` |
 | 8 | Confirmar | `src/lib/ui/Confirmar.svelte`: encerrar a sessão, encerrar a votação, passar a presidência e retirar a adoção da agenda |
 | 9 | Hora relativa | `src/lib/tempo.ts` e `src/lib/ui/Quando.svelte` (hora exata no `title`) em avisos, mensagens, matérias e atualizações de crise |

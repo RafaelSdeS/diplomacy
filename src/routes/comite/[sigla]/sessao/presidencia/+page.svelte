@@ -143,6 +143,9 @@
 	// Abrir, encerrar e aceitar quem chegou depois (passo 21).
 	$effect(manterTelaAcesa);
 	let buscaVotos = $state('');
+	// Passo 41: a fila de placas também ganha o filtro quando passa de 12 delegações.
+	let buscaFila = $state('');
+	const filaVisivel = $derived(buscaFila.trim() ? fila.filter((p) => p.delegacao && filtrarDelegacoes([p.delegacao], buscaFila).length) : fila);
 	const encerrarSessao = () => rpc('encerrar_sessao', { p_comite: comite });
 	const confirmarPresenca = (delegacao: string) =>
 		executar(supabase.from('presenca').upsert({ sessao_id: sessao!.id, comite_id: comite, delegacao_id: delegacao }));
@@ -409,8 +412,11 @@
 
 			<section class="cartao" aria-labelledby="t-fila">
 				<h2 id="t-fila">{t('Pedidos de fala')}</h2>
+				{#if fila.length > LISTA_LONGA}
+					<label class="campo">{t('Filtrar')} <input type="search" bind:value={buscaFila} /></label>
+				{/if}
 				<ol class="lista">
-					{#each fila as pedido (pedido.id)}
+					{#each filaVisivel as pedido (pedido.id)}
 						{@const ordem = escolhidos.indexOf(pedido.delegacao?.id ?? '')}
 						<li>
 							<span>
@@ -435,7 +441,7 @@
 							</span>
 						</li>
 					{:else}
-						<li class="suave">{t('Nenhuma placa levantada.')}</li>
+						<li class="suave">{fila.length ? t('Nenhuma delegação encontrada.') : t('Nenhuma placa levantada.')}</li>
 					{/each}
 				</ol>
 				{#if fila.length}

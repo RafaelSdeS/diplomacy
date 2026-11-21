@@ -1,6 +1,6 @@
 // Lógica do cronograma, sem dependências: testada em cronograma.test.ts.
 // Todos os horários aparecem no fuso do evento, qualquer que seja o do aparelho.
-import { idioma, locale } from './i18n.svelte.ts';
+import { bilingue, idioma, locale } from './i18n.svelte.ts';
 
 export const FUSO = 'America/Sao_Paulo';
 
@@ -19,7 +19,16 @@ export type ItemCronograma = {
 	inicio: string;
 	fim: string;
 	comite_id: string | null;
+	tipo?: string;
 };
+
+/** Passo 41: o tipo do item, mostrado com ícone e texto ("outro" não aparece). */
+export const TIPOS_ITEM: Record<string, string> = bilingue({
+	sessao: 'Sessão',
+	intervalo: 'Intervalo',
+	cerimonia: 'Cerimônia',
+	outro: 'Outro'
+});
 
 const ms = (iso: string) => new Date(iso).getTime();
 

@@ -11,6 +11,7 @@
 	import { FORMAS, momentoDoDebate } from '#lib/sessao.ts';
 	import { escolhasPermitidas } from '#lib/votacao.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
+	import TipoItem from '#lib/ui/TipoItem.svelte';
 	import BotaoPlaca from '#lib/ui/BotaoPlaca.svelte';
 	import Cronometro from '#lib/ui/Cronometro.svelte';
 	import Votar from '#lib/ui/Votar.svelte';
@@ -220,7 +221,7 @@
 			</p>
 		{/each}
 		{#each atuais as item (item.id)}
-			<p class="destaque">{item.titulo}</p>
+			<p class="destaque">{item.titulo} <TipoItem tipo={item.tipo} /></p>
 			<p class="suave">{junto(item.local, `${t('até')} ${formatarHora(item.fim)}`)}</p>
 		{:else}
 			<p class="suave">{t('Nada no cronograma neste momento.')}</p>
@@ -230,7 +231,7 @@
 	<article class="cartao" aria-labelledby="c-depois">
 		<h2 id="c-depois">{t('Depois')}</h2>
 		{#if proximo}
-			<p class="destaque">{proximo.titulo}</p>
+			<p class="destaque">{proximo.titulo} <TipoItem tipo={proximo.tipo} /></p>
 			<p class="suave">{junto(proximo.local, formatarQuando(proximo.inicio, agora))}</p>
 		{:else}
 			<p class="suave">{t('Nada mais no cronograma.')}</p>

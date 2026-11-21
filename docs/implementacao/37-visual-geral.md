@@ -26,7 +26,7 @@
 - Cartões: `cartao--destaque` (borda marinho, topo de 3 px) no "Com a palavra" da sessão e do painel e nas situações que pedem atenção; `cartao--discreto`. Os atalhos do fim da sessão viraram links.
 - Carimbo com borda dupla. Placa da delegação como o cartão dobrado da mesa (`.placa-nome`).
 - Telas: Agora com a data no rótulo; página da delegação e perfil como credencial (bandeira grande, foto em moldura); press com cabeçalho de jornal; cronograma em linha do tempo, com o comitê como etiqueta; entrar numa folha com a marca; telão com a linha dupla e a faixa de crise legível no fundo marinho.
-- O painel já tinha as três colunas com os relógios no centro (passos 28 a 31); ganhou o "Com a palavra" em destaque. Ficaram de fora os ícones por tipo de item no cronograma (o item não tem tipo no banco).
+- O painel já tinha as três colunas com os relógios no centro (passos 28 a 31); ganhou o "Com a palavra" em destaque. Ficaram de fora os ícones por tipo de item no cronograma (o item não tinha tipo no banco); feitos no passo 41.
 - Capturas de referência refeitas no CI depois do passo 38.
 - `tests/37-visual.spec.ts`: axe no tema escuro nas telas principais de delegado, mesa, crise e secretaria.
 
