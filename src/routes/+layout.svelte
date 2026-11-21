@@ -5,6 +5,8 @@
 	import { afterNavigate, beforeNavigate, goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import Ellipsis from '@lucide/svelte/icons/ellipsis';
+	import Search from '@lucide/svelte/icons/search';
+	import { abrirIrPara, irPara } from '#lib/ir-para.svelte.ts';
 	import { menu } from '#lib/menu.ts';
 	import { caixa } from '#lib/caixa.ts';
 	import { esquecerConta } from '#lib/conta.ts';
@@ -58,6 +60,14 @@
 	const volta = $derived(anterior());
 	// A ficha da delegação (e as bandeiras dela) só carrega na primeira vez que alguém a abre.
 	const fichaDelegacao = $derived(ficha.usada ? import('#lib/ui/FichaDelegacao.svelte') : null);
+	// "Ir para…" (passo 43): Ctrl+K (ou ⌘K) em qualquer tela; carrega na primeira vez.
+	const buscaIrPara = $derived(irPara.usado ? import('#lib/ui/IrPara.svelte') : null);
+	function atalhoIrPara(evento: KeyboardEvent) {
+		if (evento.key.toLowerCase() === 'k' && (evento.ctrlKey || evento.metaKey) && comMenu) {
+			evento.preventDefault();
+			abrirIrPara();
+		}
+	}
 	// O nome do evento da pessoa, para os títulos e o cabeçalho (passo 27).
 	const nomeDoEvento = $derived(data.participacoes[0]?.evento_nome ?? null);
 	$effect.pre(() => {
@@ -115,6 +125,8 @@
 	}
 </script>
 
+<svelte:window onkeydown={atalhoIrPara} />
+
 {#if semMoldura}
 	<main id="conteudo" class="main-sem-moldura">
 		{@render children()}
@@ -133,6 +145,19 @@
 			</a>
 			{#if data.usuario}
 				<div class="conta">
+					{#if comMenu}
+						<button
+							class="botao botao--secundario botao--pequeno ir-para-botao"
+							type="button"
+							aria-label={t('Ir para…')}
+							aria-keyshortcuts="Control+K Meta+K"
+							title={t('Ir para… (Ctrl+K)')}
+							onclick={abrirIrPara}
+						>
+							<Search aria-hidden="true" size={16} strokeWidth={1.75} />
+							<span class="ir-para-rotulo">{t('Ir para…')}</span>
+						</button>
+					{/if}
 					{#if !online}<span class="selo selo--alerta">{t('Sem conexão')}</span>{/if}
 					{#if pendentes}<span class="selo selo--info" role="status">{t('{n} para enviar', { n: pendentes })}</span>{/if}
 					{#if eu?.papel === 'delegado' && eu.delegacao_id}
@@ -207,4 +232,5 @@
 		</main>
 	</div>
 	{#if fichaDelegacao}{#await fichaDelegacao then { default: Ficha }}<Ficha />{/await}{/if}
+	{#if buscaIrPara}{#await buscaIrPara then { default: IrPara }}<IrPara participacoes={data.participacoes} />{/await}{/if}
 {/if}

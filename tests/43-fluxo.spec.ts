@@ -121,3 +121,26 @@ test('no celular, "Mais" guarda o resto do menu, e o "Voltar" volta a ele', asyn
 	await page.getByRole('link', { name: '‹ Voltar para Mais' }).click();
 	await expect(page).toHaveURL('/mais');
 });
+
+test('"Ir para…" (Ctrl+K) acha a delegação, que abre a ficha, e a tela pelo nome', async ({ page }, info) => {
+	test.skip(info.project.name !== 'notebook', 'uma tela basta');
+	await entrar(page, MESA);
+	await page.goto(PAINEL);
+	await aoVivo(page);
+	await page.keyboard.press('Control+K');
+	const busca = page.getByRole('dialog', { name: 'Ir para…' });
+	await expect(busca).toBeVisible();
+	await semErrosDeAcessibilidade(page);
+	await busca.getByRole('searchbox').fill('russia');
+	await busca.getByRole('button', { name: 'Rússia' }).click();
+	await expect(page.getByRole('dialog', { name: 'Rússia' })).toBeVisible();
+	await expect(page).toHaveURL(PAINEL);
+	await page.keyboard.press('Escape');
+
+	await page.getByRole('button', { name: 'Ir para…' }).click();
+	await busca.getByRole('searchbox').fill('crono');
+	await busca.getByRole('searchbox').press('Enter');
+	await expect(page.getByRole('heading', { level: 1, name: 'Cronograma' })).toBeVisible();
+	await page.getByRole('link', { name: '‹ Voltar para Presidência' }).click();
+	await expect(page).toHaveURL(PAINEL);
+});

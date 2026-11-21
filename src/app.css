@@ -2798,3 +2798,36 @@ dialog.ficha {
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
+
+/* Passo 43: "Ir para…", a busca por telas, delegações e documentos. */
+.ir-para-botao {
+	gap: 0.4rem;
+}
+
+@media (max-width: 639px) {
+	.ir-para-rotulo {
+		display: none;
+	}
+}
+
+dialog.ir-para {
+	width: min(36rem, calc(100vw - 2rem));
+	max-width: none;
+	margin-top: 10vh;
+}
+
+.ir-para .campo input {
+	font-size: 1.1rem;
+}
+
+.ir-para h3.rotulo {
+	margin: 1rem 0 0.25rem;
+}
+
+.ir-para .lista a {
+	text-decoration: none;
+}
+
+.ir-para .lista a:hover {
+	text-decoration: underline;
+}
