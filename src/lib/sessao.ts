@@ -25,12 +25,13 @@ export async function carregarSessao(comiteId: string) {
 			.select(
 				`forma, fase, etapa_plenaria, topico_atual, ordem_topicos, mesa_assumiu, tempo_fala_seg,
 				cronometro_inicio, cronometro_duracao_seg, cronometro_pausado_restante_seg,
-				debate_inicio, debate_duracao_seg, debate_pausado_restante_seg, debate_total_seg,
+				debate_inicio, debate_duracao_seg, debate_pausado_restante_seg, debate_total_seg, pausa_ate,
 				orador:delegacao(id, nome, bandeira),
 				sessao(id, numero, informal_min_usados,
 					presidencia:delegacao!sessao_presidencia_delegacao_id_comite_id_fkey(id, nome, bandeira),
 					presenca(delegacao_id, situacao),
 					avisos:aviso_chegada(delegacao(id, nome, bandeira)),
+					proximos:proximo_orador(ordem, delegacao(id, nome, bandeira)),
 					pedidos:pedido_fala(id, delegacao(id, nome, bandeira)),
 					pontos:ponto_mocao(id, tipo, detalhe, status, topico, minutos, aprovado_bureau, motivo, delegacao(id, nome), assinaturas:assinatura_mocao(delegacao_id)),
 					votacoes:votacao(id, objeto, tipo, regra, aberta, a_favor, contra, abstencoes, necessario,
@@ -41,6 +42,7 @@ export async function carregarSessao(comiteId: string) {
 			.eq('sessao.pedidos.situacao', 'aberto')
 			.order('criado_em', { referencedTable: 'sessao.pedidos' })
 			.order('criado_em', { referencedTable: 'sessao.pontos' })
+			.order('ordem', { referencedTable: 'sessao.proximos' })
 			.order('criado_em', { referencedTable: 'sessao.votacoes', ascending: false })
 			.limit(1, { referencedTable: 'sessao.votacoes' })
 			.maybeSingle(),
@@ -159,6 +161,20 @@ export const SITUACAO_PONTO = bilingue({
 	aceito: 'Aceito',
 	recusado: 'Recusado'
 } as const);
+
+/**
+ * O momento do debate (passo 30): alguém com a palavra, a pausa para pontos e moções
+ * depois de uma fala, ou as placas.
+ */
+export function momentoDoDebate(e: { orador: unknown; pausa_ate: string | null }, agoraMs: number): 'fala' | 'pausa' | 'placas' {
+	if (e.orador) return 'fala';
+	if (e.pausa_ate && agoraMs < Date.parse(e.pausa_ate)) return 'pausa';
+	return 'placas';
+}
+
+/** Segundos que faltam na pausa (0 sem pausa). */
+export const pausaRestanteSeg = (pausaAte: string | null, agoraMs: number) =>
+	pausaAte ? Math.max(0, Math.ceil((Date.parse(pausaAte) - agoraMs) / 1000)) : 0;
 
 /** O bureau preside agora (plenária, ação, mesa assumiu ou sem delegação na presidência)? */
 export const bureauPreside = (fase: string, mesaAssumiu: boolean | null | undefined, presidencia: string | null | undefined) =>

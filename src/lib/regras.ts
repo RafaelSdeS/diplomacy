@@ -5,6 +5,7 @@ export type Regras = {
 	quorum_fracao: [number, number];
 	informal_informal_max_min: number;
 	aviso_fala_seg: number;
+	pausa_pontos_seg: number;
 	limite_notas_pendentes: number;
 	votacao_substantiva: 'maioria_simples' | 'csnu' | 'unanimidade';
 	membros_permanentes: string[];
@@ -60,6 +61,7 @@ function regrasEmIngles(r: Regras): RegraLegivel[] {
 			texto: `drawn delegation, at most ${pluralEn(r.max_sessoes_presidencia, 'session', 'sessions')}; the bureau chairs the opening plenary and the action phase`
 		},
 		{ grupo: 'Session', rotulo: 'Time warning', texto: `${pluralEn(r.aviso_fala_seg, 'second', 'seconds')} before the end of the speech` },
+		{ grupo: 'Session', rotulo: 'Pause for points and motions', texto: r.pausa_pontos_seg ? `${pluralEn(r.pausa_pontos_seg, 'second', 'seconds')} after each speech in moderated debate` : 'none' },
 		{ grupo: 'Session', rotulo: 'Unmoderated caucus', texto: `up to ${pluralEn(r.informal_informal_max_min, 'minute', 'minutes')} per session` },
 		{ grupo: 'Voting', rotulo: 'Substantive vote', texto: votacao(r) },
 		{ grupo: 'Voting', rotulo: 'Procedural vote', texto: 'simple majority, no abstentions' },
@@ -98,6 +100,7 @@ export function regrasLegiveis(r: Regras): RegraLegivel[] {
 			texto: `delegação sorteada, no máximo ${plural(r.max_sessoes_presidencia, 'sessão', 'sessões')}; o bureau preside a plenária de abertura e a fase de ação`
 		},
 		{ grupo: 'Sessão', rotulo: 'Aviso de tempo', texto: `${plural(r.aviso_fala_seg, 'segundo', 'segundos')} antes do fim da fala` },
+		{ grupo: 'Sessão', rotulo: 'Pausa para pontos e moções', texto: r.pausa_pontos_seg ? `${plural(r.pausa_pontos_seg, 'segundo', 'segundos')} depois de cada fala no formal-informal` : 'sem pausa' },
 		{ grupo: 'Sessão', rotulo: 'Informal-informal', texto: `até ${plural(r.informal_informal_max_min, 'minuto', 'minutos')} por sessão` },
 		{ grupo: 'Votações', rotulo: 'Votação substantiva', texto: votacao(r) },
 		{ grupo: 'Votações', rotulo: 'Votação procedimental', texto: 'maioria simples, sem abstenção' },

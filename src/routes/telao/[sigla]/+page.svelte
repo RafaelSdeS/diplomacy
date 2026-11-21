@@ -2,7 +2,7 @@
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { t } from '#lib/i18n.svelte.ts';
 	import { onMount } from 'svelte';
-	import { descreverPonto, FORMAS } from '#lib/sessao.ts';
+	import { descreverPonto, FORMAS, momentoDoDebate } from '#lib/sessao.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import Bandeira from '#lib/ui/Bandeira.svelte';
 	import Cronometro from '#lib/ui/Cronometro.svelte';
@@ -23,13 +23,20 @@
 	// Um pedido esperando o bureau ou a presidência (passo 29).
 	const emAnalise = $derived(sessao?.pontos.find((p) => p.status === 'aberto'));
 	const lista = $derived(listaAtiva(data.lista, emDiscussao?.id, data.fase).filter((i) => !i.falou));
-	// Os próximos: da lista de oradores em uso ou, sem lista, da fila de placas.
+	// Os próximos: a lista curta da presidência (passo 30), a lista de oradores em uso
+	// ou, sem nenhuma das duas, a fila de placas.
+	const listaCurta = $derived((sessao?.proximos ?? []).map((p) => ({ id: p.delegacao?.id ?? '', delegacao: p.delegacao })));
 	const proximos = $derived(
-		(lista.length ? lista.map((i) => ({ id: i.id, delegacao: i.delegacao })) : (sessao?.pedidos ?? [])).slice(0, 4)
+		(listaCurta.length
+			? listaCurta
+			: lista.length
+				? lista.map((i) => ({ id: i.id, delegacao: i.delegacao }))
+				: (sessao?.pedidos ?? [])
+		).slice(0, 4)
 	);
 	let agora = $state(Date.now());
 	$effect(() => {
-		const relogio = setInterval(() => (agora = Date.now()), 10_000);
+		const relogio = setInterval(() => (agora = Date.now()), 1000);
 		return () => clearInterval(relogio);
 	});
 	const votacao = $derived(data.votacao?.aberta ? data.votacao : null);
@@ -121,6 +128,9 @@
 	{#if plantao}
 		<p class="telao-plantao" role="status"><span class="rotulo">{plantao.rotulo}</span> {plantao.texto}</p>
 	{/if}
+	{#if data.estado && momentoDoDebate(data.estado, agora + diferenca) === 'pausa'}
+		<p class="telao-pausa" role="status">{t('Há pontos ou moções?')}</p>
+	{/if}
 	{#if emAnalise}
 		<p class="telao-analise"><span class="rotulo">{t('Em análise')}</span> {descreverPonto(emAnalise)} · {emAnalise.delegacao?.nome}</p>
 	{/if}
@@ -151,7 +161,7 @@
 			{#if data.votacao && !data.votacao.aberta}
 				<p class="telao-resultado">{data.votacao.objeto}. {textoResultado(data.votacao)}</p>
 			{/if}
-			<p class="rotulo">{lista.length ? (emDiscussao ? t('Lista especial') : t('Lista de oradores')) : t('Próximos')}</p>
+			<p class="rotulo">{listaCurta.length ? t('Próximos') : lista.length ? (emDiscussao ? t('Lista especial') : t('Lista de oradores')) : t('Próximos')}</p>
 			<ol>
 				{#each proximos as item (item.id)}
 					<li class="com-bandeira"><Bandeira codigo={item.delegacao?.bandeira} /> {item.delegacao?.nome}</li>

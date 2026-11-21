@@ -5,7 +5,7 @@
 	import type { Database } from '#lib/database.types.ts';
 	import { nomeDoDocumento, STATUS_DOCUMENTO } from '#lib/formatacao.ts';
 	import { assinaturasDesconfianca, REGRAS_VOTACAO } from '#lib/votacao.ts';
-	import { bureauPreside, descreverPonto, ehPonto, FORMAS, mensagemDeErro, MOCOES_COM_LISTA, SITUACAO_PONTO, type TipoPonto } from '#lib/sessao.ts';
+	import { bureauPreside, momentoDoDebate, pausaRestanteSeg, descreverPonto, ehPonto, FORMAS, mensagemDeErro, MOCOES_COM_LISTA, SITUACAO_PONTO, type TipoPonto } from '#lib/sessao.ts';
 	import { supabase } from '#lib/supabase.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import Bandeira from '#lib/ui/Bandeira.svelte';
@@ -68,6 +68,19 @@
 			&& restanteSeg(relogioDebate(data.estado), agora + diferenca) === 0
 	);
 	const aplicarTempo = (seg: number) => rpc('aplicar_tempo_fala', { p_comite: comite, p_seg: seg });
+	// Debate rápido (passo 30): a pausa depois de cada fala e a lista curta escolhida entre as placas.
+	const momento = $derived(data.estado ? momentoDoDebate(data.estado, agora + diferenca) : null);
+	const proximos = $derived(sessao?.proximos ?? []);
+	let escolhidos = $state<string[]>([]);
+	const escolher = (delegacao: string) =>
+		(escolhidos = escolhidos.includes(delegacao)
+			? escolhidos.filter((d) => d !== delegacao)
+			: escolhidos.length < 4
+				? [...escolhidos, delegacao]
+				: escolhidos);
+	const definirProximos = () =>
+		rpc('definir_proximos', { p_comite: comite, p_delegacoes: escolhidos }).then(() => (escolhidos = []));
+	const baixarTodas = () => rpc('baixar_todas_placas', { p_comite: comite });
 	const correndo = $derived(!!data.estado?.cronometro_inicio && !pausado);
 	const votacao = $derived(data.votacao);
 	// Quem pode votar nesta votação: presentes, menos suspensas (e observadoras, na substantiva).
@@ -128,18 +141,22 @@
 		void rpc('mudar_forma', { p_comite: comite, p_forma: forma, p_minutos: minutos ?? undefined });
 	}
 
-	// Atalhos: Espaço pausa ou retoma; Enter dá a palavra ao próximo da lista de
-	// oradores ou, sem lista, ao primeiro da fila de placas. Só fora de campos e botões.
+	// Atalhos: Espaço pausa ou retoma; Enter dá a palavra ao primeiro da lista curta, ou
+	// ao próximo da lista de oradores, ou ao primeiro da fila de placas; B baixa todas as
+	// placas. Só fora de campos e botões.
 	function atalho(evento: KeyboardEvent) {
 		const alvo = evento.target as HTMLElement;
 		if (alvo.closest('input, textarea, select, button, a, dialog, [contenteditable]')) return;
-		const seguinte = proximo?.delegacao?.id ?? fila[0]?.delegacao?.id;
+		const seguinte = proximos[0]?.delegacao?.id ?? proximo?.delegacao?.id ?? fila[0]?.delegacao?.id;
 		if (evento.key === ' ') {
 			evento.preventDefault();
 			void pausarOuRetomar();
 		} else if (evento.key === 'Enter' && seguinte) {
 			evento.preventDefault();
 			void darPalavra(seguinte);
+		} else if (evento.key.toLowerCase() === 'b') {
+			evento.preventDefault();
+			void baixarTodas();
 		}
 	}
 </script>
@@ -204,7 +221,7 @@
 		)}
 	</p>
 	<p class="suave atalhos-ajuda">
-		{t('Atalhos:')} <kbd>{t('Espaço')}</kbd> {t('pausa ou retoma;')} <kbd>{t('Enter')}</kbd> {t('dá a palavra ao próximo da lista ou da fila.')}
+		{t('Atalhos:')} <kbd>{t('Espaço')}</kbd> {t('pausa ou retoma;')} <kbd>{t('Enter')}</kbd> {t('dá a palavra ao próximo da lista ou da fila;')} <kbd>B</kbd> {t('baixa todas as placas.')}
 	</p>
 
 	{#if erro}
@@ -244,6 +261,16 @@
 				</ul>
 			</section>
 		{/if}
+	{/if}
+
+	{#if momento === 'pausa' && data.estado}
+		<section class="cartao cartao--destaque pausa-pontos" aria-labelledby="t-pausa">
+			<h2 id="t-pausa">{t('Há pontos ou moções?')}</h2>
+			<p class="destaque" aria-live="polite">{t('{n} s', { n: pausaRestanteSeg(data.estado.pausa_ate, agora + diferenca) })}</p>
+			<button class="botao botao--secundario" type="button" onclick={() => rpc('encerrar_pausa', { p_comite: comite })}
+				>{t('Encerrar a pausa')}</button
+			>
+		</section>
 	{/if}
 
 	{#if debateEsgotado}
@@ -311,23 +338,55 @@
 				</section>
 			{/if}
 
+			{#if proximos.length}
+				<section class="cartao" aria-labelledby="t-proximos">
+					<h2 id="t-proximos">{t('Próximos')}</h2>
+					<ol class="lista">
+						{#each proximos as p (p.delegacao?.id)}
+							<li><NomeDelegacao sigla={data.comite.sigla} delegacao={p.delegacao} /></li>
+						{/each}
+					</ol>
+					<button class="botao" type="button" onclick={() => darPalavra(proximos[0].delegacao!.id)}>
+						{t('Dar a palavra a {delegacao}', { delegacao: proximos[0].delegacao?.nome ?? '' })}
+					</button>
+				</section>
+			{/if}
+
 			<section class="cartao" aria-labelledby="t-fila">
 				<h2 id="t-fila">{t('Pedidos de fala')}</h2>
 				<ol class="lista">
 					{#each fila as pedido (pedido.id)}
+						{@const ordem = escolhidos.indexOf(pedido.delegacao?.id ?? '')}
 						<li>
 							<NomeDelegacao sigla={data.comite.sigla} delegacao={pedido.delegacao} />
-							<button
-								class="botao botao--pequeno"
-								type="button"
-								aria-label={`Dar a palavra a ${pedido.delegacao?.nome}`}
-								onclick={() => darPalavra(pedido.delegacao!.id)}>{t('Dar a palavra')}</button
-							>
+							<span class="acoes">
+								<button
+									class="botao botao--secundario botao--pequeno"
+									type="button"
+									aria-pressed={ordem >= 0}
+									aria-label={t('Escolher para a lista curta: {delegacao}', { delegacao: pedido.delegacao?.nome ?? '' })}
+									onclick={() => escolher(pedido.delegacao!.id)}>{ordem >= 0 ? `${ordem + 1}º` : t('Escolher')}</button
+								>
+								<button
+									class="botao botao--pequeno"
+									type="button"
+									aria-label={`Dar a palavra a ${pedido.delegacao?.nome}`}
+									onclick={() => darPalavra(pedido.delegacao!.id)}>{t('Dar a palavra')}</button
+								>
+							</span>
 						</li>
 					{:else}
 						<li class="suave">{t('Nenhuma placa levantada.')}</li>
 					{/each}
 				</ol>
+				{#if fila.length}
+					<div class="acoes">
+						<button class="botao botao--secundario botao--pequeno" type="button" disabled={!escolhidos.length} onclick={definirProximos}
+							>{t('Definir os próximos ({n})', { n: escolhidos.length })}</button
+						>
+						<button class="botao botao--secundario botao--pequeno" type="button" onclick={baixarTodas}>{t('Baixar todas as placas')}</button>
+					</div>
+				{/if}
 				{#if ehMesa && data.comite.tecnologia_restrita}
 					<form
 						class="acoes"

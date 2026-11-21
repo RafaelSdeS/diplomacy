@@ -10,6 +10,7 @@
 		PONTOS,
 		pontosEmOrdem,
 		situacaoDoPonto,
+		momentoDoDebate,
 		type TipoPonto
 	} from '#lib/sessao.ts';
 	import { supabase } from '#lib/supabase.ts';
@@ -47,6 +48,19 @@
 	const tiposEmOrdem = $derived(pontosEmOrdem(data.fase, data.estado?.etapa_plenaria, data.salaFechada));
 	const minhaSituacao = $derived(data.delegacoes.find((d) => d.id === eu?.delegacao_id)?.situacao);
 	const presentes = $derived(new Set((sessao?.presenca ?? []).map((p) => p.delegacao_id)));
+	// Debate rápido (passo 30): a pausa para pontos e moções e a lista curta.
+	let agora = $state(Date.now());
+	$effect(() => {
+		const relogio = setInterval(() => (agora = Date.now()), 1000);
+		return () => clearInterval(relogio);
+	});
+	const momento = $derived(data.estado ? momentoDoDebate(data.estado, agora + diferenca) : null);
+	const naListaCurta = $derived((sessao?.proximos ?? []).findIndex((p) => p.delegacao?.id === eu?.delegacao_id));
+	function irAoPonto() {
+		const campo = document.getElementById('tipo-ponto');
+		campo?.scrollIntoView({ block: 'center' });
+		campo?.focus();
+	}
 	const minhaPresenca = $derived(sessao?.presenca.find((p) => p.delegacao_id === eu?.delegacao_id)?.situacao);
 	const meuVoto = $derived(data.votacao?.votos.find((v) => v.delegacao_id === eu?.delegacao_id)?.escolha);
 	// Tecnologia restrita: durante a sessão, a mesa opera o app; o delegado acompanha.
@@ -126,6 +140,12 @@
 	{/if}
 
 	<div class="cartoes">
+		{#if momento === 'pausa' && eu && !restrita}
+			<article class="cartao cartao--destaque pausa-pontos" aria-labelledby="c-pausa">
+				<h2 id="c-pausa">{t('Há pontos ou moções?')}</h2>
+				<button class="botao" type="button" onclick={irAoPonto}>{t('Fazer um ponto ou moção')}</button>
+			</article>
+		{/if}
 		{#if eu && !minhaPresenca && minhaSituacao !== 'suspensa'}
 			{@const avisei = sessao.avisos.some((a) => a.delegacao?.id === eu.delegacao_id)}
 			<article class="cartao cartao--destaque" aria-labelledby="c-chegada">
@@ -233,6 +253,9 @@
 		{#if eu && !restrita && data.fase !== 'plenaria'}
 			<article class="cartao" aria-labelledby="c-placa">
 				<h2 id="c-placa">{t('Sua placa')}</h2>
+				{#if naListaCurta >= 0}
+					<p class="sucesso" role="status">{t('Sua delegação é a {n}ª da lista curta.', { n: naListaCurta + 1 })}</p>
+				{/if}
 				{#if posicao >= 0}
 					<p class="destaque">{t('Placa levantada')} · {t('{n}ª na fila', { n: posicao + 1 })}</p>
 					<button class="botao botao--grande" type="button" aria-pressed="true" onclick={() => placaAcao('baixar_placa')}>
@@ -286,7 +309,7 @@
 			<form class="formulario" onsubmit={enviarPonto}>
 				<label class="campo">
 					{t('Tipo')}
-					<select bind:value={tipoPonto}>
+					<select id="tipo-ponto" bind:value={tipoPonto}>
 						{#each tiposEmOrdem as tipo (tipo)}
 							<option value={tipo}>{PONTOS[tipo]}</option>
 						{/each}

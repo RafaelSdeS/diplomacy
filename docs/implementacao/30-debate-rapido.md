@@ -5,7 +5,13 @@
 **Esforço:** M
 **Objetivo:** o app acompanha o ritmo da sala: fala, pausa para pontos e moções, placas, próxima fala. Ajuda a parte física do evento, sem substituí-la.
 
-## Hoje
+## Como ficou
+
+- Banco (`20261213090000_debate_rapido.sql`): regra `pausa_pontos_seg` (10 s; 0 desliga), `estado_sessao.pausa_ate`, `proximo_orador`, `dar_palavra` cuidando da pausa e da lista curta, `encerrar_pausa`, `definir_proximos`, `baixar_todas_placas`.
+- Painel: cartão da pausa com contagem; escolha dos próximos na fila (1º, 2º…); seção "Próximos"; "Baixar todas as placas" e o atalho B; Enter dá a palavra ao primeiro da lista curta.
+- Sessão: faixa "Há pontos ou moções?" que leva ao formulário; "Sua delegação é a 2ª da lista curta". Telão: faixa da pausa e a lista curta em "Próximos".
+
+## Antes
 
 - Encerrar uma fala (`dar_palavra(null)`) só zera o orador.
 - As placas levantadas formam a fila "Pedidos de fala" (`pedido_fala`), por ordem de chegada; a presidência dá a palavra a qualquer uma.
@@ -23,47 +29,47 @@
 
 Migração `supabase/migrations/20261213090000_debate_rapido.sql`:
 
-- [ ] Regra `pausa_pontos_seg` (número, padrão 10): `create or replace` de `regras_do_guia` e `regras_validas` a partir das versões de `20261204100000_comunicacao.sql:62` e `:85`. Tipo e texto legível em `src/lib/regras.ts` (português e inglês).
-- [ ] `estado_sessao.pausa_ate timestamptz`.
-- [ ] `create or replace function public.dar_palavra`:
+- [x] Regra `pausa_pontos_seg` (número, padrão 10): `create or replace` de `regras_do_guia` e `regras_validas` a partir das versões de `20261204100000_comunicacao.sql:62` e `:85`. Tipo e texto legível em `src/lib/regras.ts` (português e inglês).
+- [x] `estado_sessao.pausa_ate timestamptz`.
+- [x] `create or replace function public.dar_palavra`:
   - sem delegação (encerrar a fala), no debate formal-informal, grava `pausa_ate = now() + pausa_pontos_seg`;
   - com delegação, limpa `pausa_ate` e tira a delegação da lista curta.
-- [ ] `encerrar_pausa(p_comite)`: presidência; limpa `pausa_ate`.
-- [ ] Tabela `proximo_orador` (`sessao_id`, `comite_id`, `delegacao_id`, `ordem`; chave `(sessao_id, delegacao_id)`; chaves compostas):
+- [x] `encerrar_pausa(p_comite)`: presidência; limpa `pausa_ate`.
+- [x] Tabela `proximo_orador` (`sessao_id`, `comite_id`, `delegacao_id`, `ordem`; chave `(sessao_id, delegacao_id)`; chaves compostas):
   - RLS: o comitê lê, sem escrita direta;
   - Broadcast `transmitir('comite', 'comite_id')`.
-- [ ] `definir_proximos(p_comite, p_delegacoes uuid[])`: presidência; substitui a lista (até 4, só delegações presentes).
-- [ ] `baixar_todas_placas(p_comite)`: presidência; os pedidos abertos da sessão viram `baixado`.
-- [ ] Regenerar os tipos.
+- [x] `definir_proximos(p_comite, p_delegacoes uuid[])`: presidência; substitui a lista (até 4, só delegações presentes).
+- [x] `baixar_todas_placas(p_comite)`: presidência; os pedidos abertos da sessão viram `baixado`.
+- [x] Regenerar os tipos.
 
 ## Código e telas
 
-- [ ] `src/lib/sessao.ts`: `momentoDoDebate(estado, agoraMs)` devolve `'fala'`, `'pausa'` ou `'placas'` (função pura).
-- [ ] **Painel:**
+- [x] `src/lib/sessao.ts`: `momentoDoDebate(estado, agoraMs)` devolve `'fala'`, `'pausa'` ou `'placas'` (função pura).
+- [x] **Painel:**
   - depois de "Encerrar fala", cartão grande "Há pontos ou moções?" com a contagem da pausa e "Encerrar a pausa";
   - a fila de placas vira lista de escolha: tocar marca a ordem (1, 2, 3, 4), e "Definir próximos" salva;
   - Enter dá a palavra ao primeiro da lista curta, depois ao da lista de oradores, depois ao da fila;
   - novo atalho B baixa todas as placas.
-- [ ] **Sessão** (delegado):
+- [x] **Sessão** (delegado):
   - na pausa, faixa "Há pontos ou moções?" com o botão que leva ao formulário de ponto ou moção (rola e põe o foco no primeiro campo);
   - nas placas, "Levantar placa" em destaque;
   - "Você é o 2º da lista" quando a delegação está na lista curta.
-- [ ] **Telão:** faixa da pausa e "Próximos: Brasil, França, Japão".
+- [x] **Telão:** faixa da pausa e "Próximos: Brasil, França, Japão".
 
 ## Testes
 
 Arquivos: `src/lib/sessao.test.ts`, `supabase/tests/30-debate-rapido.test.sql` e `tests/30-debate-rapido.spec.ts`.
 
-- [ ] Vitest: `momentoDoDebate` nos três momentos e no fim da pausa.
-- [ ] pgTAP:
+- [x] Vitest: `momentoDoDebate` nos três momentos e no fim da pausa.
+- [x] pgTAP:
   - encerrar a fala no formal-informal cria a pausa da regra, e com regra 0 não cria;
   - só a presidência define os próximos e baixa as placas;
   - dar a palavra tira a delegação da lista curta;
   - delegação ausente não entra na lista.
-- [ ] Ponta a ponta, com relógio controlado e 3 delegações: fala → pausa aparece no celular e no telão → fim da pausa → placas → a presidência escolhe 2 → o telão mostra os próximos → Enter dá a palavra na ordem.
-- [ ] Capturas do telão na pausa e com os próximos.
+- [x] Ponta a ponta (CE-T em debate, duas placas): a presidência escolhe França e Alemanha; o telão e o celular mostram a lista curta; a França fala; ao encerrar, a pausa aparece no painel, no celular (que leva ao campo de ponto ou moção) e no telão; a presidência encerra a pausa e baixa as placas. O fim da pausa pelo tempo fica no Vitest (`momentoDoDebate`).
+- [ ] Capturas do telão na pausa e com os próximos (as de referência do telão e do painel são regeradas no CI).
 
 ## Pronto quando
 
-- [ ] Uma sessão de teste flui no ritmo da sala, sem a presidência procurar botões.
-- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
+- [x] Uma sessão de teste flui no ritmo da sala, sem a presidência procurar botões.
+- [x] Os testes acima passam no CI, junto com os de todos os passos anteriores.

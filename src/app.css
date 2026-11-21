@@ -1982,3 +1982,17 @@ kbd {
 	margin: 0.5rem 0;
 	font-size: 1.4rem;
 }
+
+/* Debate rápido (passo 30): a pausa para pontos e moções. */
+.pausa-pontos h2 {
+	color: var(--cor-marinho);
+}
+
+.telao-pausa {
+	margin: 0.5rem 0;
+	padding: 0.5rem 1rem;
+	border-left: 6px solid var(--cor-marinho);
+	background: var(--cor-marinho-suave);
+	font-family: var(--fonte-titulo);
+	font-size: 2rem;
+}

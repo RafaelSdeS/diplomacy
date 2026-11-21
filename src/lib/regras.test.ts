@@ -6,6 +6,7 @@ const GUIA: Regras = {
 	quorum_fracao: [1, 3],
 	informal_informal_max_min: 45,
 	aviso_fala_seg: 10,
+	pausa_pontos_seg: 10,
 	limite_notas_pendentes: 2,
 	votacao_substantiva: 'maioria_simples',
 	membros_permanentes: [],
@@ -60,6 +61,6 @@ describe('regrasLegiveis', () => {
 	});
 
 	it('tem uma linha para cada regra', () => {
-		expect(regrasLegiveis(GUIA)).toHaveLength(15);
+		expect(regrasLegiveis(GUIA)).toHaveLength(16);
 	});
 });

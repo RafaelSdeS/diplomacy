@@ -730,7 +730,6 @@ export const EN: Record<string, string> = {
 	'cláusula removida': 'clause removed',
 	'comitê': 'committee',
 	'dois terços': 'two-thirds',
-	'dá a palavra ao próximo da lista ou da fila.': 'gives the floor to the next on the list or in the queue.',
 	'em ordem alfabética': 'in alphabetical order',
 	'maioria simples': 'simple majority',
 	'minutos': 'minutes',
@@ -913,6 +912,20 @@ export const EN: Record<string, string> = {
 	'{pedido}: enviado à mesa.': '{pedido}: sent to the dais.',
 	'Este pedido já foi julgado.': 'This request has already been ruled on.',
 	'O bureau ainda não aprovou este pedido.': 'The dais has not approved this request yet.',
+	// Passo 30
+	'Há pontos ou moções?': 'Any points or motions?',
+	'{n} s': '{n} s',
+	'Encerrar a pausa': 'End the pause',
+	'Escolher para a lista curta: {delegacao}': 'Choose for the short list: {delegacao}',
+	'Escolher': 'Choose',
+	'Definir os próximos ({n})': 'Set the next speakers ({n})',
+	'Baixar todas as placas': 'Lower all placards',
+	'dá a palavra ao próximo da lista ou da fila;': 'gives the floor to the next on the list or queue;',
+	'baixa todas as placas.': 'lowers all placards.',
+	'Fazer um ponto ou moção': 'Raise a point or motion',
+	'Sua delegação é a {n}ª da lista curta.': 'Your delegation is number {n} on the short list.',
+	'A lista curta tem no máximo 4 delegações.': 'The short list has at most 4 delegations.',
+	'Só delegações presentes entram na lista curta.': 'Only present delegations go on the short list.',
 };
 
 /** Mensagens do banco com partes variáveis: [padrão em português, tradução]. */
