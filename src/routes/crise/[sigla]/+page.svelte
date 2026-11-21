@@ -14,6 +14,7 @@
 		type StatusNota
 	} from '#lib/crise.ts';
 	import { mensagemDeErro } from '#lib/sessao.ts';
+	import { pedirNotificacao } from '#lib/push.ts';
 	import { supabase } from '#lib/supabase.ts';
 	import { TABELAS_CRISE } from '#lib/tempo-real.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
@@ -80,9 +81,10 @@
 	async function responder(status: StatusNota) {
 		const ok = await executar(
 			supabase.rpc('responder_notas', { p_ids: alvos, p_status: status, p_resposta: resposta }),
-			alvos.length > 1 ? `${alvos.length} notas respondidas.` : t('Nota respondida.')
+			alvos.length > 1 ? t('{n} notas respondidas.', { n: alvos.length }) : t('Nota respondida.')
 		);
 		if (ok) {
+			pedirNotificacao('nota', alvos);
 			resposta = '';
 			selecionadas = [];
 		}

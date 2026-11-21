@@ -75,6 +75,26 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"assinatura_push": {
+                  Row: {
+                    "auth": string,"criada_em": string,"endpoint": string,"p256dh": string,"pessoa_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "auth": string,"criada_em"?: string,"endpoint": string,"p256dh": string,"pessoa_id": string
+                  }
+                  Update: {
+                    "auth"?: string,"criada_em"?: string,"endpoint"?: string,"p256dh"?: string,"pessoa_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "assinatura_push_pessoa_id_fkey"
+      columns: ["pessoa_id"]
+isOneToOne: false
+      referencedRelation: "pessoa"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"atualizacao_comite": {
                   Row: {
                     "atualizacao_id": string,"comite_id": string,"evento_id": string
@@ -1293,6 +1313,20 @@ isOneToOne: false
       referencedColumns: ["id","comite_id"]
     }
                   ]
+                },"push_enviado": {
+                  Row: {
+                    "chave": string,"em": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "chave": string,"em"?: string
+                  }
+                  Update: {
+                    "chave"?: string,"em"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
                 },"registro": {
                   Row: {
                     "acao": string,"alvo": string | null,"detalhe": string | null,"em": string,"evento_id": string,"id": number,"pessoa_id": string | null
@@ -1617,6 +1651,9 @@ isOneToOne: false
 "baixar_placa":
 { Args: { "p_comite": string }; Returns: undefined
                            },
+"bilhetes_denunciados_a_mim":
+{ Args: Record<PropertyKey, never>; Returns: string[]
+                           },
 "checkin_por_cracha":
 { Args: { "p_codigo": string,"p_evento": string }; Returns: string
                            },
@@ -1625,6 +1662,9 @@ isOneToOne: false
                            },
 "comentar":
 { Args: { "p_clausula": string,"p_texto": string }; Returns: undefined
+                           },
+"comites_onde_a_mesa_le_bilhetes":
+{ Args: Record<PropertyKey, never>; Returns: string[]
                            },
 "copiar_evento":
 { Args: { "p_ano": number,"p_nome": string,"p_origem": string }; Returns: string
@@ -1710,6 +1750,9 @@ isOneToOne: false
                            },
 "enviar_ponto":
 { Args: { "p_comite": string,"p_detalhe"?: string,"p_minutos"?: number,"p_tipo": string,"p_topico"?: number }; Returns: undefined
+                           },
+"esquecer_assinaturas_push":
+{ Args: { "p_endpoints": (string)[] }; Returns: undefined
                            },
 "estacionar_comentario":
 { Args: { "p_comentario": string,"p_estacionado": boolean }; Returns: undefined
@@ -1798,6 +1841,9 @@ isOneToOne: false
 "hash_codigo":
 { Args: { "p_codigo": string }; Returns: string
                            },
+"idioma_da_pessoa":
+{ Args: { "p_evento": string,"p_pessoa": string }; Returns: string
+                           },
 "importar_clausulas":
 { Args: { "p_clausulas": (string)[],"p_documento": string }; Returns: undefined
                            },
@@ -1831,11 +1877,20 @@ isOneToOne: false
 "marcar_ponto_pauta":
 { Args: { "p_ponto": string,"p_status": string }; Returns: undefined
                            },
+"meus_comites":
+{ Args: { "p_papeis": (Database["public"]['Enums']["papel"])[] }; Returns: string[]
+                           },
 "meus_dados":
+{ Args: Record<PropertyKey, never>; Returns: Json
+                           },
+"meus_dados_ate_o_passo_19":
 { Args: Record<PropertyKey, never>; Returns: Json
                            },
 "minha_delegacao":
 { Args: { "p_comite": string }; Returns: string
+                           },
+"minhas_delegacoes":
+{ Args: Record<PropertyKey, never>; Returns: string[]
                            },
 "mover_clausula":
 { Args: { "p_clausula": string,"p_para_cima": boolean }; Returns: undefined
@@ -1921,6 +1976,11 @@ isOneToOne: false
 "publicar_noticia":
 { Args: { "p_citadas"?: (string)[],"p_data_simulacao"?: string,"p_id": string,"p_imagem_descricao"?: string,"p_imagem_path"?: string,"p_linha_fina"?: string,"p_texto": string,"p_tipo": string,"p_titulo": string,"p_veiculo": string }; Returns: string
                            },
+"push_a_enviar":
+{ Args: { "p_id": string,"p_tipo": string }; Returns: {
+              "auth": string,"corpo": string,"endpoint": string,"p256dh": string,"titulo": string,"url": string
+            }[]
+                           },
 "quorum":
 { Args: { "p_comite": string }; Returns: number
                            },
@@ -1944,6 +2004,9 @@ isOneToOne: false
                            },
 "regras_validas":
 { Args: { "r": Json }; Returns: boolean
+                           },
+"remover_assinatura_push":
+{ Args: { "p_endpoint": string }; Returns: undefined
                            },
 "remover_clausula":
 { Args: { "p_clausula": string }; Returns: undefined
@@ -1976,6 +2039,9 @@ isOneToOne: false
                            },
 "sair_bloco":
 { Args: { "p_bloco": string }; Returns: undefined
+                           },
+"salvar_assinatura_push":
+{ Args: { "p_auth": string,"p_endpoint": string,"p_p256dh": string }; Returns: undefined
                            },
 "salvar_dpo":
 { Args: { "p_comite": string,"p_referencias": (string)[],"p_texto": string,"p_topico": number }; Returns: string

@@ -4,6 +4,7 @@
 	import { invalidate } from '$app/navigation';
 	import Bell from '@lucide/svelte/icons/bell';
 	import { formatarQuando } from '#lib/cronograma.ts';
+	import { pedirNotificacao } from '#lib/push.ts';
 	import { supabase } from '#lib/supabase.ts';
 	import type { PageProps } from './$types';
 
@@ -18,7 +19,7 @@
 
 	const agora = new Date();
 	const destinoDe = (id: string | null) =>
-		id ? `Para o ${data.comites.find((c) => c.id === id)?.sigla ?? t('comitê')}` : t('Para todos');
+		id ? t('Para o {sigla}', { sigla: data.comites.find((c) => c.id === id)?.sigla ?? t('comitê') }) : t('Para todos');
 	const podeRemover = (autorId: string | null) => data.secretaria || autorId === data.usuario?.id;
 
 	let texto = $state('');
@@ -28,13 +29,16 @@
 	async function publicar(evento: SubmitEvent) {
 		evento.preventDefault();
 		erro = '';
-		const { error } = await supabase
+		const { data: aviso, error } = await supabase
 			.from('aviso')
-			.insert({ evento_id: data.evento!, comite_id: destino || null, texto: texto.trim() });
+			.insert({ evento_id: data.evento!, comite_id: destino || null, texto: texto.trim() })
+			.select('id')
+			.single();
 		if (error) {
 			erro = t('Não foi possível publicar o aviso.');
 			return;
 		}
+		pedirNotificacao('aviso', [aviso.id]);
 		texto = '';
 		await invalidate('app:avisos');
 	}

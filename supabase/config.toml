@@ -434,3 +434,7 @@ enabled = true
 # Passo 14: o login pelo crachá é chamado antes de haver sessão (só com a chave pública).
 [functions.entrar-com-cracha]
 verify_jwt = false
+
+# Passo 15: a função confere a sessão ela mesma.
+[functions.enviar-push]
+verify_jwt = false

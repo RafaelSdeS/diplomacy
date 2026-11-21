@@ -13,6 +13,7 @@
 	<ul>
 		<li><strong>Da inscrição:</strong> nome, e-mail, papel no evento, comitê e delegação. Nada de telefone, endereço ou documentos.</li>
 		<li><strong>Do perfil, se você quiser:</strong> uma foto e uma minibiografia.</li>
+		<li><strong>Das notificações, se você ativar:</strong> o endereço que o navegador do aparelho dá para recebê-las, até você desativar ou sair da conta naquele aparelho. O texto da notificação passa pelo serviço de push do navegador (Google, Apple ou Mozilla) cifrado.</li>
 		<li><strong>Da simulação:</strong> o que você escreve no app (notas de crise, bilhetes, mensagens à mesa, documentos, matérias, cartas), com a autoria.</li>
 		<li><strong>Do evento:</strong> presença (check-in) e o certificado.</li>
 	</ul>

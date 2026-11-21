@@ -34,7 +34,7 @@
 ### Banco
 
 - [x] Índices para as consultas mais usadas: `nota_crise (comite_id, status, criado_em)`, `clausula (documento_id, ordem)`, `pedido_fala (sessao_id, situacao, criado_em)` e `voto (votacao_id)`. O analisador do Supabase (`npx supabase db advisors`) aponta as chaves estrangeiras sem índice; vale rodá-lo aqui e criar os índices das que aparecem em consultas.
-- [ ] Conferir os planos de consulta (`explain analyze`) com dados no tamanho do evento.
+- [x] Conferir os planos de consulta (`explain analyze`) com dados no tamanho do evento: `supabase/consultas/planos.sql` cria, numa transação desfeita no fim, 6 comitês com 25 delegações e a atividade de mais de 4 dias (18 mil bilhetes, 18 mil votos, 2.400 notas de crise, 3.600 cláusulas) e mede as leituras mais frequentes com as regras de acesso de cada papel. Tudo ficou abaixo de 5 ms, menos os bilhetes: ~400 ms por delegado, porque a regra chamava uma função linha a linha. A regra nova (migração `20261207100000_mensagens_rapidas.sql`) calcula uma vez por consulta as delegações e os comitês da pessoa, e a tela caiu para ~1 ms.
 
 ### Plano do Supabase
 

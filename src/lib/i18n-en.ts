@@ -807,7 +807,20 @@ export const EN: Record<string, string> = {
 	'Denúncia enviada à Diretoria da Press.': "Report sent to the Press Board.",
 	'Coletiva aberta.': "Press conference opened.",
 	'Coletiva encerrada.': "Press conference closed.",
-	'Pergunta na pauta.': "Question added to the agenda."
+	'Pergunta na pauta.': "Question added to the agenda.",
+	'Para o {sigla}': 'For {sigla}',
+	'{n} notas respondidas.': '{n} notes answered.',
+	'Notificações': 'Notifications',
+	'Só as importantes: avisos da organização e a resposta da crise às notas da sua delegação. Tudo continua aparecendo no app.': "Only the important ones: notices from the organisers and the crisis team's answers to your delegation's notes. Everything still shows up in the app.",
+	'Este navegador não recebe notificações. No iPhone, adicione o app à tela de início (Compartilhar → Adicionar à Tela de Início) e abra por lá.': "This browser can't receive notifications. On an iPhone, add the app to the Home Screen (Share → Add to Home Screen) and open it from there.",
+	'As notificações estão bloqueadas nas configurações do navegador para este site.': 'Notifications are blocked for this site in the browser settings.',
+	'Ativar notificações neste aparelho': 'Turn on notifications on this device',
+	'Desativar notificações neste aparelho': 'Turn off notifications on this device',
+	'Notificações ativadas neste aparelho.': 'Notifications turned on for this device.',
+	'Notificações desativadas neste aparelho.': 'Notifications turned off for this device.',
+	'Não foi possível mudar as notificações agora. Tente de novo em instantes.': "Couldn't change notifications right now. Try again in a moment.",
+	'Entre no app para ativar as notificações.': 'Sign in to turn on notifications.',
+	'Tipo de notificação desconhecido.': 'Unknown notification type.',
 };
 
 /** Mensagens do banco com partes variáveis: [padrão em português, tradução]. */

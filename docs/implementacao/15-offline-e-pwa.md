@@ -11,7 +11,7 @@
 - **Caixa de saída** (`src/lib/caixa-de-saida.ts`, com `idb-keyval`): notas de crise, matérias (com a imagem já reduzida) e propostas de alteração. A proposta ganhou o id do aparelho (`propor_alteracao(..., p_id)`). Erro de rede ou login vencido: o item fica e é reenviado; erro do banco: o item sai e a tela mostra o motivo. O cabeçalho mostra "Sem conexão" e "N para enviar". Bilhetes ficam para o passo 17.
 - **Laço de recargas (achado ao medir o consumo):** o componente ao vivo reassinava o canal a cada recarga da tela (o `data` novo mudava a dependência do efeito), e o canal já conectado mandava recarregar de novo. Eram 157 recargas em 5 atualizações. Agora o efeito depende só de uma chave de texto, e avisos em rajada viram uma recarga só (100 ms). O mesmo valia para os avisos do layout.
 - **Consumo medido** (`tests/15-offline.spec.ts`, Supabase local, sem compressão): cerca de 7 KB por atualização da sessão no celular de um delegado, ou uns 2,4 MB numa sessão de 2 h com uma mudança a cada 20 s. Um dia de 4 sessões fica perto de 10 MB, bem abaixo de um pacote de dados comum. Na nuvem, as respostas vêm comprimidas e gastam menos.
-- **Notificações (bônus):** ficaram para depois. A Agora e o telão continuam sendo o canal principal.
+- **Notificações (bônus):** só as importantes, avisos da organização e a resposta da crise a uma nota da delegação (só o título da nota, porque a notificação aparece na tela bloqueada). Cada pessoa ativa no perfil, por aparelho; sair da conta desativa naquele aparelho. O app chama a Edge Function `enviar-push` depois de publicar; ela pede ao banco os destinatários e o texto no idioma de cada um (`push_a_enviar`), e cada aviso ou nota sai uma vez só, mesmo que a função seja chamada de novo. As chaves VAPID ficam nos segredos do Supabase (veja `docs/publicar.md`). Se o app fechar entre publicar e pedir o envio, a notificação não sai; o aviso aparece no app do mesmo jeito.
 
 ## O que construir
 
@@ -32,8 +32,8 @@
 
 ### Notificações (bônus)
 
-- [ ] Web Push com chaves VAPID, assinatura salva por pessoa e uma Edge Function para enviar.
-- [ ] No iPhone só funciona com o app adicionado à tela inicial. Nenhuma função depende de notificação: a Agora e o telão continuam sendo o canal principal.
+- [x] Web Push com chaves VAPID, assinatura salva por pessoa e uma Edge Function para enviar.
+- [x] No iPhone só funciona com o app adicionado à tela inicial (o perfil explica como). Nenhuma função depende de notificação: a Agora e o telão continuam sendo o canal principal.
 
 ### Consumo de dados
 
@@ -41,13 +41,15 @@
 
 ## Testes
 
-Arquivos: `src/lib/caixa-de-saida.test.ts` e `tests/15-offline.spec.ts`.
+Arquivos: `src/lib/caixa-de-saida.test.ts`, `tests/15-offline.spec.ts` e, para as notificações, `supabase/tests/15-notificacoes.test.sql` e `tests/15-notificacoes.spec.ts`.
 
 - [x] Vitest (com `fake-indexeddb`): um item que falhou fica guardado, é reenviado quando a rede volta e só sai da caixa depois de confirmado.
 - [x] Vitest: dois reenvios do mesmo item não geram dois envios ao mesmo tempo.
 - [x] Ponta a ponta: com a rede desligada no meio da sessão (`context.setOffline`), uma nota escrita offline chega ao reconectar, uma vez só.
 - [x] Ponta a ponta: o app abre sem rede depois do primeiro acesso.
 - [x] Ponta a ponta: uma nova versão do app substitui a antiga no cache.
+- [x] pgTAP: cada pessoa vê só os próprios aparelhos; o aviso vai ao evento (ou ao comitê), no idioma de cada um, e sai uma vez só; a resposta da crise vai só à delegação; o app não pede os destinatários direto.
+- [x] Ponta a ponta: ativar no perfil guarda o aparelho, um aviso publicado dispara o envio pela Edge Function, a mensagem que chega vira notificação, e desativar remove o aparelho.
 - [ ] Manual: modo avião num Android e num iPhone reais, e notificação push num Android e num iPhone com o app na tela inicial.
 
 ## Pronto quando

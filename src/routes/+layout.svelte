@@ -14,6 +14,7 @@
 	import Users from '@lucide/svelte/icons/users';
 	import { caixa } from '#lib/caixa.ts';
 	import { esquecerConta } from '#lib/conta.ts';
+	import { desativarPush } from '#lib/push.ts';
 	import { supabase, type Papel } from '#lib/supabase.ts';
 	import { assinarAvisos } from '#lib/tempo-real.ts';
 	import type { LayoutProps } from './$types';
@@ -96,6 +97,8 @@
 	async function sair() {
 		// Os dados lidos ficam no aparelho para abrir sem internet; quem sai leva os seus.
 		await caches?.delete('dados').catch(() => {});
+		// O aparelho pode ser de outra pessoa: as notificações desta conta param aqui.
+		await desativarPush().catch(() => {});
 		await supabase.auth.signOut();
 		esquecerConta();
 		await goto('/entrar', { invalidateAll: true });

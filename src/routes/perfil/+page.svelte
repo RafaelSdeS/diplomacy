@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { t } from '#lib/i18n.svelte.ts';
 	import { esquecerConta } from '#lib/conta.ts';
-	import { untrack } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import { invalidate } from '$app/navigation';
 	import { reduzirImagem } from '#lib/imagem.ts';
+	import { ativarPush, desativarPush, estadoPush, type EstadoPush } from '#lib/push.ts';
 	import { rotuloPapel } from '#lib/papeis.ts';
 	import { supabase } from '#lib/supabase.ts';
 	import Bandeira from '#lib/ui/Bandeira.svelte';
@@ -18,10 +19,40 @@
 	let mensagem = $state('');
 	let erro = $state('');
 	let enviandoFoto = $state(false);
+	let push = $state<EstadoPush | null>(null);
+	let mudandoPush = $state(false);
+	let avisoPush = $state('');
+	let erroPush = $state('');
+
+	onMount(() => {
+		estadoPush().then(
+			(e) => (push = e),
+			() => (push = 'indisponivel')
+		);
+	});
+
+	async function alternarPush() {
+		mensagem = erro = avisoPush = erroPush = '';
+		mudandoPush = true;
+		try {
+			if (push === 'ativo') {
+				await desativarPush();
+				push = 'inativo';
+				avisoPush = t('Notificações desativadas neste aparelho.');
+			} else {
+				push = await ativarPush();
+				if (push === 'ativo') avisoPush = t('Notificações ativadas neste aparelho.');
+			}
+		} catch {
+			erroPush = t('Não foi possível mudar as notificações agora. Tente de novo em instantes.');
+		} finally {
+			mudandoPush = false;
+		}
+	}
 
 	async function salvar(evento: SubmitEvent) {
 		evento.preventDefault();
-		mensagem = erro = '';
+		mensagem = erro = avisoPush = erroPush = '';
 		const { error } = await supabase
 			.from('pessoa')
 			.update({ nome: nome.trim(), bio: bio.trim() || null, idioma: idiomaEscolhido || null })
@@ -133,3 +164,29 @@
 	</section>
 {/if}
 </section>
+
+{#if push}
+	<section aria-labelledby="t-notificacoes">
+		<h2 id="t-notificacoes">{t('Notificações')}</h2>
+		<p class="suave">
+			{t('Só as importantes: avisos da organização e a resposta da crise às notas da sua delegação. Tudo continua aparecendo no app.')}
+		</p>
+		{#if push === 'indisponivel'}
+			<p>
+				{t('Este navegador não recebe notificações. No iPhone, adicione o app à tela de início (Compartilhar → Adicionar à Tela de Início) e abra por lá.')}
+			</p>
+		{:else if push === 'bloqueado'}
+			<p>{t('As notificações estão bloqueadas nas configurações do navegador para este site.')}</p>
+		{:else}
+			<button class="botao botao--secundario" disabled={mudandoPush} onclick={alternarPush}>
+				{push === 'ativo' ? t('Desativar notificações neste aparelho') : t('Ativar notificações neste aparelho')}
+			</button>
+		{/if}
+		{#if avisoPush}
+			<p class="sucesso" role="status">{avisoPush}</p>
+		{/if}
+		{#if erroPush}
+			<p class="erro" role="alert">{erroPush}</p>
+		{/if}
+	</section>
+{/if}

@@ -117,6 +117,18 @@ Ela usa a chave de serviço que o próprio Supabase dá às funções; nenhuma c
 
 No evento, todos entram pelo mesmo wi-fi, ou seja, pelo mesmo IP. Antes do credenciamento, em **Authentication → Rate Limits**, suba **Token verifications** para pelo menos 500 a cada 5 minutos. O padrão (30) barraria a fila do credenciamento.
 
+## 5b. Notificações (passo 15, bônus)
+
+A Edge Function `enviar-push` manda as notificações dos avisos e das respostas da crise. Ela precisa de um par de chaves VAPID, que fica só nos segredos do Supabase (a pública o app pede à própria função). Uma vez só:
+
+```sh
+node scripts/chaves-push.ts /tmp/push.env
+npx supabase secrets set --env-file /tmp/push.env && rm /tmp/push.env
+npx supabase functions deploy enviar-push
+```
+
+Trocar as chaves desliga as notificações já ativadas: cada pessoa ativa de novo no perfil. No iPhone, as notificações só funcionam com o app adicionado à tela de início.
+
 ## 6. Depois do evento (passo 19)
 
 1. Em **Secretaria → Participantes → Dados e arquivo**, imprima o arquivo da edição (PDF) e baixe os dados públicos (JSON). Entregue os dois à organização.
@@ -130,7 +142,7 @@ O Cloudflare publica o app a cada push na `main`, mas as migrações vão para a
 
 1. `npx supabase db push --remote --dry-run`, para conferir o que vai ser aplicado;
 2. `npx supabase db push --remote`;
-3. se a Edge Function mudou, `npx supabase functions deploy entrar-com-cracha`;
+3. se uma Edge Function mudou, `npx supabase functions deploy <nome>` (`entrar-com-cracha` ou `enviar-push`);
 4. só então `git push`.
 
 Quando a migração só acrescenta tabelas e funções, o app antigo continua funcionando com o banco novo durante o deploy. Quando ela muda ou apaga algo que o app antigo usa (como o passo 07, que troca a assinatura de funções da sessão), o app publicado fica com erro por um ou dois minutos, até o Cloudflare terminar o build novo. Com dados de teste isso não importa; perto do evento, faça essas mudanças em duas etapas (acrescentar, publicar, depois remover o antigo).

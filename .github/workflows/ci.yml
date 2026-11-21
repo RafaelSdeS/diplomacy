@@ -26,6 +26,8 @@ jobs:
 
       - run: npm ci
 
+      - name: Chaves descartáveis das notificações (a Edge Function lê ao subir)
+        run: node scripts/chaves-push.ts supabase/functions/.env
       - name: Supabase local (aplica as migrações do zero)
         run: npm run db:iniciar
       - name: Variáveis do Supabase local

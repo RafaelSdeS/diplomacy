@@ -62,3 +62,32 @@ sw.addEventListener('fetch', (evento) => {
 	// Leituras da API do Supabase: da rede; sem rede, a última resposta guardada.
 	if (url.pathname.startsWith('/rest/v1/')) evento.respondWith(daRedeOuDoCache(pedido, DADOS));
 });
+
+// Notificações (bônus): o texto vem do banco, pela Edge Function enviar-push.
+sw.addEventListener('push', (evento) => {
+	let dados: { titulo?: string; corpo?: string; url?: string } = {};
+	try {
+		dados = evento.data?.json() ?? {};
+	} catch {
+		// mensagem sem JSON: mostra só o nome do app
+	}
+	evento.waitUntil(
+		sw.registration.showNotification(dados.titulo ?? 'UFRGSMUN', {
+			body: dados.corpo,
+			icon: '/icone-192.png',
+			data: { url: dados.url ?? '/' }
+		})
+	);
+});
+
+// Tocar na notificação abre a tela certa, numa janela do app que já esteja aberta.
+sw.addEventListener('notificationclick', (evento) => {
+	evento.notification.close();
+	const url = new URL(evento.notification.data?.url ?? '/', sw.location.origin).href;
+	evento.waitUntil(
+		sw.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((janelas) => {
+			const aberta = janelas[0];
+			return aberta ? aberta.navigate(url).then((j) => (j ?? aberta).focus()) : sw.clients.openWindow(url);
+		})
+	);
+});
