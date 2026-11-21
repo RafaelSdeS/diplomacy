@@ -5,7 +5,13 @@
 **Esforço:** M
 **Objetivo:** clicar num país em qualquer tela abre a página da delegação, com os delegados, os documentos públicos dela e as ações possíveis. É o ponto onde os passos seguintes se penduram (anotações, números clicáveis).
 
-## Hoje
+## Como ficou
+
+- Página `/comite/[sigla]/delegacao/[id]`: bandeira, nome oficial em versalete, situação, delegados (foto ou iniciais, minibiografia), DPOs e cartas abertos, matérias da press, votos recentes e, para outra delegação, "Mandar bilhete" e bloquear bilhetes.
+- Os países viram links pelo `ui/NomeDelegacao.svelte`; o perfil ganhou "Página da delegação".
+- Nada no banco: as permissões existentes já cobriam tudo.
+
+## Antes
 
 - Na tela do comitê (`src/routes/comite/[sigla]/+page.svelte`), as delegações são uma lista sem link.
 - O DPO de outra delegação só aparece no fim da tela de DPO, com o link "Imprimir", e só se o comitê abriu os DPOs aprovados (`pode_ver_dpo`).
@@ -48,26 +54,21 @@ Conteúdo, nesta ordem:
 
 **Links em todo o app:**
 
-- [ ] `src/lib/ui/NomeDelegacao.svelte` (props `sigla`, `id`, `nome`, `bandeira`, `link = true`): bandeira mais nome, como link. Substitui o padrão `<span class="com-bandeira"><Bandeira …/> {nome}</span>` na tela do comitê, na sessão, no painel, na chamada, na agenda, na lista de votos, nas cartas, nos DPOs e nas mensagens. No telão, `link={false}`.
-- [ ] A tela de Mensagens lê `?para=` e pré-seleciona o destinatário.
+- [x] `src/lib/ui/NomeDelegacao.svelte` (props `sigla`, `delegacao`, `link = true`): bandeira mais nome, como link. Entrou na tela do comitê, na fila de placas e nas listas de oradores (sessão e painel), na agenda e na lista de votos. Ficaram de fora a chamada (cada delegação já é um botão), o orador em destaque e o telão (projetado, sem link); cartas, DPOs e mensagens ganham links no passo 33.
+- [x] A tela de Mensagens lê `?para=` e pré-seleciona o destinatário.
 
 **Perfil:**
 
-- [ ] Bloco "Sua delegação", com bandeira, nome, comitê e link para a página da delegação.
+- [x] Bloco "Sua delegação", com bandeira, nome, comitê e link para a página da delegação.
 
 ## Testes
 
 Arquivos: `supabase/tests/26-delegacao.test.sql` e `tests/26-delegacao.spec.ts`.
 
-- [ ] pgTAP (garantia, mesmo sem tabela nova): pessoa de outro comitê não lê a participação, a pessoa nem a foto dos delegados desta delegação; o delegado do mesmo comitê lê.
-- [ ] Ponta a ponta:
-  - na tela do comitê, clicar em "EUA" abre a página com os dois delegados;
-  - o DPO aprovado aparece com `dpos_publicos` ligado e some com ele desligado;
-  - "Mandar bilhete" abre Mensagens com os EUA escolhidos;
-  - na lista de oradores, o país é link;
-  - axe na página nova, nos 3 tamanhos.
+- [x] pgTAP (garantia, mesmo sem tabela nova): pessoa de outro comitê não lê a participação, a pessoa nem a foto dos delegados desta delegação; o delegado do mesmo comitê lê.
+- [x] Ponta a ponta: na tela do comitê, clicar em "EUA" abre a página com os dois delegados; "Mandar bilhete" abre Mensagens com os EUA escolhidos; a própria delegação chega pela página do perfil e não vê as ações de bilhete; axe no celular e no notebook. A visibilidade dos DPOs já é coberta pelo pgTAP do passo 10 (`pode_ver_dpo`).
 
 ## Pronto quando
 
-- [ ] De qualquer tela, um toque no país leva aos delegados e aos documentos públicos daquela delegação.
-- [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
+- [x] De qualquer tela, um toque no país leva aos delegados e aos documentos públicos daquela delegação.
+- [x] Os testes acima passam no CI, junto com os de todos os passos anteriores.

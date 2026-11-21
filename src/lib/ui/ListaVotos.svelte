@@ -5,6 +5,7 @@
 	import X from '@lucide/svelte/icons/x';
 	import { agruparVotos, type Escolha } from '#lib/votacao.ts';
 	import Bandeira from './Bandeira.svelte';
+	import NomeDelegacao from './NomeDelegacao.svelte';
 
 	// Como cada delegação votou, em grupos: ícone, título e contagem, nunca só cor.
 	type Delegacao = { id: string; nome: string; bandeira: string | null; situacao?: string | null };
@@ -13,8 +14,10 @@
 		votos: { delegacao_id: string; escolha: Escolha }[];
 		tipo: string;
 		presentes: Set<string>;
+		/** Com a sigla do comitê, cada país vira link para a página da delegação. */
+		sigla?: string;
 	};
-	let { delegacoes, votos, tipo, presentes }: Props = $props();
+	let { delegacoes, votos, tipo, presentes, sigla }: Props = $props();
 
 	const grupos = $derived(agruparVotos(delegacoes, votos, tipo, presentes, idioma.atual === 'en' ? 'en' : 'pt-BR'));
 	const TITULOS = $derived([
@@ -35,7 +38,9 @@
 				</p>
 				<ul aria-label={`${rotulo} (${grupos[chave].length})`}>
 					{#each grupos[chave] as d (d.id)}
-						<li class="com-bandeira"><Bandeira codigo={d.bandeira} /> {d.nome}</li>
+						<li>
+							{#if sigla}<NomeDelegacao {sigla} delegacao={d} />{:else}<span class="com-bandeira"><Bandeira codigo={d.bandeira} /> {d.nome}</span>{/if}
+						</li>
 					{/each}
 				</ul>
 			</div>

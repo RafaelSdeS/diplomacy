@@ -1,10 +1,11 @@
 <script lang="ts">
+	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { bilingue, t } from '#lib/i18n.svelte.ts';
 	import { untrack } from 'svelte';
 	import { invalidate } from '$app/navigation';
 	import { mensagemDeErro } from '#lib/sessao.ts';
 	import { supabase } from '#lib/supabase.ts';
-	import Bandeira from '#lib/ui/Bandeira.svelte';
+	import NomeDelegacao from '#lib/ui/NomeDelegacao.svelte';
 	import { escreverEsboco, lerEsboco } from '#lib/votacao.ts';
 	import type { PageProps } from './$types';
 
@@ -110,7 +111,7 @@
 {/snippet}
 
 <svelte:head>
-	<title>{t('Agenda')} · {data.comite.sigla} · UFRGSMUN</title>
+	<title>{tituloDaAba(t('Agenda'), data.comite.sigla)}</title>
 </svelte:head>
 
 <p class="rotulo">{t('Comitê')} · {data.comite.sigla}</p>
@@ -151,7 +152,11 @@
 					{@const autor = proposta.delegacao?.nome ?? t('Mesa')}
 					<article class="cartao" aria-label={t('Proposta de {delegacao}', { delegacao: autor })}>
 						<div class="cartao-timbre">
-							<span class="com-bandeira"><Bandeira codigo={proposta.delegacao?.bandeira} /> {autor}</span>
+							{#if proposta.delegacao}
+								<NomeDelegacao sigla={data.comite.sigla} delegacao={proposta.delegacao} />
+							{:else}
+								<span>{autor}</span>
+							{/if}
 							{#if proposta.adotada}<span class="selo selo--ok">{t('Adotada')}</span>{/if}
 						</div>
 						{@render arvore(proposta.pontos, null, proposta.adotada)}
