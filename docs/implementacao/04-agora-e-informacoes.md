@@ -41,7 +41,7 @@ Migração `supabase/migrations/20261121090000_informacoes.sql`:
 
 ## Tamanho
 
-- [x] `scripts/tamanho.js` agora mede só a primeira abertura, a partir do manifesto do Vite: `index.html`, as entradas do SvelteKit, o layout raiz e a tela `/entrar`, com tudo o que importam (JS, CSS e a fonte). Somar o build inteiro deixou de fazer sentido com as 271 bandeiras. Hoje: 127 KB de 300 KB.
+- [x] `scripts/tamanho.js` agora mede só a primeira abertura, a partir do manifesto do Vite: `index.html`, as entradas do SvelteKit, o layout raiz e a tela `/entrar`, com tudo o que importam (JS, CSS e a fonte). Somar o build inteiro deixou de fazer sentido com as 271 bandeiras. Na época: 127 KB de 300 KB; em 21/11/2026, depois dos passos 20 a 38: 161 KB.
 
 ## Testes
 

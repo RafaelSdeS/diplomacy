@@ -2,7 +2,7 @@
 	import { t } from '#lib/i18n.svelte.ts';
 	import '@fontsource/source-serif-4/latin-600.css';
 	import '../app.css';
-	import { goto, invalidate } from '$app/navigation';
+	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import CalendarDays from '@lucide/svelte/icons/calendar-days';
 	import Gavel from '@lucide/svelte/icons/gavel';
@@ -21,7 +21,7 @@
 	import { papelPrincipal } from '#lib/papeis.ts';
 	import Trilha from '#lib/ui/Trilha.svelte';
 	import { supabase, type Papel } from '#lib/supabase.ts';
-	import { assinarAvisos } from '#lib/tempo-real.ts';
+	import { assinarAvisos, esquecerLeituras, recarregarAoVivo } from '#lib/tempo-real.ts';
 	import type { LayoutProps } from './$types';
 
 	let { data, children }: LayoutProps = $props();
@@ -87,7 +87,7 @@
 	const logado = $derived(!!data.usuario);
 	$effect(() => {
 		if (!logado || !eventos) return;
-		return assinarAvisos(eventos.split(','), () => invalidate('app:avisos'));
+		return assinarAvisos(eventos.split(','), (tabela) => recarregarAoVivo('app:avisos', tabela ? [tabela] : null));
 	});
 
 	// Conexão e caixa de saída: reenvia ao voltar a rede, ao voltar o app para a frente
@@ -123,6 +123,7 @@
 		await desativarPush().catch(() => {});
 		await supabase.auth.signOut();
 		esquecerConta();
+		esquecerLeituras();
 		await goto('/entrar', { invalidateAll: true });
 	}
 </script>

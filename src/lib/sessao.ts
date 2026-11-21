@@ -2,6 +2,7 @@ import { error } from '@sveltejs/kit';
 import { diferencaRelogio } from './cronometro.ts';
 import type { Regras } from './regras.ts';
 import { supabase } from './supabase.ts';
+import { lerAoVivo } from './tempo-real.ts';
 import { bilingue, t, traduzirMensagem } from './i18n.svelte.ts';
 
 /** O comitê pela sigla; 404 se não existe ou a pessoa não participa do evento (RLS). */
@@ -17,10 +18,26 @@ export async function comitePorSigla(sigla: string) {
 	return comite.data;
 }
 
+/** As tabelas que a leitura do estado da sessão embute. */
+const TABELAS_DO_ESTADO = [
+	'estado_sessao',
+	'presenca',
+	'aviso_chegada',
+	'proximo_orador',
+	'pedido_fala',
+	'ponto_mocao',
+	'assinatura_mocao',
+	'votacao',
+	'voto',
+	'passe'
+];
+
 /** Tudo o que as telas da sessão mostram: estado, listas, última votação, regras e permissão. */
 export async function carregarSessao(comiteId: string) {
+	// Cada leitura diz as tabelas de que depende: uma mudança ao vivo só relê as dela.
+	const ler = <T>(nome: string, tabelas: string[], consulta: () => PromiseLike<T>) => lerAoVivo(`sessao:${comiteId}:${nome}`, tabelas, consulta);
 	const [estado, lista, delegacoes, regras, podePresidir, emVotacao, representacoes] = await Promise.all([
-		supabase
+		ler('estado', TABELAS_DO_ESTADO, () => supabase
 			.from('estado_sessao')
 			.select(
 				`forma, fase, etapa_plenaria, topico_atual, ordem_topicos, mesa_assumiu, tempo_fala_seg,
@@ -45,19 +62,25 @@ export async function carregarSessao(comiteId: string) {
 			.order('ordem', { referencedTable: 'sessao.proximos' })
 			.order('criado_em', { referencedTable: 'sessao.votacoes', ascending: false })
 			.limit(1, { referencedTable: 'sessao.votacoes' })
-			.maybeSingle(),
-		supabase
-			.from('lista_oradores')
-			.select('id, lado, ordem, falou, ponto_mocao_id, delegacao(id, nome, bandeira)')
-			.eq('comite_id', comiteId)
-			.order('ordem'),
-		supabase.from('delegacao').select('id, nome, bandeira, situacao').eq('comite_id', comiteId).order('nome'),
-		supabase.rpc('regras', { p_comite: comiteId }, { get: true }),
-		supabase.rpc('pode_presidir', { p_comite: comiteId }, { get: true }),
+			.maybeSingle()),
+		ler('lista', ['lista_oradores'], () =>
+			supabase
+				.from('lista_oradores')
+				.select('id, lado, ordem, falou, ponto_mocao_id, delegacao(id, nome, bandeira)')
+				.eq('comite_id', comiteId)
+				.order('ordem')
+		),
+		// Delegações e regras não mudam durante a sessão: só se releem ao abrir a tela.
+		ler('delegacoes', ['delegacao'], () => supabase.from('delegacao').select('id, nome, bandeira, situacao').eq('comite_id', comiteId).order('nome')),
+		ler('regras', ['comite'], () => supabase.rpc('regras', { p_comite: comiteId }, { get: true })),
+		// Muda com a fase, a mesa assumir e o rodízio (passar_presidencia mexe no estado).
+		ler('pode-presidir', ['estado_sessao'], () => supabase.rpc('pode_presidir', { p_comite: comiteId }, { get: true })),
 		// Um projeto em votação fecha a sala (só divisão da questão e votação nominal).
-		supabase.from('documento').select('id').eq('comite_id', comiteId).eq('status', 'em_votacao').limit(1),
+		ler('em-votacao', ['documento'], () => supabase.from('documento').select('id').eq('comite_id', comiteId).eq('status', 'em_votacao').limit(1)),
 		// A mesa no lugar de delegações ausentes (passo 31).
-		supabase.from('representacao').select('pessoa_id, delegacao(id, nome, bandeira)').eq('comite_id', comiteId)
+		ler('representacoes', ['representacao'], () =>
+			supabase.from('representacao').select('pessoa_id, delegacao(id, nome, bandeira)').eq('comite_id', comiteId)
+		)
 	]);
 	for (const r of [estado, lista, delegacoes, regras, podePresidir, emVotacao, representacoes]) if (r.error) throw r.error;
 

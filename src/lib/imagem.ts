@@ -1,3 +1,5 @@
+import { supabase } from './supabase.ts';
+
 // Fotos de perfil: reduzidas no próprio aparelho antes do envio, para gastar
 // pouca internet móvel e pouco armazenamento.
 
@@ -29,3 +31,25 @@ export async function reduzirImagem(arquivo: Blob, maximo = LADO_MAXIMO): Promis
 	if (!jpeg) throw new Error('Não foi possível processar a imagem.');
 	return jpeg;
 }
+
+// Passo 40: links assinados das imagens dos buckets privados, guardados até 5 min antes
+// de vencer. O mesmo link deixa o navegador reaproveitar a imagem que já baixou; um link
+// novo a cada recarga baixava a imagem de novo.
+// ponytail: a foto nova de outra pessoa pode levar até 1 h para aparecer.
+const VALIDADE_S = 3600;
+const links = new Map<string, { url: string; ate: number }>();
+
+/** O link de cada caminho que existe no bucket (sem rede, os que já havia). */
+export async function linksAssinados(bucket: 'press' | 'fotos', caminhos: string[]): Promise<Map<string, string>> {
+	const agora = Date.now();
+	const faltam = caminhos.filter((c) => (links.get(`${bucket}/${c}`)?.ate ?? 0) <= agora);
+	if (faltam.length) {
+		const { data } = await supabase.storage.from(bucket).createSignedUrls(faltam, VALIDADE_S);
+		for (const l of data ?? []) if (l.path && l.signedUrl) links.set(`${bucket}/${l.path}`, { url: l.signedUrl, ate: agora + (VALIDADE_S - 300) * 1000 });
+	}
+	const achados = caminhos.map((c) => [c, links.get(`${bucket}/${c}`)?.url] as const);
+	return new Map(achados.filter((a): a is readonly [string, string] => !!a[1]));
+}
+
+/** Depois de trocar uma imagem: o próximo pedido gera um link novo. */
+export const esquecerLink = (bucket: 'press' | 'fotos', caminho: string) => links.delete(`${bucket}/${caminho}`);

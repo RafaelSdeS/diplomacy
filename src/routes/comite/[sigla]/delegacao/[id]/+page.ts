@@ -1,4 +1,5 @@
 import { error } from '@sveltejs/kit';
+import { linksAssinados } from '#lib/imagem.ts';
 import { supabase } from '#lib/supabase.ts';
 import type { PageLoad } from './$types';
 
@@ -45,12 +46,7 @@ export const load: PageLoad = async ({ params, parent, depends }) => {
 
 	// Fotos num bucket privado: um link assinado (1 h) para cada uma.
 	const pessoas = delegados.data!.map((p) => p.pessoa).filter((p) => p !== null);
-	const caminhos = pessoas.map((p) => p.foto_path).filter((c) => c !== null);
-	const fotos = new Map<string, string>();
-	if (caminhos.length) {
-		const { data } = await supabase.storage.from('fotos').createSignedUrls(caminhos, 3600);
-		for (const f of data ?? []) if (f.path && f.signedUrl) fotos.set(f.path, f.signedUrl);
-	}
+	const fotos = await linksAssinados('fotos', pessoas.map((p) => p.foto_path).filter((c) => c !== null));
 
 	return {
 		delegacao: delegacao.data,

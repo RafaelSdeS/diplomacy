@@ -1,4 +1,5 @@
 import type { RealtimeChannel } from '@supabase/supabase-js';
+import { invalidate } from '$app/navigation';
 import { supabase } from './supabase.ts';
 
 // Todo o tempo real passa por aqui (passo 13: Broadcast em canais privados). O banco
@@ -18,14 +19,22 @@ export const TABELAS_SESSAO = [
 	'lista_oradores',
 	'votacao',
 	'voto',
-	'documento'
+	'documento',
+	// Passo 40: com a releitura por tabela, o que a tela mostra precisa do próprio aviso.
+	'proximo_orador',
+	'assinatura_mocao',
+	'passe',
+	'representacao',
+	'emenda',
+	'emenda_assinatura'
 ];
 /** O que muda ao vivo na crise do comitê. */
 export const TABELAS_CRISE = ['nota_crise', 'atualizacao_comite', 'incidente_comite', 'incidente_efeito'];
 /** Blocos e documentos do comitê. */
 export const TABELAS_BLOCOS = ['bloco_membro', 'documento'];
 
-type Ouvinte = { tabelas: Set<string> | null; aoMudar: () => void; aoConectar: (ok: boolean) => void };
+// `aoMudar` recebe a tabela que mudou, ou null quando tudo pode ter mudado (ao conectar).
+type Ouvinte = { tabelas: Set<string> | null; aoMudar: (tabela: string | null) => void; aoConectar: (ok: boolean) => void };
 type Canal = { ouvintes: Set<Ouvinte>; conectado: boolean; canal?: RealtimeChannel; saida?: ReturnType<typeof setTimeout> };
 
 // Um canal por tópico, dividido entre as telas: o realtime-js reaproveita o canal
@@ -46,7 +55,7 @@ function ouvir(topico: string, ouvinte: Ouvinte): () => void {
 			novo.canal = supabase
 				.channel(topico, { config: { private: true } })
 				.on('broadcast', { event: 'mudou' }, ({ payload }) => {
-					for (const o of novo.ouvintes) if (!o.tabelas || o.tabelas.has(payload?.tabela)) o.aoMudar();
+					for (const o of novo.ouvintes) if (!o.tabelas || o.tabelas.has(payload?.tabela)) o.aoMudar(payload?.tabela ?? null);
 				})
 				// Ao entrar (e ao voltar depois de uma queda), recarrega: o que mudou enquanto
 				// a tela estava sem canal não se perde.
@@ -54,7 +63,7 @@ function ouvir(topico: string, ouvinte: Ouvinte): () => void {
 					novo.conectado = status === 'SUBSCRIBED';
 					for (const o of novo.ouvintes) {
 						o.aoConectar(novo.conectado);
-						if (novo.conectado) o.aoMudar();
+						if (novo.conectado) o.aoMudar(null);
 					}
 				});
 		})();
@@ -65,7 +74,7 @@ function ouvir(topico: string, ouvinte: Ouvinte): () => void {
 	canal.ouvintes.add(ouvinte);
 	if (canal.conectado) {
 		ouvinte.aoConectar(true);
-		ouvinte.aoMudar();
+		ouvinte.aoMudar(null);
 	}
 	return () => {
 		canal.ouvintes.delete(ouvinte);
@@ -88,7 +97,7 @@ function ouvir(topico: string, ouvinte: Ouvinte): () => void {
 export function assinar(
 	topicos: string[],
 	tabelas: string[] | null,
-	aoMudar: () => void,
+	aoMudar: (tabela: string | null) => void,
 	aoConectar: (ok: boolean) => void = () => {}
 ): () => void {
 	const filtro = tabelas ? new Set(tabelas) : null;
@@ -108,10 +117,55 @@ export function assinar(
 }
 
 /** Avisos novos ou removidos nos eventos da pessoa. */
-export function assinarAvisos(eventos: string[], aoMudar: () => void): () => void {
+export function assinarAvisos(eventos: string[], aoMudar: (tabela: string | null) => void): () => void {
 	return assinar(
 		eventos.map((e) => `evento:${e}`),
 		['aviso'],
 		aoMudar
 	);
 }
+
+// Passo 40: numa recarga causada pelo tempo real, só se relê o que usa uma tabela que
+// mudou; o resto devolve a última leitura. Navegar, recarregar à mão e reconectar
+// releem tudo, porque aí `pendentes` é 0 (ou `tudo` está ligado).
+// ponytail: um `invalidate` feito à mão durante uma recarga ao vivo pode reaproveitar uma
+// leitura antiga; ela se corrige no aviso seguinte do banco, que chega logo depois.
+const mudadas = new Set<string>();
+let tudo = false;
+let pendentes = 0;
+const lidas = new Map<string, Promise<unknown>>();
+
+/** Recarrega a dependência relendo só as leituras das `tabelas` (null: todas). */
+export async function recarregarAoVivo(dependencia: `${string}:${string}`, tabelas: Iterable<string> | null) {
+	if (tabelas) for (const t of tabelas) mudadas.add(t);
+	else tudo = true;
+	pendentes++;
+	try {
+		await invalidate(dependencia);
+	} finally {
+		if (--pendentes === 0) {
+			mudadas.clear();
+			tudo = false;
+		}
+	}
+}
+
+/**
+ * Uma leitura de tela ao vivo. `chave` identifica a consulta (com os ids); `tabelas` são
+ * as que ela lê, inclusive as embutidas e as que uma função consulta.
+ */
+export function lerAoVivo<T>(chave: string, tabelas: string[], ler: () => PromiseLike<T>): Promise<T> {
+	const anterior = lidas.get(chave) as Promise<T> | undefined;
+	if (anterior && pendentes > 0 && !tudo && !tabelas.some((t) => mudadas.has(t))) return anterior;
+	const leitura = Promise.resolve(ler());
+	lidas.set(chave, leitura);
+	// Uma falha (sem rede, por exemplo) não fica guardada.
+	leitura.then(
+		(r) => (r as { error?: unknown } | null)?.error && lidas.delete(chave),
+		() => lidas.delete(chave)
+	);
+	return leitura;
+}
+
+/** Ao sair da conta: nada lido por uma pessoa serve para a próxima. */
+export const esquecerLeituras = () => lidas.clear();

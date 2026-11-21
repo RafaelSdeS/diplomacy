@@ -1,6 +1,7 @@
 import { esperando } from '#lib/crise.ts';
 import type { Regras } from '#lib/regras.ts';
 import { supabase } from '#lib/supabase.ts';
+import { lerAoVivo } from '#lib/tempo-real.ts';
 import type { PageLoad } from './$types';
 
 export const load: PageLoad = async ({ parent, depends }) => {
@@ -13,8 +14,11 @@ export const load: PageLoad = async ({ parent, depends }) => {
 			.select('id, tipo, titulo, texto, status, resposta, criado_em, respondida_em')
 			.eq('comite_id', comite.id)
 			.order('criado_em', { ascending: false }),
-		supabase.from('atualizacao_comite').select('atualizacao:atualizacao_crise(id, texto, publicada_em)').eq('comite_id', comite.id),
-		supabase.rpc('regras', { p_comite: comite.id }, { get: true })
+		// Passo 40: o que não é nota só se relê quando muda.
+		lerAoVivo(`atualizacoes:${comite.id}`, ['atualizacao_comite'], () =>
+			supabase.from('atualizacao_comite').select('atualizacao:atualizacao_crise(id, texto, publicada_em)').eq('comite_id', comite.id)
+		),
+		lerAoVivo(`regras:${comite.id}`, ['comite'], () => supabase.rpc('regras', { p_comite: comite.id }, { get: true }))
 	]);
 	if (notas.error) throw notas.error;
 	if (atualizacoes.error) throw atualizacoes.error;

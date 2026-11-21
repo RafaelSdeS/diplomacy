@@ -1,3 +1,4 @@
+import { linksAssinados } from '#lib/imagem.ts';
 import { supabase } from '#lib/supabase.ts';
 import type { PageLoad } from './$types';
 
@@ -6,11 +7,8 @@ export const load: PageLoad = async ({ parent }) => {
 	const pessoa = await supabase.from('pessoa').select('nome, bio, foto_path, idioma').eq('id', usuario!.id).single();
 	if (pessoa.error) throw pessoa.error;
 
-	let fotoUrl: string | null = null;
-	if (pessoa.data.foto_path) {
-		const assinada = await supabase.storage.from('fotos').createSignedUrl(pessoa.data.foto_path, 3600);
-		fotoUrl = assinada.data?.signedUrl ?? null;
-	}
+	const foto = pessoa.data.foto_path;
+	const fotoUrl = foto ? ((await linksAssinados('fotos', [foto])).get(foto) ?? null) : null;
 	// Recortes: as matérias publicadas que citam a delegação da pessoa.
 	const delegacoes = participacoes.filter((p) => p.papel === 'delegado' && p.delegacao_id).map((p) => p.delegacao_id!);
 	const recortes = await supabase

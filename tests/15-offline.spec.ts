@@ -97,23 +97,43 @@ test('uma versão nova do app substitui a antiga no cache', async ({ browser }) 
 	await page.context().close();
 });
 
-test('consumo de dados: quanto o celular de um delegado gasta por atualização da sessão', async ({ browser }) => {
-	test.setTimeout(120_000);
+test('a instalação não baixa todas as bandeiras nem as fontes .woff (passo 40)', async ({ browser }) => {
+	const page = await celular(browser, DELEGADO);
+	await comServiceWorker(page);
+	const guardados = await page.evaluate(async () => (await (await caches.open('imutaveis')).keys()).map((p) => new URL(p.url).pathname));
+	expect(guardados.some((c) => c.endsWith('.js'))).toBe(true);
+	// Das 271 bandeiras, entram só as que já apareceram na tela; as fontes .woff, nunca.
+	expect(guardados.filter((c) => c.endsWith('.svg')).length).toBeLessThan(10);
+	expect(guardados.filter((c) => c.endsWith('.woff'))).toEqual([]);
+	await page.context().close();
+});
+
+/**
+ * Bytes e leituras da API por atualização da sessão, no celular de um delegado, numa
+ * tela ao vivo. Uma sessão de 2 h com uma mudança a cada 20 s tem ~360 atualizações.
+ */
+async function consumo(browser: Browser, rota: string) {
 	const mesa = await clienteComo(C.conta('mesa-treino@exemplo.test'));
 	const comite = (await mesa.from('comite').select('id').eq('sigla', C.sigla).single()).data!.id;
 	const delegacoes = (await mesa.from('delegacao').select('id').eq('comite_id', comite)).data!;
-	expect((await mesa.rpc('abrir_sessao', { p_comite: comite })).error).toBeNull();
+	const aberta = await mesa.from('estado_sessao').select('sessao_id').eq('comite_id', comite).maybeSingle();
+	if (!aberta.data?.sessao_id) expect((await mesa.rpc('abrir_sessao', { p_comite: comite })).error).toBeNull();
 
 	// Sem o service worker: as leituras dele não aparecem na rede da página.
 	const page = await celular(browser, DELEGADO, 'block');
-	await page.goto(`/comite/${C.sigla}/sessao`);
+	await page.goto(rota);
 	await expect(page.locator('[data-ao-vivo="sim"]')).toBeVisible({ timeout: 10_000 });
 	await page.waitForTimeout(1_000);
 
-	// Conta os bytes que chegam ao aparelho: respostas da API e mensagens do tempo real.
+	// Conta os bytes que chegam ao aparelho (respostas da API e mensagens do tempo real) e
+	// as leituras da API (sem as consultas prévias do CORS).
 	const cdp = await page.context().newCDPSession(page);
 	await cdp.send('Network.enable');
 	let bytes = 0;
+	let leituras = 0;
+	cdp.on('Network.requestWillBeSent', (e) => {
+		if (e.request.url.includes('/rest/v1/') && e.request.method !== 'OPTIONS') leituras++;
+	});
 	cdp.on('Network.loadingFinished', (e) => (bytes += e.encodedDataLength));
 	cdp.on('Network.webSocketFrameReceived', (e) => (bytes += e.response.payloadData.length));
 
@@ -121,17 +141,31 @@ test('consumo de dados: quanto o celular de um delegado gasta por atualização 
 	for (let i = 0; i < ATUALIZACOES; i++) {
 		const orador = delegacoes[i % delegacoes.length].id;
 		expect((await mesa.rpc('dar_palavra', { p_comite: comite, p_delegacao: orador, p_seg: 60 })).error).toBeNull();
-		await page.waitForTimeout(400);
+		await page.waitForTimeout(600);
 	}
 	await page.waitForTimeout(1_500);
-	const porAtualizacao = bytes / ATUALIZACOES;
-	// Uma sessão de 2 h com uma mudança a cada 20 s (orador, cronômetro, placas, votos) tem ~360.
-	const sessao = (porAtualizacao * 360) / 1024 / 1024;
-	test.info().annotations.push({
-		type: 'consumo',
-		description: `${(porAtualizacao / 1024).toFixed(1)} KB por atualização; ~${sessao.toFixed(1)} MB por sessão de 2 h`
-	});
-	console.log(`Consumo: ${(porAtualizacao / 1024).toFixed(1)} KB por atualização, ~${sessao.toFixed(1)} MB por sessão de 2 h`);
-	expect(porAtualizacao).toBeLessThan(20 * 1024);
 	await page.context().close();
+	const resultado = { kb: bytes / ATUALIZACOES / 1024, leituras: leituras / ATUALIZACOES };
+	const texto = `${rota}: ${resultado.kb.toFixed(1)} KB e ${resultado.leituras.toFixed(1)} leituras por atualização; ~${((resultado.kb * 360) / 1024).toFixed(1)} MB por sessão de 2 h`;
+	test.info().annotations.push({ type: 'consumo', description: texto });
+	console.log(`Consumo: ${texto}`);
+	return resultado;
+}
+
+test('consumo de dados: a tela da sessão relê só o que mudou', async ({ browser }) => {
+	test.setTimeout(120_000);
+	const { kb, leituras } = await consumo(browser, `/comite/${C.sigla}/sessao`);
+	// O estado da sessão e a permissão de presidir (passo 40); antes eram 9 leituras. A folga
+	// cobre os avisos que outros testes, em paralelo, publicam no mesmo evento.
+	expect(leituras).toBeLessThanOrEqual(3);
+	expect(kb).toBeLessThan(20);
+});
+
+test('consumo de dados: o Agora relê só o que mudou', async ({ browser }) => {
+	test.setTimeout(120_000);
+	const { kb, leituras } = await consumo(browser, '/');
+	// O estado da sessão, a permissão de presidir e o andamento dos comitês; antes eram 18.
+	// A folga cobre os avisos que outros testes, em paralelo, publicam no mesmo evento.
+	expect(leituras).toBeLessThanOrEqual(5);
+	expect(kb).toBeLessThan(20);
 });

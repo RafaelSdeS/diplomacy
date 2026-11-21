@@ -1,22 +1,27 @@
 import { carregarIncidentes } from '#lib/crise.ts';
 import { carregarSessao, comitePorSigla } from '#lib/sessao.ts';
 import { supabase } from '#lib/supabase.ts';
+import { lerAoVivo } from '#lib/tempo-real.ts';
 import type { PageLoad } from './$types';
 
 export const load: PageLoad = async ({ params, depends }) => {
 	depends('app:sessao-ao-vivo');
-	const comite = await comitePorSigla(params.sigla);
+	const comite = await lerAoVivo(`comite:${params.sigla}`, ['comite'], () => comitePorSigla(params.sigla));
 	const [sessao, plantoes, urgentes, incidentes] = await Promise.all([
 		carregarSessao(comite.id),
-		supabase.from('atualizacao_comite').select('atualizacao:atualizacao_crise(id, texto, publicada_em)').eq('comite_id', comite.id),
-		supabase
-			.from('noticia')
-			.select('id, titulo, publicada_em, veiculo(nome)')
-			.eq('comite_id', comite.id)
-			.eq('tipo', 'nota_urgente')
-			.eq('status', 'publicada')
-			.order('publicada_em', { ascending: false })
-			.limit(1),
+		lerAoVivo(`atualizacoes:${comite.id}`, ['atualizacao_comite'], () =>
+			supabase.from('atualizacao_comite').select('atualizacao:atualizacao_crise(id, texto, publicada_em)').eq('comite_id', comite.id)
+		),
+		lerAoVivo(`nota-urgente:${comite.id}`, ['noticia'], () =>
+			supabase
+				.from('noticia')
+				.select('id, titulo, publicada_em, veiculo(nome)')
+				.eq('comite_id', comite.id)
+				.eq('tipo', 'nota_urgente')
+				.eq('status', 'publicada')
+				.order('publicada_em', { ascending: false })
+				.limit(1)
+		),
 		carregarIncidentes(comite.id)
 	]);
 	if (plantoes.error) throw plantoes.error;

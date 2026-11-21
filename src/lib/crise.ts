@@ -1,6 +1,7 @@
 // Funções da crise (as puras, testadas em crise.test.ts).
 import { bilingue, idioma, t } from './i18n.svelte.ts';
 import { supabase } from './supabase.ts';
+import { lerAoVivo } from './tempo-real.ts';
 
 export type StatusNota = 'pendente' | 'em_analise' | 'aprovada' | 'rejeitada' | 'pede_ajuste';
 
@@ -89,12 +90,14 @@ export const DESFECHO_MS = 60_000;
 
 /** As crises do comitê em andamento, e as que acabaram há menos de um minuto (o desfecho). */
 export async function carregarIncidentes(comiteId: string, agoraMs = Date.now()): Promise<Incidente[]> {
-	const { data, error } = await supabase
-		.from('incidente_comite')
-		.select(
-			'incidente:incidente_crise(id, titulo, texto, prazo, desfecho, desfecho_texto, encerrado_em, efeitos:incidente_efeito(delegacao_id, texto, ate, delegacao(nome)))'
-		)
-		.eq('comite_id', comiteId);
+	const { data, error } = await lerAoVivo(`incidentes:${comiteId}`, ['incidente_comite', 'incidente_efeito'], () =>
+		supabase
+			.from('incidente_comite')
+			.select(
+				'incidente:incidente_crise(id, titulo, texto, prazo, desfecho, desfecho_texto, encerrado_em, efeitos:incidente_efeito(delegacao_id, texto, ate, delegacao(nome)))'
+			)
+			.eq('comite_id', comiteId)
+	);
 	if (error) throw error;
 	return (data ?? [])
 		.map((c) => c.incidente as Incidente | null)

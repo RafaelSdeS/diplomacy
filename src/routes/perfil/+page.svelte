@@ -5,7 +5,7 @@
 	import { esquecerConta } from '#lib/conta.ts';
 	import { onMount, untrack } from 'svelte';
 	import { invalidate } from '$app/navigation';
-	import { reduzirImagem } from '#lib/imagem.ts';
+	import { esquecerLink, linksAssinados, reduzirImagem } from '#lib/imagem.ts';
 	import { ativarPush, desativarPush, estadoPush, type EstadoPush } from '#lib/push.ts';
 	import { rotuloPapel } from '#lib/papeis.ts';
 	import { supabase } from '#lib/supabase.ts';
@@ -94,8 +94,8 @@
 			if (envio.error) throw envio.error;
 			const atualizacao = await supabase.from('pessoa').update({ foto_path: caminho }).eq('id', data.usuario!.id);
 			if (atualizacao.error) throw atualizacao.error;
-			const assinada = await supabase.storage.from('fotos').createSignedUrl(caminho, 3600);
-			fotoUrl = assinada.data?.signedUrl ?? null;
+			esquecerLink('fotos', caminho);
+			fotoUrl = (await linksAssinados('fotos', [caminho])).get(caminho) ?? null;
 			mensagem = t('Foto atualizada.');
 		} catch {
 			erro = t('Não foi possível enviar a foto. Tente outra imagem.');

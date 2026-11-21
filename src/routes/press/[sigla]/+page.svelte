@@ -110,7 +110,7 @@
 			</p>
 			<h2 id="t-materia">{noticia.titulo}</h2>
 			{#if noticia.linha_fina}<p class="linha-fina">{noticia.linha_fina}</p>{/if}
-			{#if noticia.imagem}<img class="materia-imagem" src={noticia.imagem} alt={noticia.imagem_descricao ?? ''} />{/if}
+			{#if noticia.imagem}<img class="materia-imagem" src={noticia.imagem} alt={noticia.imagem_descricao ?? ''} loading="lazy" decoding="async" />{/if}
 			{#each paragrafos(noticia.texto) as p, i (i)}<p>{p}</p>{/each}
 			{#if noticia.citacoes.length}
 				<p class="detalhe">{t('Cita')}: {noticia.citacoes.map((c) => c.delegacao?.nome).join(', ')}</p>
