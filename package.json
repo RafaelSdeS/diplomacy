@@ -22,6 +22,7 @@
 		"db:resetar": "supabase db reset",
 		"db:tipos": "supabase gen types typescript --local > src/lib/database.types.ts",
 		"seed": "node scripts/seed.ts",
+		"demo": "node scripts/demonstracao.ts",
 		"test:db": "supabase test db",
 		"test:unit": "vitest run",
 		"textos": "node scripts/textos-fixos.ts",

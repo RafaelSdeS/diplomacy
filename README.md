@@ -102,6 +102,7 @@ As fases do projeto (validação, piloto, evento e crescimento) e o calendário 
 ## Documentos
 
 - [Plano completo (PDF)](docs/plano-do-app.pdf): problema, módulos, regras, arquitetura, riscos e calendário.
+- [Por que cada um usaria o Diplomacy](docs/proposta-de-valor.md): a frase de valor de cada papel e o roteiro do "mock and rules".
 - [Melhorias depois da revisão (PDF)](docs/melhorias-pos-revisao.pdf): as observações da revisão, priorizadas por impacto e esforço; fonte em [HTML](docs/melhorias-pos-revisao.html), gerada do mesmo jeito.
 - [Fonte do plano (HTML)](docs/plano-do-app.html). Para gerar o PDF de novo:
 
@@ -121,11 +122,12 @@ npx playwright install chromium
 cp .env.example .env # valores do Supabase local
 npm run db:iniciar   # Supabase local (banco, autenticação e API)
 npm run seed         # dados fictícios: contas @exemplo.test, senha "senha-de-teste"
+npm run demo         # evento de demonstração: os 6 comitês, 147 delegações, contas demo.*@exemplo.test
 npm run dev          # app em http://localhost:5173
 npm run testar       # tipos, unidade, banco, build, tamanho e ponta a ponta
 ```
 
-Contas do seed para entrar: `delegado01@exemplo.test` a `delegado16`, `mesa01`, `crise01`, `press01`, `secretaria01` e `semconvite` (sem convite), todas `@exemplo.test` com a senha `senha-de-teste`. Não há cadastro livre: as contas são criadas pelo seed ou pelo administrador, e os convites da secretaria definem o papel.
+Contas do seed para entrar: `delegado01@exemplo.test` a `delegado16`, `mesa01`, `crise01`, `press01`, `secretaria01` e `semconvite` (sem convite), todas `@exemplo.test` com a senha `senha-de-teste`. No evento de demonstração (`npm run demo`), as contas seguem o padrão `demo.<sigla>.<nn>@exemplo.test` (delegação `nn` do comitê, em ordem; `01b` e `02b` são segundos delegados), `demo.<sigla>.mesa1`, `.press`, `.crise1`, mais `demo.secretaria` e `demo.diretoria-press`. Não há cadastro livre: as contas são criadas pelo seed ou pelo administrador, e os convites da secretaria definem o papel.
 
 Para ver uma sessão funcionando: entre como `mesa01`, abra Sessão › Chamada e rodízio, sorteie o rodízio, abra a sessão e marque as presenças. No Painel da presidência, conduza a plenária de abertura (briefing, discursos e moção do tópico no topo); em outra janela, um delegado propõe o tópico e vota. Depois da plenária, preside a delegação sorteada. O telão fica em `/telao/CSNU-T`.
 

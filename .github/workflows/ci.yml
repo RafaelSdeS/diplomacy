@@ -59,6 +59,10 @@ jobs:
       - name: Gerar capturas de referência
         if: ${{ inputs.atualizar_capturas }}
         run: npx playwright test --update-snapshots
+      # Depois dos testes, para não mexer nos dados que eles usam; duas vezes porque
+      # o script pode ser repetido.
+      - name: Evento de demonstração (passo 20)
+        run: npm run demo && npm run demo
 
       - uses: actions/upload-artifact@v4
         if: ${{ inputs.atualizar_capturas }}

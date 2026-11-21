@@ -5,44 +5,10 @@
 // cria a pessoa e as participações. Pode rodar várias vezes sem duplicar nada.
 // Só roda no Supabase local, a menos que SEED_PERMITIR_REMOTO=1 (para um projeto
 // de teste, nunca o de produção).
-import { execFileSync } from 'node:child_process';
-import { createClient } from '@supabase/supabase-js';
+import { conectarAdmin, criarContas, SENHA, verificar } from './admin.ts';
 import { DELEGACOES, DELEGACOES_TREINO, TOPICOS_TREINO } from './delegacoes.ts';
 
-const SENHA = 'senha-de-teste';
-
-function credenciais(): { url: string; chave: string } {
-	if (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
-		return { url: process.env.SUPABASE_URL, chave: process.env.SUPABASE_SERVICE_ROLE_KEY };
-	}
-	const saida = execFileSync('npx', ['supabase', 'status', '-o', 'json'], {
-		encoding: 'utf8',
-		stdio: ['ignore', 'pipe', 'ignore']
-	});
-	const status = JSON.parse(saida);
-	return { url: status.API_URL, chave: status.SERVICE_ROLE_KEY };
-}
-
-const { url, chave } = credenciais();
-const local = ['127.0.0.1', 'localhost'].includes(new URL(url).hostname);
-if (!local && process.env.SEED_PERMITIR_REMOTO !== '1') {
-	throw new Error(`Recusado: ${url} não é o Supabase local. Use SEED_PERMITIR_REMOTO=1 só num projeto de teste.`);
-}
-
-const db = createClient(url, chave, { auth: { persistSession: false, autoRefreshToken: false } });
-
-// Logo depois de `db reset`, a API ainda se reconecta ao banco por alguns segundos.
-for (let tentativa = 1; ; tentativa++) {
-	const { error } = await db.from('evento').select('id').limit(1);
-	if (!error) break;
-	if (tentativa === 30) throw new Error(`A API do Supabase não respondeu: ${error.message}`);
-	await new Promise((pronto) => setTimeout(pronto, 500));
-}
-
-function verificar<T>(resposta: { data: T; error: { message: string } | null }, onde: string) {
-	if (resposta.error) throw new Error(`${onde}: ${resposta.error.message}`);
-	return resposta.data as NonNullable<T>;
-}
+const { db, url } = await conectarAdmin('SEED_PERMITIR_REMOTO');
 
 const evento = verificar(
 	await db
@@ -281,20 +247,7 @@ verificar(
 	'convites'
 );
 
-const lista = await db.auth.admin.listUsers({ perPage: 1000 });
-if (lista.error) throw new Error(`usuários: ${lista.error.message}`);
-const existentes = new Set(lista.data.users.map((u) => u.email));
-
-for (const conta of contas) {
-	if (existentes.has(conta.email)) continue;
-	const { error } = await db.auth.admin.createUser({
-		email: conta.email,
-		password: SENHA,
-		email_confirm: true,
-		user_metadata: { nome: conta.nome }
-	});
-	if (error) throw new Error(`conta ${conta.email}: ${error.message}`);
-}
+await criarContas(db, contas);
 
 // Cronograma de dois dias fictícios do evento (horário de Brasília). As datas ficam
 // no passado de propósito: os testes congelam o relógio nelas, e um relógio antes

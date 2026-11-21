@@ -3,9 +3,9 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
-	// Testes de unidade: só funções puras de src/lib (as telas ficam com o Playwright).
+	// Testes de unidade: só funções puras de src/lib e dos scripts (as telas ficam com o Playwright).
 	test: {
-		include: ['src/**/*.test.ts']
+		include: ['src/**/*.test.ts', 'scripts/**/*.test.ts']
 	},
 	build: {
 		// As 271 bandeiras viram arquivos próprios, baixados só quando aparecem;

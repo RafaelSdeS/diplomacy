@@ -5,7 +5,13 @@
 **Esforço:** M
 **Objetivo:** escrever por que cada papel usaria o app e criar um evento de demonstração com os 6 comitês do UFRGSMUN, para testar à mão todos os passos seguintes.
 
-## Hoje
+## Como ficou
+
+- `npm run demo` (`scripts/demonstracao.ts`, dados em `scripts/demonstracao/dados.ts`) cria o evento "UFRGSMUN Demonstração" com os 6 comitês, 147 delegações, 191 contas, cronograma de 4 dias a partir do dia da primeira execução, avisos e, em cada comitê, DPOs, cartas, agenda adotada, bloco com working paper e projeto em rodada, notícias e a sessão 1 (na OEA, com tecnologia restrita, só a chamada).
+- O seed e a demonstração dividem `scripts/admin.ts` (trava de "só local", contas, `verificar`).
+- `docs/proposta-de-valor.md` tem as frases por papel e o roteiro do mock and rules.
+
+## Antes
 
 - Não há frase de valor por papel.
 - Só há comitês de teste (CSNU-T, TREINO, OEA-T, CE-T, UNOCT-T), com contas genéricas, e os testes automáticos dependem deles. A lista do CSNU-T não é a composição real do Conselho.
@@ -13,9 +19,9 @@
 
 ## Parte A · Proposta de valor
 
-- [ ] Criar `docs/proposta-de-valor.md` com a tabela do documento de melhorias (item 1): papel, por que usaria, o que precisa estar excelente.
-- [ ] Acrescentar uma seção "Roteiro do mock and rules": a ordem em que o app é mostrado aos delegados no primeiro dia (entrar, placa, ponto ou moção, voto, bilhete, documento).
-- [ ] Ligar o arquivo no `README.md` da raiz.
+- [x] Criar `docs/proposta-de-valor.md` com a tabela do documento de melhorias (item 1): papel, por que usaria, o que precisa estar excelente.
+- [x] Acrescentar uma seção "Roteiro do mock and rules": a ordem em que o app é mostrado aos delegados no primeiro dia (entrar, placa, ponto ou moção, voto, bilhete, documento).
+- [x] Ligar o arquivo no `README.md` da raiz.
 - [ ] Manual: validar as frases com a organização do UFRGSMUN.
 
 ## Parte B · Dados de demonstração
@@ -33,7 +39,7 @@
 - `scripts/demonstracao/dados.ts`: comitês, delegações (nome, nome oficial, código da bandeira, situação), tópicos, veículos e cronograma. Só dados, sem lógica.
 - `scripts/demonstracao.ts`: o script. Roda só no local, a menos que `DEMO_PERMITIR_REMOTO=1`, igual ao seed. Pode rodar de novo sem duplicar.
 - `package.json`: `"demo": "node scripts/demonstracao.ts"`.
-- Remover `supabase/demonstracao.sql`: o script cobre o mesmo com `DEMO_PERMITIR_REMOTO=1`. `supabase/treino.sql` fica.
+- `supabase/demonstracao.sql` e `supabase/treino.sql` ficam: servem para a nuvem sem contas fictícias (`docs/publicar.md`).
 
 ### Comitês e delegações
 
@@ -86,13 +92,13 @@ Total: 147 delegações.
 
 Arquivos: `scripts/demonstracao/dados.test.ts`; passo novo no CI.
 
-- [ ] Vitest: as contagens por comitê são 15, 24, 26, 27, 27 e 28 (147); não há nome repetido dentro de um comitê; todo código de bandeira existe no `flag-icons` ou em `static/bandeiras/`.
-- [ ] CI: `npm run demo` roda depois do seed, no banco do CI, sem erro. Se passar de 60 s, vai para um `workflow_dispatch`.
-- [ ] Os testes de ponta a ponta continuam usando o evento de teste e passam iguais.
+- [x] Vitest: as contagens por comitê são 15, 24, 26, 27, 27 e 28 (147); não há nome repetido dentro de um comitê; todo código de bandeira existe no `flag-icons` ou em `static/bandeiras/`.
+- [x] CI: `npm run demo` roda duas vezes, depois dos testes de ponta a ponta (para não mexer nos dados deles). Leva cerca de 25 s na primeira vez e 2 s na segunda.
+- [x] Os testes de ponta a ponta continuam usando o evento de teste e passam iguais.
 - [ ] Manual: entrar com uma conta de delegado de cada comitê e conferir que nenhuma tela fica vazia.
 
 ## Pronto quando
 
 - [ ] `docs/proposta-de-valor.md` existe e foi validado com a organização.
-- [ ] `npm run demo` monta o evento de demonstração do zero, local e (com a variável) num projeto de teste.
+- [x] `npm run demo` monta o evento de demonstração do zero, local e (com a variável) num projeto de teste.
 - [ ] Os testes acima passam no CI, junto com os de todos os passos anteriores.
