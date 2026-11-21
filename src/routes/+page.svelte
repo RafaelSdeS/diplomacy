@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { t } from '#lib/i18n.svelte.ts';
-	import { formatarHora, formatarQuando, itensAtuais, proximoItem } from '#lib/cronograma.ts';
+	import { formatarDia, formatarHora, formatarQuando, itensAtuais, proximoItem } from '#lib/cronograma.ts';
 	import { rotuloPapel } from '#lib/papeis.ts';
 	import Bandeira from '#lib/ui/Bandeira.svelte';
 	import { FASES } from '#lib/votacao.ts';
@@ -71,7 +71,7 @@
 </svelte:head>
 
 <p class="rotulo">
-	{data.participacoes[0]?.evento_nome}
+	{data.participacoes[0]?.evento_nome} · {formatarDia(new Date().toISOString())}
 	{#if data.aoVivo && data.minha?.comite_id}<AoVivo comiteId={data.minha.comite_id} bind:diferenca />{/if}
 </p>
 <h1>{t('Agora')}</h1>

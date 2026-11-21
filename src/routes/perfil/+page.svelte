@@ -98,6 +98,25 @@
 
 <p class="rotulo">{t('Conta')}</p>
 <h1>{t('Perfil')}</h1>
+
+{#if data.participacoes[0]}
+	{@const p = data.participacoes[0]}
+	<article class="credencial" aria-label={t('Credencial')}>
+		{#if fotoUrl}
+			<img class="foto" src={fotoUrl} alt={t('Sua foto')} width="96" height="96" />
+		{:else}
+			<span class="foto foto--iniciais" aria-hidden="true">{data.pessoa.nome.slice(0, 1).toUpperCase()}</span>
+		{/if}
+		<div>
+			<p class="rotulo">{p.evento_nome}</p>
+			<p class="credencial-nome">{data.pessoa.nome}</p>
+			<p class="com-bandeira">
+				<Bandeira codigo={p.delegacao_bandeira} />
+				{[rotuloPapel(p.papel), p.delegacao_nome, p.comite_sigla].filter(Boolean).join(' · ')}
+			</p>
+		</div>
+	</article>
+{/if}
 <p class="acoes"><a class="botao botao--secundario" href="/perfil/meus-dados">{t('Meus dados (LGPD)')}</a> <a class="botao botao--secundario" href="/pesquisa">{t('Pesquisa de satisfação')}</a></p>
 
 <section aria-labelledby="t-participacao">
@@ -119,9 +138,6 @@
 
 <section aria-labelledby="t-dados">
 	<h2 id="t-dados">{t('Seus dados')}</h2>
-	{#if fotoUrl}
-		<img class="foto" src={fotoUrl} alt={t('Sua foto')} width="96" height="96" />
-	{/if}
 	<form class="formulario" onsubmit={salvar}>
 		<label class="campo">
 			{t('Foto')}

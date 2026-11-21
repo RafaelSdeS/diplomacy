@@ -6,12 +6,14 @@
 	type Item = { texto: string; href?: string };
 	type Props = { rotulo: string; itens: Item[]; vazio?: string };
 	let { rotulo, itens, vazio }: Props = $props();
-	let aberto = $state(false);
+	// O estado vem do próprio elemento: o evento "toggle" chega depois, e um Esc logo
+	// após abrir se perderia.
+	let caixa = $state<HTMLDetailsElement>();
 </script>
 
-<svelte:window onkeydown={(e) => aberto && e.key === 'Escape' && (aberto = false)} />
+<svelte:window onkeydown={(e) => e.key === 'Escape' && caixa?.open && (caixa.open = false)} />
 
-<details class="contagem" bind:open={aberto}>
+<details class="contagem" bind:this={caixa}>
 	<summary>{rotulo}</summary>
 	<ul class="contagem-lista">
 		{#each itens as item, i (i)}

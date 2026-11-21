@@ -17,13 +17,13 @@
 	}
 </script>
 
+<p class="placa-nome" class:placa-nome--levantada={posicao >= 0}>{nome}</p>
 {#if posicao >= 0}
 	<p class="destaque">{t('Placa levantada')} · {t('{n}ª na fila', { n: posicao + 1 })}</p>
 	<button class="botao botao--grande" type="button" aria-pressed="true" onclick={() => acao('baixar_placa')}>
 		<Hand aria-hidden="true" size={20} /> {t('Baixar placa')}
 	</button>
 {:else}
-	<p class="suave">{nome}</p>
 	<button class="botao botao--grande" type="button" aria-pressed="false" onclick={() => acao('levantar_placa')}>
 		<Hand aria-hidden="true" size={20} /> {t('Levantar placa')}
 	</button>

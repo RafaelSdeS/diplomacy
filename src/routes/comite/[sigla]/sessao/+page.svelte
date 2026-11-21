@@ -250,7 +250,7 @@
 			</article>
 		{/if}
 
-		<article class="cartao" aria-labelledby="c-palavra">
+		<article class="cartao cartao--destaque" aria-labelledby="c-palavra">
 			<h2 id="c-palavra">{t('Com a palavra')}</h2>
 			{#if data.estado.orador}
 				<p class="destaque com-bandeira">

@@ -73,7 +73,7 @@
 {#each grupos as grupo (grupo.chave)}
 	<section aria-labelledby={`dia-${grupo.chave}`}>
 		<h2 id={`dia-${grupo.chave}`} class="capitalizar">{grupo.rotulo}</h2>
-		<ul class="lista">
+		<ul class="lista linha-do-tempo">
 			{#each grupo.itens as item (item.id)}
 				<li aria-current={atuais.has(item.id) ? 'time' : undefined}>
 					<span>
@@ -82,7 +82,10 @@
 						{#if atuais.has(item.id)}
 							<span class="selo selo--ok"><Check aria-hidden="true" size={14} /> {t('Agora')}</span>
 						{/if}
-						<span class="detalhe">{[item.local, siglaDe(item.comite_id)].filter(Boolean).join(' · ')}</span>
+						<span class="detalhe">
+							{item.local ?? ''}
+							{#if siglaDe(item.comite_id)}<span class="etiqueta">{siglaDe(item.comite_id)}</span>{/if}
+						</span>
 					</span>
 					{#if data.eventoDaSecretaria}
 						<button

@@ -1035,6 +1035,8 @@ export const EN: Record<string, string> = {
 	'Legenda copiada.': 'Caption copied.',
 	'Copie a legenda': 'Copy the caption',
 	'Publique a imagem pelo Instagram no celular ou pelo Meta Business Suite.': 'Post the image through Instagram on your phone or through Meta Business Suite.',
+	// Passo 37
+	'Credencial': 'Credential',
 };
 
 /** Mensagens do banco com partes variáveis: [padrão em português, tradução]. */

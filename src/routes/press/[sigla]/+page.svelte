@@ -78,12 +78,14 @@
 	<title>{tituloDaAba(data.veiculo.nome, t('Press'))}</title>
 </svelte:head>
 
-<p class="rotulo">
-	{t('Press')} · {data.comite.sigla} · {t('Simulação')}
-	<AoVivo comiteId={data.comite.id} tabelas={['noticia']} dependencia="app:press" />
-</p>
-<h1>{data.veiculo.nome}</h1>
-{#if data.veiculo.linha_editorial}<p class="suave">{data.veiculo.linha_editorial}</p>{/if}
+<header class="jornal-cabecalho">
+	<p class="rotulo">
+		{t('Press')} · {data.comite.sigla} · {t('Simulação')}
+		<AoVivo comiteId={data.comite.id} tabelas={['noticia']} dependencia="app:press" />
+	</p>
+	<h1>{data.veiculo.nome}</h1>
+	{#if data.veiculo.linha_editorial}<p class="suave">{data.veiculo.linha_editorial}</p>{/if}
+</header>
 {#if souPress || modero}
 	<p class="acoes">
 		{#if souPress}<a class="botao" href="/press/escrever">{t('Escrever matéria')}</a>{/if}

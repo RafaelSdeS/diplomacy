@@ -156,7 +156,7 @@
 				{#if aberto === d.id}
 					<li class="avaliacao">
 						<div class="formulario formulario--largo">
-							<p class="texto-nota">{d.texto}</p>
+							<p class="texto-nota folha">{d.texto}</p>
 							<label class="campo">
 								{t('Comentário para a delegação')}
 								<textarea rows="3" maxlength="1000" bind:value={comentario}></textarea>
