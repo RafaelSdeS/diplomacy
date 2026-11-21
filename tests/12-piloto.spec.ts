@@ -1,14 +1,17 @@
 import { expect, test, type Browser, type Page } from '@playwright/test';
-import { contaDoTreino, DELEGACOES_TREINO } from '../scripts/delegacoes.ts';
+import { contaDoTreino, DELEGACOES_TREINO, isolado } from '../scripts/delegacoes.ts';
 import { clienteComo, entrar } from './ajuda.ts';
+
+// Passo 39: a cópia do TREINO só deste arquivo (scripts/delegacoes.ts).
+const C = isolado('12');
 
 // O fim do fluxo do piloto no comitê de treino: o projeto de resolução votado, com a
 // mesa no teclado, uma delegação num celular em 3G lento e o telão. As etapas
 // anteriores (agenda, debate, crise, editor e press) têm os próprios testes (06 a 11).
-const MESA = 'mesa-treino@exemplo.test';
-const SESSAO = '/comite/TREINO/sessao';
-const PRESIDENCIA = '/comite/TREINO/sessao/presidencia';
-const TELAO = '/telao/TREINO';
+const MESA = C.conta('mesa-treino@exemplo.test');
+const SESSAO = `/comite/${C.sigla}/sessao`;
+const PRESIDENCIA = `/comite/${C.sigla}/sessao/presidencia`;
+const TELAO = `/telao/${C.sigla}`;
 const TITULO = `Pacto do Rio Aurora ${Date.now()}`;
 const SIGNATARIOS = ['Brasil', 'Argentina', 'Chile', 'Paraguai', 'Uruguai'];
 
@@ -32,7 +35,7 @@ let delegacoes: { id: string; nome: string }[] = [];
 
 test('preparação: sessão aberta, todas presentes e um projeto aprovado pela mesa', async () => {
 	const mesa = await clienteComo(MESA);
-	comite = (await mesa.from('comite').select('id').eq('sigla', 'TREINO').single()).data!.id;
+	comite = (await mesa.from('comite').select('id').eq('sigla', C.sigla).single()).data!.id;
 	delegacoes = (await mesa.from('delegacao').select('id, nome').eq('comite_id', comite)).data!;
 
 	// Uma sessão nova a cada execução; quem preside a votação é a mesa.
@@ -46,7 +49,7 @@ test('preparação: sessão aberta, todas presentes e um projeto aprovado pela m
 	if (fase === 'debate') expect((await mesa.rpc('assumir_presidencia', { p_comite: comite, p_assumir: true })).error).toBeNull();
 
 	// O projeto: um bloco, três cláusulas, cinco signatários, enviado e aprovado pela mesa.
-	const [redator, ...outros] = await Promise.all(SIGNATARIOS.map((nome) => clienteComo(contaDoTreino(nome))));
+	const [redator, ...outros] = await Promise.all(SIGNATARIOS.map((nome) => clienteComo(C.conta(contaDoTreino(nome)))));
 	const bloco = await redator.rpc('criar_bloco', { p_comite: comite, p_nome: `Bloco do Prata ${Date.now()}` });
 	expect(bloco.error).toBeNull();
 	for (const cliente of outros) expect((await cliente.rpc('entrar_bloco', { p_bloco: bloco.data! })).error).toBeNull();
@@ -86,7 +89,7 @@ test('a mesa abre a votação pelo teclado, o celular em 3G lento vota e o telã
 		downloadThroughput: (400 * 1024) / 8,
 		uploadThroughput: (400 * 1024) / 8
 	});
-	await entrar(celular, contaDoTreino('Brasil'));
+	await entrar(celular, C.conta(contaDoTreino('Brasil')));
 	await celular.goto(SESSAO);
 	await aoVivo(celular, 30_000);
 
@@ -113,7 +116,7 @@ test('a mesa abre a votação pelo teclado, o celular em 3G lento vota e o telã
 	// As outras delegações votam pelos próprios aparelhos (aqui, pela API).
 	const id = (await (await clienteComo(MESA)).from('votacao').select('id').eq('comite_id', comite).eq('aberta', true).single()).data!.id;
 	for (const [nome] of DELEGACOES_TREINO.filter(([nome]) => nome !== 'Brasil')) {
-		const cliente = await clienteComo(contaDoTreino(nome));
+		const cliente = await clienteComo(C.conta(contaDoTreino(nome)));
 		const escolha = nome === 'Bolívia' ? 'contra' : 'a_favor';
 		expect((await cliente.rpc('votar', { p_votacao: id, p_escolha: escolha })).error).toBeNull();
 	}
@@ -131,7 +134,7 @@ test('a mesa abre a votação pelo teclado, o celular em 3G lento vota e o telã
 });
 
 test('a conexão cai no meio da sessão, e a tela do celular se atualiza quando ela volta', async ({ browser }) => {
-	const celular = await abrir(browser, contaDoTreino('Chile'), SESSAO, { width: 360, height: 740 });
+	const celular = await abrir(browser, C.conta(contaDoTreino('Chile')), SESSAO, { width: 360, height: 740 });
 	await aoVivo(celular);
 	const palavra = celular.getByRole('article', { name: 'Com a palavra' });
 

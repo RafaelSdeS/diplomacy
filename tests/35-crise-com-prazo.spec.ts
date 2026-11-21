@@ -1,12 +1,15 @@
 import { expect, test, type Page } from '@playwright/test';
-import { contaDoTreino } from '../scripts/delegacoes.ts';
+import { contaDoTreino, isolado } from '../scripts/delegacoes.ts';
 import { clienteComo, entrar } from './ajuda.ts';
+
+// Passo 39: a cópia do TREINO só deste arquivo (scripts/delegacoes.ts).
+const C = isolado('35');
 
 // Passo 35: a equipe de crise lança uma crise com prazo que deixa o Brasil sem voz; o
 // telão entra em modo crise; no fim, o desfecho aparece e a voz volta. Comitê TREINO.
-const CRISE = 'crise-treino@exemplo.test';
-const MESA = 'mesa-treino@exemplo.test';
-const BRASIL = contaDoTreino('Brasil');
+const CRISE = C.conta('crise-treino@exemplo.test');
+const MESA = C.conta('mesa-treino@exemplo.test');
+const BRASIL = C.conta(contaDoTreino('Brasil'));
 const TITULO = `Sequestro na fronteira ${Date.now()}`;
 
 test.describe.configure({ mode: 'serial' });
@@ -16,7 +19,7 @@ test.beforeEach(({}, info) => {
 
 async function semCriseAtiva() {
 	const crise = await clienteComo(CRISE);
-	const comite = (await crise.from('comite').select('id').eq('sigla', 'TREINO').single()).data!.id;
+	const comite = (await crise.from('comite').select('id').eq('sigla', C.sigla).single()).data!.id;
 	const ativas = await crise.from('incidente_comite').select('incidente:incidente_crise(id, encerrado_em)').eq('comite_id', comite);
 	for (const a of ativas.data ?? []) {
 		if (a.incidente && !a.incidente.encerrado_em) await crise.rpc('encerrar_incidente', { p_id: a.incidente.id, p_desfecho: 'fracassou', p_texto: '' });
@@ -43,7 +46,7 @@ const aoVivo = (page: Page) => expect(page.locator('[data-ao-vivo="sim"]')).toBe
 
 test('a crise deixa o Brasil sem voz, toma o telão e, no fim, devolve a voz', async ({ page, browser }) => {
 	await entrar(page, CRISE);
-	await page.goto('/crise/TREINO');
+	await page.goto(`/crise/${C.sigla}`);
 	const lancar = page.getByRole('form', { name: 'Lançar uma crise' });
 	await lancar.getByLabel('Título').fill(TITULO);
 	await lancar.getByLabel('Briefing').fill('O delegado brasileiro foi sequestrado. O comitê tem 20 minutos para negociar.');
@@ -55,7 +58,7 @@ test('a crise deixa o Brasil sem voz, toma o telão e, no fim, devolve a voz', a
 
 	const telao = await (await browser.newContext({ viewport: { width: 1920, height: 1080 } })).newPage();
 	await entrar(telao, MESA);
-	await telao.goto('/telao/TREINO');
+	await telao.goto(`/telao/${C.sigla}`);
 	const modoCrise = telao.locator('.telao-crise', { hasText: TITULO });
 	await expect(modoCrise).toContainText('Urgente');
 	await expect(modoCrise.locator('.telao-crise-prazo')).toHaveText(/^(20:00|19:\d\d)$/);
@@ -63,7 +66,7 @@ test('a crise deixa o Brasil sem voz, toma o telão e, no fim, devolve a voz', a
 
 	const brasil = await (await browser.newContext()).newPage();
 	await entrar(brasil, BRASIL);
-	await brasil.goto('/comite/TREINO/sessao');
+	await brasil.goto(`/comite/${C.sigla}/sessao`);
 	await aoVivo(brasil);
 	await expect(brasil.getByRole('alert').filter({ hasText: 'impedida pela crise' })).toContainText('Delegado sequestrado');
 	// Sem voz: o formulário de ponto ou moção some (e a placa, fora da plenária).

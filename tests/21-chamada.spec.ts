@@ -1,14 +1,18 @@
 import { expect, test, type Browser, type Page } from '@playwright/test';
+import { isolado } from '../scripts/delegacoes.ts';
 import AxeBuilder from '@axe-core/playwright';
 import { entrar } from './ajuda.ts';
 
+// Passo 39: a cópia do CE-T só deste arquivo (scripts/delegacoes.ts).
+const C = isolado('21');
+
 // Passo 21: abrir, fazer a chamada, aceitar quem chega depois e encerrar com resumo.
 // Usa o Conselho Europeu de teste (CE-T), para não disputar a sessão do CSNU-T.
-const CHAMADA = '/comite/CE-T/sessao/chamada';
-const PAINEL = '/comite/CE-T/sessao/presidencia';
-const SESSAO = '/comite/CE-T/sessao';
-const MESA = 'mesa-ce@exemplo.test';
-const ALEMANHA = 'ce-alemanha@exemplo.test';
+const CHAMADA = `/comite/${C.sigla}/sessao/chamada`;
+const PAINEL = `/comite/${C.sigla}/sessao/presidencia`;
+const SESSAO = `/comite/${C.sigla}/sessao`;
+const MESA = C.conta('mesa-ce@exemplo.test');
+const ALEMANHA = C.conta('ce-alemanha@exemplo.test');
 
 test.describe.configure({ mode: 'serial' });
 test.beforeEach(({}, info) => {

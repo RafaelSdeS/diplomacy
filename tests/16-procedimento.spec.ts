@@ -1,6 +1,9 @@
 import { expect, test, type Browser, type Page } from '@playwright/test';
-import { contaDoTreino, DELEGACOES_TREINO } from '../scripts/delegacoes.ts';
+import { contaDoTreino, DELEGACOES_TREINO, isolado } from '../scripts/delegacoes.ts';
 import { clienteComo, entrar } from './ajuda.ts';
+
+// Passo 39: a cópia do TREINO só deste arquivo (scripts/delegacoes.ts).
+const C = isolado('16');
 
 // Passo 16: a votação nominal de um projeto, do painel da mesa ao telão, e a OEA com
 // tecnologia restrita (a mesa registra falas e votos; o telão acompanha).
@@ -38,11 +41,11 @@ async function sessaoAberta(contaMesa: string, sigla: string) {
 
 test('uma votação nominal completa, do painel da mesa ao telão', async ({ browser }) => {
 	test.setTimeout(120_000);
-	const { mesa, comite } = await sessaoAberta('mesa-treino@exemplo.test', 'TREINO');
+	const { mesa, comite } = await sessaoAberta(C.conta('mesa-treino@exemplo.test'), C.sigla);
 
 	// Um projeto aprovado pela mesa (sem tópico: o teste roda várias vezes).
 	const [redator, ...outros] = await Promise.all(
-		['Brasil', 'Argentina', 'Chile', 'Paraguai', 'Uruguai'].map((n) => clienteComo(contaDoTreino(n)))
+		['Brasil', 'Argentina', 'Chile', 'Paraguai', 'Uruguai'].map((n) => clienteComo(C.conta(contaDoTreino(n))))
 	);
 	const bloco = await redator.rpc('criar_bloco', { p_comite: comite, p_nome: `Bloco nominal ${Date.now()}` });
 	for (const c of outros) expect((await c.rpc('entrar_bloco', { p_bloco: bloco.data! })).error).toBeNull();
@@ -52,9 +55,9 @@ test('uma votação nominal completa, do painel da mesa ao telão', async ({ bro
 	expect((await redator.rpc('enviar_documento', { p_documento: projeto, p_aprovacao: 'votacao' })).error).toBeNull();
 	expect((await mesa.rpc('aprovar_documento', { p_documento: projeto, p_aprovar: true })).error).toBeNull();
 
-	const telao = await abrir(browser, 'mesa-treino@exemplo.test', '/telao/TREINO', { width: 1920, height: 1080 });
-	const painel = await abrir(browser, 'mesa-treino@exemplo.test', '/comite/TREINO/sessao/presidencia');
-	const celular = await abrir(browser, contaDoTreino('Chile'), '/comite/TREINO/sessao', { width: 360, height: 740 });
+	const telao = await abrir(browser, C.conta('mesa-treino@exemplo.test'), `/telao/${C.sigla}`, { width: 1920, height: 1080 });
+	const painel = await abrir(browser, C.conta('mesa-treino@exemplo.test'), `/comite/${C.sigla}/sessao/presidencia`);
+	const celular = await abrir(browser, C.conta(contaDoTreino('Chile')), `/comite/${C.sigla}/sessao`, { width: 360, height: 740 });
 
 	// A mesa anuncia a votação: a sala fecha. O Chile pede a votação nominal pelo celular.
 	await painel.getByRole('button', { name: new RegExp(`^Iniciar a votação \\(sala fechada\\): .*${TITULO}$`) }).click();

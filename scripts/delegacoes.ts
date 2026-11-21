@@ -47,3 +47,33 @@ export function contaDoTreino(nome: string) {
 	if (i < 0) throw new Error(`Delegação desconhecida no treino: ${nome}`);
 	return `treino${String(i + 1).padStart(2, '0')}@exemplo.test`;
 }
+
+/**
+ * Passo 39: cópias dos comitês de teste, uma por arquivo de ponta a ponta que mexe na
+ * sessão, na crise ou nos documentos do comitê. A cópia tem as mesmas delegações e
+ * regras do original, e as mesmas contas com "+NN" no e-mail (o seed cria tudo).
+ * Assim os arquivos rodam em paralelo e cada um só vê o que ele mesmo fez.
+ */
+export const ISOLADOS = {
+	'06': 'CSNU-T',
+	'08': 'CSNU-T',
+	'09': 'CSNU-T',
+	'10': 'CSNU-T',
+	'12': 'TREINO',
+	'15': 'TREINO',
+	'16': 'TREINO',
+	'21': 'CE-T',
+	'23': 'UNOCT-T',
+	'28': 'CE-T',
+	'29': 'CE-T',
+	'30': 'CE-T',
+	'31': 'CE-T',
+	'32': 'CE-T',
+	'33': 'CE-T',
+	'35': 'TREINO'
+} as const;
+
+/** O comitê do arquivo NN e as contas dele: `conta('mesa01@exemplo.test')` vira `mesa01+NN@…`. */
+export function isolado(n: keyof typeof ISOLADOS) {
+	return { sigla: `${ISOLADOS[n]}-${n}`, conta: (email: string) => email.replace('@', `+${n}@`) };
+}

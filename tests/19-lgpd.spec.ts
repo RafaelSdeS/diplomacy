@@ -82,7 +82,7 @@ test('o arquivo da edição tem os documentos públicos e o JSON esperados', asy
 
 	await page.getByRole('link', { name: 'Imprimir o arquivo (PDF)' }).click();
 	const impresso = page.getByRole('article', { name: 'Arquivo da edição' });
-	await expect(impresso.getByRole('region', { name: 'CSNU-T' })).toBeVisible();
+	await expect(impresso.getByRole('region', { name: 'CSNU-T', exact: true })).toBeVisible();
 	await page.emulateMedia({ media: 'print' });
 	expect((await page.pdf({ format: 'A4' })).byteLength).toBeGreaterThan(1000);
 });

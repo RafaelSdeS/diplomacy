@@ -36,7 +36,7 @@ export async function conectarAdmin(variavelDeLiberacao: string) {
 	for (let tentativa = 1; ; tentativa++) {
 		const { error } = await db.from('evento').select('id').limit(1);
 		if (!error) break;
-		if (tentativa === 30) throw new Error(`A API do Supabase não respondeu: ${error.message}`);
+		if (tentativa === 120) throw new Error(`A API do Supabase não respondeu: ${error.message}`);
 		await new Promise((pronto) => setTimeout(pronto, 500));
 	}
 	return { db, url, chavePublica };

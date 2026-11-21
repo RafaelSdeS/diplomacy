@@ -1,11 +1,15 @@
 import { expect, test, type Page } from '@playwright/test';
+import { isolado } from '../scripts/delegacoes.ts';
 import { clienteComo, comiteEmDebate, entrar } from './ajuda.ts';
 
+// Passo 39: a cópia do CE-T só deste arquivo (scripts/delegacoes.ts).
+const C = isolado('30');
+
 // Passo 30: placas → lista curta → fala → "Há pontos ou moções?" → placas. Comitê CE-T.
-const PAINEL = '/comite/CE-T/sessao/presidencia';
-const MESA = 'mesa-ce@exemplo.test';
-const ALEMANHA = 'ce-alemanha@exemplo.test';
-const FRANCA = 'ce-franca@exemplo.test';
+const PAINEL = `/comite/${C.sigla}/sessao/presidencia`;
+const MESA = C.conta('mesa-ce@exemplo.test');
+const ALEMANHA = C.conta('ce-alemanha@exemplo.test');
+const FRANCA = C.conta('ce-franca@exemplo.test');
 
 test.describe.configure({ mode: 'serial' });
 test.beforeEach(({}, info) => {
@@ -14,7 +18,7 @@ test.beforeEach(({}, info) => {
 
 test.beforeAll(async ({}, info) => {
 	if (info.project.name !== 'notebook') return;
-	const { mesa, comite } = await comiteEmDebate(MESA, 'CE-T', ALEMANHA);
+	const { mesa, comite } = await comiteEmDebate(MESA, C.sigla, ALEMANHA);
 	// Começa no formal-informal, sem orador, sem pausa e sem placas.
 	expect((await mesa.rpc('mudar_forma', { p_comite: comite, p_forma: 'formal_informal' })).error).toBeNull();
 	expect((await mesa.rpc('encerrar_pausa', { p_comite: comite })).error).toBeNull();
@@ -41,13 +45,16 @@ test('a presidência escolhe a lista curta, e a pausa para pontos e moções vem
 	await expect(proximos.getByRole('listitem')).toHaveText([/França/, /Alemanha/]);
 
 	const telao = await (await browser.newContext({ viewport: { width: 1920, height: 1080 } })).newPage();
+	await telao.clock.install();
 	await entrar(telao, MESA);
-	await telao.goto('/telao/CE-T');
+	await telao.goto(`/telao/${C.sigla}`);
+	// A votação do tópico na preparação deixa a grade 30 s na tela (passo 23): o relógio pula.
+	await telao.clock.fastForward(30_000);
 	await expect(telao.getByRole('complementary', { name: 'Próximos oradores' }).getByRole('listitem').first()).toContainText('França');
 
 	const alemanha = await (await browser.newContext()).newPage();
 	await entrar(alemanha, ALEMANHA);
-	await alemanha.goto('/comite/CE-T/sessao');
+	await alemanha.goto(`/comite/${C.sigla}/sessao`);
 	await aoVivo(alemanha);
 	await expect(alemanha.getByText('Sua delegação é a 2ª da lista curta.')).toBeVisible();
 

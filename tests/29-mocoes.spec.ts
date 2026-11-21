@@ -1,11 +1,15 @@
 import { expect, test, type Page } from '@playwright/test';
+import { isolado } from '../scripts/delegacoes.ts';
 import { clienteComo, comiteEmDebate, entrar } from './ajuda.ts';
+
+// Passo 39: a cópia do CE-T só deste arquivo (scripts/delegacoes.ts).
+const C = isolado('29');
 
 // Passo 29: o pedido passa pelo bureau antes da presidência. O caminho completo, com a
 // delegação que preside concedendo, está no teste do passo 06; aqui, a recusa com
 // motivo e o telão. Comitê CE-T, com uma delegação na presidência.
-const MESA = 'mesa-ce@exemplo.test';
-const ALEMANHA = 'ce-alemanha@exemplo.test';
+const MESA = C.conta('mesa-ce@exemplo.test');
+const ALEMANHA = C.conta('ce-alemanha@exemplo.test');
 
 test.describe.configure({ mode: 'serial' });
 test.beforeEach(({}, info) => {
@@ -14,7 +18,7 @@ test.beforeEach(({}, info) => {
 
 test.beforeAll(async ({}, info) => {
 	if (info.project.name !== 'notebook') return;
-	const { mesa, comite } = await comiteEmDebate(MESA, 'CE-T', ALEMANHA);
+	const { mesa, comite } = await comiteEmDebate(MESA, C.sigla, ALEMANHA);
 	// Uma delegação na presidência: sorteia o rodízio e reabre a sessão no debate.
 	const presidencia = await mesa.from('estado_sessao').select('sessao(presidencia_delegacao_id)').eq('comite_id', comite).single();
 	if (!presidencia.data?.sessao?.presidencia_delegacao_id) {
@@ -29,7 +33,7 @@ const aoVivo = (page: Page) => expect(page.locator('[data-ao-vivo="sim"]')).toBe
 test('o bureau recusa um pedido com motivo, e o delegado vê a etapa e o motivo', async ({ page, browser }) => {
 	const delegada = await (await browser.newContext()).newPage();
 	await entrar(delegada, ALEMANHA);
-	await delegada.goto('/comite/CE-T/sessao');
+	await delegada.goto(`/comite/${C.sigla}/sessao`);
 	await aoVivo(delegada);
 	await delegada.getByLabel('Tipo').selectOption({ label: 'Moção de informal-informal' });
 	await delegada.getByLabel(/^Minutos \(até/).fill('10');
@@ -41,11 +45,11 @@ test('o bureau recusa um pedido com motivo, e o delegado vê a etapa e o motivo'
 	// O telão mostra o pedido em análise.
 	const telao = await (await browser.newContext({ viewport: { width: 1920, height: 1080 } })).newPage();
 	await entrar(telao, MESA);
-	await telao.goto('/telao/CE-T');
+	await telao.goto(`/telao/${C.sigla}`);
 	await expect(telao.locator('.telao-analise')).toContainText('Alemanha');
 
 	await entrar(page, MESA);
-	await page.goto('/comite/CE-T/sessao/presidencia');
+	await page.goto(`/comite/${C.sigla}/sessao/presidencia`);
 	await aoVivo(page);
 	const julgar = page.getByRole('region', { name: 'Bureau · pedidos para aprovar' });
 	const nome = 'Moção de informal-informal: 10 minutos';
@@ -56,7 +60,7 @@ test('o bureau recusa um pedido com motivo, e o delegado vê a etapa e o motivo'
 
 test('a delegação retira o próprio pedido enquanto ele espera (passo 38)', async ({ page }) => {
 	await entrar(page, ALEMANHA);
-	await page.goto('/comite/CE-T/sessao');
+	await page.goto(`/comite/${C.sigla}/sessao`);
 	await aoVivo(page);
 	await page.getByLabel('Tipo').selectOption({ label: 'Ponto de dúvida' });
 	await page.getByRole('button', { name: 'Enviar à mesa' }).click();
@@ -71,7 +75,7 @@ test.afterAll(async ({}, info) => {
 	if (info.project.name !== 'notebook') return;
 	// Deixa a fila do bureau limpa para os outros testes do comitê.
 	const mesa = await clienteComo(MESA);
-	const comite = (await mesa.from('comite').select('id').eq('sigla', 'CE-T').single()).data!.id;
+	const comite = (await mesa.from('comite').select('id').eq('sigla', C.sigla).single()).data!.id;
 	const abertos = await mesa.from('ponto_mocao').select('id').eq('comite_id', comite).eq('status', 'aberto').is('aprovado_bureau', null);
 	for (const p of abertos.data ?? []) await mesa.rpc('julgar_ponto', { p_ponto: p.id, p_em_ordem: false });
 });

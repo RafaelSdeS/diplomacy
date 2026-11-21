@@ -45,7 +45,7 @@ Migração `supabase/migrations/20261216090000_incidente_crise.sql`:
 - [x] `delegacao_sem_voz(p_delegacao) returns boolean` (stable): existe efeito com incidente não encerrado e `ate` nulo ou futuro.
 - [x] `create or replace function public.exigir_delegacao` (a versão do passo 31): recusa com "Sua delegação está impedida pela crise." quando `delegacao_sem_voz`. Também em `validar_voto` (votos da delegação e os registrados pela mesa).
 - [x] Broadcast em `incidente_comite` e `incidente_efeito`: `transmitir('comite', 'comite_id', 'crise', 'comite_id')`. O fim chega pelo `encerrado_em` de `incidente_comite`.
-- [x] Notificação push no lançamento, pelo mesmo caminho das notificações do passo 15: `push_a_enviar('crise', id)` (título "Crise: <título>", para todos do comitê) e a Edge Function `enviar-push` aceitando o tipo `crise`. A função precisa de novo deploy (`npx supabase functions deploy enviar-push`); até lá, o pedido é recusado sem efeito e o alerta aparece ao vivo no app.
+- [x] Notificação push no lançamento, pelo mesmo caminho das notificações do passo 15: `push_a_enviar('crise', id)` (título "Crise: <título>", para todos do comitê) e a Edge Function `enviar-push` aceitando o tipo `crise`. A função com o tipo `crise` foi publicada na nuvem em 21/11/2026 (`npx supabase functions deploy enviar-push`).
 - [x] Regenerar os tipos.
 
 ## Telas

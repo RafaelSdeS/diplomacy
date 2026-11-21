@@ -1,11 +1,15 @@
 import { expect, test, type Page } from '@playwright/test';
+import { isolado } from '../scripts/delegacoes.ts';
 import { clienteComo, comiteEmDebate, entrar } from './ajuda.ts';
+
+// Passo 39: a cópia do CE-T só deste arquivo (scripts/delegacoes.ts).
+const C = isolado('28');
 
 // Passo 28: dois cronômetros. Dar a palavra não apaga o tempo do debate; o
 // informal-informal esgotado oferece a volta ao formal-informal. Comitê CE-T.
-const PAINEL = '/comite/CE-T/sessao/presidencia';
-const MESA = 'mesa-ce@exemplo.test';
-const ALEMANHA = 'ce-alemanha@exemplo.test';
+const PAINEL = `/comite/${C.sigla}/sessao/presidencia`;
+const MESA = C.conta('mesa-ce@exemplo.test');
+const ALEMANHA = C.conta('ce-alemanha@exemplo.test');
 
 test.describe.configure({ mode: 'serial' });
 test.beforeEach(({}, info) => {
@@ -14,7 +18,7 @@ test.beforeEach(({}, info) => {
 
 test.beforeAll(async ({}, info) => {
 	if (info.project.name !== 'notebook') return;
-	await comiteEmDebate(MESA, 'CE-T', ALEMANHA);
+	await comiteEmDebate(MESA, C.sigla, ALEMANHA);
 });
 
 const aoVivo = (page: Page) => expect(page.locator('[data-ao-vivo="sim"]')).toBeVisible({ timeout: 10_000 });
@@ -33,7 +37,7 @@ test('o tempo do debate segue contando quando alguém recebe a palavra', async (
 
 	// A Alemanha levanta a placa e recebe a palavra: o relógio do debate continua.
 	const alemanha = await clienteComo(ALEMANHA);
-	const comite = (await alemanha.from('comite').select('id').eq('sigla', 'CE-T').single()).data!.id;
+	const comite = (await alemanha.from('comite').select('id').eq('sigla', C.sigla).single()).data!.id;
 	expect((await alemanha.rpc('levantar_placa', { p_comite: comite })).error).toBeNull();
 	await page.getByRole('button', { name: 'Dar a palavra a Alemanha' }).first().click();
 	await expect(page.getByRole('region', { name: 'Com a palavra' })).toContainText('Alemanha');

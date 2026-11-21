@@ -1,6 +1,6 @@
 # Plano de implementação
 
-Ordem dos passos para construir o app. Os passos 01 a 12 formam o **piloto**: planos gratuitos, poucos usuários e dados fictícios. Os passos 13 a 19 levam o app à **escala do evento**. Os passos 20 a 38 são as **melhorias depois da revisão** do app, explicadas e priorizadas em [melhorias-pos-revisao.pdf](../melhorias-pos-revisao.pdf).
+Ordem dos passos para construir o app. Os passos 01 a 12 formam o **piloto**: planos gratuitos, poucos usuários e dados fictícios. Os passos 13 a 19 levam o app à **escala do evento**. Os passos 20 a 38 são as **melhorias depois da revisão** do app, explicadas e priorizadas em [melhorias-pos-revisao.pdf](../melhorias-pos-revisao.pdf). Os passos 39 a 41 deixam o desenvolvimento mais rápido, o app mais leve na internet móvel e fecham as pendências.
 
 Cada passo só começa quando os passos de que ele depende estão prontos. As regras de procedimento que o app segue estão resumidas em [regras-de-procedimento.md](../regras-de-procedimento.md).
 
@@ -47,6 +47,10 @@ Cada passo só começa quando os passos de que ele depende estão prontos. As re
 | [36](36-press-nas-redes.md) | Press: WhatsApp, X e Instagram | 27 |
 | [37](37-visual-geral.md) | Visual geral | 20 a 36 |
 | [38](38-melhorias-de-uso.md) | Melhorias de uso (cada uma pode entrar antes, no passo da mesma tela) | 21 |
+| **Desenvolvimento e leveza** | | |
+| [39](39-testes-e-ci-rapidos.md) | Testes e CI mais rápidos: um comitê por arquivo, capturas no contêiner, CI em paralelo | 38 |
+| [40](40-menos-dados-no-celular.md) | Menos dados no celular: service worker, tempo real e imagens | 39 |
+| [41](41-pendencias.md) | Pendências: logo, ícones do cronograma, filtro dos próximos e capturas da crise | 39 |
 
 ## Melhorias depois da revisão
 
@@ -123,7 +127,7 @@ Cada passo tem uma seção "Testes" com os testes que provam que ele funciona e 
 | Unidade | Vitest (a partir do passo 04) | Funções puras: cálculos, formatação e validações | Ao lado do código, `*.test.ts` |
 | Ponta a ponta | Playwright, nas três telas | Fluxos completos como o usuário faz, inclusive tempo real com dois navegadores | `tests/NN-nome.spec.ts` |
 | Acessibilidade | axe dentro do Playwright | Erros de acessibilidade em cada rota | Junto dos testes de ponta a ponta |
-| Aparência | Capturas de tela de referência do Playwright, geradas só no CI | Mudanças de layout sem querer | `tests/capturas/` |
+| Aparência | Capturas de tela de referência do Playwright, sempre no mesmo contêiner (`npm run capturas` ou CI) | Mudanças de layout sem querer | `tests/capturas/` |
 | Tamanho | Script no CI | Primeira abertura abaixo de 300 KB | `scripts/tamanho.js` |
 | Manual | Lista no próprio passo | O que não dá para automatizar: celulares reais, leitor de tela, login do Google, projetor | Seção "Testes" do passo |
 
@@ -137,12 +141,14 @@ Cada passo tem uma seção "Testes" com os testes que provam que ele funciona e 
 
 ### Como os testes rodam
 
-- O trabalho vai direto para a `main`, porque há uma pessoa só no projeto. O CI roda a cada push.
-- Um passo só é dado como pronto com o CI verde.
-- `npm run testar` roda localmente tudo o que o CI roda, antes do push.
+- O trabalho vai direto para a `main`, porque há uma pessoa só no projeto. O CI roda a cada push que não seja só de documentação, em três frentes paralelas (passo 39), e um push novo cancela o anterior.
+- Um passo só é dado como pronto com o CI verde. O push não espera o CI; o que falhar lá se conserta em seguida.
+- Antes de cada commit: `npm run rapido` (tipos, textos e unidade). Durante o passo: `npx playwright test tests/NN-*.spec.ts`. A suíte inteira roda em paralelo no computador com `npx playwright test`.
+- **Cada arquivo de ponta a ponta que mexe na sessão, na crise ou nos documentos de um comitê usa uma cópia só dele** (`isolado('NN')` em `scripts/delegacoes.ts`, criada pelo seed). Os outros arquivos só leem os comitês de sempre. Um teste de um arquivo serial monta as próprias condições, porque uma nova tentativa recomeça no meio do arquivo.
+- **Capturas:** comparadas só no contêiner do Playwright (`CAPTURAS=1`), o mesmo no CI e no `npm run capturas`, que as regrava no computador. Confira as imagens no `git diff` antes do commit.
 - Testes de tempo real usam dois navegadores (dois contextos do Playwright) e esperam a atualização chegar.
 - Testes que dependem de horário usam o relógio controlado do Playwright (`page.clock`).
-- Os dados vêm do seed fictício, e cada teste de ponta a ponta começa com o banco no estado do seed.
+- Os dados vêm do seed fictício. No CI o banco começa do zero; no computador ele é reaproveitado entre execuções (`npm run db:resetar && npm run seed` volta ao estado do seed).
 
 ### Matriz por passo
 
@@ -186,6 +192,9 @@ Cada passo tem uma seção "Testes" com os testes que provam que ele funciona e 
 | 36 | — | sim | sim | sim |
 | 37 | — | — | capturas e axe | sim |
 | 38 | sim | sim | sim | sim |
+| 39 | — | — | a suíte inteira, em paralelo | — |
+| 40 | — | sim | sim (consumo) | sim (3G e cabeçalhos) |
+| 41 | sim | — | sim | — |
 
 ## Aparência
 

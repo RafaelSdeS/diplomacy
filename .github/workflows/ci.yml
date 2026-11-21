@@ -3,29 +3,59 @@ name: CI
 on:
   push:
     branches: [main]
+    # Mudança só na documentação não roda o CI.
+    paths-ignore: ['docs/**', '**/*.md']
   pull_request:
   workflow_dispatch:
     inputs:
       atualizar_capturas:
-        description: Gerar novas capturas de referência (baixe o artefato "capturas" e faça o commit)
+        description: Gerar novas capturas de referência (baixe os artefatos "capturas-N" e faça o commit). O normal é npm run capturas, no computador.
         type: boolean
         default: false
 
+# Um push novo cancela a execução anterior do mesmo ramo.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Os testes de ponta a ponta rodam neste contêiner, o mesmo do npm run capturas:
+  # as capturas de referência geradas no computador batem com as do CI.
+  IMAGEM: mcr.microsoft.com/playwright:v1.65.1-noble
+
+# Três frentes em paralelo (passo 39). Ubuntu fixo para nada mudar sozinho.
 jobs:
-  testes:
-    # Um job só: os testes de ponta a ponta precisam do Supabase local, que usa o
-    # Docker do runner. Versão do Ubuntu fixa para as capturas não mudarem sozinhas.
+  rapido:
+    # Sem Docker: o primeiro aviso, em cerca de um minuto.
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
           cache: npm
-
       - run: npm ci
+      - name: Variáveis do Supabase local
+        run: cp .env.example .env
+      - name: Checagem de tipos
+        run: npm run check
+      - name: Nenhum texto fixo nas telas de comitê
+        run: npm run textos
+      - name: Testes de unidade (inclui as chaves de tradução)
+        run: npm run test:unit
+      - run: npm run build
+      - name: Tamanho da primeira abertura
+        run: npm run tamanho
 
+  banco:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
       - name: Chaves descartáveis das notificações (a Edge Function lê ao subir)
         run: node scripts/chaves-push.ts supabase/functions/.env
       - name: Supabase local (aplica as migrações do zero)
@@ -40,38 +70,51 @@ jobs:
         run: |
           npx supabase gen types typescript --local > /tmp/tipos.ts
           diff -u src/lib/database.types.ts /tmp/tipos.ts
-
-      - name: Checagem de tipos
-        run: npm run check
-      - name: Nenhum texto fixo nas telas de comitê
-        run: npm run textos
-      - name: Testes de unidade (inclui as chaves de tradução)
-        run: npm run test:unit
-      - run: npm run build
-      - name: Tamanho da primeira abertura
-        run: npm run tamanho
-
-      - name: Navegador dos testes
-        run: npx playwright install --with-deps chromium
-      - name: Testes de ponta a ponta
-        if: ${{ !inputs.atualizar_capturas }}
-        run: npx playwright test
-      - name: Gerar capturas de referência
-        if: ${{ inputs.atualizar_capturas }}
-        run: npx playwright test --update-snapshots
-      # Depois dos testes, para não mexer nos dados que eles usam; duas vezes porque
-      # o script pode ser repetido.
-      - name: Evento de demonstração (passo 20)
+      - name: Evento de demonstração, duas vezes (passo 20; o script pode ser repetido)
         run: npm run demo && npm run demo
+
+  ponta-a-ponta:
+    # Três partes, cada uma com o próprio Supabase: o limite do tempo real local
+    # (100 mensagens por segundo) vale por instância, então cada parte roda um processo só.
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        parte: [1, 2, 3]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Chaves descartáveis das notificações (a Edge Function lê ao subir)
+        run: node scripts/chaves-push.ts supabase/functions/.env
+      - name: Variáveis do Supabase local
+        run: cp .env.example .env
+      - name: Supabase, build e contêiner dos testes ao mesmo tempo
+        run: |
+          npm run db:iniciar > /tmp/supabase.log 2>&1 & banco=$!
+          docker pull -q "$IMAGEM" > /dev/null & imagem=$!
+          npm run build
+          wait $imagem
+          wait $banco || { cat /tmp/supabase.log; exit 1; }
+      - name: Dados fictícios
+        run: npm run seed
+      - name: Testes de ponta a ponta, com as capturas (parte ${{ matrix.parte }} de 3)
+        run: >
+          docker run --rm --network host --ipc host --user "$(id -u):$(id -g)"
+          -e HOME=/tmp -e CI=1 -e CAPTURAS=1 -v "$PWD":/app -w /app "$IMAGEM"
+          npx playwright test --shard=${{ matrix.parte }}/3 ${{ inputs.atualizar_capturas && '--update-snapshots' || '' }}
 
       - uses: actions/upload-artifact@v4
         if: ${{ inputs.atualizar_capturas }}
         with:
-          name: capturas
+          name: capturas-${{ matrix.parte }}
           path: tests/capturas/
 
       - uses: actions/upload-artifact@v4
         if: ${{ failure() }}
         with:
-          name: relatorio-playwright
+          name: relatorio-playwright-${{ matrix.parte }}
           path: playwright-report/

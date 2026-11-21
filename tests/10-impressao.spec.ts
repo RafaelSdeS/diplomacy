@@ -1,10 +1,13 @@
 import { expect, test, type Browser, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { contaDaDelegacao } from '../scripts/delegacoes.ts';
+import { contaDaDelegacao, isolado } from '../scripts/delegacoes.ts';
 import { adotarAgenda, clienteComo, CONTAS, entrar } from './ajuda.ts';
 
-const DPO = '/comite/CSNU-T/dpo';
-const CARTAS = '/comite/CSNU-T/cartas';
+// Passo 39: a cópia do CSNU-T só deste arquivo (scripts/delegacoes.ts).
+const C = isolado('10');
+
+const DPO = `/comite/${C.sigla}/dpo`;
+const CARTAS = `/comite/${C.sigla}/cartas`;
 const CARTA = `Proposta de cooperação ${Date.now()}`;
 
 // O DPO dos EUA passa da delegação para a mesa e para a impressão: roda em série, num projeto só.
@@ -33,16 +36,16 @@ let projeto = '';
 
 test('o DPO escrito no celular vai à mesa, que pede ajustes e depois aprova', async ({ browser }) => {
 	// Uma execução anterior deixa o DPO dos EUA enviado ou aprovado: a mesa devolve para ajuste.
-	const eua = await clienteComo(CONTAS.delegado);
+	const eua = await clienteComo(C.conta(CONTAS.delegado));
 	const anterior = (
 		await eua.from('dpo').select('id, status, delegacao!inner(nome)').eq('topico', 1).eq('delegacao.nome', 'EUA').maybeSingle()
 	).data;
 	if (anterior && (anterior.status === 'enviado' || anterior.status === 'aprovado')) {
-		const mesa = await clienteComo(CONTAS.mesa);
+		const mesa = await clienteComo(C.conta(CONTAS.mesa));
 		expect((await mesa.rpc('avaliar_dpo', { p_dpo: anterior.id, p_status: 'pede_ajustes', p_comentario: 'De novo.' })).error).toBeNull();
 	}
 
-	const celular = await abrir(browser, CONTAS.delegado, DPO, { width: 360, height: 740 });
+	const celular = await abrir(browser, C.conta(CONTAS.delegado), DPO, { width: 360, height: 740 });
 	await expect(celular.locator('[data-ao-vivo="sim"]')).toBeVisible({ timeout: 10_000 });
 	const topico = celular.getByRole('region', { name: /^Tópico 1:/ });
 	await topico.getByLabel(/^Texto/).fill(
@@ -55,7 +58,7 @@ test('o DPO escrito no celular vai à mesa, que pede ajustes e depois aprova', a
 	await expect(celular.getByRole('status')).toHaveText('DPO enviado à mesa.');
 	await expect(topico.getByLabel(/^Texto/)).toBeDisabled();
 
-	const mesa = await abrir(browser, CONTAS.mesa, DPO);
+	const mesa = await abrir(browser, C.conta(CONTAS.mesa), DPO);
 	await mesa.getByRole('button', { name: 'Avaliar o DPO de EUA, tópico 1' }).click();
 	await mesa.getByRole('button', { name: 'Pedir ajustes' }).click();
 	await expect(mesa.getByRole('alert')).toHaveText('Diga o que precisa ser ajustado.');
@@ -81,7 +84,7 @@ test('o DPO escrito no celular vai à mesa, que pede ajustes e depois aprova', a
 });
 
 test('o DPO impresso tem bandeira, nome oficial, tópico, duas colunas e referências', async ({ page }) => {
-	await entrar(page, CONTAS.delegado);
+	await entrar(page, C.conta(CONTAS.delegado));
 	await page.goto(dpo);
 	const folha = page.getByRole('article', { name: 'DPO para impressão' });
 	await expect(folha.getByRole('heading', { level: 1 })).toHaveText('United States of America');
@@ -97,20 +100,20 @@ test('o DPO impresso tem bandeira, nome oficial, tópico, duas colunas e referê
 	await expect(page.getByRole('button', { name: 'Imprimir ou salvar como PDF' })).toBeHidden();
 	const pdf = await page.pdf({ format: 'A4' });
 	expect(pdf.byteLength).toBeGreaterThan(1000);
-	if (process.env.CI) await expect(page).toHaveScreenshot('dpo-impresso.png', { fullPage: true });
+	if (process.env.CAPTURAS) await expect(page).toHaveScreenshot('dpo-impresso.png', { fullPage: true });
 });
 
 test('o projeto impresso tem a linha do comitê e os signatários', async ({ page }) => {
 	// O projeto é montado pela API, como o app faria (o editor já foi testado no passo 09).
-	const eua = await clienteComo(CONTAS.delegado);
-	const comite = (await eua.from('comite').select('id').eq('sigla', 'CSNU-T').single()).data!.id;
+	const eua = await clienteComo(C.conta(CONTAS.delegado));
+	const comite = (await eua.from('comite').select('id').eq('sigla', C.sigla).single()).data!.id;
 	const bloco = await eua.rpc('criar_bloco', { p_comite: comite, p_nome: `Bloco da impressão ${Date.now()}` });
 	expect(bloco.error).toBeNull();
 	for (const nome of ['Rússia', 'China', 'Reino Unido', 'França']) {
-		const cliente = await clienteComo(contaDaDelegacao(nome));
+		const cliente = await clienteComo(C.conta(contaDaDelegacao(nome)));
 		expect((await cliente.rpc('entrar_bloco', { p_bloco: bloco.data! })).error).toBeNull();
 	}
-	await adotarAgenda(CONTAS.mesa, 'CSNU-T', 1);
+	await adotarAgenda(C.conta(CONTAS.mesa), C.sigla, 1);
 	const documento = await eua.rpc('criar_documento', {
 		p_bloco: bloco.data!,
 		p_tipo: 'projeto',
@@ -126,12 +129,12 @@ test('o projeto impresso tem a linha do comitê e os signatários', async ({ pag
 	]) {
 		expect((await eua.rpc('adicionar_clausula', { p_documento: projeto, p_tipo: tipo, p_texto: texto })).error).toBeNull();
 	}
-	for (const conta of [CONTAS.delegado, ...['Rússia', 'China', 'Reino Unido', 'França'].map(contaDaDelegacao)]) {
+	for (const conta of [C.conta(CONTAS.delegado), ...['Rússia', 'China', 'Reino Unido', 'França'].map((n) => C.conta(contaDaDelegacao(n)))]) {
 		const cliente = await clienteComo(conta);
 		expect((await cliente.rpc('assinar', { p_documento: projeto, p_assinar: true })).error).toBeNull();
 	}
 
-	await entrar(page, CONTAS.delegado);
+	await entrar(page, C.conta(CONTAS.delegado));
 	await page.goto(`/documento/${projeto}`);
 	await page.getByText('Ver como documento').click();
 	await page.getByRole('link', { name: 'Imprimir ou salvar como PDF' }).click();
@@ -146,16 +149,16 @@ test('o projeto impresso tem a linha do comitê e os signatários', async ({ pag
 });
 
 test('a carta privada só chega ao destinatário', async ({ browser }) => {
-	const eua = await abrir(browser, CONTAS.delegado, CARTAS);
+	const eua = await abrir(browser, C.conta(CONTAS.delegado), CARTAS);
 	await eua.getByRole('group', { name: 'Para as delegações' }).getByLabel('Brasil').check();
 	await eua.getByLabel('Título').fill(CARTA);
 	await eua.getByLabel('Carta', { exact: true }).fill('Propomos uma reunião bilateral.\n\nAguardamos a resposta.');
 	await eua.getByRole('button', { name: 'Enviar carta' }).click();
 	await expect(eua.getByRole('status')).toHaveText('Carta enviada.');
 
-	const brasil = await abrir(browser, contaDaDelegacao('Brasil'), CARTAS);
+	const brasil = await abrir(browser, C.conta(contaDaDelegacao('Brasil')), CARTAS);
 	await expect(brasil.getByRole('region', { name: 'Cartas' })).toContainText(CARTA);
-	const china = await abrir(browser, contaDaDelegacao('China'), CARTAS);
+	const china = await abrir(browser, C.conta(contaDaDelegacao('China')), CARTAS);
 	await expect(china.locator('[data-ao-vivo="sim"]')).toBeVisible({ timeout: 10_000 });
 	await expect(china.getByRole('region', { name: 'Cartas' })).not.toContainText(CARTA);
 
@@ -171,7 +174,7 @@ test('a carta privada só chega ao destinatário', async ({ browser }) => {
 for (const tema of ['light', 'dark'] as const) {
 	test(`as telas de DPO, cartas e impressão não têm erros de acessibilidade (tema ${tema})`, async ({ page }) => {
 		await page.emulateMedia({ colorScheme: tema });
-		await entrar(page, CONTAS.delegado);
+		await entrar(page, C.conta(CONTAS.delegado));
 		for (const rota of [DPO, CARTAS, dpo, `/imprimir/documento/${projeto}`]) {
 			await page.goto(rota);
 			await expect(page.locator('main h1')).toBeVisible();

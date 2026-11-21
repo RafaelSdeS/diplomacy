@@ -1,16 +1,19 @@
 import { expect, test, type Browser, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { contaDaDelegacao } from '../scripts/delegacoes.ts';
+import { contaDaDelegacao, isolado } from '../scripts/delegacoes.ts';
 import { CONTAS, entrar } from './ajuda.ts';
+
+// Passo 39: a cópia do CSNU-T só deste arquivo (scripts/delegacoes.ts).
+const C = isolado('06');
 
 const OCULTAR_RODIZIO = `${import.meta.dirname}/ocultar-rodizio.css`;
 
 // Passos 06 e 07: sessão, plenária de abertura, votação, debate, agenda e telão.
-const SESSAO = '/comite/CSNU-T/sessao';
-const PRESIDENCIA = '/comite/CSNU-T/sessao/presidencia';
-const CHAMADA = '/comite/CSNU-T/sessao/chamada';
-const AGENDA = '/comite/CSNU-T/sessao/agenda';
-const TELAO = '/telao/CSNU-T';
+const SESSAO = `/comite/${C.sigla}/sessao`;
+const PRESIDENCIA = `/comite/${C.sigla}/sessao/presidencia`;
+const CHAMADA = `/comite/${C.sigla}/sessao/chamada`;
+const AGENDA = `/comite/${C.sigla}/sessao/agenda`;
+const TELAO = `/telao/${C.sigla}`;
 const PRESENTES = ['Brasil', 'China', 'EUA', 'França', 'Rússia'];
 
 // O comitê de teste tem uma sessão só, e estes testes mexem nela: rodam em série,
@@ -58,7 +61,7 @@ let preside = '';
 let outra = '';
 
 test('a mesa sorteia o rodízio, abre a sessão e faz a chamada', async ({ page }) => {
-	await entrar(page, CONTAS.mesa);
+	await entrar(page, C.conta(CONTAS.mesa));
 	await page.goto(CHAMADA);
 	await aoVivo(page);
 
@@ -102,7 +105,7 @@ test('plenária de abertura: discursos pela lista de oradores e moção do tópi
 	browser
 }) => {
 	test.setTimeout(90_000); // quatro aparelhos, cada um com login
-	await entrar(page, CONTAS.mesa);
+	await entrar(page, C.conta(CONTAS.mesa));
 	await page.goto(PRESIDENCIA);
 	await aoVivo(page);
 	const plenaria = page.getByRole('region', { name: 'Plenária de abertura' });
@@ -120,7 +123,7 @@ test('plenária de abertura: discursos pela lista de oradores e moção do tópi
 	// Discursos → moção do tópico no topo, proposta por uma delegação no celular.
 	await plenaria.getByRole('button', { name: 'Passar à moção do tópico no topo' }).click();
 	await expect(plenaria).toContainText('Moção do tópico no topo da agenda');
-	const eua = await abrir(browser, CONTAS.delegado, SESSAO, { width: 360, height: 740 });
+	const eua = await abrir(browser, C.conta(CONTAS.delegado), SESSAO, { width: 360, height: 740 });
 	await eua.getByLabel('Tipo').selectOption({ label: 'Moção de introdução do tópico no topo da agenda' });
 	await eua.getByRole('combobox', { name: /^Tópico/ }).selectOption({ index: 1 });
 	await eua.getByRole('button', { name: 'Enviar à mesa' }).click();
@@ -129,13 +132,13 @@ test('plenária de abertura: discursos pela lista de oradores e moção do tópi
 	// Lista especial: a Rússia fala a favor.
 	const pontos = page.getByRole('region', { name: 'Pontos e moções' });
 	await pontos.getByRole('button', { name: /^Abrir lista especial/ }).click();
-	const russia = await abrir(browser, contaDaDelegacao('Rússia'), SESSAO);
+	const russia = await abrir(browser, C.conta(contaDaDelegacao('Rússia')), SESSAO);
 	await russia.getByRole('button', { name: 'Falar a favor' }).click();
 	await expect(page.getByRole('region', { name: 'Lista especial' })).toContainText('Rússia');
 
 	// Votação: o voto dado no celular aparece no telão.
 	await pontos.getByRole('button', { name: /^Votar/ }).click();
-	const telao = await abrir(browser, CONTAS.mesa, TELAO, { width: 1920, height: 1080 });
+	const telao = await abrir(browser, C.conta(CONTAS.mesa), TELAO, { width: 1920, height: 1080 });
 	const grade = telao.getByRole('complementary', { name: 'Votação' });
 	await expect(grade).toContainText('Tópico 2 no topo da agenda');
 	await eua.getByRole('button', { name: 'A favor' }).click();
@@ -164,18 +167,18 @@ test('no debate, preside a delegação sorteada, e um pedido de fala chega ao pa
 	page,
 	browser
 }) => {
-	await entrar(page, CONTAS.mesa);
+	await entrar(page, C.conta(CONTAS.mesa));
 	preside = await presidencia(page);
 	expect(preside).not.toBe('Mesa');
 	outra = PRESENTES.find((n) => n !== preside)!;
 
-	const painel = await abrir(browser, contaDaDelegacao(preside), PRESIDENCIA);
+	const painel = await abrir(browser, C.conta(contaDaDelegacao(preside)), PRESIDENCIA);
 	const fila = painel.getByRole('region', { name: 'Pedidos de fala' });
 	await expect(
 		painel.getByRole('navigation', { name: 'Principal' }).getByRole('link', { name: 'Sessão' })
 	).toHaveAttribute('aria-current', 'true');
 
-	const delegado = await abrir(browser, contaDaDelegacao(outra), SESSAO);
+	const delegado = await abrir(browser, C.conta(contaDaDelegacao(outra)), SESSAO);
 	await delegado.getByRole('button', { name: 'Levantar placa' }).click();
 	await expect(fila).toContainText(outra, { timeout: 1_000 });
 	await expect(delegado.getByRole('article', { name: 'Sua placa' })).toContainText('1ª na fila');
@@ -183,9 +186,9 @@ test('no debate, preside a delegação sorteada, e um pedido de fala chega ao pa
 });
 
 test('Enter dá a palavra ao próximo, e os dois aparelhos mostram o mesmo tempo', async ({ browser }) => {
-	const painel = await abrir(browser, contaDaDelegacao(preside), PRESIDENCIA);
+	const painel = await abrir(browser, C.conta(contaDaDelegacao(preside)), PRESIDENCIA);
 	await expect(painel.getByRole('region', { name: 'Pedidos de fala' })).toContainText(outra);
-	const delegado = await abrir(browser, contaDaDelegacao(outra), SESSAO);
+	const delegado = await abrir(browser, C.conta(contaDaDelegacao(outra)), SESSAO);
 
 	await painel.keyboard.press('Enter');
 	await expect(painel.getByRole('region', { name: 'Com a palavra' })).toContainText(outra);
@@ -201,9 +204,9 @@ test('Enter dá a palavra ao próximo, e os dois aparelhos mostram o mesmo tempo
 });
 
 test('Espaço pausa e retoma o cronômetro, mas não dentro de um campo', async ({ browser }) => {
-	const painel = await abrir(browser, contaDaDelegacao(preside), PRESIDENCIA);
+	const painel = await abrir(browser, C.conta(contaDaDelegacao(preside)), PRESIDENCIA);
 	const palavra = painel.getByRole('region', { name: 'Com a palavra' });
-	const delegado = await abrir(browser, contaDaDelegacao(outra), SESSAO);
+	const delegado = await abrir(browser, C.conta(contaDaDelegacao(outra)), SESSAO);
 
 	await painel.keyboard.press('Space');
 	await expect(palavra.getByRole('status')).toHaveText('Pausado');
@@ -227,18 +230,18 @@ test('Espaço pausa e retoma o cronômetro, mas não dentro de um campo', async 
 });
 
 test('um ponto chega à presidência, e a resposta volta à delegação', async ({ browser }) => {
-	const delegado = await abrir(browser, contaDaDelegacao(outra), SESSAO);
+	const delegado = await abrir(browser, C.conta(contaDaDelegacao(outra)), SESSAO);
 	await delegado.getByLabel('Tipo').selectOption({ label: 'Ponto de dúvida' });
 	await delegado.getByLabel('Detalhe (opcional)').fill('Qual é o tempo de fala?');
 	await delegado.getByRole('button', { name: 'Enviar à mesa' }).click();
 	await expect(delegado.getByRole('status').filter({ hasText: 'enviado' })).toBeVisible();
 
 	// Passo 29: o bureau aprova, e só então a presidência vê o pedido.
-	const painel = await abrir(browser, contaDaDelegacao(preside), PRESIDENCIA);
+	const painel = await abrir(browser, C.conta(contaDaDelegacao(preside)), PRESIDENCIA);
 	const pontos = painel.getByRole('region', { name: 'Pontos e moções' });
 	await expect(pontos).not.toContainText('Qual é o tempo de fala?');
 	await expect(delegado.getByRole('list', { name: 'Seus pontos e moções' })).toContainText('Aguardando o bureau');
-	const mesa = await abrir(browser, CONTAS.mesa, PRESIDENCIA);
+	const mesa = await abrir(browser, C.conta(CONTAS.mesa), PRESIDENCIA);
 	await mesa
 		.getByRole('region', { name: 'Bureau · pedidos para aprovar' })
 		.getByRole('button', { name: `Em ordem: Ponto de dúvida, ${outra}` })
@@ -253,7 +256,7 @@ test('um ponto chega à presidência, e a resposta volta à delegação', async 
 });
 
 test('quem não preside não usa o painel', async ({ page }) => {
-	await entrar(page, contaDaDelegacao(outra));
+	await entrar(page, C.conta(contaDaDelegacao(outra)));
 	await page.goto(PRESIDENCIA);
 	await expect(page.getByText('Você não preside esta sessão.')).toBeVisible();
 	await expect(page.getByRole('button', { name: 'Pausar' })).toHaveCount(0);
@@ -263,7 +266,7 @@ test('quem não preside não usa o painel', async ({ page }) => {
 });
 
 test('a agenda informal: propostas em tópicos, lado a lado, e a mesa adota uma', async ({ browser }) => {
-	const delegado = await abrir(browser, contaDaDelegacao(outra), AGENDA);
+	const delegado = await abrir(browser, C.conta(contaDaDelegacao(outra)), AGENDA);
 	// Um tópico ainda sem agenda adotada (numa nova tentativa, o primeiro já pode estar).
 	const livres = [];
 	for (const n of [1, 2]) {
@@ -283,7 +286,7 @@ test('a agenda informal: propostas em tópicos, lado a lado, e a mesa adota uma'
 	await delegado.getByRole('button', { name: 'Salvar proposta' }).click();
 	await expect(delegado.getByRole('status')).toHaveText('Proposta salva.');
 
-	const mesa = await abrir(browser, CONTAS.mesa, AGENDA);
+	const mesa = await abrir(browser, C.conta(CONTAS.mesa), AGENDA);
 	await escolher(mesa);
 	await mesa.getByLabel('Agenda em tópicos').fill('A. Contexto\nB. Cooperação\n  B.1 Inteligência');
 	await mesa.getByRole('button', { name: 'Salvar proposta' }).click();
@@ -311,7 +314,7 @@ test.describe('telão em 1920 × 1080', () => {
 	test.use({ viewport: { width: 1920, height: 1080 } });
 
 	test('mostra orador, bandeira, cronômetro e o tópico, sem rolagem e sem a navegação do app', async ({ page }) => {
-		await entrar(page, CONTAS.mesa);
+		await entrar(page, C.conta(CONTAS.mesa));
 		await page.goto(TELAO);
 		await aoVivo(page);
 
@@ -332,21 +335,23 @@ test.describe('telão em 1920 × 1080', () => {
 	});
 
 	test('aparência do telão', async ({ page }) => {
-		test.skip(!process.env.CI, 'capturas de referência só no CI');
-		await entrar(page, CONTAS.mesa);
+		test.skip(!process.env.CAPTURAS, 'capturas só no contêiner (npm run capturas)');
+		await page.clock.install();
+		await entrar(page, C.conta(CONTAS.mesa));
 		await page.goto(TELAO);
 		await aoVivo(page);
 		await expect(page.getByRole('region', { name: 'Com a palavra' })).toContainText(outra);
-		// Depois de uma votação, a grade fica 30 s na tela (passo 23): a captura espera a fila voltar.
-		await expect(page.getByRole('complementary', { name: 'Próximos oradores' })).toBeVisible({ timeout: 45_000 });
+		// Depois de uma votação, a grade fica 30 s na tela (passo 23): o relógio pula esse tempo.
+		await page.clock.fastForward(30_000);
+		await expect(page.getByRole('complementary', { name: 'Próximos oradores' })).toBeVisible();
 		// A presidência do rodízio depende de quantas vezes o fluxo já rodou: fica invisível.
 		await expect(page).toHaveScreenshot('telao.png', { mask: [page.locator('.cronometro')], stylePath: OCULTAR_RODIZIO });
 	});
 });
 
 test('aparência do painel da presidência', async ({ page }) => {
-	test.skip(!process.env.CI, 'capturas de referência só no CI');
-	await entrar(page, contaDaDelegacao(preside));
+	test.skip(!process.env.CAPTURAS, 'capturas só no contêiner (npm run capturas)');
+	await entrar(page, C.conta(contaDaDelegacao(preside)));
 	await page.goto(PRESIDENCIA);
 	await aoVivo(page);
 	await expect(page.getByRole('region', { name: 'Com a palavra' })).toContainText(outra);
@@ -361,7 +366,7 @@ test('aparência do painel da presidência', async ({ page }) => {
 for (const tema of ['light', 'dark'] as const) {
 	test(`as telas da sessão não têm erros de acessibilidade (tema ${tema})`, async ({ page }) => {
 		await page.emulateMedia({ colorScheme: tema });
-		await entrar(page, contaDaDelegacao(preside));
+		await entrar(page, C.conta(contaDaDelegacao(preside)));
 		for (const [rota, titulo] of [
 			[SESSAO, /^Sessão/],
 			[PRESIDENCIA, 'Presidência'],
@@ -374,7 +379,7 @@ for (const tema of ['light', 'dark'] as const) {
 		await page.getByRole('button', { name: 'Sair' }).click();
 		await expect(page).toHaveURL(/\/entrar$/);
 
-		await entrar(page, CONTAS.mesa);
+		await entrar(page, C.conta(CONTAS.mesa));
 		for (const rota of [CHAMADA, PRESIDENCIA, TELAO]) {
 			await page.goto(rota);
 			await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
@@ -385,8 +390,8 @@ for (const tema of ['light', 'dark'] as const) {
 }
 
 test('a presidência passada vai para a próxima delegação sorteada', async ({ browser }) => {
-	const painel = await abrir(browser, contaDaDelegacao(preside), PRESIDENCIA);
-	const mesa = await abrir(browser, CONTAS.mesa, SESSAO);
+	const painel = await abrir(browser, C.conta(contaDaDelegacao(preside)), PRESIDENCIA);
+	const mesa = await abrir(browser, C.conta(CONTAS.mesa), SESSAO);
 
 	await painel.getByRole('button', { name: 'Passar a presidência' }).click();
 	await painel.getByRole('dialog').getByRole('button', { name: 'Passar a presidência' }).click();

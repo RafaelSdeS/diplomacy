@@ -1,12 +1,16 @@
 import { expect, test } from '@playwright/test';
+import { isolado } from '../scripts/delegacoes.ts';
 import AxeBuilder from '@axe-core/playwright';
 import { clienteComo, entrar } from './ajuda.ts';
+
+// Passo 39: a cópia do UNOCT-T só deste arquivo (scripts/delegacoes.ts).
+const C = isolado('23');
 
 // Passo 23: depois de encerrada, todos veem como cada delegação votou.
 // Usa o comitê em inglês de teste (UNOCT-T, 5 delegações), que nenhum outro teste
 // abre em sessão: a França vota pelo app, e a mesa registra o voto de placa do Brasil.
-const MESA = 'unoct-mesa@exemplo.test';
-const FRANCA = 'unoct-france@exemplo.test';
+const MESA = C.conta('unoct-mesa@exemplo.test');
+const FRANCA = C.conta('unoct-france@exemplo.test');
 const OBJETO = `Test vote ${Date.now()}`;
 
 test.describe.configure({ mode: 'serial' });
@@ -16,7 +20,7 @@ test.beforeEach(({}, info) => {
 
 async function comiteComMesa() {
 	const mesa = await clienteComo(MESA);
-	const comite = (await mesa.from('comite').select('id').eq('sigla', 'UNOCT-T').single()).data!.id;
+	const comite = (await mesa.from('comite').select('id').eq('sigla', C.sigla).single()).data!.id;
 	return { mesa, comite };
 }
 
@@ -43,7 +47,7 @@ test.afterAll(async ({}, info) => {
 // Primeiro, porque a grade só fica 30 s no telão.
 test('o telão mantém a grade de votos logo depois de encerrada', async ({ page }) => {
 	await entrar(page, MESA);
-	await page.goto('/telao/UNOCT-T');
+	await page.goto(`/telao/${C.sigla}`);
 	const grade = page.getByRole('complementary', { name: 'Vote' });
 	await expect(grade).toContainText(OBJETO);
 	await expect(grade.getByRole('listitem').filter({ hasText: 'Japan' })).toContainText('Did not vote');
@@ -51,7 +55,7 @@ test('o telão mantém a grade de votos logo depois de encerrada', async ({ page
 
 test('o resultado mostra quem votou a favor, contra e quem não votou', async ({ page }) => {
 	await entrar(page, FRANCA);
-	await page.goto('/comite/UNOCT-T/sessao');
+	await page.goto(`/comite/${C.sigla}/sessao`);
 	const ultima = page.getByRole('article', { name: 'Last vote' });
 	await expect(ultima).toContainText(OBJETO);
 	await expect(ultima.getByRole('list', { name: 'In favour (1)' })).toHaveText(/France/);
@@ -63,7 +67,7 @@ test('o resultado mostra quem votou a favor, contra e quem não votou', async ({
 
 test('o histórico do comitê lista a votação com o mesmo agrupamento', async ({ page }) => {
 	await entrar(page, FRANCA);
-	await page.goto('/comite/UNOCT-T/votacoes');
+	await page.goto(`/comite/${C.sigla}/votacoes`);
 	const votacao = page.locator('details', { hasText: OBJETO });
 	await votacao.locator('summary').click();
 	await expect(votacao.getByRole('list', { name: 'In favour (1)' })).toHaveText(/France/);

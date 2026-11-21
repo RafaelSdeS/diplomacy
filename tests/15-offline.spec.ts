@@ -1,6 +1,9 @@
 import { expect, test, type Browser, type Page } from '@playwright/test';
-import { contaDoTreino } from '../scripts/delegacoes.ts';
+import { contaDoTreino, isolado } from '../scripts/delegacoes.ts';
 import { clienteComo, entrar } from './ajuda.ts';
+
+// Passo 39: a cópia do TREINO só deste arquivo (scripts/delegacoes.ts).
+const C = isolado('15');
 
 // Passo 15: o app abre sem internet, a caixa de saída não perde nem duplica nada, e o
 // consumo de dados de uma sessão fica medido.
@@ -10,8 +13,8 @@ test.beforeEach(({}, info) => {
 	test.skip(info.project.name !== 'notebook', 'roda num projeto só');
 });
 
-const DELEGADO = contaDoTreino('Paraguai');
-const CRISE = '/comite/TREINO/crise';
+const DELEGADO = C.conta(contaDoTreino('Paraguai'));
+const CRISE = `/comite/${C.sigla}/crise`;
 
 async function celular(browser: Browser, conta: string, serviceWorkers: 'allow' | 'block' = 'allow') {
 	const contexto = await browser.newContext({ viewport: { width: 360, height: 740 }, isMobile: true, serviceWorkers });
@@ -45,7 +48,7 @@ test('depois do primeiro acesso, o app abre sem rede', async ({ browser }) => {
 
 test('uma nota escrita sem rede fica no aparelho, até depois de fechar o app, e chega uma vez só', async ({ browser }) => {
 	// Execuções anteriores deixam notas esperando: a crise responde, para o limite não barrar.
-	const crise = await clienteComo('crise-treino@exemplo.test');
+	const crise = await clienteComo(C.conta('crise-treino@exemplo.test'));
 	const pendentes = (await crise.from('nota_crise').select('id').in('status', ['pendente', 'em_analise'])).data!;
 	if (pendentes.length) {
 		await crise.rpc('responder_notas', { p_ids: pendentes.map((n) => n.id), p_status: 'aprovada', p_resposta: 'Ok.' });
@@ -96,14 +99,14 @@ test('uma versão nova do app substitui a antiga no cache', async ({ browser }) 
 
 test('consumo de dados: quanto o celular de um delegado gasta por atualização da sessão', async ({ browser }) => {
 	test.setTimeout(120_000);
-	const mesa = await clienteComo('mesa-treino@exemplo.test');
-	const comite = (await mesa.from('comite').select('id').eq('sigla', 'TREINO').single()).data!.id;
+	const mesa = await clienteComo(C.conta('mesa-treino@exemplo.test'));
+	const comite = (await mesa.from('comite').select('id').eq('sigla', C.sigla).single()).data!.id;
 	const delegacoes = (await mesa.from('delegacao').select('id').eq('comite_id', comite)).data!;
 	expect((await mesa.rpc('abrir_sessao', { p_comite: comite })).error).toBeNull();
 
 	// Sem o service worker: as leituras dele não aparecem na rede da página.
 	const page = await celular(browser, DELEGADO, 'block');
-	await page.goto('/comite/TREINO/sessao');
+	await page.goto(`/comite/${C.sigla}/sessao`);
 	await expect(page.locator('[data-ao-vivo="sim"]')).toBeVisible({ timeout: 10_000 });
 	await page.waitForTimeout(1_000);
 

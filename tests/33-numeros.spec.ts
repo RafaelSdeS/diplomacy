@@ -1,10 +1,14 @@
 import { expect, test } from '@playwright/test';
+import { isolado } from '../scripts/delegacoes.ts';
 import AxeBuilder from '@axe-core/playwright';
 import { clienteComo, comiteEmDebate, entrar } from './ajuda.ts';
 
+// Passo 39: a cópia do CE-T só deste arquivo (scripts/delegacoes.ts).
+const C = isolado('33');
+
 // Passo 33: os números abrem o que contam. CE-T em debate, com uma votação aberta.
-const MESA = 'mesa-ce@exemplo.test';
-const ALEMANHA = 'ce-alemanha@exemplo.test';
+const MESA = C.conta('mesa-ce@exemplo.test');
+const ALEMANHA = C.conta('ce-alemanha@exemplo.test');
 let votacao = '';
 
 test.describe.configure({ mode: 'serial' });
@@ -14,7 +18,7 @@ test.beforeEach(({}, info) => {
 
 test.beforeAll(async ({}, info) => {
 	if (info.project.name !== 'notebook') return;
-	const { mesa, comite } = await comiteEmDebate(MESA, 'CE-T', ALEMANHA);
+	const { mesa, comite } = await comiteEmDebate(MESA, C.sigla, ALEMANHA);
 	const aberta = await mesa.from('votacao').select('id').eq('comite_id', comite).eq('aberta', true).maybeSingle();
 	if (aberta.data) await mesa.rpc('encerrar_votacao', { p_votacao: aberta.data.id });
 	votacao = (await mesa.rpc('abrir_votacao_livre', { p_comite: comite, p_objeto: `Números ${Date.now()}` })).data!;
@@ -28,7 +32,7 @@ test.afterAll(async ({}, info) => {
 
 test('no painel, "presentes" e "votaram" abrem quem está e quem falta', async ({ page }) => {
 	await entrar(page, MESA);
-	await page.goto('/comite/CE-T/sessao/presidencia');
+	await page.goto(`/comite/${C.sigla}/sessao/presidencia`);
 	await expect(page.locator('[data-ao-vivo="sim"]')).toBeVisible({ timeout: 10_000 });
 
 	const presentes = page.locator('details.contagem', { hasText: /^Presentes: \d+ de 5/ });

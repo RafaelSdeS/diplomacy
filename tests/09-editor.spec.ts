@@ -1,9 +1,12 @@
 import { expect, test, type Browser, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { contaDaDelegacao } from '../scripts/delegacoes.ts';
+import { contaDaDelegacao, isolado } from '../scripts/delegacoes.ts';
 import { adotarAgenda, clienteComo, CONTAS, entrar } from './ajuda.ts';
 
-const BLOCOS = '/comite/CSNU-T/blocos';
+// Passo 39: a cópia do CSNU-T só deste arquivo (scripts/delegacoes.ts).
+const C = isolado('09');
+
+const BLOCOS = `/comite/${C.sigla}/blocos`;
 // O nome do bloco muda a cada execução: blocos não se repetem no comitê.
 const BLOCO = `Bloco de teste ${Date.now()}`;
 const MEMBROS = ['Rússia', 'China', 'Reino Unido', 'França'];
@@ -36,7 +39,7 @@ let workingPaper = '';
 let projeto = '';
 
 test('um bloco escreve um working paper, com verbos sugeridos', async ({ page }) => {
-	await entrar(page, CONTAS.delegado); // EUA
+	await entrar(page, C.conta(CONTAS.delegado)); // EUA
 	await page.goto(BLOCOS);
 	await page.getByLabel('Nome do novo bloco').fill(BLOCO);
 	await page.getByRole('button', { name: 'Criar bloco' }).click();
@@ -45,11 +48,11 @@ test('um bloco escreve um working paper, com verbos sugeridos', async ({ page })
 
 	// As outras delegações entram pela API, como no app.
 	const blocoId = await (async () => {
-		const eua = await clienteComo(CONTAS.delegado);
+		const eua = await clienteComo(C.conta(CONTAS.delegado));
 		return (await eua.from('bloco').select('id').eq('nome', BLOCO).single()).data!.id;
 	})();
 	for (const nome of MEMBROS) {
-		const cliente = await clienteComo(contaDaDelegacao(nome));
+		const cliente = await clienteComo(C.conta(contaDaDelegacao(nome)));
 		const { error } = await cliente.rpc('entrar_bloco', { p_bloco: blocoId });
 		expect(error).toBeNull();
 	}
@@ -81,8 +84,8 @@ test('um bloco escreve um working paper, com verbos sugeridos', async ({ page })
 test('uma proposta feita no celular e aceita pelo redator aparece para todo o bloco sem recarregar', async ({
 	browser
 }) => {
-	const russia = await abrir(browser, contaDaDelegacao('Rússia'), workingPaper, { width: 360, height: 740 });
-	const eua = await abrir(browser, CONTAS.delegado, workingPaper);
+	const russia = await abrir(browser, C.conta(contaDaDelegacao('Rússia')), workingPaper, { width: 360, height: 740 });
+	const eua = await abrir(browser, C.conta(CONTAS.delegado), workingPaper);
 
 	// No celular, um toque na cláusula abre a conversa.
 	await russia.getByRole('button', { name: /Operativa 1 Pede cooperação/ }).click();
@@ -106,8 +109,8 @@ test('uma proposta feita no celular e aceita pelo redator aparece para todo o bl
 });
 
 test('a barra de progresso e a cláusula em foco atualizam para todos', async ({ browser }) => {
-	const russia = await abrir(browser, contaDaDelegacao('Rússia'), workingPaper);
-	const eua = await abrir(browser, CONTAS.delegado, workingPaper);
+	const russia = await abrir(browser, C.conta(contaDaDelegacao('Rússia')), workingPaper);
+	const eua = await abrir(browser, C.conta(CONTAS.delegado), workingPaper);
 
 	await eua.getByRole('button', { name: /Preambular Recordando/ }).click();
 	await eua.getByRole('button', { name: 'Marcar como acordada' }).click();
@@ -124,16 +127,16 @@ test('a barra de progresso e a cláusula em foco atualizam para todos', async ({
 });
 
 test('o working paper vai à mesa e, aprovado, aparece ao comitê', async ({ browser }) => {
-	const eua = await abrir(browser, CONTAS.delegado, workingPaper);
+	const eua = await abrir(browser, C.conta(CONTAS.delegado), workingPaper);
 	await eua.getByRole('button', { name: 'Enviar à mesa' }).click();
 	await expect(eua.getByRole('status')).toHaveText('Documento enviado à mesa.');
 	await expect(eua.getByText('Working paper', { exact: false }).first()).toBeVisible();
 
-	const brasil = await abrir(browser, contaDaDelegacao('Brasil'), BLOCOS);
+	const brasil = await abrir(browser, C.conta(contaDaDelegacao('Brasil')), BLOCOS);
 	const documentos = brasil.getByRole('region', { name: 'Documentos do comitê' });
 	await expect(documentos).not.toContainText(WP);
 
-	const mesa = await abrir(browser, CONTAS.mesa, workingPaper);
+	const mesa = await abrir(browser, C.conta(CONTAS.mesa), workingPaper);
 	await mesa.getByRole('button', { name: 'Aprovar' }).click();
 	await expect(mesa.getByRole('status')).toHaveText('Documento aprovado.');
 
@@ -142,8 +145,8 @@ test('o working paper vai à mesa e, aprovado, aparece ao comitê', async ({ bro
 });
 
 test('o projeto junta cláusulas do working paper, recebe 5 assinaturas e vai à mesa', async ({ page }) => {
-	await adotarAgenda(CONTAS.mesa, 'CSNU-T', 1); // projeto só depois da agenda (passo 22)
-	await entrar(page, CONTAS.delegado);
+	await adotarAgenda(C.conta(CONTAS.mesa), C.sigla, 1); // projeto só depois da agenda (passo 22)
+	await entrar(page, C.conta(CONTAS.delegado));
 	await page.goto(BLOCOS);
 	await page.getByRole('article', { name: `Bloco ${BLOCO}` }).getByRole('button', { name: 'Novo documento' }).click();
 	const novo = page.getByRole('form', { name: 'Novo documento' });
@@ -169,7 +172,7 @@ test('o projeto junta cláusulas do working paper, recebe 5 assinaturas e vai à
 
 	const id = projeto.split('/').pop()!;
 	for (const nome of MEMBROS) {
-		const cliente = await clienteComo(contaDaDelegacao(nome));
+		const cliente = await clienteComo(C.conta(contaDaDelegacao(nome)));
 		expect((await cliente.rpc('assinar', { p_documento: id, p_assinar: true })).error).toBeNull();
 	}
 	await expect(page.getByText('Signatários (5 de no mínimo 5)')).toBeVisible({ timeout: 10_000 });
@@ -189,12 +192,12 @@ test('o projeto junta cláusulas do working paper, recebe 5 assinaturas e vai à
 });
 
 test('aparência do documento aberto no celular e no notebook', async ({ browser }) => {
-	test.skip(!process.env.CI, 'capturas de referência só no CI');
+	test.skip(!process.env.CAPTURAS, 'capturas só no contêiner (npm run capturas)');
 	for (const [nome, viewport] of [
 		['documento-celular.png', { width: 360, height: 740 }],
 		['documento-notebook.png', { width: 1366, height: 768 }]
 	] as const) {
-		const page = await abrir(browser, CONTAS.delegado, workingPaper, viewport);
+		const page = await abrir(browser, C.conta(CONTAS.delegado), workingPaper, viewport);
 		await page.getByRole('button', { name: /Operativa 1/ }).click();
 		await expect(page).toHaveScreenshot(nome, {
 			fullPage: true,
@@ -207,7 +210,7 @@ test('aparência do documento aberto no celular e no notebook', async ({ browser
 for (const tema of ['light', 'dark'] as const) {
 	test(`as telas do editor não têm erros de acessibilidade (tema ${tema})`, async ({ page }) => {
 		await page.emulateMedia({ colorScheme: tema });
-		await entrar(page, CONTAS.delegado);
+		await entrar(page, C.conta(CONTAS.delegado));
 		for (const rota of [BLOCOS, workingPaper, projeto]) {
 			await page.goto(rota);
 			await expect(page.locator('[data-ao-vivo="sim"]')).toBeVisible({ timeout: 10_000 });

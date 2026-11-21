@@ -1,9 +1,13 @@
 import { expect, test, type Page } from '@playwright/test';
+import { isolado } from '../scripts/delegacoes.ts';
 import { comiteEmDebate, entrar } from './ajuda.ts';
 
+// Passo 39: a cópia do CE-T só deste arquivo (scripts/delegacoes.ts).
+const C = isolado('31');
+
 // Passo 31: a mesa assume a Itália (sem delegado no seed), age por ela e deixa. CE-T.
-const PAINEL = '/comite/CE-T/sessao/presidencia';
-const MESA = 'mesa-ce@exemplo.test';
+const PAINEL = `/comite/${C.sigla}/sessao/presidencia`;
+const MESA = C.conta('mesa-ce@exemplo.test');
 
 test.describe.configure({ mode: 'serial' });
 test.beforeEach(({}, info) => {
@@ -12,7 +16,7 @@ test.beforeEach(({}, info) => {
 
 test.beforeAll(async ({}, info) => {
 	if (info.project.name !== 'notebook') return;
-	const { mesa, comite } = await comiteEmDebate(MESA, 'CE-T', 'ce-alemanha@exemplo.test');
+	const { mesa, comite } = await comiteEmDebate(MESA, C.sigla, C.conta('ce-alemanha@exemplo.test'));
 	await mesa.rpc('representar', { p_comite: comite, p_delegacao: null as unknown as string });
 	await mesa.rpc('baixar_todas_placas', { p_comite: comite });
 });
@@ -41,6 +45,6 @@ test('a mesa assume a Itália, levanta a placa por ela e deixa', async ({ page }
 
 	await page.getByRole('region', { name: 'Assumir uma delegação' }).getByRole('button', { name: 'Deixar' }).click();
 	await expect(page.getByRole('region', { name: 'Assumir uma delegação' }).getByRole('button', { name: 'Assumir' })).toBeVisible();
-	await page.goto('/comite/CE-T/sessao');
+	await page.goto(`/comite/${C.sigla}/sessao`);
 	await expect(page.getByRole('button', { name: 'Levantar placa' })).toHaveCount(0);
 });

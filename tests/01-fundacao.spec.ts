@@ -74,7 +74,7 @@ test.describe('zoom de 200%', () => {
 
 test.describe('aparência', () => {
 	// As capturas de referência vêm do CI; em outra máquina as fontes mudam.
-	test.skip(!process.env.CI, 'capturas só no CI');
+	test.skip(!process.env.CAPTURAS, 'capturas só no contêiner (npm run capturas)');
 
 	for (const tema of temas) {
 		test(`/estilo bate com a captura de referência (tema ${tema})`, async ({ page }) => {

@@ -6,7 +6,7 @@
 // Só roda no Supabase local, a menos que SEED_PERMITIR_REMOTO=1 (para um projeto
 // de teste, nunca o de produção).
 import { conectarAdmin, criarContas, SENHA, verificar } from './admin.ts';
-import { DELEGACOES, DELEGACOES_TREINO, TOPICOS_TREINO } from './delegacoes.ts';
+import { DELEGACOES, DELEGACOES_TREINO, ISOLADOS, isolado, TOPICOS_TREINO } from './delegacoes.ts';
 
 const { db, url } = await conectarAdmin('SEED_PERMITIR_REMOTO');
 
@@ -252,7 +252,45 @@ verificar(
 	'convites'
 );
 
-await criarContas(db, contas);
+// Passo 39: as cópias dos comitês para os testes de ponta a ponta (ISOLADOS), com as
+// mesmas delegações, regras e contas do original (e-mail com +NN).
+const idDaBase = new Map<string, string>([['CSNU-T', comite.id], ['TREINO', treino.id], ...comiteEspecial]);
+const baseDaConta = (c: Conta) => c.especial ?? (c.treino ? 'TREINO' : 'CSNU-T');
+const contasIsoladas: Conta[] = [];
+for (const [n, base] of Object.entries(ISOLADOS) as [keyof typeof ISOLADOS, string][]) {
+	const { sigla, conta } = isolado(n);
+	const { id, ...original } = verificar(await db.from('comite').select('*').eq('id', idDaBase.get(base)!).single(), base);
+	const copia = verificar(
+		await db.from('comite').upsert({ ...original, sigla }, { onConflict: 'evento_id,sigla' }).select('id').single(),
+		sigla
+	);
+	const daBase = verificar(await db.from('delegacao').select('nome, nome_oficial, bandeira, situacao').eq('comite_id', id), `delegações de ${base}`);
+	const novas = verificar(
+		await db
+			.from('delegacao')
+			.upsert(daBase.map((d) => ({ ...d, comite_id: copia.id })), { onConflict: 'comite_id,nome' })
+			.select('id, nome'),
+		`delegações de ${sigla}`
+	);
+	const porNome = new Map(novas.map((d) => [d.nome, d.id]));
+	const doComite = contas.filter((c) => c.papel && c.papel !== 'secretaria' && c.papel !== 'diretoria_press' && baseDaConta(c) === base);
+	verificar(
+		await db.from('convite').upsert(
+			doComite.map((c) => ({
+				email: conta(c.email),
+				evento_id: evento.id,
+				papel: c.papel,
+				comite_id: copia.id,
+				delegacao_id: c.delegacao ? porNome.get(c.delegacao) : null
+			})),
+			{ onConflict: 'email,evento_id,papel,comite_id', ignoreDuplicates: true }
+		),
+		`convites de ${sigla}`
+	);
+	contasIsoladas.push(...doComite.map((c) => ({ ...c, email: conta(c.email) })));
+}
+
+await criarContas(db, [...contas, ...contasIsoladas]);
 
 // Cronograma de dois dias fictícios do evento (horário de Brasília). As datas ficam
 // no passado de propósito: os testes congelam o relógio nelas, e um relógio antes
@@ -301,5 +339,5 @@ if (!avisos.count) {
 }
 
 console.log(
-	`Seed pronto: ${delegacoes.length + delegacoesTreino.length} delegações e ${contas.length} contas @exemplo.test (senha "${SENHA}") em ${url}.`
+	`Seed pronto: ${delegacoes.length + delegacoesTreino.length} delegações, ${contas.length} contas @exemplo.test (senha "${SENHA}") e ${Object.keys(ISOLADOS).length} cópias de comitê para os testes (${contasIsoladas.length} contas) em ${url}.`
 );
