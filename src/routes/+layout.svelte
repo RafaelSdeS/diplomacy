@@ -2,7 +2,7 @@
 	import { t } from '#lib/i18n.svelte.ts';
 	import '@fontsource/spectral/latin-600.css';
 	import '../app.css';
-	import { goto } from '$app/navigation';
+	import { afterNavigate, beforeNavigate, goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import CalendarDays from '@lucide/svelte/icons/calendar-days';
 	import Gavel from '@lucide/svelte/icons/gavel';
@@ -18,6 +18,8 @@
 	import { desativarPush } from '#lib/push.ts';
 	import { APP, marca } from '#lib/titulo.svelte.ts';
 	import { trilha } from '#lib/trilha.ts';
+	import { anterior, antesDeNavegar, depoisDeNavegar } from '#lib/voltar.svelte.ts';
+	import { ficha } from '#lib/ficha.svelte.ts';
 	import { papelPrincipal, rotuloPapel } from '#lib/papeis.ts';
 	import Trilha from '#lib/ui/Trilha.svelte';
 	import { supabase, type Papel } from '#lib/supabase.ts';
@@ -74,7 +76,18 @@
 			.filter((h) => page.url.pathname === h || (h !== '/' && page.url.pathname.startsWith(`${h}/`)))
 			.sort((a, b) => b.length - a.length)[0]
 	);
-	const elos = $derived(trilha(page.route.id, page.params, page.data));
+	// Passo 43: na trilha, a mesa volta ao Painel (não à tela do delegado).
+	const siglaDaTela = $derived(page.params.sigla ?? (page.data as { comite?: { sigla: string } }).comite?.sigla);
+	const mesaDaTela = $derived(
+		data.participacoes.some((p) => p.papel === 'secretaria' || (p.papel === 'mesa' && p.comite_sigla === siglaDaTela))
+	);
+	const elos = $derived(trilha(page.route.id, page.params, page.data, mesaDaTela));
+	// "Voltar" leva à tela de onde a pessoa veio (passo 43).
+	beforeNavigate(antesDeNavegar);
+	afterNavigate(depoisDeNavegar);
+	const volta = $derived(anterior());
+	// A ficha da delegação (e as bandeiras dela) só carrega na primeira vez que alguém a abre.
+	const fichaDelegacao = $derived(ficha.usada ? import('#lib/ui/FichaDelegacao.svelte') : null);
 	// O nome do evento da pessoa, para os títulos e o cabeçalho (passo 27).
 	const nomeDoEvento = $derived(data.participacoes[0]?.evento_nome ?? null);
 	$effect.pre(() => {
@@ -197,8 +210,23 @@
 		{/if}
 
 		<main id="conteudo">
-			{#if elos.length}<Trilha {elos} />{/if}
+			{#if volta || elos.length}
+				<div class="caminho">
+					{#if volta}
+						<a
+							class="voltar"
+							href={volta.href}
+							onclick={(e) => {
+								e.preventDefault();
+								history.back();
+							}}>‹ {volta.titulo ? t('Voltar para {tela}', { tela: volta.titulo }) : t('Voltar')}</a
+						>
+					{/if}
+					{#if elos.length}<Trilha {elos} />{/if}
+				</div>
+			{/if}
 			{@render children()}
 		</main>
 	</div>
+	{#if fichaDelegacao}{#await fichaDelegacao then { default: Ficha }}<Ficha />{/await}{/if}
 {/if}

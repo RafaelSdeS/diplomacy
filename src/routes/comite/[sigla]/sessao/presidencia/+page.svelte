@@ -334,7 +334,7 @@
 					<ol class="lista">
 						{#each lista as inscricao (inscricao.id)}
 							<li aria-current={inscricao.id === proximo?.id ? 'step' : undefined}>
-								<NomeDelegacao sigla={data.comite.sigla} delegacao={inscricao.delegacao} />
+								<NomeDelegacao ficha sigla={data.comite.sigla} delegacao={inscricao.delegacao} />
 								{#if inscricao.lado}<span class="selo">{inscricao.lado === 'a_favor' ? t('A favor') : t('Contra')}</span>{/if}
 								{#if inscricao.falou}<span class="selo selo--ok">{t('Falou')}</span>{/if}
 							</li>
@@ -353,7 +353,7 @@
 					<h2 id="t-proximos">{t('Próximos')}</h2>
 					<ol class="lista">
 						{#each proximos as p (p.delegacao?.id)}
-							<li><NomeDelegacao sigla={data.comite.sigla} delegacao={p.delegacao} /></li>
+							<li><NomeDelegacao ficha sigla={data.comite.sigla} delegacao={p.delegacao} /></li>
 						{/each}
 					</ol>
 					<button class="botao" type="button" onclick={() => darPalavra(proximos[0].delegacao!.id)}>
@@ -372,7 +372,7 @@
 						{@const ordem = escolhidos.indexOf(pedido.delegacao?.id ?? '')}
 						<li>
 							<span>
-								<NomeDelegacao sigla={data.comite.sigla} delegacao={pedido.delegacao} />
+								<NomeDelegacao ficha sigla={data.comite.sigla} delegacao={pedido.delegacao} />
 								{#if pedido.pela_mesa}<span class="selo">{t('pela mesa')}</span>{/if}
 								{#if semVoz(data.incidentes, pedido.delegacao?.id, agora + diferenca)}<span class="selo selo--alerta">{t('impedida')}</span>{/if}
 							</span>

@@ -304,7 +304,7 @@
 				<ol class="lista">
 					{#each lista as inscricao (inscricao.id)}
 						<li>
-							<NomeDelegacao sigla={data.comite.sigla} delegacao={inscricao.delegacao} />
+							<NomeDelegacao ficha sigla={data.comite.sigla} delegacao={inscricao.delegacao} />
 							{#if inscricao.lado}<span class="selo">{inscricao.lado === 'a_favor' ? t('A favor') : t('Contra')}</span>{/if}
 							{#if inscricao.falou}<span class="selo selo--ok">{t('Falou')}</span>{/if}
 						</li>
@@ -342,7 +342,7 @@
 				<h2 id="c-fila">{t('Pedidos de fala')}</h2>
 				<ol class="lista">
 					{#each fila as pedido (pedido.id)}
-						<li><NomeDelegacao sigla={data.comite.sigla} delegacao={pedido.delegacao} /></li>
+						<li><NomeDelegacao ficha sigla={data.comite.sigla} delegacao={pedido.delegacao} /></li>
 					{:else}
 						<li class="suave">{t('Nenhuma placa levantada.')}</li>
 					{/each}

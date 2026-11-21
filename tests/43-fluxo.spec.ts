@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { isolado } from '../scripts/delegacoes.ts';
-import { comiteEmDebate, CONTAS, entrar } from './ajuda.ts';
+import { clienteComo, comiteEmDebate, CONTAS, entrar } from './ajuda.ts';
 
 // Passo 43: fácil de achar, fácil de voltar, sem rolar. Os testes medem tarefas
 // (cliques, o que está na primeira tela, para onde o "Voltar" leva), não a aparência.
@@ -42,4 +42,40 @@ test('a faixa mostra a bandeira e o nome da delegação de quem entrou', async (
 	// No celular o nome cede lugar à bandeira e à sigla.
 	if (info.project.name === 'celular') await expect(identidade.getByText('EUA')).toBeHidden();
 	else await expect(identidade.getByText('EUA')).toBeVisible();
+});
+
+test('do painel à chamada e de volta: o "Voltar" e a trilha levam ao Painel', async ({ page }, info) => {
+	test.skip(info.project.name !== 'notebook', 'o painel é do notebook');
+	await entrar(page, MESA);
+	await page.goto(PAINEL);
+	await aoVivo(page);
+	await page.getByRole('link', { name: 'Chamada', exact: true }).click();
+	await expect(page.getByRole('heading', { level: 1 })).toContainText('Chamada');
+	// A trilha da mesa passa pelo Painel, não pela tela do delegado.
+	await expect(page.getByRole('navigation', { name: 'Trilha' }).getByRole('link', { name: 'Painel' })).toHaveAttribute('href', PAINEL);
+	await page.getByRole('link', { name: '‹ Voltar para Presidência' }).click();
+	await expect(page).toHaveURL(PAINEL);
+	await expect(page.getByRole('region', { name: 'Com a palavra' })).toBeVisible();
+	// Por link direto não há de onde voltar: fica só a trilha.
+	await page.goto(`/comite/${C.sigla}/sessao/chamada`);
+	await expect(page.getByRole('link', { name: /^‹ Voltar/ })).toHaveCount(0);
+});
+
+test('no painel, o nome da delegação abre a ficha sem sair da tela', async ({ page }, info) => {
+	test.skip(info.project.name !== 'notebook', 'o painel é do notebook');
+	const eua = await clienteComo(EUA);
+	const comite = (await eua.from('comite').select('id').eq('sigla', C.sigla).single()).data!.id;
+	await eua.rpc('baixar_placa', { p_comite: comite });
+	expect((await eua.rpc('levantar_placa', { p_comite: comite })).error).toBeNull();
+	await entrar(page, MESA);
+	await page.goto(PAINEL);
+	await aoVivo(page);
+	await page.getByRole('region', { name: 'Pedidos de fala' }).getByRole('button', { name: 'EUA', exact: true }).click();
+	const ficha = page.getByRole('dialog', { name: 'EUA' });
+	await expect(ficha).toBeVisible();
+	await expect(ficha.getByRole('link', { name: 'Abrir a página da delegação' })).toBeVisible();
+	await expect(page).toHaveURL(PAINEL);
+	await page.keyboard.press('Escape');
+	await expect(ficha).toBeHidden();
+	await expect(page.getByRole('region', { name: 'Com a palavra' })).toBeVisible();
 });

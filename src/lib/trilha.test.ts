@@ -14,6 +14,12 @@ describe('trilha', () => {
 		expect(hrefs('/comite/[sigla]/sessao/presidencia')).toEqual(['/comite/UNOCT', '/comite/UNOCT/sessao']);
 		expect(hrefs('/comite/[sigla]/sessao/agenda')).toEqual(['/comite/UNOCT', '/comite/UNOCT/sessao']);
 	});
+	it('para a mesa, as telas da sessão ficam sob o Painel (passo 43)', () => {
+		const mesa = (rota: string) => trilha(rota, { sigla: 'UNOCT' }, {}, true).map((e) => e.href);
+		expect(mesa('/comite/[sigla]/sessao/chamada')).toEqual(['/comite/UNOCT', '/comite/UNOCT/sessao/presidencia']);
+		expect(mesa('/comite/[sigla]/sessao/agenda')).toEqual(['/comite/UNOCT', '/comite/UNOCT/sessao/presidencia']);
+		expect(mesa('/comite/[sigla]/sessao/presidencia')).toEqual(['/comite/UNOCT']);
+	});
 	it('o documento usa o comitê carregado', () => {
 		expect(hrefs('/documento/[id]', { id: 'x' }, { comite: { sigla: 'CSNU' } })).toEqual(['/comite/CSNU', '/comite/CSNU/blocos']);
 	});

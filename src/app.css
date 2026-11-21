@@ -2308,6 +2308,101 @@ kbd {
 	color: inherit;
 }
 
+/* Passo 43: nas telas ao vivo, o nome abre a ficha por cima, sem sair da tela. */
+.nome-delegacao--ficha {
+	padding: 0;
+	border: 0;
+	background: none;
+	font: inherit;
+	text-align: left;
+	text-decoration: underline;
+	text-decoration-color: var(--cor-linha);
+	text-underline-offset: 3px;
+	cursor: pointer;
+}
+
+.nome-delegacao--ficha:hover {
+	text-decoration-color: currentColor;
+}
+
+/* A ficha da delegação: um painel na lateral direita. */
+dialog.ficha {
+	margin: 0 0 0 auto;
+	width: min(26rem, 100vw);
+	max-width: 100vw;
+	height: 100dvh;
+	max-height: 100dvh;
+	border: 0;
+	border-left: 3px solid var(--cor-fio-dourado);
+	overflow-y: auto;
+}
+
+.ficha-bandeira {
+	margin: 0 0 0.5rem;
+}
+
+.ficha-bandeira .bandeira {
+	width: 4rem;
+	height: auto;
+	box-shadow: 0 0 0 1px var(--cor-linha);
+}
+
+.ficha h3 {
+	margin-bottom: 0.25rem;
+	font-size: 1.5rem;
+}
+
+.ficha-dados {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	gap: 0.4rem 1rem;
+	margin: 1rem 0;
+}
+
+.ficha-dados dt {
+	font-size: 0.8rem;
+	font-variant-caps: all-small-caps;
+	letter-spacing: 0.08em;
+	color: var(--cor-texto-suave);
+}
+
+.ficha-dados dd {
+	margin: 0;
+}
+
+.ficha-dpo {
+	display: block;
+}
+
+/* Passo 43: "Voltar" para a tela de onde a pessoa veio, ao lado da trilha. */
+.caminho {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0.25rem 1.25rem;
+	margin: 0 0 0.75rem;
+}
+
+.caminho .trilha ol {
+	margin: 0;
+}
+
+.voltar {
+	font-size: 0.9rem;
+	font-weight: 600;
+	text-decoration: none;
+}
+
+.voltar:hover {
+	text-decoration: underline;
+}
+
+@media (max-width: 40rem) {
+	.caminho:has(.voltar) .trilha {
+		display: none;
+	}
+}
+
 /* Dois cronômetros (passo 28): o tempo de fala com valores rápidos e o relógio do debate. */
 .tempo-fala {
 	display: flex;
