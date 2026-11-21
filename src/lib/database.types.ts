@@ -251,6 +251,32 @@ isOneToOne: false
       referencedColumns: ["id","comite_id"]
     }
                   ]
+                },"bloqueio_bilhete": {
+                  Row: {
+                    "bloqueada_id": string,"comite_id": string,"criado_em": string,"delegacao_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "bloqueada_id": string,"comite_id": string,"criado_em"?: string,"delegacao_id": string
+                  }
+                  Update: {
+                    "bloqueada_id"?: string,"comite_id"?: string,"criado_em"?: string,"delegacao_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "bloqueio_bilhete_bloqueada_id_comite_id_fkey"
+      columns: ["bloqueada_id","comite_id"]
+isOneToOne: false
+      referencedRelation: "delegacao"
+      referencedColumns: ["id","comite_id"]
+    },{
+      foreignKeyName: "bloqueio_bilhete_delegacao_id_comite_id_fkey"
+      columns: ["delegacao_id","comite_id"]
+isOneToOne: false
+      referencedRelation: "delegacao"
+      referencedColumns: ["id","comite_id"]
+    }
+                  ]
                 },"carta": {
                   Row: {
                     "autor_id": string | null,"comite_id": string,"corpo": string,"enviada_em": string,"id": string,"publica": boolean,"remetente_bloco_id": string | null,"remetente_delegacao_id": string | null,"titulo": string
@@ -1685,6 +1711,9 @@ isOneToOne: false
                            },
 "bilhetes_denunciados_a_mim":
 { Args: Record<PropertyKey, never>; Returns: string[]
+                           },
+"bloquear_bilhetes":
+{ Args: { "p_bloquear": boolean,"p_comite": string,"p_delegacao": string }; Returns: undefined
                            },
 "checkin_por_cracha":
 { Args: { "p_codigo": string,"p_evento": string }; Returns: string

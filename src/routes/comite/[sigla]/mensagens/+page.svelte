@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { t } from '#lib/i18n.svelte.ts';
 	import { invalidate } from '$app/navigation';
+	import { page } from '$app/state';
 	import { caixa, mensagemDoEnvio } from '#lib/caixa.ts';
 	import { formatarQuando } from '#lib/cronograma.ts';
 	import { mensagemDeErro } from '#lib/sessao.ts';
@@ -26,8 +27,18 @@
 	let erro = $state('');
 	let mensagem = $state('');
 	let texto = $state<Record<string, string>>({ bilhete: '', mesa: '', interno: '', resposta: '' });
-	let para = $state('');
+	let para = $state(page.url.searchParams.get('para') ?? '');
 	let responderA = $state('');
+	let bloquear = $state('');
+
+	// Bloqueios de bilhetes (passo 24): os que a sua delegação fez e os que recebeu.
+	const bloqueei = $derived(new Set(data.bloqueios.filter((b) => b.delegacao_id === eu?.delegacao_id).map((b) => b.bloqueada_id)));
+	const meBloquearam = $derived(new Set(data.bloqueios.filter((b) => b.bloqueada_id === eu?.delegacao_id).map((b) => b.delegacao_id)));
+	const bloquearBilhetes = (delegacao: string, sim: boolean) =>
+		executar(
+			supabase.rpc('bloquear_bilhetes', { p_comite: data.comite.id, p_delegacao: delegacao, p_bloquear: sim }),
+			sim ? t('Bilhetes de {delegacao} bloqueados.', { delegacao: nome(delegacao) }) : t('Bilhetes de {delegacao} desbloqueados.', { delegacao: nome(delegacao) })
+		);
 
 	async function enviar(tipo: 'bilhete' | 'mesa' | 'interno', campo: string, destino: string | null, enviado: string) {
 		erro = mensagem = '';
@@ -69,7 +80,7 @@
 
 <p class="rotulo">
 	{t('Comitê')} · {data.comite.sigla}
-	<AoVivo comiteId={data.comite.id} {canais} tabelas={['mensagem', 'entrevista']} dependencia="app:mensagens" />
+	<AoVivo comiteId={data.comite.id} {canais} tabelas={['mensagem', 'entrevista', 'bloqueio_bilhete']} dependencia="app:mensagens" />
 </p>
 <h1>{t('Mensagens')}</h1>
 <p class="suave">
@@ -128,7 +139,11 @@
 				<label class="campo">
 					{t('Para')}
 					<select required bind:value={para}>
-						{#each data.delegacoes.filter((d) => d.id !== eu.delegacao_id) as d (d.id)}<option value={d.id}>{d.nome}</option>{/each}
+						{#each data.delegacoes.filter((d) => d.id !== eu.delegacao_id) as d (d.id)}
+							<option value={d.id} disabled={meBloquearam.has(d.id)}
+								>{d.nome}{meBloquearam.has(d.id) ? ` · ${t('não aceita seus bilhetes')}` : ''}</option
+							>
+						{/each}
 					</select>
 				</label>
 				<label class="campo">
@@ -137,6 +152,53 @@
 				</label>
 				<button class="botao">{t('Enviar bilhete')}</button>
 			</form>
+		{/if}
+	</section>
+
+	<section aria-labelledby="t-bloqueios">
+		<h2 id="t-bloqueios">{t('Bloqueios')}</h2>
+		<h3>{t('Sua delegação não recebe bilhetes de')}</h3>
+		<ul class="lista">
+			{#each data.delegacoes.filter((d) => bloqueei.has(d.id)) as d (d.id)}
+				<li>
+					<span>{d.nome}</span>
+					<button
+						class="botao botao--secundario botao--pequeno"
+						type="button"
+						aria-label={t('Desbloquear {delegacao}', { delegacao: d.nome })}
+						onclick={() => bloquearBilhetes(d.id, false)}>{t('Desbloquear')}</button
+					>
+				</li>
+			{:else}
+				<li class="suave">{t('Nenhuma delegação bloqueada.')}</li>
+			{/each}
+		</ul>
+		<form
+			class="formulario"
+			aria-label={t('Bloquear bilhetes')}
+			onsubmit={(e) => {
+				e.preventDefault();
+				if (bloquear) void bloquearBilhetes(bloquear, true).then(() => (bloquear = ''));
+			}}
+		>
+			<label class="campo">
+				{t('Delegação')}
+				<select required bind:value={bloquear}>
+					<option value="">{t('Escolha')}</option>
+					{#each data.delegacoes.filter((d) => d.id !== eu.delegacao_id && !bloqueei.has(d.id)) as d (d.id)}
+						<option value={d.id}>{d.nome}</option>
+					{/each}
+				</select>
+			</label>
+			<button class="botao botao--secundario">{t('Bloquear bilhetes desta delegação')}</button>
+		</form>
+		{#if meBloquearam.size}
+			<h3>{t('Não aceitam bilhetes da sua delegação')}</h3>
+			<ul class="lista" aria-label={t('Não aceitam bilhetes da sua delegação')}>
+				{#each data.delegacoes.filter((d) => meBloquearam.has(d.id)) as d (d.id)}
+					<li>{d.nome}</li>
+				{/each}
+			</ul>
 		{/if}
 	</section>
 
@@ -228,6 +290,17 @@
 			<button class="botao botao--secundario">{t('Salvar a regra')}</button>
 		</form>
 	</section>
+
+	{#if data.bloqueios.length}
+		<section aria-labelledby="t-bloqueios-comite">
+			<h2 id="t-bloqueios-comite">{t('Bloqueios no comitê')}</h2>
+			<ul class="lista">
+				{#each data.bloqueios as b (`${b.delegacao_id}-${b.bloqueada_id}`)}
+					<li>{t('{delegacao} não recebe bilhetes de {bloqueada}', { delegacao: nome(b.delegacao_id), bloqueada: nome(b.bloqueada_id) })}</li>
+				{/each}
+			</ul>
+		</section>
+	{/if}
 
 	<section aria-labelledby="t-delegacoes">
 		<h2 id="t-delegacoes">{t('Com as delegações')}</h2>

@@ -869,10 +869,27 @@ export const EN: Record<string, string> = {
 	'Votações desta sessão': 'Votes in this session',
 	'Nenhuma votação encerrada ainda.': 'No closed votes yet.',
 	'Votação nominal': 'Roll-call vote',
+	// Passo 24
+	'Bilhetes de {delegacao} bloqueados.': 'Notes from {delegacao} blocked.',
+	'Bilhetes de {delegacao} desbloqueados.': 'Notes from {delegacao} unblocked.',
+	'não aceita seus bilhetes': 'does not accept your notes',
+	'Bloqueios': 'Blocks',
+	'Sua delegação não recebe bilhetes de': 'Your delegation does not receive notes from',
+	'Desbloquear {delegacao}': 'Unblock {delegacao}',
+	'Desbloquear': 'Unblock',
+	'Nenhuma delegação bloqueada.': 'No delegation blocked.',
+	'Bloquear bilhetes': 'Block notes',
+	'Escolha': 'Choose',
+	'Bloquear bilhetes desta delegação': 'Block notes from this delegation',
+	'Não aceitam bilhetes da sua delegação': 'Do not accept notes from your delegation',
+	'Bloqueios no comitê': 'Blocks in the committee',
+	'{delegacao} não recebe bilhetes de {bloqueada}': '{delegacao} does not receive notes from {bloqueada}',
+	'Só delegações bloqueiam bilhetes.': 'Only delegations block notes.',
 };
 
 /** Mensagens do banco com partes variáveis: [padrão em português, tradução]. */
 export const EN_PADROES: [RegExp, string][] = [
+	[/^A delegação de (.+) não aceita bilhetes da sua delegação\.$/, 'The delegation of $1 does not accept notes from your delegation.'],
 	[/^A emenda precisa de pelo menos (\d+) signatários\.$/, 'The amendment needs at least $1 signatories.'],
 	[/^A não-confiança precisa de (\d+) assinaturas antes da votação\.$/, 'No confidence needs $1 signatures before the vote.'],
 	[/^O documento já teve as (\d+) rodadas\.$/, 'The document has already had its $1 rounds.'],

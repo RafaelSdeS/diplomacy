@@ -28,7 +28,7 @@ create temp table ids (nome text primary key, id uuid);
 grant all on ids to authenticated;
 create function pg_temp.id(p_nome text) returns uuid language sql as $$ select id from ids where nome = p_nome $$;
 create function pg_temp.item(p_texto text) returns uuid language sql as $$
-	select id from public.ponto_pauta where texto = p_texto
+	select id from public.ponto_pauta where texto = p_texto and comite_id = '00000000-0000-0000-0000-0000000000c1'
 $$;
 
 -- Antes da agenda adotada, só working papers
@@ -57,7 +57,7 @@ insert into ids values ('wp-b', public.criar_documento(pg_temp.id('bloco'), 'wor
 -- Editar a agenda adotada mantém o andamento dos itens de mesmo texto
 
 reset role;
-update public.ponto_pauta set status = 'em_debate' where texto = 'A.1 Atores';
+update public.ponto_pauta set status = 'em_debate' where id = pg_temp.item('A.1 Atores');
 insert into ids values ('a1', pg_temp.item('A.1 Atores'));
 
 select pg_temp.entrar('00000000-0000-0000-0000-0000000000a1');
@@ -68,11 +68,11 @@ select throws_ok(
 select pg_temp.entrar('00000000-0000-0000-0000-0000000000a3');
 select public.editar_agenda_adotada(pg_temp.id('proposta'),
 	'[{"texto": "A. Causas", "nivel": 0}, {"texto": "A.1 Atores", "nivel": 1}, {"texto": "C. Financiamento", "nivel": 0}]');
-select results_eq($$select texto from public.ponto_pauta order by ordem$$,
+select results_eq($$select texto from public.ponto_pauta where comite_id = '00000000-0000-0000-0000-0000000000c1' order by ordem$$,
 	array['A. Causas', 'A.1 Atores', 'C. Financiamento'], 'a agenda adotada tem os itens novos, na ordem');
 select results_eq($$select status from public.ponto_pauta where id = pg_temp.id('a1')$$, array['em_debate'],
 	'o item de mesmo texto continua o mesmo, com o andamento');
-select results_eq($$select status from public.ponto_pauta where texto = 'C. Financiamento'$$, array['pendente'],
+select results_eq($$select status from public.ponto_pauta where id = pg_temp.item('C. Financiamento')$$, array['pendente'],
 	'o item novo entra pendente');
 reset role; -- a mesa não vê rascunhos
 select results_eq($$select ponto_pauta_id from public.documento where id = pg_temp.id('wp-b')$$, array[null::uuid],
