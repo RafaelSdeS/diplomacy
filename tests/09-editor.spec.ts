@@ -1,7 +1,7 @@
 import { expect, test, type Browser, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { contaDaDelegacao } from '../scripts/delegacoes.ts';
-import { clienteComo, CONTAS, entrar } from './ajuda.ts';
+import { adotarAgenda, clienteComo, CONTAS, entrar } from './ajuda.ts';
 
 const BLOCOS = '/comite/CSNU-T/blocos';
 // O nome do bloco muda a cada execução: blocos não se repetem no comitê.
@@ -142,6 +142,7 @@ test('o working paper vai à mesa e, aprovado, aparece ao comitê', async ({ bro
 });
 
 test('o projeto junta cláusulas do working paper, recebe 5 assinaturas e vai à mesa', async ({ page }) => {
+	await adotarAgenda(CONTAS.mesa, 'CSNU-T', 1); // projeto só depois da agenda (passo 22)
 	await entrar(page, CONTAS.delegado);
 	await page.goto(BLOCOS);
 	await page.getByRole('article', { name: `Bloco ${BLOCO}` }).getByRole('button', { name: 'Novo documento' }).click();

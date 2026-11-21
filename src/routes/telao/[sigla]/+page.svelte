@@ -125,8 +125,11 @@
 
 	{#if naTela}
 		<aside class="telao-fila telao-votacao" aria-label={t('Votação')}>
-			<p class="rotulo">{naTela.nominal ? t('Votação nominal') : t('Votação')} · {naTela.objeto}</p>
-			{#if !naTela.aberta}<p class="telao-resultado">{textoResultado(naTela)}</p>{/if}
+			{#if naTela.aberta}
+				<p class="rotulo">{naTela.nominal ? t('Votação nominal') : t('Votação')} · {naTela.objeto}</p>
+			{:else}
+				<p class="telao-resultado">{naTela.objeto}. {textoResultado(naTela)}</p>
+			{/if}
 			<GradeVotos delegacoes={votantes} votos={naTela.votos} encerrada={!naTela.aberta} />
 		</aside>
 	{:else}
