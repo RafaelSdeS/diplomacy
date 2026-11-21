@@ -70,20 +70,20 @@ export async function adotarAgenda(contaMesa: string, sigla: string, topico: num
 export async function comiteEmDebate(contaMesa: string, sigla: string, contaDelegado: string) {
 	const ok = <T>(r: { data: T; error: { message: string } | null }) => {
 		if (r.error) throw new Error(r.error.message);
-		return r.data;
+		return r.data as NonNullable<T>;
 	};
 	const mesa = await clienteComo(contaMesa);
 	const comite = ok(await mesa.from('comite').select('id').eq('sigla', sigla).single()).id;
 	const estado = () => mesa.from('estado_sessao').select('sessao_id, fase, etapa_plenaria').eq('comite_id', comite).maybeSingle();
-	if (!ok(await estado())?.sessao_id) ok(await mesa.rpc('abrir_sessao', { p_comite: comite }));
+	if (!(await estado()).data?.sessao_id) ok(await mesa.rpc('abrir_sessao', { p_comite: comite }));
 	ok(await mesa.rpc('marcar_todas_presentes', { p_comite: comite }));
-	const agora = ok(await estado())!;
+	const agora = ok(await estado());
 	if (agora.fase === 'plenaria') {
 		if (agora.etapa_plenaria === 'briefing') ok(await mesa.rpc('avancar_plenaria', { p_comite: comite }));
 		if (agora.etapa_plenaria !== 'topico') ok(await mesa.rpc('avancar_plenaria', { p_comite: comite }));
 		const delegado = await clienteComo(contaDelegado);
 		ok(await delegado.rpc('enviar_ponto', { p_comite: comite, p_tipo: 'topico_no_topo', p_topico: 1 }));
-		const sessao = ok(await estado())!.sessao_id!;
+		const sessao = ok(await estado()).sessao_id!;
 		const ponto = ok(
 			await mesa.from('ponto_mocao').select('id').eq('sessao_id', sessao).eq('tipo', 'topico_no_topo').eq('status', 'aberto').limit(1).single()
 		).id;
