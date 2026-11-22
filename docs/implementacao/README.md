@@ -73,6 +73,13 @@ Cada passo só começa quando os passos de que ele depende estão prontos. As re
 
 **Fora do plano por enquanto** (itens 24 a 26 do documento): edição simultânea do mesmo texto (o editor por cláusula cobre posições e comentários); configuração para outros eventos (a base existe; esperar um segundo evento); habilidades especiais para delegações (não recomendado: a equipe de crise julga o realismo das diretivas de cada país).
 
+## Planos posteriores desta investigação
+
+- [Plano da coletiva de imprensa](../coletiva-de-imprensa.md): dinâmica oral, pergunta chamada ao vivo, pauta, telão, matéria e testes.
+- [Plano de segurança online](../seguranca-online.md): cache offline, RLS, Storage, sessões, demonstração e resposta a incidentes.
+- [Plano de interface oficial e demonstração](../interface-e-demonstracao.md): modals, ícones, ambiente separado, roteiro e cenário fictício.
+- [Ordem de prioridade consolidada](../ordem-de-prioridade.md): sequência recomendada de implementação dos planos discutidos.
+
 ## Convenções
 
 **Stack:** SvelteKit 3 com Svelte 5, em modo SPA (`adapter-static`), TypeScript, Supabase (Postgres, Auth, Realtime e Storage) e Cloudflare Pages. Node 24 (`.nvmrc`).
