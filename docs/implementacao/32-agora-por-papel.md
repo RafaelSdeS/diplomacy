@@ -11,6 +11,36 @@
 - Agora: delegado com a sessão ao vivo (fala, relógios, pausa, votação, placa) e "Na sua caixa" (bilhetes e rodadas); delegação que preside com o cartão dourado; mesa com atalhos e contadores; crise com as notas pendentes; press com as entrevistas; secretaria com atalhos.
 - `ui/BotaoPlaca.svelte` e `ui/Votar.svelte`, usados pela Sessão e pelo Agora.
 
+## Escopo reduzido para o piloto
+
+Para o piloto, o Agora deve resolver uma pergunta: **“o que eu preciso fazer agora?”** Não é necessário criar mais telas, preferências ou recomendações inteligentes nesta fase.
+
+- Manter **um único cartão em destaque** por papel.
+- Delegado: a sessão ao vivo vem primeiro; abaixo, apenas votação ativa, bilhete novo, chegada pendente, ponto ou moção pendente, DPO ou rodada com prazo.
+- Mesa: estado da sessão vem primeiro; abaixo, três ações diretas no máximo — chamada, pedidos da mesa e DPO/documentos enviados.
+- Press, crise e secretaria: manter somente a situação que exige ação imediata.
+- Cada pendência deve levar diretamente à ação ou abrir um modal curto. Não pode apontar apenas para uma lista que contém a ação.
+- Quando não houver pendência, mostrar estado atual, próxima etapa e “nada esperando você agora”. Não manter cartões vazios ou repetidos.
+- Retirar do piloto: favoritos pessoais, personalização de painel, cards por assunto, feeds secundários e agrupamento de alertas complexos.
+- Limitar a atualização ao vivo aos dados necessários para o cartão principal. Não solicitar dados adicionais de listas ou documentos que não estejam em uso.
+
+## Visual e confirmação no piloto
+
+- Um destaque marinho ou dourado no cartão do evento atual; demais itens em linhas compactas.
+- Usar selo e texto para cada estado, não apenas cor.
+- O cartão deve caber na tela principal sem esconder o próximo conteúdo operacional por excesso de rolagem.
+- Celular: até uma ação principal visível e uma lista curta de pendências.
+- Notebook: painel principal à esquerda e pendências compactas à direita, quando houver espaço.
+- Projetor e outras superfícies públicas não usam este painel, salvo quando a mesa estiver operando.
+
+## Critério de pronto do piloto
+
+- Ao abrir o app, uma pessoa nova entende em menos de dez segundos a situação e a próxima ação.
+- A pessoa não precisa entrar em três abas para concluir uma pendência comum.
+- Delegado, mesa, press, crise e secretaria veem dados diferentes e apenas os dados úteis ao seu papel.
+- Reconexão, atraso e dados pendentes são visíveis sem substituir o estado conhecido por uma tela vazia.
+- O consumo de dados continua próximo dos limites já medidos; o cartão não amplia a consulta da sessão.
+
 ## Antes
 
 - `src/routes/+page.svelte` e `+page.ts`: cartões de acontecendo agora (fase de cada comitê e cronograma), depois, avisos, respostas da crise, na press, seus DPOs e você.

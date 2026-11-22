@@ -137,6 +137,18 @@ O visual deve transmitir formalidade, clareza e imersão diplomática. Deve cons
 
 Além da reorganização das abas e da substituição de links por modais, o projeto pode ganhar em clareza e confiabilidade com as seguintes mudanças:
 
+#### Prioridades do piloto
+
+- A primeira entrega da área unificada da sessão deve mostrar orador, relógios, tópico, fila curta, votação ativa e a ação prioritária da delegação.
+- A tela não deve mostrar todos os recursos ao mesmo tempo. Pontos, moções, placa, voto e crise aparecem somente quando forem relevantes.
+- A sessão deve incluir uma área curta para nota rápida e rascunho da próxima fala, reutilizando o caderno já planejado.
+- O rascunho não precisa virar um editor completo no piloto. Deve permitir salvar uma ideia, ligar automaticamente sessão, tópico e orador e continuar disponível ao mudar de tela.
+- No notebook, apresentar a sessão e o rascunho em duas áreas próximas. No celular, usar uma área curta ou folha inferior sem perder o contexto.
+- A tela “Agora” deve virar um painel por pendências: uma ação principal em destaque e poucas linhas com ações diretas.
+- Delegado, mesa, press, crise e secretaria devem ver apenas o que pode exigir ação naquele momento.
+- Não adicionar favoritos, personalização, apresentação avançada de discurso, presença por tecla ou discussão por cláusula nesta etapa.
+- Priorizar hierarquia formal, legibilidade, contraste e ação clara em vez de novos módulos.
+
 #### Painel inicial orientado a pendências
 
 - Transformar a tela “Agora” em um painel de prioridades para cada papel.
