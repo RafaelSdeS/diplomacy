@@ -112,6 +112,7 @@ As fases do projeto (validação, piloto, evento e crescimento) e o calendário 
 - [Plano de interface oficial e demonstração](docs/interface-e-demonstracao.md): modals, ícones, ambiente público fictício e roteiro.
 - [Ordem de prioridade dos planos](docs/ordem-de-prioridade.pdf): consolidação e sequência recomendada para o trabalho futuro.
 - Protótipos visuais: [coletiva de imprensa](docs/prototipos-coletiva.pdf), [interface e demonstração](docs/prototipos-interface-demonstracao.pdf) e [segurança ao sair](docs/prototipos-seguranca.pdf).
+- Propostas visuais adicionais: [edição colaborativa](docs/prototipos-editor-documentos.pdf), [preparação de fala](docs/prototipos-preparacao-fala.pdf), [Agora e sessão](docs/prototipos-agora-sessao.pdf) e [melhorias gerais de interface](docs/prototipos-melhorias-interface.pdf).
 - Imagens dos protótipos em [docs/imagens/](docs/imagens/). O HTML-fonte está em [docs/prototipos-telas.html](docs/prototipos-telas.html).
 - [Plano da edição colaborativa de documentos (PDF)](docs/plano-editor-documentos.pdf): edição em tempo real, propostas por cláusula, rodadas curtas, conflitos e fusão de working papers.
 - [Plano de preparação de discursos durante o debate (PDF)](docs/plano-preparacao-discursos.pdf): notas rápidas, contexto das delegações, rascunho por blocos e ensaio da fala.

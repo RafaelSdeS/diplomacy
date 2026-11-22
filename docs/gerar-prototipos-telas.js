@@ -23,7 +23,14 @@ const screens = [
 	['demo', 'demonstracao-escolha-papel.png'],
 	['delegacao', 'ficha-delegacao.png'],
 	['mobile', 'agora-mobile.png'],
-	['seguranca', 'saida-segura.png']
+	['seguranca', 'saida-segura.png'],
+	['editor-clausulas', 'editor-estrutura-clausulas.png'],
+	['proposta-clausula', 'editor-proposta-modal.png'],
+	['rodada-documento', 'editor-encerramento-rodada.png'],
+	['mesa-preparacao-fala', 'preparacao-fala-mesa.png'],
+	['captura-nota', 'preparacao-fala-captura.png'],
+	['agora-unificado', 'agora-unificado.png'],
+	['sessao-unificada', 'sessao-unificada.png']
 ];
 
 for (const width of [1200]) {
@@ -59,6 +66,10 @@ async function gerarPdf(nome, ids) {
 await gerarPdf('prototipos-coletiva.pdf', ['coletiva-pauta', 'resposta-modal', 'telao']);
 await gerarPdf('prototipos-interface-demonstracao.pdf', ['demo', 'delegacao', 'mobile']);
 await gerarPdf('prototipos-seguranca.pdf', ['seguranca']);
+await gerarPdf('prototipos-editor-documentos.pdf', ['editor-clausulas', 'proposta-clausula', 'rodada-documento']);
+await gerarPdf('prototipos-preparacao-fala.pdf', ['mesa-preparacao-fala', 'captura-nota']);
+await gerarPdf('prototipos-agora-sessao.pdf', ['agora-unificado', 'sessao-unificada', 'delegacao']);
+await gerarPdf('prototipos-melhorias-interface.pdf', ['demo', 'mobile', 'delegacao', 'seguranca']);
 
 await browser.close();
 server.kill('SIGTERM');
