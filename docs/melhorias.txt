@@ -1,0 +1,39 @@
+## Melhorar a organização das abas Comitê e Sessão
+
+A aba **Comitê** precisa de uma organização visual mais clara. Atualmente, os links aparecem em uma lista simples, sem indicar quais são as funções principais, quais estão relacionadas entre si ou qual deve ser o fluxo de uso. A área da **mesa** e a área das **delegações** também parecem elementos posicionados de forma provisória, sem uma hierarquia definida e sem deixar claro como se relacionam com o restante do comitê.
+
+### Aba Comitê
+
+- Organizar os links em grupos funcionais, em vez de exibi-los como uma lista única.
+- Destacar a mesa como a área central do comitê, com informações como fase atual, ordem dos trabalhos, presidência e status da sessão.
+- Apresentar as delegações em uma seção própria, com cartões ou uma tabela organizada. Cada delegação deve mostrar, de forma rápida, nome, país, representante, posição/status e possíveis ações disponíveis.
+- Diferenciar visualmente informações de consulta, ações operacionais e áreas de acompanhamento.
+- Usar títulos, descrições curtas, ícones ou cards para explicar o propósito de cada opção.
+- Definir uma hierarquia visual que indique o que é mais importante no momento, evitando que mesa, delegações e links concorram pela atenção.
+- Manter ações frequentes acessíveis sem obrigar o usuário a procurar em uma lista extensa.
+
+### Aba Sessão
+
+As opções da aba **Sessão** também estão dispostas de maneira solta, sem uma estrutura que ajude o usuário a entender o funcionamento da sessão. Atualmente aparecem lado a lado: **Agenda, Votações, Caderno, Blocos e documentos, Cartas, Mensagens, Notas de crise e Telão**.
+
+Esses itens deveriam ser agrupados por finalidade e apresentados em uma navegação mais consistente. Uma possível organização seria:
+
+- **Condução da sessão:** Agenda e Votações.
+- **Preparação e produção:** Caderno, Blocos e documentos e Cartas.
+- **Comunicação:** Mensagens.
+- **Acompanhamento e registro:** Notas de crise.
+- **Exibição:** Telão.
+
+Cada opção deve ter uma identificação clara e, quando necessário, uma breve descrição do que pode ser feito nela. A tela inicial da aba Sessão pode funcionar como um painel-resumo, mostrando o estado atual da agenda, a próxima votação, documentos recentes, mensagens pendentes e alertas importantes. A navegação deve deixar evidente onde o usuário está, permitir retornar facilmente ao painel da sessão e preservar o contexto ao alternar entre as áreas.
+
+### Resultado esperado
+
+As duas abas devem deixar de parecer um conjunto de links e passar a funcionar como áreas de trabalho estruturadas. O usuário deve conseguir entender rapidamente:
+
+1. onde está;
+2. qual é a situação atual do comitê ou da sessão;
+3. quais ações são prioritárias;
+4. onde encontrar cada recurso; e
+5. como voltar ao contexto principal sem se perder.
+
+Além da reorganização visual, é importante aplicar padrões consistentes de layout, espaçamento, títulos, estados ativos, cards e componentes de navegação nas duas abas.
