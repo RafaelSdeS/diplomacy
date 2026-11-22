@@ -1,0 +1,968 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Diplomacy · melhorias de interface e experiência</title>
+<style>
+  @page {
+    size: A4;
+    margin: 20mm 18mm 22mm 18mm;
+    @bottom-left { content: "Diplomacy · melhorias de interface e experiência"; font: 8pt "Noto Sans", sans-serif; color: #7a8594; }
+    @bottom-right { content: counter(page) " / " counter(pages); font: 8pt "Noto Sans", sans-serif; color: #7a8594; }
+  }
+  :root {
+    --ink: #1b2430;
+    --quiet: #5d6878;
+    --line: #d5dbe3;
+    --accent: #1f4e79;
+    --tint: #eaf0f6;
+    --gold: #8c6d2c;
+    --gold-tint: #f7f0e1;
+    --warn: #8a5a00;
+    --warn-tint: #fdf5e4;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font: 10pt/1.55 "Noto Sans", "DejaVu Sans", sans-serif;
+    color: var(--ink);
+    margin: 0;
+    background: #fff;
+  }
+  h1, h2, h3 {
+    font-family: "Noto Serif", "DejaVu Serif", serif;
+    color: var(--accent);
+    line-height: 1.25;
+    break-after: avoid;
+  }
+  h1 { font-size: 24pt; margin: 6pt 0 4pt; }
+  h2 {
+    font-size: 15pt;
+    margin: 22pt 0 7pt;
+    padding-bottom: 3pt;
+    border-bottom: 1.5px solid var(--accent);
+  }
+  h3 { font-size: 11.5pt; margin: 13pt 0 4pt; color: var(--ink); }
+  p { margin: 0 0 7pt; }
+  ul, ol { margin: 0 0 8pt; padding-left: 16pt; }
+  li { margin-bottom: 2.5pt; }
+  code, pre {
+    font-family: "DejaVu Sans Mono", monospace;
+    font-size: 8.5pt;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 6pt 0 10pt;
+    font-size: 8.8pt;
+  }
+  th {
+    background: var(--tint);
+    color: var(--accent);
+    text-align: left;
+    font-weight: 700;
+  }
+  th, td {
+    border: 1px solid var(--line);
+    padding: 5pt 7pt;
+    vertical-align: top;
+  }
+  tr { break-inside: avoid; }
+  .kicker {
+    font-size: 9pt;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--quiet);
+    margin: 0 0 4pt;
+  }
+  .subtitle { font-size: 12pt; color: var(--quiet); margin: 0 0 4pt; }
+  .meta { font-size: 9pt; color: var(--quiet); margin-bottom: 16pt; }
+  .summary {
+    background: var(--tint);
+    border-left: 4px solid var(--accent);
+    padding: 10pt 14pt;
+    border-radius: 0 6px 6px 0;
+    break-inside: avoid;
+  }
+  .summary p:last-child { margin-bottom: 0; }
+  .note {
+    background: var(--warn-tint);
+    border-left: 4px solid var(--warn);
+    padding: 8pt 12pt;
+    border-radius: 0 6px 6px 0;
+    break-inside: avoid;
+    margin: 8pt 0 10pt;
+  }
+  .note p:last-child { margin-bottom: 0; }
+  .lead { font-size: 10.5pt; break-inside: avoid; }
+  .muted { color: var(--quiet); }
+  .two {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14pt;
+    break-inside: avoid;
+  }
+  .panel {
+    border: 1px solid var(--line);
+    border-radius: 8pt;
+    padding: 9pt 11pt 5pt;
+    break-inside: avoid;
+  }
+  .panel h3 { margin-top: 0; }
+  .priority {
+    display: inline-block;
+    border: 1px solid var(--accent);
+    border-radius: 999px;
+    color: var(--accent);
+    font-size: 8pt;
+    padding: 1pt 7pt;
+    margin: 0 3pt 4pt 0;
+  }
+  .priority.high { background: var(--accent); color: #fff; }
+  .priority.gold { border-color: var(--gold); color: var(--gold); }
+  .checklist { list-style: none; padding-left: 0; }
+  .checklist li::before {
+    content: "☐";
+    color: var(--accent);
+    margin-right: 6pt;
+  }
+  .wire {
+    border: 1.5px solid #2b3542;
+    border-radius: 10pt;
+    padding: 9pt;
+    background: #fbfcfd;
+    break-inside: avoid;
+  }
+  .wire-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1.5px solid var(--accent);
+    padding-bottom: 5pt;
+    margin-bottom: 7pt;
+  }
+  .wire-title {
+    font-family: "Noto Serif", serif;
+    font-size: 12pt;
+    color: var(--accent);
+  }
+  .wire-status {
+    font-size: 7.5pt;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    border-radius: 999px;
+    padding: 1pt 6pt;
+  }
+  .wire-grid {
+    display: grid;
+    grid-template-columns: 1.15fr .85fr;
+    gap: 7pt;
+  }
+  .wire-card {
+    border: 1px solid var(--line);
+    border-radius: 6pt;
+    background: #fff;
+    padding: 6pt 7pt;
+    margin-bottom: 5pt;
+  }
+  .wire-card.main {
+    border: 1.5px solid var(--accent);
+    background: var(--tint);
+  }
+  .wire-card b { color: var(--accent); }
+  .small { font-size: 8.5pt; }
+  figure {
+    margin: 10pt 0 14pt;
+    break-inside: avoid;
+  }
+  figure svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  figcaption {
+    font-size: 8.5pt;
+    color: var(--quiet);
+    margin-top: 4pt;
+  }
+  .caption-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10pt;
+  }
+  .mockup-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10pt;
+  }
+  .mockup {
+    border: 1.5px solid #2b3542;
+    border-radius: 8pt;
+    background: #fbfcfd;
+    break-inside: avoid;
+    overflow: hidden;
+  }
+  .mockup .faixa {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 42pt;
+    padding: 7pt 10pt;
+    background: var(--accent);
+    color: #fff;
+  }
+  .mockup .faixa .marca {
+    font-family: "Noto Serif", serif;
+    font-size: 11pt;
+    font-weight: 700;
+  }
+  .mockup .faixa .contexto {
+    color: #d5deea;
+    font-size: 7.5pt;
+  }
+  .mockup-principal {
+    display: grid;
+    grid-template-columns: 92pt 1fr;
+  }
+  .mockup-nav {
+    padding: 8pt;
+    border-right: 1px solid var(--line);
+    background: #fff;
+  }
+  .mockup-nav .ativo {
+    border-left: 3px solid #c0a45a;
+    background: var(--tint);
+    color: var(--accent);
+  }
+  .mockup-nav div {
+    padding: 5pt 7pt;
+    margin-bottom: 3pt;
+    font-size: 8pt;
+  }
+  .mockup-conteudo {
+    padding: 9pt;
+  }
+  .mockup-conteudo .kicker-mini {
+    color: var(--quiet);
+    font-size: 7pt;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+  .mockup-conteudo h4 {
+    margin: 3pt 0 7pt;
+    color: var(--accent);
+    font-family: "Noto Serif", serif;
+    font-size: 13pt;
+  }
+  .mockup-destaque {
+    border-radius: 6pt;
+    background: var(--accent);
+    color: #fff;
+    padding: 8pt 9pt;
+  }
+  .mockup-destaque .mini {
+    color: #d5deea;
+    font-size: 7pt;
+  }
+  .mockup-destaque strong {
+    display: block;
+    margin: 4pt 0 3pt;
+    font-family: "Noto Serif", serif;
+    font-size: 11pt;
+  }
+  .mockup-destaque .acao {
+    display: inline-block;
+    margin-top: 5pt;
+    border-radius: 4pt;
+    background: #fff;
+    color: var(--accent);
+    padding: 3pt 8pt;
+    font-size: 8pt;
+    font-weight: 700;
+  }
+  .mockup-linha {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6pt;
+    margin-top: 6pt;
+    border: 1px solid var(--line);
+    border-radius: 5pt;
+    background: #fff;
+    padding: 6pt 8pt;
+    font-size: 8pt;
+  }
+  .mockup-linha strong {
+    color: var(--accent);
+  }
+  .modal-mockup {
+    min-height: 210pt;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12pt;
+    background: #eef2f5;
+  }
+  .modal-folha {
+    width: 86%;
+    border: 1.5px solid var(--accent);
+    border-radius: 7pt;
+    background: #fff;
+    overflow: hidden;
+  }
+  .modal-folha.confirmacao {
+    border-color: var(--gold);
+  }
+  .modal-folha .modal-cabecalho {
+    padding: 7pt 9pt;
+    background: var(--accent);
+    color: #fff;
+  }
+  .modal-folha.confirmacao .modal-cabecalho {
+    background: var(--gold-tint);
+    color: var(--gold);
+  }
+  .modal-folha .modal-cabecalho strong {
+    font-family: "Noto Serif", serif;
+  }
+  .modal-folha .modal-corpo {
+    padding: 9pt;
+    font-size: 8.5pt;
+  }
+  .modal-folha .modal-corpo p {
+    margin-bottom: 5pt;
+  }
+  .modal-acoes {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6pt;
+  }
+  .modal-acoes span {
+    border: 1px solid var(--line);
+    border-radius: 4pt;
+    padding: 4pt 7pt;
+    font-size: 8pt;
+  }
+  .modal-acoes .primario {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: #fff;
+  }
+  .telefone-mockup {
+    width: 178pt;
+    margin: 10pt auto;
+    border: 2px solid #2b3542;
+    border-radius: 14pt;
+    background: #fff;
+    padding: 8pt;
+  }
+  .telefone-mockup .telefone-faixa {
+    margin: -8pt -8pt 8pt;
+    border-radius: 11pt 11pt 0 0;
+    background: var(--accent);
+    color: #fff;
+    padding: 7pt 8pt;
+  }
+  .telefone-mockup .telefone-faixa strong {
+    display: block;
+    font-family: "Noto Serif", serif;
+  }
+  .telefone-mockup .destaque {
+    border-radius: 5pt;
+    background: var(--accent);
+    color: #fff;
+    padding: 7pt;
+  }
+  .telefone-mockup .destaque strong {
+    display: block;
+    margin: 3pt 0;
+    font-family: "Noto Serif", serif;
+  }
+  .telefone-mockup .destaque span {
+    font-size: 7.5pt;
+  }
+</style>
+</head>
+<body>
+
+<p class="kicker">Diplomacy · Direção de produto e interface</p>
+<h1>Melhorias de organização, visual e usabilidade</h1>
+<p class="subtitle">Uma experiência diplomática coesa para Comitê e Sessão, com navegação contextual e poucas decisões desnecessárias</p>
+<p class="meta">22 de novembro de 2026 · Documento detalhado para implementação e validação</p>
+
+<div class="summary">
+  <p><b>Objetivo.</b> Transformar Comitê e Sessão de uma coleção de links em áreas de trabalho claras, elegantes e imersivas. Toda a interface deve parecer parte do mesmo produto diplomático: formal, específica e fácil de usar.</p>
+  <p><b>Diretriz principal.</b> Mostrar o contexto atual, destacar a ação mais importante e revelar opções secundárias somente quando forem necessárias. Os menus suspensos padrão devem ser exceção. Seleções importantes, detalhes e ações contextuais devem aparecer em modais, painéis laterais ou componentes próprios da identidade do Diplomacy.</p>
+  <p><b>Simplicidade máxima.</b> Quanto menos decisões, menos cliques e menos mudanças de contexto, melhor. A interface deve ser <i>unclustered</i>: clara, organizada e visualmente leve. Não deve parecer um painel administrativo cheio de cartões, opções e indicadores.</p>
+  <p><b>Formalidade diplomática.</b> O resultado deve parecer adequado ao uso por delegações e mesa: discreto, confiável e profissional. Deve evitar linguagem juvenil, animações decorativas, gamificação e componentes genéricos de redes sociais ou ferramentas corporativas.</p>
+  <p><b>Critério de sucesso.</b> Uma pessoa que nunca viu o app deve conseguir descobrir onde está, compreender a situação da sessão ou do comitê, identificar a próxima ação e voltar ao contexto principal sem depender de explicação externa.</p>
+</div>
+
+<h2>Proibição prática de complexidade desnecessária</h2>
+<table>
+  <thead><tr><th>Situação</th><th>Decisão correta</th></tr></thead>
+  <tbody>
+    <tr><td>A ação principal está disponível na tela</td><td>Mostrar um único botão claro, sem exigir menu ou navegação</td></tr>
+    <tr><td>A informação é curta e depende do contexto</td><td>Usar modal ou painel lateral, sem mudar de página</td></tr>
+    <tr><td>Há apenas duas ou três ações relacionadas</td><td>Exibir diretamente no local da tarefa</td></tr>
+    <tr><td>Há muitas ações secundárias</td><td>Ocultar em “Mais opções” ou em contexto; não criar uma grade permanente</td></tr>
+    <tr><td>A tarefa exige concentração prolongada</td><td>Usar página dedicada somente por esse motivo</td></tr>
+  </tbody>
+</table>
+
+<h2>1. Diagnóstico atual</h2>
+<p class="lead">As duas abas têm uma base funcional válida, mas podem fazer a navegação parecer uma lista de ferramentas. Isso aumenta o esforço cognitivo e dificulta distinguir uma consulta de uma ação operacional.</p>
+
+<table>
+  <thead>
+    <tr><th>Problema</th><th>Efeito no usuário</th><th>Direção da melhoria</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Comitê apresenta links sem explicar sua relação ou importância</td><td>O usuário precisa adivinhar qual área usar primeiro</td><td>Agrupar por finalidade e destacar mesa, estado atual e ações prioritárias</td></tr>
+    <tr><td>Mesa e delegações não têm hierarquia visual clara</td><td>Informação central e recursos secundários disputam a atenção</td><td>Transformar mesa em área central e delegações em cartões de fácil escaneamento</td></tr>
+    <tr><td>Sessão reúne opções diferentes lado a lado</td><td>A função de cada opção não é evidente</td><td>Organizar por condução, produção, comunicação, acompanhamento e exibição</td></tr>
+    <tr><td>Telas abertas podem parecer desconectadas do contexto</td><td>É difícil saber onde voltar ou o que continua acontecendo</td><td>Manter comitê, sessão e posição atual visíveis na navegação</td></tr>
+    <tr><td>Menus ou páginas inteiras para tarefas rápidas</td><td>Mais passos do que o necessário e maior perda de contexto</td><td>Usar modal, painel lateral ou diálogo contextual</td></tr>
+  </tbody>
+</table>
+
+<h2>2. Principais princípios da experiência</h2>
+
+<div class="two">
+  <div class="panel">
+    <h3>Contexto antes das opções</h3>
+    <p>A pessoa precisa ver primeiro em que situação está. Comitê, sessão, fase atual, presidência e estado de votação devem ficar visíveis antes de uma longa coleção de ações.</p>
+  </div>
+  <div class="panel">
+    <h3>Uma ação prioritária por área</h3>
+    <p>Não usar todos os botões com o mesmo peso. A ação principal recebe destaque; ações secundárias permanecem disponíveis sem competir visualmente.</p>
+  </div>
+</div>
+<div class="two" style="margin-top:14pt">
+  <div class="panel">
+    <h3>Poucos destinos, rápidos acessos</h3>
+    <p>Navegação deve servir a tarefas reais. Itens pouco frequentes podem ficar em áreas contextuais em vez de ocupar o menu permanente.</p>
+  </div>
+  <div class="panel">
+    <h3>Ação no contexto certo</h3>
+    <p>Consultar uma delegação, confirmar uma votação ou escrever uma nota não deve obrigar a saída da tela principal quando uma interação curta resolve o trabalho.</p>
+  </div>
+</div>
+
+<h2>Exemplos visuais propostos</h2>
+<p class="lead">Os esquemas abaixo são referências de hierarquia e de comportamento. Eles não definem uma tela pronta, mas mostram como uma interface formal pode concentrar a informação e reduzir a quantidade de decisões.</p>
+
+<figure>
+<div class="mockup">
+  <div class="faixa">
+    <div><span class="marca">DIPLOMACY</span><div class="contexto">Conferência · CSNU</div></div>
+    <div class="contexto">Ir para… · Ctrl K&nbsp;&nbsp; França · Delegado</div>
+  </div>
+  <div class="mockup-principal">
+    <nav class="mockup-nav" aria-label="Exemplo de navegação">
+      <div class="ativo">Agora</div>
+      <div>Sessão</div>
+      <div>Comitê</div>
+      <div>Documentos</div>
+      <div>Mensagens</div>
+      <div>Mais opções</div>
+    </nav>
+    <div class="mockup-conteudo">
+      <div class="kicker-mini">Comitê · CSNU</div>
+      <h4>Sessão em andamento</h4>
+      <div class="mockup-grid">
+        <div class="mockup-destaque">
+          <div class="mini">PRÓXIMA AÇÃO</div>
+          <strong>Votação aberta</strong>
+          Projeto de resolução CSNU/RES/3
+          <div><span class="acao">Registrar voto</span></div>
+        </div>
+        <div class="wire-card">
+          <div class="kicker-mini">Estado da sala</div>
+          <strong>França tem a palavra</strong>
+          <p class="small">Tempo restante · 01:42<br>Debate moderado</p>
+        </div>
+      </div>
+      <div class="kicker-mini" style="margin-top:8pt">Pendências</div>
+      <div class="mockup-linha"><span>DPO do tópico 2 aguarda ajustes da mesa</span><strong>Revisar ›</strong></div>
+      <div class="mockup-linha"><span>1 bilhete não lido</span><strong>Abrir ›</strong></div>
+    </div>
+  </div>
+</div>
+<figcaption><b>1. Visão principal no computador.</b> Uma barra lateral curta substitui a grade de links. O estado atual ocupa o centro, a próxima ação recebe o único destaque forte e as pendências ficam em uma lista compacta.</figcaption>
+</figure>
+
+<figure>
+<div class="caption-grid">
+<div class="modal-mockup">
+  <div class="modal-folha">
+    <div class="modal-cabecalho"><strong>França</strong></div>
+    <div class="modal-corpo">
+      <p><b>República Francesa</b><br><span class="muted">Delegada: Ana Silva · membro</span></p>
+      <div class="wire-card"><b>Com a palavra</b><br><span class="small">Tempo restante · 01:42</span></div>
+      <div class="modal-acoes"><span class="primario">Enviar bilhete</span><span>Abrir delegação</span></div>
+    </div>
+  </div>
+</div>
+<div class="modal-mockup">
+  <div class="modal-folha confirmacao">
+    <div class="modal-cabecalho"><strong>Encerrar a votação?</strong></div>
+    <div class="modal-corpo">
+      <p><b>Projeto de resolução CSNU/RES/3</b></p>
+      <p>O resultado será registrado e deixará de receber votos.</p>
+      <p class="muted">147 delegações podem ser afetadas pelo resultado.</p>
+      <div class="modal-acoes"><span>Cancelar</span><span class="primario">Encerrar votação</span></div>
+    </div>
+  </div>
+</div>
+<figcaption><b>2. Modais contextuais.</b> À esquerda, clicar em uma delegação abre sua ficha sem sair da sessão. À direita, uma confirmação explica a consequência antes de uma ação coletiva irreversível.</figcaption>
+</figure>
+
+<figure>
+<div class="caption-grid">
+  <div class="panel">
+    <h3>A ação principal vem primeiro</h3>
+    <p>O usuário não precisa subir a página nem entrar em uma aba secundária.</p>
+    <p><b>Navegação fixa:</b> Agora · Sessão · Comitê · Mais</p>
+  </div>
+  <div>
+    <div class="telefone-mockup">
+      <div class="telefone-faixa"><span class="kicker-mini" style="color:#d5deea">Sessão · CSNU</span><strong>Sessão 3</strong></div>
+      <div class="destaque"><span>VOCÊ TEM A PALAVRA</span><strong>03:00 restantes</strong><span>Encerrar fala</span></div>
+      <div class="mockup-linha"><span>Votação aberta</span><strong>Votar ›</strong></div>
+      <div class="mockup-linha"><span>1 bilhete não lido</span><strong>Abrir ›</strong></div>
+    </div>
+  </div>
+</div>
+<figcaption><b>3. Exemplo móvel.</b> A prioridade do momento ocupa o topo, há apenas alguns destinos permanentes e cada pendência oferece uma ação curta sem exigir exploração de menus.</figcaption>
+</figure>
+
+<h2>3. Área Comitê</h2>
+<p>A aba <b>Comitê</b> deve representar o ambiente de trabalho da mesa e das delegações. Ela não deve funcionar como uma biblioteca de links, mas como uma visão organizada do que está acontecendo e do que pode ser feito.</p>
+
+<h3>Estrutura recomendada</h3>
+<div class="wire">
+  <div class="wire-head">
+    <span class="wire-title">Comitê · Conselho de Segurança</span>
+    <span class="wire-status">Sessão em andamento</span>
+  </div>
+  <div class="wire-grid">
+    <div>
+      <div class="wire-card main">
+        <b>Mesa e condução</b><br>
+        Fase atual · presidência · próximo item · ordem dos trabalhos
+      </div>
+      <div class="wire-card">
+        <b>Delegações</b><br>
+        Busca por país ou status · cartões com bandeira e posição
+      </div>
+      <div class="wire-card">
+        <b>Atividade prioritária</b><br>
+        Pedidos pendentes · votação aberta · documentos a avaliar
+      </div>
+    </div>
+    <div>
+      <div class="wire-card">
+        <b>Estado da sessão</b><br>
+        Abertura concluída · quórum · com a palavra
+      </div>
+      <div class="wire-card">
+        <b>Ações frequentes</b><br>
+        Chamada · agenda · votação · telão
+      </div>
+      <div class="wire-card">
+        <b>Registro</b><br>
+        Crise · mensagens · documentos recentes
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3>Organização dos elementos</h3>
+<ul>
+  <li><b>Mesa central:</b> apresentar fase atual, ordem dos trabalhos, presidência, status da sessão, próximo horário ou ação relevante e um acesso direto ao que está ativo.</li>
+  <li><b>Delegações:</b> mostrar bandeira, país, representante, posição ou status e possíveis ações. A informação deve caber em cartões ou em uma tabela visual, não em texto corrido.</li>
+  <li><b>Ações agrupadas por finalidade:</b> condução da sessão, chamadas e presenças, documentos, votações e acompanhamento devem formar grupos distintos.</li>
+  <li><b>História e status:</b> diferenciar consulta, operação e registro por peso visual e por rótulos claros, sem exigir conhecimento prévio.</li>
+  <li><b>Ficha da delegação:</b> abrir em modal ou painel lateral representantes, DPO, posição atual, votos recentes, bilhetes, documentos e ações permitidas.</li>
+</ul>
+
+<h3>Como se comportar em cada tamanho de tela</h3>
+<table>
+  <thead><tr><th>Tela</th><th>Comportamento esperado</th></tr></thead>
+  <tbody>
+    <tr><td>Celular</td><td>Mesa em destaque no topo, delegações acessíveis por busca ou cartões maiores e ações secundárias dentro de atalhos claramente identificados</td></tr>
+    <tr><td>Notebook</td><td>Visão principal em painel único, mesa e atividade atual em destaque e delegações em área lateral ou tabela responsiva</td></tr>
+    <tr><td>Tela ampla</td><td>Distribuir mesa, atividade e delegações sem criar vazios excessivos; manter o contexto da sessão em todas as colunas</td></tr>
+  </tbody>
+</table>
+
+<h2>4. Área Sessão</h2>
+<p>A aba <b>Sessão</b> deve funcionar como o centro de condução da reunião. O painel inicial é uma síntese da situação e não uma página de navegação com todos os módulos no mesmo nível.</p>
+
+<h3>Grupos recomendados</h3>
+<table>
+  <thead><tr><th>Grupo</th><th>Conteúdo</th><th>Informação prioritária</th></tr></thead>
+  <tbody>
+    <tr><td>Condução da sessão</td><td>Agenda, pontos e moções, votações</td><td>Fase atual, próximo item e pendências</td></tr>
+    <tr><td>Preparação e produção</td><td>Caderno, blocos e documentos, cartas</td><td>Documentos recentes e aguardando avaliação</td></tr>
+    <tr><td>Comunicação</td><td>Mensagens e bilhetes</td><td>Mensagens pendentes e bloqueios</td></tr>
+    <tr><td>Acompanhamento e registro</td><td>Notas de crise, histórico e situação</td><td>Alertas, prazo e responsabilidade</td></tr>
+    <tr><td>Exibição</td><td>Telão e visualização pública</td><td>Estado exibido e última atualização</td></tr>
+  </tbody>
+</table>
+
+<h3>Painel-resumo da sessão</h3>
+<ul>
+  <li>Estado atual da sessão e fase da agenda em destaque.</li>
+  <li>Ordem dos trabalhos e próximo marco relevante.</li>
+  <li>Próxima votação ou votação ativa, com acesso direto à ação necessária.</li>
+  <li>Documentos recentes, documentos pendentes e mudanças relevantes.</li>
+  <li>Mensagens pendentes e alertas de crise ou de prazo.</li>
+  <li>Indicação clara de quem está com a palavra, quando aplicável.</li>
+</ul>
+
+<h3>Ao alternar entre áreas</h3>
+<ul>
+  <li>Mostrar no cabeçalho comitê, sessão e localização atual.</li>
+  <li>Preservar a área principal ao abrir detalhes ou tarefas rápidas.</li>
+  <li>Permitir voltar diretamente ao painel da sessão.</li>
+  <li>Preservar posição, rascunhos e filtros ao trocar de área e retornar.</li>
+  <li>Indicar claramente quando uma ação abre em modal e quando muda de tela.</li>
+</ul>
+
+<h2>5. Modais e ações contextuais</h2>
+<p>Modais devem aproximar a tarefa do contexto em que ela surgiu. Não devem parecer caixas genéricas de formulário nem esconder a navegação principal.</p>
+
+<table>
+  <thead><tr><th>Tipo de modal</th><th>Quando usar</th><th>Conteúdo mínimo</th></tr></thead>
+  <tbody>
+    <tr><td>Ficha contextual</td><td>Seleção de delegação, pessoa ou documento</td><td>Título específico, dados essenciais, estado atual e ações relevantes</td></tr>
+    <tr><td>Confirmação</td><td>Encerrar votação, passar presidência ou alterar o estado da sessão</td><td>Resumo da consequência, botão principal claro e opção de cancelar</td></tr>
+    <tr><td>Seleção rápida</td><td>Escolher país, documento ou ponto da ordem</td><td>Busca curta, opções organizadas e confirmação visível</td></tr>
+    <tr><td>Produção curta</td><td>Criar carta, bilhete ou nota curta</td><td>Campos necessários, rascunho e feedback de salvamento</td></tr>
+    <tr><td>Painel lateral</td><td>Consultar histórico ou detalhes sem sair da página</td><td>Contexto preservado, fechamento óbvio e ação principal</td></tr>
+  </tbody>
+</table>
+
+<h3>Exemplos de uso adequado</h3>
+<ul>
+  <li>Ao clicar em uma delegação: ficha com representantes, DPO, posição, votos recentes e ações disponíveis.</li>
+  <li>Ao clicar em uma votação: estado, participantes, opções de voto e ação da mesa em uma interface própria.</li>
+  <li>Ao clicar em uma carta ou documento: leitura, estado, participantes e ações relacionadas sem sair da área da sessão.</li>
+  <li>Ao clicar em uma ação irreversível: confirmação clara da consequência e botão de cancelar.</li>
+  <li>Ao iniciar uma tarefa longa: páginas dedicadas ou painéis maiores para preservar foco e legibilidade.</li>
+</ul>
+
+<h3>Comportamentos obrigatórios dos modais</h3>
+<ul class="checklist">
+  <li>Título específico e descrição curta da tarefa.</li>
+  <li>Ação principal destacada e opção de cancelamento visível.</li>
+  <li>Fechamento por botão, fundo seguro e tecla Escape.</li>
+  <li>Foco inicial previsível e retorno do foco ao elemento que abriu o modal.</li>
+  <li>Compatibilidade com teclado e leitor de tela.</li>
+  <li>Feedback claro após salvar, cancelar ou concluir uma ação.</li>
+  <li>Confirmação para mudanças irreversíveis ou de impacto coletivo.</li>
+</ul>
+
+<div class="note">
+  <p><b>Limite importante.</b> Uma interface modal não é apropriada para tarefas complexas ou para trabalho prolongado. Edição extensa de documentos, condução contínua da sessão e revisão de vários itens devem continuar em páginas ou painéis dedicados.</p>
+</div>
+
+<h2>6. Menus suspensos</h2>
+<p>O padrão de “dropdown” genérico não deve definir toda a interação. Menus suspensos continuam válidos apenas quando a seleção é curta, direta e não depende de explicação detalhada.</p>
+
+<table>
+  <thead><tr><th>Usar dropdown quando</th><th>Preferir outra interface quando</th></tr></thead>
+  <tbody>
+    <tr><td>Escolher tema, idioma ou uma configuração pequena</td><td>Houver mais de seis opções relevantes</td></tr>
+    <tr><td>A escolha completa cabe em poucas palavras</td><td>A opção tiver status, bandeira, país, descrição ou consequência</td></tr>
+    <tr><td>A ação não altera o contexto coletivo</td><td>A ação puder encerrar, aprovar ou alterar uma sessão</td></tr>
+    <tr><td>A seleção não exige filtragem</td><td>A lista exigir busca, agrupamento ou comparação</td></tr>
+  </tbody>
+</table>
+
+<p>Para casos complexos, o sistema pode usar listas pesquisáveis, cartões selecionáveis, uma ficha contextual ou um modal dedicado. O componente deve usar tipografia, bordas, estados e identidade visual próprias do Diplomacy, evitando um visual genérico de formulário.</p>
+
+<h2>7. Direção visual diplomática</h2>
+
+<h3>Identidade</h3>
+<p>O visual deve transmitir formalidade, precisão e imersão sem parecer pesado ou decorativo. Deve sugerir documentos oficiais, mesas parlamentares e identidades diplomáticas, mantendo a legibilidade de uma interface moderna.</p>
+<p>A aparência deve ser adequada a uma autoridade formal: discreta, confiável e preparada para uso prolongado em uma sala diplomática. A tela não deve distrair pela quantidade de elementos, cores ou animações. Textos devem ser objetivos e institucionais, sem slogans ou linguagem de consumo.</p>
+
+<table>
+  <thead><tr><th>Elemento</th><th>Aplicação recomendada</th></tr></thead>
+  <tbody>
+    <tr><td>Cabeçalho e títulos</td><td>Serifa para títulos de tela e documentos, timbre curto com comitê e contexto</td></tr>
+    <tr><td>Superfícies</td><td>Papel claro sobre mesa neutra; no tema escuro, manter hierarquia entre superfícies</td></tr>
+    <tr><td>Cartões</td><td>Um destaque por área, cartões comuns e superfícies discretas para apoio</td></tr>
+    <tr><td>Bordas e espaçamento</td><td>Linhas finas, raio discreto e escala consistente de espaçamento</td></tr>
+    <tr><td>Estados</td><td>Texto, ícone ou selo além da cor para ativo, pendente, aprovado, votado ou encerrado</td></tr>
+    <tr><td>Elementos expressivos</td><td>Placas de mesa, crachás, timbres, selos e carimbos usados com moderação</td></tr>
+  </tbody>
+</table>
+
+<h3>O que evitar</h3>
+<ul>
+  <li>Gradientes decorativos, sombras pesadas e efeitos visuais sem relação com a informação.</li>
+  <li>Botões grandes e de mesmo peso para todas as opções.</li>
+  <li>Ícones sozinhos quando o nome da ação não puder ser inferido.</li>
+  <li>Cartões repetidos em larga escala sem diferença de importância.</li>
+  <li>Uma identidade visual totalmente diferente em cada página.</li>
+  <li>Variações excessivas de bordas, tipografia e espaçamento.</li>
+</ul>
+
+<h3>Hierarquia de componentes</h3>
+<p><span class="priority high">Destaque único</span> para situação ou ação principal ·
+<span class="priority">Componente normal</span> para informação importante ·
+<span class="priority gold">Componente discreto</span> para apoio e registro ·
+<span class="priority">Ação secundária</span> como texto ou botão leve.</p>
+
+<h2>8. Facilidade de uso e navegação</h2>
+
+<h3>Regras práticas</h3>
+<ol>
+  <li><b>Priorizar:</b> o estado atual e a ação mais provável aparecem antes de opções secundárias.</li>
+  <li><b>Escanear:</b> país, delegação, documento, sessão e ação precisam ser localizáveis em poucos segundos.</li>
+  <li><b>Manter contexto:</b> comitê, sessão, delegação e papel permanecem visíveis durante a operação.</li>
+  <li><b>Voltar simplesmente:</b> um caminho claro leva à tela anterior ou ao painel principal, sem depender do navegador.</li>
+  <li><b>Preservar trabalho:</b> filtros, posição e rascunhos não devem ser perdidos ao abrir um detalhe.</li>
+  <li><b>Pesquisar quando houver volume:</b> busca acima de listas longas de delegações e documentos.</li>
+  <li><b>Feedback claro:</b> informar quando uma ação foi salva, enviada, pendente ou rejeitada.</li>
+  <li><b>Confirmar consequências:</b> ações coletivas ou irreversíveis exigem confirmação apropriada.</li>
+</ol>
+
+<h3>Comportamento responsivo</h3>
+<table>
+  <thead><tr><th>Contexto</th><th>Objetivo</th><th>Evitar</th></tr></thead>
+  <tbody>
+    <tr><td>Celular</td><td>Atalhos grandes, leitura curta e ação prioritária visível sem rolagem excessiva</td><td>Menus estreitos, tabelas largas e ações secundárias pequenas</td></tr>
+    <tr><td>Notebook</td><td>Painel funcional em uma tela, com detalhes e listas organizadas em colunas</td><td>Layouts vazios ou área central ocupada por conteúdo repetido</td></tr>
+    <tr><td>Projetor</td><td>Informação pública legível à distância e hierarquia clara</td><td>Texto pequeno, excesso de detalhes e estados difíceis de distinguir</td></tr>
+  </tbody>
+</table>
+
+<h2>9. Sequência sugerida de implementação</h2>
+
+<table>
+  <thead><tr><th>Etapa</th><th>Entregas</th><th>Objetivo de validação</th></tr></thead>
+  <tbody>
+    <tr><td><b>Fundação visual</b></td><td>Tokens de tipografia, espaço, cor, superfícies, estados e cartões com pesos diferentes</td><td>O conjunto parece uma única identidade diplomática</td></tr>
+    <tr><td><b>Comitê</b></td><td>Nova hierarquia da mesa, agrupamento de ações e cartões ou tabela das delegações</td><td>A situação e a próxima ação são compreendidas rapidamente</td></tr>
+    <tr><td><b>Ficha contextual</b></td><td>Modal ou painel da delegação, da votação e dos documentos principais</td><td>Uma pessoa consegue consultar e agir sem se perder</td></tr>
+    <tr><td><b>Sessão</b></td><td>Painel-resumo, grupos funcionais e preservação do contexto</td><td>Condução, produção e registro ficam facilmente encontrados</td></tr>
+    <tr><td><b>Interações</b></td><td>Estados, confirmações, feedback, pesquisa e navegação responsiva</td><td>Teclado, celular e notebook mantêm o mesmo entendimento</td></tr>
+    <tr><td><b>Consistência</b></td><td>Revisão de todas as telas com o mesmo sistema de aparência e componentes</td><td>Não surgem estilos genéricos ou comportamentos contraditórios</td></tr>
+  </tbody>
+</table>
+
+<h2>10. Critérios de aceitação</h2>
+<ul class="checklist">
+  <li>Uma pessoa nova compreende a localização e o estado atual em menos de dez segundos.</li>
+  <li>Comitê e Sessão têm estrutura clara por finalidade e não parecem uma lista de links.</li>
+  <li>A mesa ou o painel da sessão destaca uma única prioridade principal.</li>
+  <li>Delegações apresentam nome, bandeira ou identificação, status e ação sem exigir pesquisa extensa.</li>
+  <li>Detalhes e ações rápidas são abertos em modais ou painéis contextuais.</li>
+  <li>Menus suspensos não escondem decisões importantes ou listas com muitas opções complexas.</li>
+  <li>O usuário encontra a ação desejada em poucos passos e tem um retorno claro ao painel principal.</li>
+  <li>O visual permanece formal e diplomático sem parecer um painel administrativo padrão.</li>
+  <li>Estados ativos, pendentes e irreversíveis não dependem apenas de cor.</li>
+  <li>Modais suportam teclado, leitor de tela, Escape e retorno do foco.</li>
+  <li>A interface mantém hierarquia e facilidade de uso no celular, notebook e projetor.</li>
+  <li>O tema claro e escuro seguem a mesma linguagem e os mesmos padrões de acessibilidade.</li>
+</ul>
+
+<h2>11. Investigações adicionais sobre links e navegação</h2>
+<p class="lead">A revisão da implementação confirma que o excesso de links não está limitado às duas abas principais. Ele aparece em várias telas por meio de grades, barras horizontais, cartões e listas operacionais.</p>
+
+<table>
+  <thead><tr><th>Onde ocorre</th><th>O que foi encontrado</th><th>Melhoria proposta</th></tr></thead>
+  <tbody>
+    <tr><td>Comitê</td><td>Uma grade com painel, agenda, documentos, blocos, DPO, cartas, mensagens, caderno, crise, votações, regras, telão e guia externo</td><td>Substituir por painel de tarefas, com estado atual, prioridades e recursos recentes; agrupar o restante em contexto ou pesquisa</td></tr>
+    <tr><td>Sessão do delegado</td><td>Faixa superior com painel da mesa, chamada, agenda, votações, crise e telão, além dos cartões operacionais</td><td>Manter uma linha curta de contexto e colocar operações secundárias dentro dos cartões ou modais</td></tr>
+    <tr><td>Tela principal “Agora”</td><td>Cartões por papel com várias listas e vários destinos relacionados a cada pendência</td><td>Cada pendência aponta diretamente à ação; o estado compartilhado aparece uma única vez</td></tr>
+    <tr><td>Delegações</td><td>Cartões inteiros são links para uma página completa</td><td>Usar modal ou painel lateral para consulta rápida e manter a página completa como opção</td></tr>
+    <tr><td>“Mais” no celular</td><td>Uma página adicional composta por uma grade de links</td><td>Painel acessível pela barra inferior, com ações recentes, favoritas e grupos de funções</td></tr>
+  </tbody>
+</table>
+
+<h3>Regras de navegação por tipo de ação</h3>
+<table>
+  <thead><tr><th>Tipo</th><th>Componente preferido</th><th>Exemplo</th></tr></thead>
+  <tbody>
+    <tr><td>Consulta curta</td><td>Modal ou painel lateral</td><td>Ficha da delegação, detalhes da votação ou resumo de documento</td></tr>
+    <tr><td>Ação curta</td><td>Modal ou elemento contextual</td><td>Confirmar presença, enviar voto, responder bilhete ou registrar chegada</td></tr>
+    <tr><td>Produção longa</td><td>Página dedicada</td><td>Editor de resolução, caderno, painel da crise ou condução da sessão</td></tr>
+    <tr><td>Painel persistente</td><td>Página ou área fixa</td><td>Agora, painel da mesa, agenda da sessão e telão</td></tr>
+    <tr><td>Destino compartilhável</td><td>Link para página dedicada</td><td>Documento público, guia externo ou posição de delegação</td></tr>
+  </tbody>
+</table>
+
+<h2>12. Painel inicial orientado a pendências</h2>
+<p>A tela “Agora” deve priorizar o que requer ação da pessoa no momento. Cada pendência deve apontar para a ação exata e não apenas para uma página que contém a ação.</p>
+<ul>
+  <li>Delegado: chegada pendente, ponto ou moção em pausa, votação aberta, DPO para revisar, rodada do documento e bilhete novo.</li>
+  <li>Mesa: chegadas a confirmar, pedidos para avaliar, DPOs enviados, documentos recebidos e sessão a conduzir.</li>
+  <li>Crise: notas aguardando resposta, prazo próximo e incidentes sem encaminhamento.</li>
+  <li>Press: entrevistas próximas, matérias pendentes e atualizações da sessão relacionadas ao veículo.</li>
+  <li>Secretaria: check-in, participantes pendentes e avisos a publicar.</li>
+</ul>
+<p>Quando não houver pendência, a tela deve apresentar estado atual e próximo marco. Não deve manter apenas cartões vazios ou repetir o conteúdo disponível na barra principal.</p>
+
+<h2>13. Objetos clicáveis consistentes</h2>
+<p>Delegação, votação, documento, ponto, moção e nota devem seguir o mesmo padrão em todas as páginas.</p>
+<ul>
+  <li>Delegação: modal com bandeira, representantes, DPO, posição, votos recentes e ações permitidas.</li>
+  <li>Documento: prévia com título, autores, estado e ações; opção explícita para abrir o editor completo.</li>
+  <li>Votação: detalhes da questão, participantes necessários, escolha atual e resultado sem uma mudança de página desnecessária.</li>
+  <li>Ponto ou moção: origem, estado, prazo, assinaturas e próxima etapa em uma única interface contextual.</li>
+  <li>Nota de crise: remetente, status, prazo, responsável e encaminhamento em painel lateral.</li>
+</ul>
+
+<h2>14. Estado ao vivo e conectividade</h2>
+<p>O estado da sessão é um dos elementos mais importantes. Ele não deve ser repetido em vários cartões ou links; deve existir como uma faixa persistente ou bloco único.</p>
+<table>
+  <thead><tr><th>Mostrar</th><th>Propósito</th></tr></thead>
+  <tbody>
+    <tr><td>Fase, tópico e forma do debate</td><td>Indicar imediatamente o que está acontecendo</td></tr>
+    <tr><td>Quem tem a palavra e tempo restante</td><td>Permitir que delegado e presidência antecipem a ação</td></tr>
+    <tr><td>Próxima votação ou pedido pendente</td><td>Reduzir a necessidade de procurar entre abas</td></tr>
+    <tr><td>Reconexão e atraso dos dados</td><td>Evitar que uma ação pareça falhar silenciosamente</td></tr>
+  </tbody>
+</table>
+<p>Vibração, som e animações devem ser reservados para eventos que exigem ação imediata. Atualizações secundárias precisam apenas mudar o estado no local da informação.</p>
+
+<h2>15. Preservação de contexto e da tarefa</h2>
+<ul class="checklist">
+  <li>A página não perde filtros, posição ou rascunho ao abrir um modal.</li>
+  <li>O contexto do comitê e da sessão continua visível em consultas e ações rápidas.</li>
+  <li>Voltar fecha a interface contextual ou retorna ao último destino real, sem reiniciar a página.</li>
+  <li>O usuário sabe quando uma ação salvará, enviará ou apenas fechará um detalhe.</li>
+  <li>O tema, o idioma e o papel atual não mudam inesperadamente ao navegar.</li>
+</ul>
+
+<h2>16. Melhorias de pesquisa e atalhos</h2>
+<p>A busca “Ir para…” já existe e pode funcionar como um centro de comando, não apenas como uma lista de telas.</p>
+<ul>
+  <li>Agrupar resultados por tarefas, pessoas, delegações, documentos e áreas da sessão.</li>
+  <li>Guardar os destinos usados recentemente e permitir favoritos.</li>
+  <li>Usar palavras e sinônimos úteis: “presidência”, “mesa”, “voto”, “pausa”, “bilhete”, “papel” e “crise”.</li>
+  <li>Adicionar poucos atalhos explícitos no teclado e mostrar os atalhos nos componentes relevantes.</li>
+  <li>Usar busca para encontrar conteúdo, não para compensar uma hierarquia confusa.</li>
+</ul>
+
+<h2>17. Navegação móvel e densidade</h2>
+<table>
+  <thead><tr><th>Direção</th><th>Aplicação</th></tr></thead>
+  <tbody>
+    <tr><td>Barra inferior curta</td><td>Agora, Sessão, Comitê e Mais, com nomes claros e somente um estado ativo</td></tr>
+    <tr><td>Folha inferior contextual</td><td>Ações rápidas relacionadas ao objeto atual, sem mudar de página</td></tr>
+    <tr><td>Painel lateral no notebook</td><td>Detalhes e tarefas secundárias, preservando a visão principal</td></tr>
+    <tr><td>Controle de densidade</td><td>Menos títulos repetidos, menos descrições e mais ação visível</td></tr>
+  </tbody>
+</table>
+<p>A interface não deve empilhar cabeçalho, subnavegação, estado, fila e ações no celular. Deve responder ao papel ativo e esconder detalhes que não ajudam naquele momento.</p>
+
+<h2>18. Feedback, rascunhos e prevenção de erros</h2>
+<ul>
+  <li>Indicar “salvando”, “salvo neste aparelho”, “enviado” e “não enviado” em rascunhos.</li>
+  <li>Usar placeholders de carregamento leves em áreas cujo layout já é conhecido.</li>
+  <li>Manter tamanho e posição dos títulos, listas, cartões e modais para evitar deslocamento ao chegar o conteúdo real.</li>
+  <li>Preferir blocos neutros em CSS, sem imagens adicionais, fontes novas ou animações chamativas.</li>
+  <li>Não animar placeholders pequenos ou substituí-los em atualizações rápidas; respeitar preferência de movimento reduzido.</li>
+  <li>Manter dados já carregados visíveis enquanto uma área secundária é atualizada.</li>
+  <li>Usar texto curto de estado para reconexão ou carregamento incerto, em vez de uma tela inteira vazia.</li>
+  <li>Diferenciar falha temporária de rede, falta de permissão e conteúdo inválido.</li>
+  <li>Permitir reenvio explícito para ações armazenadas offline.</li>
+  <li>Validar campos antes do envio sem apagar os dados já preenchidos.</li>
+  <li>Usar confirmação somente para ações relevantes, irreversíveis ou coletivas.</li>
+  <li>Manter uma fila ou estado visível para ações pendentes, em vez de retornar uma mensagem de sucesso falsa.</li>
+</ul>
+
+<h2>19. Estados vazios e estados de carregamento</h2>
+<p>Uma tela vazia precisa explicar o estado e indicar a próxima ação. O sistema deve diferenciar:</p>
+<ul>
+  <li>conteúdo que ainda não existe;</li>
+  <li>conteúdo em carregamento;</li>
+  <li>conteúdo bloqueado por papel ou permissão;</li>
+  <li>conteúdo aguardando a mesa ou outra pessoa;</li>
+  <li>conteúdo indisponível por estar offline; e</li>
+  <li>nenhum resultado após um filtro.</li>
+</ul>
+<p>Filtros devem permanecer visíveis, mostrar quantos itens existem e permitir limpar a seleção em uma ação clara.</p>
+
+<h3>Padrão recomendado para placeholders</h3>
+<table>
+  <thead><tr><th>Contexto</th><th>Apresentação</th><th>Evitar</th></tr></thead>
+  <tbody>
+    <tr><td>Lista ou delegação</td><td>Linhas neutras no formato dos nomes, estados e cartões que serão exibidos</td><td>Uma tela inteira cinza ou animação em cada linha</td></tr>
+    <tr><td>Estado da sessão</td><td>Manter fase e dados já conhecidos; mostrar apenas o campo que ainda aguarda atualização</td><td>Remover o estado atual até todas as informações chegarem</td></tr>
+    <tr><td>Modal ou ficha</td><td>Reservar o tamanho do modal e mostrar uma estrutura curta de título e dados</td><td>Fazer o modal crescer repetidamente conforme o conteúdo chega</td></tr>
+    <tr><td>Reconexão incerta</td><td>Texto curto e estado discreto da conexão</td><td>Placeholder indefinido sem informação ou prazo</td></tr>
+  </tbody>
+</table>
+<p>Os placeholders devem usar CSS existente, sem baixar imagens ou recursos adicionais. A animação deve ser silenciosa, curta e opcional, com suporte a movimento reduzido. O objetivo é manter continuidade visual sem aumentar o volume de dados nem o consumo de energia.</p>
+
+<h2>20. Busca global eficiente</h2>
+<p>A busca “Ir para…” já evita a necessidade de navegar por várias páginas. Ela pode ser ainda mais rápida e econômica se não carregar todos os dados necessários ao abrir.</p>
+<table>
+  <thead><tr><th>Fase</th><th>Comportamento recomendado</th></tr></thead>
+  <tbody>
+    <tr><td>Abertura vazia</td><td>Mostrar telas recentes, ações frequentes e destinos do contexto atual</td></tr>
+    <tr><td>Busca curta</td><td>Pesquisar primeiro os resultados locais já carregados</td></tr>
+    <tr><td>Busca ampla</td><td>Consultar delegações e documentos em lotes pequenos, com limite de resultados</td></tr>
+    <tr><td>Fechar e abrir novamente</td><td>Reutilizar dados recentes e atualizar apenas o que mudou</td></tr>
+  </tbody>
+</table>
+<p>No estado atual, o modal pode consultar delegações e até 200 documentos ao abrir. Isso deve ser evitado em eventos grandes ou em rede móvel: iniciar apenas com dados leves e ampliar a consulta conforme o usuário digita.</p>
+
+<h2>21. Atualização ao vivo sem reconstruir a tela</h2>
+<ul>
+  <li>Atualizar somente orador, tempo, tópico, voto, presença e pendências afetadas pela mudança.</li>
+  <li>Não remontar toda a página ou fechar modais ao receber atualização do banco.</li>
+  <li>Preservar formulário, seleção, filtro e foco durante atualizações de tempo real.</li>
+  <li>Mostrar a diferença entre dados conhecidos, dados antigos e dados aguardando confirmação.</li>
+  <li>Usar atualização otimista apenas em ações reversíveis; não inventar confirmação em ações coletivas.</li>
+</ul>
+
+<h2>22. Recuperação por desfazer</h2>
+<p>Uma confirmação interrompe o usuário e aumenta o número de decisões. Sempre que a ação puder ser revertida com segurança, “Desfazer” pode oferecer melhor recuperação.</p>
+<table>
+  <thead><tr><th>Usar “Desfazer”</th><th>Usar confirmação</th></tr></thead>
+  <tbody>
+    <tr><td>Retirar um ponto enquanto ainda é permitido</td><td>Encerrar uma sessão</td></tr>
+    <tr><td>Remover um item ainda não enviado</td><td>Encerrar uma votação coletiva</td></tr>
+    <tr><td>Cancelar uma alteração local</td><td>Passar uma responsabilidade permanente</td></tr>
+  </tbody>
+</table>
+
+<h2>23. Preferências e densidade</h2>
+<ul>
+  <li>Permitir poucos destinos favoritos em vez de telas inteiras de personalização.</li>
+  <li>Guardar tema, tamanho de texto e densidade localmente no Perfil.</li>
+  <li>Usar densidade confortável no celular e compacta no notebook sem mudar a ordem das informações.</li>
+  <li>Usar fonte maior para público e projetor, não apenas zoom do navegador.</li>
+  <li>Não exigir que cada usuário configure o app em toda sessão ou em cada aparelho.</li>
+</ul>
+
+<h2>24. Biblioteca visual de componentes</h2>
+<p>Para evitar novas variações em cada página, o projeto precisa documentar e consolidar componentes próprios:</p>
+<table>
+  <thead><tr><th>Componente</th><th>Uso</th></tr></thead>
+  <tbody>
+    <tr><td>Ficha de objeto</td><td>Delegação, votação, documento ou ponto</td></tr>
+    <tr><td>Painel lateral</td><td>Detalhes persistentes sem troca de página</td></tr>
+    <tr><td>Modal contextual</td><td>Confirmação ou ação curta ligada ao contexto</td></tr>
+    <tr><td>Estado vazio</td><td>Explicar ausência de conteúdo e próxima ação</td></tr>
+    <tr><td>Selo de estado</td><td>Ativo, pendente, aprovado, encerrado, bloqueado ou em revisão</td></tr>
+    <tr><td>Ação principal</td><td>Uma ação prioritária por área</td></tr>
+  </tbody>
+</table>
+
+<h2>Resultado esperado</h2>
+<div class="summary">
+  <p><b>Em uso, o usuário deve responder rapidamente:</b> “Estou no Comitê ou na Sessão; sei o que está acontecendo; conheço a prioridade; encontrei o recurso necessário; e consigo voltar sem perder o contexto.”</p>
+  <p>Essa experiência final deve parecer parte de uma instituição diplomática coesa: poucos destinos desnecessários, opções explicadas no contexto, componentes estilizados e uma hierarquia que reduz esforço em vez de exigir memorização.</p>
+</div>
+
+</body>
+</html>

@@ -1,39 +1,272 @@
-## Melhorar a organização das abas Comitê e Sessão
+## Melhorias de organização e interação
 
-A aba **Comitê** precisa de uma organização visual mais clara. Atualmente, os links aparecem em uma lista simples, sem indicar quais são as funções principais, quais estão relacionadas entre si ou qual deve ser o fluxo de uso. A área da **mesa** e a área das **delegações** também parecem elementos posicionados de forma provisória, sem uma hierarquia definida e sem deixar claro como se relacionam com o restante do comitê.
+O objetivo destas melhorias é transformar as áreas de **Comitê** e **Sessão** em ambientes de trabalho claros, elegantes e imersivos. As telas devem parecer parte de um único produto diplomático: não podem ter a aparência genérica de um painel administrativo, nem depender de menus extensos ou listas soltas de opções.
 
-### Aba Comitê
+A navegação deve ser fácil, rápida e previsível. Em uma abertura rápida, o usuário precisa entender onde está, qual é a situação atual, o que exige atenção e qual é a próxima ação possível. Quando uma ação estiver relacionada a uma pessoa, delegação, documento, votação ou registro da sessão, ela deve abrir em um modal contextual — em vez de levar o usuário para uma página separada ou escondê-la em um menu suspenso.
 
-- Organizar os links em grupos funcionais, em vez de exibi-los como uma lista única.
-- Destacar a mesa como a área central do comitê, com informações como fase atual, ordem dos trabalhos, presidência e status da sessão.
-- Apresentar as delegações em uma seção própria, com cartões ou uma tabela organizada. Cada delegação deve mostrar, de forma rápida, nome, país, representante, posição/status e possíveis ações disponíveis.
-- Diferenciar visualmente informações de consulta, ações operacionais e áreas de acompanhamento.
-- Usar títulos, descrições curtas, ícones ou cards para explicar o propósito de cada opção.
-- Definir uma hierarquia visual que indique o que é mais importante no momento, evitando que mesa, delegações e links concorram pela atenção.
-- Manter ações frequentes acessíveis sem obrigar o usuário a procurar em uma lista extensa.
+O principal critério de sucesso é a simplicidade percebida: quanto menos decisões, menos cliques e menos mudanças de contexto, melhor. A interface deve ser **unclustered** — clara, organizada e visualmente leve. Não deve parecer um painel administrativo com muitos cartões, opções e indicadores concorrendo pela atenção.
 
-### Aba Sessão
+Os documentos visuais que acompanham esta proposta apresentam exemplos conceituais de como esses princípios podem aparecer na prática:
 
-As opções da aba **Sessão** também estão dispostas de maneira solta, sem uma estrutura que ajude o usuário a entender o funcionamento da sessão. Atualmente aparecem lado a lado: **Agenda, Votações, Caderno, Blocos e documentos, Cartas, Mensagens, Notas de crise e Telão**.
+- uma tela principal com poucos destinos e uma prioridade central;
+- uma ficha de delegação em modal, sem abrir uma nova página;
+- uma confirmação formal para uma ação coletiva;
+- uma navegação móvel curta e facilmente alcançável;
+- uma área da mesa com estado da sessão, próximos passos e recursos secundários agrupados.
 
-Esses itens deveriam ser agrupados por finalidade e apresentados em uma navegação mais consistente. Uma possível organização seria:
+O produto deve transmitir a sobriedade de um ambiente formal usado por diplomatas. A estética deve ser deliberada, institucional e confiável, com linguagem precisa e hierarquia calma. Evitar elementos infantis, efeitos decorativos, metáforas casuais ou componentes genéricos de rede social. A experiência deve parecer um instrumento profissional de trabalho, não um jogo ou um quadro de tarefas.
+
+Em caso de dúvida entre mostrar uma opção e ocultá-la em contexto secundário, priorizar o caminho do usuário real. Ações raras podem exigir uma etapa a mais; ações frequentes e importantes devem estar visíveis e alcançar o resultado em um clique ou poucos passos.
+
+### Regra operacional para a quantidade de cliques
+
+- A ação principal da tela deve ser acessível sem abrir outro menu.
+- Qualquer consulta rápida deve ser concluída no mesmo contexto, preferencialmente em modal ou painel lateral.
+- Até três ações relacionadas devem aparecer juntas; ações adicionais ficam em “Mais opções” ou em uma interface contextual.
+- Uma tarefa comum não deve exigir voltar ao menu principal, entrar em uma aba, localizar outra página e retornar.
+- Se uma ação exige concentração ou vários campos, ela pode abrir uma página dedicada.
+- Ao concluir uma ação rápida, o usuário deve permanecer no contexto em que estava, salvo quando a própria tarefa indicar um destino completo.
+- O retorno deve ser sempre óbvio e, quando possível, de uma etapa.
+
+Os menus suspensos existentes devem ser revisados. Eles só devem ser usados quando a escolha puder ser feita de forma direta e breve. Sempre que a quantidade de opções, a descrição ou as consequências forem maiores, o usuário deve receber uma interface mais clara: cartões, modal, lista pesquisável ou seleção contextual com visual próprio do sistema. A navegação nunca deve parecer um conjunto padrão de componentes de formulário.
+
+### Redução dos links e das mudanças de página
+
+A revisão do código confirmou que o excesso de links aparece em várias superfícies. A aba **Comitê** oferece atualmente uma grade com até treze atalhos — painel, agenda, documentos, blocos, DPO, cartas, mensagens, caderno, crise, votações, regras, telão e guia externo. A tela da **Sessão** possui outra faixa horizontal com chamada, agenda, votações, crise e telão, além dos links da navegação principal e dos cartões operacionais.
+
+Essa quantidade não precisa ser eliminada, mas não pode continuar no mesmo nível visual. Links são adequados para navegar a uma área completa e persistente. Modais são melhores para consultar dados, tomar decisões curtas, confirmar ações ou executar uma tarefa que depende do estado atual da tela.
+
+Recomendações:
+
+- Substituir as grades extensas de links por uma tela-resumo organizada por tarefas. Mostrar imediatamente sessão, prioridade atual e recursos recentes.
+- Transformar destinos ligados a objetos em modais ou painéis contextuais: delegação, votação, documento, moção, pedido de palavra, bilhete, carta ou nota de crise.
+- Manter como página dedicada apenas áreas que usam o tempo e o foco de forma prolongada: condução da sessão, edição de documento, painel da mesa, telão, crise e criação de longas resoluções.
+- Mostrar poucos atalhos de alta frequência: abrir sessão, agenda, documentos pendentes, mensagens e votação ativa. Colocar recursos secundários em “Ver mais”, pesquisa ou contexto.
+- Transformar a faixa de links da Sessão em uma linha contextual de estado, com uma aba ativa, no lugar de uma lista permanente de destinos.
+- Não apresentar “Mais” como uma simples página de outros links. Usar um painel lateral ou modal com funções agrupadas, recentes e favoritas.
+- Manter os links importantes que precisam ser compartilhados, marcados ou abertos em outra janela. Toda página ainda pode ser acessada por busca ou URL.
+- Distinguir visualmente página, modal e ação externa. Abrir modal não deve parecer navegação, enquanto um destino completo pode continuar com uma seta ou destaque próprio.
+
+### Comitê
+
+A aba **Comitê** deve mostrar a mesa e as delegações como uma área de trabalho integrada. Os links do comitê não podem aparecer como uma simples lista sem relação entre si.
+
+- Organizar as opções por finalidade, destacando as ações principais e separando consulta, operação e acompanhamento.
+- Apresentar a mesa como o centro da tela, com fase atual, ordem dos trabalhos, presidência, status da sessão e próximos horários ou ações relevantes.
+- Exibir as delegações em cartões ou em uma tabela visualmente organizada. Cada delegação deve mostrar bandeira ou identificação, país, representante, posição ou status e ações disponíveis.
+- Permitir que uma delegação seja selecionada para abrir, em um modal ou painel lateral contextual, informações como representantes, DPO, posição, notas recentes, ações permitidas e histórico da participação.
+- Usar títulos claros, descrições curtas, ícones significativos e elementos próprios da identidade diplomática. Os ícones não devem substituir textos necessários para entender uma ação.
+- Destacar apenas o que exige atenção ou representa a ação prioritária no momento. Mesa, delegações e recursos devem ter pesos visuais diferentes para não disputar a atenção do usuário.
+- Mostrar ações frequentes diretamente na tela. Funções secundárias podem ser agrupadas em opções contextuais ou no modal da delegação, documento ou mesa.
+- Evitar menus profundos e excesso de configurações visíveis. O usuário deve chegar à ação desejada em poucos passos e poder voltar facilmente à visão principal.
+
+### Sessão
+
+A aba **Sessão** deve funcionar como um painel de condução, não como uma coleção de links lado a lado.
+
+As áreas podem ser organizadas por finalidade:
 
 - **Condução da sessão:** Agenda e Votações.
 - **Preparação e produção:** Caderno, Blocos e documentos e Cartas.
-- **Comunicação:** Mensagens.
-- **Acompanhamento e registro:** Notas de crise.
-- **Exibição:** Telão.
+- **Comunicação:** Mensagens e bilhetes.
+- **Acompanhamento e registro:** notas de crise, histórico e situação da sessão.
+- **Exibição:** Telão e visualização pública.
 
-Cada opção deve ter uma identificação clara e, quando necessário, uma breve descrição do que pode ser feito nela. A tela inicial da aba Sessão pode funcionar como um painel-resumo, mostrando o estado atual da agenda, a próxima votação, documentos recentes, mensagens pendentes e alertas importantes. A navegação deve deixar evidente onde o usuário está, permitir retornar facilmente ao painel da sessão e preservar o contexto ao alternar entre as áreas.
+Cada opção deve ter identificação clara e uma breve descrição do que permite fazer. Nos dispositivos menores, os grupos podem aparecer como atalhos grandes e fáceis de tocar. No computador, podem ser organizados em painéis ou em uma barra lateral curta, sem transformar toda a tela em uma longa lista de navegação.
+
+A tela inicial da sessão deve funcionar como um painel-resumo. Ela deve mostrar, com hierarquia, a situação atual da sessão, a fase da agenda, a ordem dos trabalhos, a próxima votação, documentos recentes, mensagens pendentes, pedidos de crise e outras alertas relevantes.
+
+Ao abrir uma área da sessão:
+
+- manter o contexto da sessão visível;
+- indicar claramente onde o usuário está;
+- preservar a posição e o conteúdo já aberto;
+- permitir um retorno direto ao painel;
+- usar modais ou painéis laterais para tarefas rápidas, detalhes e confirmações;
+- evitar substituir a tela inteira quando o usuário apenas precisa consultar ou executar uma ação curta.
+
+### Modais e ações contextuais
+
+Modais devem ser usados para trazer a ação para o contexto da tarefa, sem desorganizar a navegação.
+
+Exemplos de usos adequados:
+
+- ficha completa de uma delegação;
+- confirmação de abertura ou encerramento de votação;
+- seleção de uma delegação, documento, país ou ponto da ordem;
+- detalhes de uma moção ou pedido de palavra;
+- criação ou revisão de carta, bilhete, documento ou nota de crise;
+- informações do estado atual da sessão;
+- ações administrativas que possam causar alterações relevantes.
+
+Cada modal deve ter um título específico, explicar brevemente a ação, destacar o botão principal e permitir cancelamento ou fechamento óbvio. A navegação não deve depender de ações importantes escondidas dentro de modais genéricos. Quando houver uma decisão longa ou dependente de concentração, o modal pode ser substituído por uma página dedicada; fora disso, a interação deve permanecer contextual.
+
+Os componentes utilizados devem considerar teclado, leitor de tela, foco, fechamento com Escape, retorno do foco ao elemento que abriu o modal e confirmação para ações irreversíveis.
+
+### Direção visual
+
+O visual deve transmitir formalidade, clareza e imersão diplomática. Deve conservar uma identidade própria do Diplomacy: austera, institucional e elegante, sem reproduzir o visual genérico de sistemas administrativos.
+
+- Priorizar legibilidade, ordem e tranquilidade em vez de quantidade de elementos visuais.
+- Usar menos superfícies visíveis, mas com melhor hierarquia e significado.
+- Cada tela deve parecer adequada a um documento, mesa ou reunião diplomática real.
+- Empregar linguagem formal sem ser burocrática: frases completas, objetivos claros e termos conhecidos pelas delegações.
+- Evitar slogans, humor excessivo, animações chamativas e ícones decorativos.
+- Favorecer textura visual em documentos, linha oficial, timbre e selos, em vez de componentes grandes e coloridos.
+- O resultado deve parecer “discreto, confiável e preparado”, não “entretenimento”, “gamificação” ou “painel corporativo”.
+- Criar uma hierarquia consistente para títulos, subtítulos, rótulos, estados e ações.
+- Usar documentos, carimbos, placas de mesa, timbres, credenciais, selos e elementos gráficos coerentes com o ambiente diplomático.
+- Aplicar uma escala de peso entre cartões e ações: um único destaque principal por área, componentes secundários discretos e ações críticas facilmente reconhecíveis.
+- Usar bordas finas, espaçamento uniforme, contraste adequado e uma paleta diplomática. Evitar excesso de sombras, gradientes decorativos, animações sem propósito e contornos excessivamente arredondados.
+- Manter aparência consistente entre comitê, sessão, mesa, documentos e telão, sem transformar cada seção em uma página visualmente diferente.
+- Garantir que os estados — ativo, pendente, aprovado, em votação, encerrado, atenção e bloqueado — tenham diferença clara, usando cor, ícone e texto. Não depender apenas da cor.
+- Tornar a leitura confortável em celular, notebook e projetor.
+
+### Facilidade de uso
+
+- Priorização: mostrar primeiro o estado atual e a ação mais provável.
+- Escaneabilidade: permitir encontrar rapidamente mesa, delegação, documento ou recurso necessário.
+- Contexto: manter comitê, sessão, delegação e papel visíveis durante as operações.
+- Retorno simples: um único caminho claro para voltar à tela anterior ou ao painel principal.
+- Pesquisa: usar busca somente onde houver conteúdo suficiente para justificá-la, especialmente em listas de delegações e documentos.
+- Responsividade: no celular, transformar ações secundárias em atalhos organizados; no notebook, aproveitar o espaço sem criar painéis vazios.
+- Feedback: informar claramente quando uma ação foi realizada, pendente ou rejeitada.
+- Confiabilidade: confirmar ações irreversíveis e evitar saídas acidentais de etapas em andamento.
+
+### Outras melhorias propostas
+
+Além da reorganização das abas e da substituição de links por modais, o projeto pode ganhar em clareza e confiabilidade com as seguintes mudanças:
+
+#### Painel inicial orientado a pendências
+
+- Transformar a tela “Agora” em um painel de prioridades para cada papel.
+- A pessoa deve ver apenas o que exige uma ação agora: chegada pendente, ponto em pausa, votação ativa, DPO para revisar, rodada de documento para responder, bilhete novo ou nota de crise sem atendimento.
+- Cada pendência deve apontar diretamente para a ação, não apenas para a página que contém a ação.
+- Quando não houver pendência, mostrar o estado atual da sessão e o próximo marco em vez de uma lista vazia ou repetitiva.
+
+#### Objetos clicáveis consistentes
+
+- Delegações, documentos, votações, pontos, moções e notas devem ter um comportamento coerente em todas as páginas.
+- Nomes de delegação podem abrir sua ficha contextual.
+- Documentos podem abrir uma prévia com estado, autores e ações antes de levar à edição completa.
+- Votações podem mostrar participantes e resultado em uma interface própria, sem exigir uma página separada.
+- A primeira abertura de cada objeto deve ser rápida; páginas completas continuam disponíveis como “Abrir versão completa”.
+
+#### Estado ao vivo resumido
+
+- Mostrar em um único bloco persistente o estado da sessão: fase, tópico, forma do debate, quem tem a palavra, tempo e próxima ação.
+- Não repetir o mesmo estado em vários cartões. Usá-lo uma vez e criar ações ligadas a ele.
+- Usar vibração, som ou avisos visuais apenas para eventos realmente importantes. Evitar chamar a atenção para atualizações secundárias.
+- Indicar atraso ou reconexão de forma visível, já que a interface depende de dados ao vivo.
+
+#### Redução da carga visual
+
+- Não misturar mais de um “destaque principal” na tela inicial.
+- Trocar cartões muito similares por linhas de atividade, listas compactas ou cartões com estados diferentes.
+- Reservar o padrão mais chamativo para urgências, pendências e ações críticas.
+- Diminuir descrições longas de atalhos: título curto, uma frase apenas quando necessário e estado atualizado.
+- Usar o mesmo tratamento para cartões, tabelas e modais em todo o app.
+
+#### Fluxos melhores na presidência e na mesa
+
+- O painel da presidência deve mostrar, em uma única área, situação da sessão, com a palavra, fila curta, pontos pendentes e votação ativa.
+- A chamada, a entrada de uma delegação atrasada e o rodízio da presidência devem ser ações diretas ou em modal, não páginas de configuração expostas.
+- Confirmar abertura e encerramento de sessão, encerramento de votação e passagem da presidência com títulos que expliquem exatamente o que será alterado.
+- Quando uma ação tiver prazo ou efeito coletivo, mostrar o tempo restante e o número de pessoas afetadas.
+
+#### Pesquisa e atalhos melhores
+
+- A busca “Ir para…” já existe e pode ser elevada a um centro de comando completo.
+- Agrupar resultados por pessoa, delegação, documento, ação e lugar da sessão.
+- Guardar destinos usados recentemente e favoritos explicitamente escolhidos.
+- Adicionar um conjunto pequeno de atalhos de teclado e indicar os atalhos na interface.
+- Não usar a busca como substituição de uma navegação principal ainda confusa.
+
+#### Navegação móvel
+
+- A barra inferior já organiza a experiência por tarefas. Ela pode ser simplificada ainda mais com “Agora”, “Sessão”, “Comitê” e “Mais”.
+- Para o celular, ações secundárias devem aparecer em uma folha inferior contextual ou em painel lateral, não em páginas com muitos blocos empilhados.
+- Ações frequentes devem ser grandes o suficiente para toque, mas não ocupar permanentemente a tela.
+- Evitar empilhar cabeçalho, subnavegação, fila e ações; manter somente o contexto necessário ao papel ativo.
+
+#### Feedback e prevenção de erros
+
+- Mostrar estados de salvamento em rascunhos: salvando, salvo neste aparelho, enviado ou não enviado.
+- Usar placeholders de carregamento (skeletons) em áreas que aguardam dados. A estrutura deve preservar a altura e a posição dos títulos, cartões, listas e modais que aparecerão em seguida.
+- Os placeholders devem ser simples e estáveis: blocos neutros no formato do conteúdo, sem animações chamativas, pulsação intensa ou repetição excessiva.
+- Não animar placeholders em elementos pequenos ou em atualizações rápidas. Preferir uma transição breve e discreta apenas quando o carregamento durar tempo suficiente para o usuário perceber.
+- Usar placeholders apenas para dados esperados com layout conhecido. Durante reconexão ou espera incerta, mostrar um texto curto e objetivo junto ao estado atual.
+- Manter o estado da sessão ou os dados já carregados visíveis enquanto informações secundárias são atualizadas. Não substituir toda a tela por um carregamento.
+- Não usar placeholder em ações imediatas que já possuem feedback local. A ação pode permanecer visível com estado “salvando”, “enviando” ou “aguardando confirmação”.
+- Os placeholders devem consumir poucos recursos e não carregar imagens, fontes ou dados adicionais. Usar CSS ou uma forma estática muito leve.
+- Respeitar preferência de movimento reduzido e tema claro ou escuro.
+- Evitar layouts que mudem significativamente quando o conteúdo real chegar. Isso reduz movimento visual e facilita a leitura.
+- Distinguir erros temporários de rede de erros de permissão ou validação.
+- Permitir reenvio explícito quando uma ação estiver na caixa offline.
+- Validar campos antes do envio, mas deixar o usuário corrigir sem apagar o restante do formulário.
+- Usar confirmações somente para ações relevantes e irreversíveis, evitando perguntas repetitivas.
+
+#### Qualidade dos estados vazios
+
+- Nunca mostrar uma tela vazia sem explicar o estado e a próxima ação possível.
+- Para delegações sem DPO, documentos sem revisão ou notas sem resposta, informar o motivo e o que pode ser feito.
+- Diferenciar “não existe”, “não foi carregado”, “não tem permissão”, “aguardando a mesa” e “offline”.
+- Manter filtros ativos e mostrar claramente quantos resultados estão ocultos.
+
+#### Busca global eficiente
+
+- A busca “Ir para…” já é um recurso importante. No estado atual, ela pode carregar até 200 documentos ao abrir e também carregar todas as delegações do comitê.
+- Limitar a carga inicial ao necessário: resultados recentes, favoritas e destinos frequentes no início.
+- Pesquisar delegações e documentos localmente somente após um tamanho seguro; para comitês maiores, manter uma busca incremental no banco.
+- Não repetir consultas ao fechar e abrir o mesmo modal. Reutilizar dados recentes, com atualização discreta ao voltar o aplicativo.
+- Mostrar imediatamente ações da sessão atual e evitar misturar telas, delegações e documentos em uma mesma lista genérica antes de o usuário começar a buscar.
+- Usar teclas, abreviações e palavras reconhecidas pelas delegações. Após uma ação frequente, oferecer o destino como sugestão prioritária.
+
+#### Dados ao vivo sem recarregamento visual
+
+- A interface já usa atualização em tempo real. Preservar o estado atual da tela durante atualizações da sessão.
+- Atualizar somente os campos que mudaram: estado do orador, tempo, voto, ponto ou presença. Não remontar toda a área da sessão.
+- Exibir reconexão ou atraso entre o aparelho e o servidor sem substituir o último estado conhecido por uma tela vazia.
+- Marcar dados antigos de forma discreta enquanto aguardam confirmação, e nunca apresentá-los como permanentes antes do servidor confirmar.
+- Usar atualizações otimistas somente em ações reversíveis e rápidas. Se houver risco coletivo, aguardar confirmação do servidor.
+
+#### Três níveis de densidade
+
+- Criar modos de densidade consistentes: confortável no celular, compacto no notebook e público no telão.
+- Não exigir que o usuário reorganize o mesmo conjunto de informações em cada tamanho de tela.
+- Em telas cheias de dados, preservar o contexto importante no topo e permitir que cada lista avance independentemente sem rolar a página inteira.
+- Evitar que uma coluna torne-se tão comprida que esconda a ação principal em outra coluna.
+
+#### Preferências do usuário
+
+- Permitir que o usuário fixe poucos destinos favoritos no “Ir para…” ou em ações rápidas.
+- Guardar preferências locais de tema, tamanho de texto, densidade e notificações sem misturá-las com dados de sessão.
+- No celular, permitir que ações frequentes do papel ativo fiquem diretamente acessíveis sem configurá-las a cada sessão.
+- Não transformar preferências em uma seção longa de administração. Mostrar opções simples no Perfil e em configurações do contexto atual.
+
+#### Recuperação e desfazer
+
+- Sempre que possível, usar “Desfazer” em uma ação curta em vez de abrir uma confirmação longa.
+- Reservar modal de confirmação para encerramentos, alterações coletivas, votos estruturais ou ações sem recuperação simples.
+- Manter rascunhos, posição e texto após uma falha temporária.
+- Em ações de envio, mostrar uma única fila de estados: preparando, aguardando rede, enviado e falha. Não mostrar várias mensagens concorrentes.
+- Explicar como corrigir uma falha e oferecer uma ação direta de reenvio.
+
+#### Documentação visual e consistência
+
+- Criar componentes comuns para modal, painel lateral, estado vazio, confirmação, ficha de objeto, selo e ação principal.
+- Documentar qual componente usar para cada tarefa em vez de permitir estilos individuais em cada página.
+- Revisar o contraste, o foco do teclado, o tamanho mínimo de área tocável e a resposta de zoom em todas as áreas.
+- Criar testes visuais para os novos estados, não apenas para a página inicial.
 
 ### Resultado esperado
 
-As duas abas devem deixar de parecer um conjunto de links e passar a funcionar como áreas de trabalho estruturadas. O usuário deve conseguir entender rapidamente:
+Ao abrir o aplicativo, o usuário deve conseguir compreender rapidamente:
 
 1. onde está;
-2. qual é a situação atual do comitê ou da sessão;
-3. quais ações são prioritárias;
-4. onde encontrar cada recurso; e
-5. como voltar ao contexto principal sem se perder.
+2. em que fase a sessão ou o comitê se encontra;
+3. quais informações ou ações são prioritárias;
+4. para onde deve ir para realizar uma tarefa; e
+5. como voltar ao contexto principal sem perder o que estava fazendo.
 
-Além da reorganização visual, é importante aplicar padrões consistentes de layout, espaçamento, títulos, estados ativos, cards e componentes de navegação nas duas abas.
+O resultado final deve parecer parte de uma experiência diplomática coesa, não um conjunto de páginas de administração. Deve haver pouco a aprender na interface, poucas opções desnecessárias e sempre uma ação clara, bonita e fácil de alcançar.

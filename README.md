@@ -107,6 +107,8 @@ As fases do projeto (validação, piloto, evento e crescimento) e o calendário 
 ## Documentos
 
 - [Plano completo (PDF)](docs/plano-do-app.pdf): problema, módulos, regras, arquitetura, riscos e calendário.
+- [Plano da edição colaborativa de documentos (PDF)](docs/plano-editor-documentos.pdf): edição em tempo real, propostas por cláusula, rodadas curtas, conflitos e fusão de working papers.
+- [Plano de preparação de discursos durante o debate (PDF)](docs/plano-preparacao-discursos.pdf): notas rápidas, contexto das delegações, rascunho por blocos e ensaio da fala.
 - [Por que cada um usaria o Diplomacy](docs/proposta-de-valor.md): a frase de valor de cada papel e o roteiro do "mock and rules".
 - [Melhorias depois da revisão (PDF)](docs/melhorias-pos-revisao.pdf): as observações da revisão, priorizadas por impacto e esforço; fonte em [HTML](docs/melhorias-pos-revisao.html), gerada do mesmo jeito.
 - [Fonte do plano (HTML)](docs/plano-do-app.html). Para gerar o PDF de novo:

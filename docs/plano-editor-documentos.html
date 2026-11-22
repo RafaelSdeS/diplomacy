@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Diplomacy · plano de edição colaborativa de documentos</title>
+<style>
+  @page {
+    size: A4;
+    margin: 20mm 18mm 22mm 18mm;
+    @bottom-left { content: "Diplomacy · edição colaborativa de documentos"; font: 8pt "Noto Sans", sans-serif; color: #7a8594; }
+    @bottom-right { content: counter(page) " / " counter(pages); font: 8pt "Noto Sans", sans-serif; color: #7a8594; }
+  }
+  :root {
+    --ink:#1b2430; --quiet:#5d6878; --line:#d5dbe3; --accent:#1f4e79;
+    --tint:#eaf0f6; --gold:#8c6d2c; --gold-tint:#f7f0e1;
+    --green:#3f6d55; --green-tint:#edf5ef; --red:#8a3d32;
+  }
+  * { box-sizing:border-box; }
+  body { font:10pt/1.55 "Noto Sans","DejaVu Sans",sans-serif; color:var(--ink); margin:0; }
+  h1,h2,h3 { font-family:"Noto Serif","DejaVu Serif",serif; color:var(--accent); line-height:1.25; break-after:avoid; }
+  h1 { font-size:24pt; margin:6pt 0 4pt; }
+  h2 { font-size:15pt; margin:22pt 0 7pt; padding-bottom:3pt; border-bottom:1.5px solid var(--accent); }
+  h3 { font-size:11.5pt; margin:13pt 0 4pt; color:var(--ink); }
+  p { margin:0 0 7pt; }
+  ul,ol { margin:0 0 8pt; padding-left:16pt; }
+  li { margin-bottom:2.5pt; }
+  code { font-family:"DejaVu Sans Mono",monospace; font-size:8.5pt; }
+  table { width:100%; border-collapse:collapse; margin:6pt 0 10pt; font-size:8.8pt; break-inside:auto; }
+  th,td { border:1px solid var(--line); padding:5pt 7pt; vertical-align:top; }
+  th { background:var(--tint); color:var(--accent); text-align:left; }
+  tr { break-inside:avoid; }
+  .kicker { font-size:9pt; letter-spacing:.08em; text-transform:uppercase; color:var(--quiet); margin:0 0 4pt; }
+  .subtitle { font-size:12pt; color:var(--quiet); margin:0 0 4pt; }
+  .meta { font-size:9pt; color:var(--quiet); margin-bottom:16pt; }
+  .summary { background:var(--tint); border-left:4px solid var(--accent); padding:10pt 14pt; border-radius:0 6px 6px 0; break-inside:avoid; }
+  .summary p:last-child { margin-bottom:0; }
+  .note { background:var(--gold-tint); border-left:4px solid var(--gold); padding:8pt 12pt; border-radius:0 6px 6px 0; break-inside:avoid; margin:8pt 0 10pt; }
+  .note p:last-child { margin-bottom:0; }
+  .lead { font-size:10.5pt; break-inside:avoid; }
+  .muted { color:var(--quiet); }
+  .pill { display:inline-block; border:1px solid var(--accent); border-radius:999px; color:var(--accent); padding:1pt 7pt; margin:0 3pt 4pt 0; font-size:8pt; }
+  .pill.on { background:var(--accent); color:#fff; }
+  .two { display:grid; grid-template-columns:1fr 1fr; gap:12pt; break-inside:avoid; }
+  .three { display:grid; grid-template-columns:repeat(3,1fr); gap:8pt; break-inside:avoid; }
+  .panel { border:1px solid var(--line); border-radius:7pt; padding:8pt 9pt 5pt; background:#fbfcfd; break-inside:avoid; }
+  .panel h3 { margin-top:0; }
+  .wire { border:1.5px solid #2b3542; border-radius:9pt; background:#fbfcfd; overflow:hidden; break-inside:avoid; }
+  .wire-header { display:flex; justify-content:space-between; align-items:center; padding:7pt 9pt; background:var(--accent); color:#fff; }
+  .wire-header strong { font-family:"Noto Serif",serif; }
+  .wire-header span { font-size:7.5pt; color:#d5deea; }
+  .wire-body { display:grid; grid-template-columns:1.05fr 1fr; gap:8pt; padding:9pt; }
+  .wire-list,.wire-work { border:1px solid var(--line); border-radius:6pt; background:#fff; padding:7pt; }
+  .mini-label { color:var(--quiet); font-size:7.5pt; letter-spacing:.08em; text-transform:uppercase; }
+  .clause { margin-top:5pt; border:1px solid var(--line); border-radius:5pt; padding:5pt 6pt; font-size:8.5pt; background:#fff; }
+  .clause.active { border-left:3px solid var(--gold); background:var(--gold-tint); }
+  .clause.agreed { border-left:3px solid var(--green); background:var(--green-tint); }
+  .work-head { display:flex; justify-content:space-between; align-items:center; padding-bottom:5pt; border-bottom:1px solid var(--line); }
+  .status { border:1px solid var(--line); border-radius:999px; padding:1pt 5pt; font-size:7.5pt; color:var(--quiet); }
+  .diff { margin-top:6pt; border:1px solid var(--line); border-radius:5pt; overflow:hidden; }
+  .diff div { padding:4pt 6pt; font-size:8.5pt; }
+  .removed { background:#f8ecea; color:#74392f; text-decoration:line-through; }
+  .added { background:#edf5ef; color:#365b45; }
+  .actions { display:flex; justify-content:flex-end; gap:5pt; margin-top:6pt; }
+  .action { border:1px solid var(--accent); border-radius:4pt; padding:3pt 7pt; color:var(--accent); font-size:8pt; }
+  .action.primary { background:var(--accent); color:#fff; }
+  .timeline { display:grid; grid-template-columns:repeat(5,1fr); gap:5pt; break-inside:avoid; margin:8pt 0; }
+  .step { border-top:3px solid var(--line); padding:6pt 5pt 3pt; background:#fbfcfd; font-size:8pt; }
+  .step.current { border-top-color:var(--accent); background:var(--tint); }
+  .step.done { border-top-color:var(--green); }
+  .step strong { display:block; color:var(--accent); margin-bottom:2pt; }
+  figure { margin:9pt 0 12pt; break-inside:avoid; }
+  figcaption { color:var(--quiet); font-size:8.5pt; margin-top:4pt; }
+  .checklist { list-style:none; padding-left:0; }
+  .checklist li::before { content:"☐"; color:var(--accent); margin-right:6pt; }
+</style>
+</head>
+<body>
+
+<p class="kicker">Diplomacy · plano de evolução da edição</p>
+<h1>Edição colaborativa de documentos sem Google Docs</h1>
+<p class="subtitle">Um fluxo em tempo real para agenda, working papers, projetos de resolução e resoluções de crise, feito para decisões rápidas e imersão diplomática</p>
+<p class="meta">22 de novembro de 2026 · Plano detalhado com base no editor já implementado</p>
+
+<div class="summary">
+  <p><b>Objetivo.</b> Fazer com que um bloco possa produzir um texto sem passar horas debatendo cada palavra em comentários soltos. Todas as contribuições continuam visíveis e revisáveis, mas o documento progride por cláusula, proposta curta e decisão explícita.</p>
+  <p><b>Não é Google Docs.</b> Não haverá um campo livre onde todos digitam ao mesmo tempo. Haverá uma pessoa responsável pela redação de cada cláusula, colaboradores que enviam propostas estruturadas e uma área breve para justificativa ou dúvida.</p>
+  <p><b>Princípio central.</b> Ao vivo para estado e presença; assíncrono e estruturado para texto e decisão. Participantes veem o que mudou, não um cursor competindo com o cursor do colega.</p>
+</div>
+
+<h2>1. Estado atual do editor</h2>
+<p class="lead">A base existente já resolve segurança, concorrência e responsabilidade: o redator altera o texto, membros do bloco podem propor alterações e comentar, cláusulas acordadas são travadas, rodadas têm prazo e propostas têm versão.</p>
+<table>
+  <thead><tr><th>Recurso existente</th><th>O que já entrega</th><th>Limitação atual</th></tr></thead>
+  <tbody>
+    <tr><td>Redator único por bloco</td><td>Uma pessoa controla o texto final de cada cláusula</td><td>A troca de contexto exige selecionar cláusula, voltar ao texto e ler propostas separadas</td></tr>
+    <tr><td>Proposta de alteração</td><td>Texto novo enviado ao redator</td><td>A proposta ainda é predominantemente um campo de texto completo, sem tipo nem visão de diferenças</td></tr>
+    <tr><td>Comentários por cláusula</td><td>Permite estacionar observações fora do texto</td><td>Pode virar uma conversa paralela se não houver decisão ou prazo</td></tr>
+    <tr><td>Cláusula acordada</td><td>Impede mudanças e protege o progresso</td><td>Reabrir exige vários pedidos, mas não existe revisão rápida do conjunto decidido</td></tr>
+    <tr><td>Rodadas abertas</td><td>Define um período de edição e revisões</td><td>A atividade dentro da rodada ainda exige revisar várias áreas manualmente</td></tr>
+    <tr><td>Tempo real por Broadcast</td><td>Invalida a página quando documento, cláusula, proposta ou rodada muda</td><td>A interface não indica presença nem intenção por cláusula</td></tr>
+    <tr><td>Versão da cláusula</td><td>Detecta conflito ao salvar</td><td>O conflito pode exigir que o redator releia o estado atualizado em outra área</td></tr>
+  </tbody>
+</table>
+
+<h2>2. Produto desejado</h2>
+<div class="three">
+  <div class="panel"><h3>Redação</h3><p>Um redator trabalha no texto acordado. O app mostra apenas o necessário para escrever e recebe mudanças estruturadas.</p></div>
+  <div class="panel"><h3>Revisão curta</h3><p>Membros sugerem mudança, dúvida ou aprovação. Propostas devem ser decididas em lotes e com prazo.</p></div>
+  <div class="panel"><h3>Aprovação</h3><p>A cláusula fica acordada, registrada e travada. Itens não decididos não permanecem em discussão indefinida.</p></div>
+</div>
+
+<h2>3. Modelo de edição recomendado</h2>
+<p class="lead">A edição acontece em três modos explícitos. O sistema não permite que os modos sejam confundidos dentro da tela.</p>
+<table>
+  <thead><tr><th>Modo</th><th>Quem participa</th><th>Comportamento</th><th>Resultado</th></tr></thead>
+  <tbody>
+    <tr><td><b>Escrita</b></td><td>Redator da cláusula</td><td>Texto, verificação de verbo, pontuação e subitens</td><td>Versão nova pronta para revisão</td></tr>
+    <tr><td><b>Revisão</b></td><td>Membros do bloco</td><td>Propor alteração, manter, remover, mover ou fazer uma pergunta curta</td><td>Lista curta de decisões pendentes</td></tr>
+    <tr><td><b>Decisão</b></td><td>Redator ou delegação responsável pela cláusula</td><td>Aceitar, ajustar ou recusar propostas; marcar acordada</td><td>Texto bloqueado e registrado</td></tr>
+  </tbody>
+</table>
+
+<figure>
+<div class="wire">
+  <div class="wire-header"><strong>Projeto de resolução · CSNU/RES/3</strong><span>Rodada 2 de 3 · termina em 08:42 · 7 de 12 cláusulas acordadas</span></div>
+  <div class="wire-body">
+    <div class="wire-list">
+      <div class="mini-label">Estrutura do documento</div>
+      <div class="clause agreed">Preambular 1 · Reafirma ...</div>
+      <div class="clause active">Operativa 3 · Solicita ao Secretariado ... <b>3 propostas</b></div>
+      <div class="clause">Operativa 4 · Incentiva a coordenação ...</div>
+      <div class="clause agreed">Operativa 5 · Decide manter ...</div>
+    </div>
+    <div class="wire-work">
+      <div class="work-head"><strong>Operativa 3</strong><span class="status">Em revisão</span></div>
+      <div class="mini-label" style="margin-top:6pt">Diferenças pendentes</div>
+      <div class="diff">
+        <div class="removed">Solicita ao Secretariado que apresente informações.</div>
+        <div class="added">Solicita ao Secretariado que apresente, em 30 dias, um relatório público.</div>
+      </div>
+      <div class="actions"><span class="action">Recusar</span><span class="action">Editar proposta</span><span class="action primary">Aceitar alteração</span></div>
+      <p class="muted" style="font-size:8pt;margin:6pt 0 0">Proposta da França · prazo da rodada: 08:42</p>
+    </div>
+  </div>
+</div>
+<figcaption><b>Interface principal proposta.</b> Estrutura à esquerda e revisão da cláusula selecionada à direita. O redator decide mudanças no texto sem abrir comentários em outra página.</figcaption>
+</figure>
+
+<h2>4. Como as pessoas contribuem sem abrir debate interminável</h2>
+<p>Membros do bloco não devem escrever comentários livres para propor uma mudança textual. Em vez disso, escolhem uma ação curta:</p>
+<table>
+  <thead><tr><th>Ação</th><th>Quando usar</th><th>Dados enviados</th></tr></thead>
+  <tbody>
+    <tr><td>Manter</td><td>Concorda com a versão atual</td><td>Estado de concordância da delegação</td></tr>
+    <tr><td>Alterar texto</td><td>A ideia precisa mudar palavras ou estrutura</td><td>Trecho original, texto novo e justificativa curta opcional</td></tr>
+    <tr><td>Adicionar</td><td>Falta uma cláusula ou subitem</td><td>Tipo, posição, texto e justificativa curta</td></tr>
+    <tr><td>Remover</td><td>A cláusula não é necessária ou é incompatível</td><td>Motivo curto obrigatório</td></tr>
+    <tr><td>Mover</td><td>A posição não corresponde à estrutura</td><td>Nova posição e justificativa curta</td></tr>
+    <tr><td>Fazer pergunta</td><td>Há dúvida factual ou jurídica antes da decisão</td><td>Uma pergunta limitada a 240 caracteres</td></tr>
+  </tbody>
+</table>
+
+<div class="note">
+  <p><b>Regra de encerramento.</b> Comentários livres não ficam permanentemente abertos. Quando uma pergunta é respondida ou uma observação é incorporada, ela é marcada como resolvida. O redator e a mesa não precisam examinar conversa antiga para saber o estado atual.</p>
+</div>
+
+<h2>5. Comparação de texto e lotes de decisão</h2>
+<p>O editor deve mostrar apenas o que mudou, em vez de exigir leitura da proposta completa e do texto atual separadamente.</p>
+<ul>
+  <li>Trechos retirados em vermelho claro e trechos adicionados em verde claro.</li>
+  <li>Movimentos de cláusula mostrados como “de 4 para 3”, sem duplicar o texto.</li>
+  <li>Uma proposta pode ser aceita como está, editada pelo redator ou rejeitada com uma frase curta.</li>
+  <li>O redator pode selecionar várias propostas compatíveis e gerar uma versão revisada única.</li>
+  <li>A versão criada pelo redator aparece em prévia antes de substituir o texto acordado.</li>
+  <li>Delegações veem em tempo real apenas o resultado público: proposta recebida, proposta aceita ou cláusula acordada.</li>
+</ul>
+
+<h2>6. Rodadas curtas com objetivo claro</h2>
+<p>Rodadas não devem ser apenas cronômetros. Cada rodada deve ter um objetivo e uma regra de saída.</p>
+<table>
+  <thead><tr><th>Rodada</th><th>Objetivo</th><th>Entrada</th><th>Saída</th></tr></thead>
+  <tbody>
+    <tr><td><b>Rodada 1 · estrutura</b></td><td>Definir cláusulas necessárias e posição geral</td><td>Working paper ou lista inicial</td><td>Estrutura revisada e propostas principais agrupadas</td></tr>
+    <tr><td><b>Rodada 2 · texto</b></td><td>Fechar palavras, prazos e verbos operativos</td><td>Texto da primeira rodada</td><td>Cláusulas sem conflito relevante</td></tr>
+    <tr><td><b>Rodada 3 · fechamento</b></td><td>Resolver divergências restantes ou marcar como pendentes justificadas</td><td>Lista reduzida de diferenças</td><td>Documento pronto para acordo ou envio à mesa</td></tr>
+  </tbody>
+</table>
+
+<p>Ao terminar o prazo, o sistema congela novas propostas e mostra automaticamente:</p>
+<ul>
+  <li>cláusulas acordadas;</li>
+  <li>cláusulas com proposta pendente;</li>
+  <li>cláusulas sem resposta;</li>
+  <li>quem precisa decidir ou abrir uma exceção; e</li>
+  <li>tempo e ação necessária para continuar.</li>
+</ul>
+
+<h2>7. Presença ao vivo sem imersão quebrada</h2>
+<p>A participação ao vivo deve ajudar sem reproduzir um editor coletivo confuso.</p>
+<div class="timeline">
+  <div class="step done"><strong>Presença</strong>quem está no bloco</div>
+  <div class="step done"><strong>Intenção</strong>redigindo ou revisando</div>
+  <div class="step current"><strong>Foco</strong>cláusula selecionada</div>
+  <div class="step"><strong>Estado</strong>proposta ou acordo</div>
+  <div class="step"><strong>Versão</strong>texto publicado no bloco</div>
+</div>
+<ul>
+  <li>Mostrar presença discreta, como “Ana está nesta cláusula”, sem avatar ou cursor sobre o texto.</li>
+  <li>Não mostrar cada tecla digitada. Atualizar apenas uma versão autosalva em intervalos curtos.</li>
+  <li>Quando outra pessoa aceita uma mudança, destacar o resultado em uma faixa curta e permanecer na cláusula atual.</li>
+  <li>Não tocar som ou vibrar para cada proposta. Avisar apenas decisão importante, término de rodada ou documento enviado.</li>
+  <li>Ao reconectar, restaurar o texto local, a cláusula selecionada e o estado da rodada.</li>
+</ul>
+
+<h2>8. Proposta de interação no celular</h2>
+<p>A tela mobile não deve reproduzir as duas colunas do notebook.</p>
+<div class="two">
+  <div class="panel">
+    <h3>Visão reduzida</h3>
+    <ol>
+      <li>Lista compacta das cláusulas.</li>
+      <li>Ao tocar, abrir uma folha com o texto atual.</li>
+      <li>Mostrar uma única ação principal: manter, alterar, remover ou perguntar.</li>
+      <li>Comparação abre como prévia de tela inteira curta.</li>
+      <li>Comentário é secundário e opcional.</li>
+    </ol>
+  </div>
+  <div class="panel">
+    <h3>Evitar</h3>
+    <ul>
+      <li>Lista de propostas ao lado do texto.</li>
+      <li>Editor com vários campos ao mesmo tempo.</li>
+      <li>Discussão expansiva por comentário.</li>
+      <li>Botões como “Aceitar” e “Recusar” sem contexto.</li>
+      <li>Perda da cláusula ao receber atualização ao vivo.</li>
+    </ul>
+  </div>
+</div>
+
+<h2>9. Fusões e working papers</h2>
+<p>Cláusulas de working papers devem ser incorporadas por origem e não por cópia solta.</p>
+<table>
+  <thead><tr><th>Etapa</th><th>Experiência atual</th><th>Melhoria proposta</th></tr></thead>
+  <tbody>
+    <tr><td>Selecionar origem</td><td>Escolher cláusulas de documentos separados</td><td>Mostrar documento, blocos participantes e status em cartões</td></tr>
+    <tr><td>Comparar</td><td>Listas lado a lado</td><td>Grupo por assunto e diff entre propostas equivalentes</td></tr>
+    <tr><td>Combinar</td><td>Importar cláusula mantendo origem</td><td>Permitir mesclar propostas em uma cláusula só e registrar todas as origens</td></tr>
+    <tr><td>Resolver conflito</td><td>O redator decide manualmente</td><td>Comparar os textos lado a lado e escolher partes ou aceitar versão mista</td></tr>
+    <tr><td>Concluir</td><td>Cláusulas importadas entram no projeto</td><td>Mostrar fontes, diferenças pendentes e número de revisões necessárias</td></tr>
+  </tbody>
+</table>
+
+<h2>10. Estados e regras do documento</h2>
+<table>
+  <thead><tr><th>Estado</th><th>Permite edição</th><th>Permite propostas</th><th>Ação seguinte</th></tr></thead>
+  <tbody>
+    <tr><td>Rascunho</td><td>Somente redator</td><td>Membros do bloco</td><td>Rodada ou acordar cláusulas</td></tr>
+    <tr><td>Rodada ativa</td><td>Somente redator</td><td>Até o término do prazo</td><td>Decidir propostas pendentes</td></tr>
+    <tr><td>Fechado para revisão</td><td>Não</td><td>Não</td><td>Reabrir somente com regra definida</td></tr>
+    <tr><td>Enviado à mesa</td><td>Não</td><td>Emendas separadas</td><td>Mesa avalia ou devolve</td></tr>
+    <tr><td>Aprovado pela mesa</td><td>Não</td><td>Consenso, votação ou emenda conforme regra</td><td>Exibir ao comitê ou arquivar</td></tr>
+  </tbody>
+</table>
+
+<h2>11. Arquitetura técnica proposta</h2>
+<p>O plano deve preservar o banco atual e ampliar o modelo em vez de criar um segundo sistema de edição.</p>
+<table>
+  <thead><tr><th>Parte</th><th>Implementação recomendada</th></tr></thead>
+  <tbody>
+    <tr><td>Texto persistente</td><td>Continuar usando <code>clausula</code>, com texto completo, versão e status. Não salvar cada tecla como uma linha nova.</td></tr>
+    <tr><td>Propostas</td><td>Ampliar <code>proposta_alteracao</code> com tipo, trecho anterior, trecho novo, posição, justificativa curta e origem da versão.</td></tr>
+    <tr><td>Presença</td><td>Broadcast efêmero, separado das tabelas persistentes, com documento, cláusula, intenção e timestamp.</td></tr>
+    <tr><td>Autosave</td><td>Salvar após pausa curta, não a cada tecla. Reconciliação por versão.</td></tr>
+    <tr><td>Conflito</td><td>Preservar o texto digitado localmente, informar a nova versão e mostrar o diff antes da substituição.</td></tr>
+    <tr><td>Offline</td><td>Usar a caixa de saída para propostas e comentários; texto em rascunho local com reenvio explícito.</td></tr>
+    <tr><td>Histórico</td><td>Guardar versões relevantes, não todos os caracteres. Resultado de cada rodada e decisão fica auditável.</td></tr>
+    <tr><td>Tempo real</td><td>Continuar Broadcast privado, filtrando alterações por documento e invalidando somente tabelas afetadas.</td></tr>
+  </tbody>
+</table>
+
+<h3>Eventos ao vivo separados do banco</h3>
+<ul>
+  <li><code>entrar-clausula</code>: quem está olhando a cláusula;</li>
+  <li><code>editar-clausula</code>: apenas indicação de que o redator está editando;</li>
+  <li><code>proposta-nova</code>: atualização de contagem e sinal discreto;</li>
+  <li><code>proposta-resolvida</code>: resultado público de aceitar ou recusar;</li>
+  <li><code>rodada-iniciada</code>: prazo e objetivo da rodada;</li>
+  <li><code>rodada-terminada</code>: lista do que resta decidir.</li>
+</ul>
+
+<h2>12. Segurança e integridade</h2>
+<ul class="checklist">
+  <li>Somente o redator pode alterar o texto persistente.</li>
+  <li>Membros só podem enviar propostas dentro do bloco e da rodada permitida.</li>
+  <li>A mesa não participa da conversa interna salvo quando o documento foi enviado ou devolvido.</li>
+  <li>Cláusulas acordadas não recebem alteração direta ou nova proposta.</li>
+  <li>Versão nova só substitui a que o redator abriu após resolver conflito.</li>
+  <li>Assinaturas e envio continuam ligados ao estado do documento e à presença mínima exigida.</li>
+  <li>Presença e intenção não são persistidas como dados pessoais além do necessário.</li>
+  <li>Texto offline continua protegido pelas mesmas regras ao sincronizar.</li>
+</ul>
+
+<h2>13. Sequência de implementação</h2>
+<table>
+  <thead><tr><th>Etapa</th><th>Entrega</th><th>Duração</th><th>Resultado validado</th></tr></thead>
+  <tbody>
+    <tr><td>1. Contrato de dados</td><td>Tipos estruturados de proposta, resolução e foco da cláusula</td><td>P</td><td>Uma proposta informa ação, texto e justificativa</td></tr>
+    <tr><td>2. Diferenças</td><td>Prévia de diff e lote de propostas compatíveis</td><td>M</td><td>O redator decide sem comparar páginas separadas</td></tr>
+    <tr><td>3. Tela de cláusula</td><td>Estrutura à esquerda e revisão à direita; folha no celular</td><td>M</td><td>Uma cláusula, uma decisão principal</td></tr>
+    <tr><td>4. Rodadas guiadas</td><td>Objetivo, prazo e resumo de pendências</td><td>M</td><td>Ninguém mantém discussão indefinida</td></tr>
+    <tr><td>5. Presença leve</td><td>Indicação de pessoas por cláusula sem transmissão de teclas</td><td>P–M</td><td>Colaboração ao vivo sem editor caótico</td></tr>
+    <tr><td>6. Autosave</td><td>Pausa curta, recuperação offline e revisão de conflito</td><td>M</td><td>Texto não é perdido nem sobrescrito</td></tr>
+    <tr><td>7. Fusão melhorada</td><td>Agrupamento por tema, origem e diff</td><td>M–G</td><td>Working papers se transformam em projeto com rastreabilidade</td></tr>
+    <tr><td>8. Consistência</td><td>Estados, acessibilidade, tema e testes ponta a ponta</td><td>M</td><td>Notebook e celular usam o mesmo modelo</td></tr>
+  </tbody>
+</table>
+
+<h2>14. Testes obrigatórios</h2>
+<table>
+  <thead><tr><th>Tipo</th><th>Caso</th></tr></thead>
+  <tbody>
+    <tr><td>Banco</td><td>Proposta só pode ser criada por membro na rodada válida e só o redator pode aceitar</td></tr>
+    <tr><td>Banco</td><td>Cláusula acordada não recebe proposta ou alteração direta</td></tr>
+    <tr><td>Conflito</td><td>Duas versões chegam ao redator; a segunda preserva o texto local e exige escolha</td></tr>
+    <tr><td>Rodada</td><td>Término do prazo congela propostas e gera resumo de pendências</td></tr>
+    <tr><td>Presença</td><td>Reconexão não fecha o modal nem perde a cláusula selecionada</td></tr>
+    <tr><td>Mobile</td><td>Uma proposta pode ser enviada e decidida em até três ações claras</td></tr>
+    <tr><td>Offline</td><td>Texto e proposta são recuperados e sincronizados sem duplicação</td></tr>
+    <tr><td>Acessibilidade</td><td>Diff, estados, foco, teclado e leitor de tela não dependem de cor</td></tr>
+  </tbody>
+</table>
+
+<h2>15. Métricas de sucesso</h2>
+<ul>
+  <li><b>Tempo até acordo:</b> redução do tempo entre uma primeira proposta e uma cláusula acordada.</li>
+  <li><b>Propostas por cláusula:</b> identificar cláusulas que concentram debate excessivo.</li>
+  <li><b>Rodadas desperdiçadas:</b> rodadas sem alterações relevantes ou sem decisão final.</li>
+  <li><b>Conflitos de versão:</b> frequência de sobrescrita ou texto digitado novamente.</li>
+  <li><b>Conclusão no celular:</b> propor ou aceitar uma alteração sem rolagem desnecessária.</li>
+  <li><b>Perda de contexto:</b> mudanças ao vivo não alteram o bloco ou a cláusula selecionada.</li>
+  <li><b>Acordos reabertos:</b> quantas cláusulas são abertas novamente após serem travadas.</li>
+</ul>
+
+<h2>Pronto quando</h2>
+<div class="summary">
+  <p><b>Um bloco consegue concluir um documento em rodadas curtas</b> sem trocar para Google Docs, sem debates paralelos em comentários e sem perder o controle do texto final.</p>
+  <p>O redator vê mudanças claras, os membros fazem propostas com uma ação simples e o documento avança por estados visíveis. A versão acordada fica protegida, rastreável e pronta para envio à mesa ou para votação no comitê.</p>
+</div>
+
+</body>
+</html>

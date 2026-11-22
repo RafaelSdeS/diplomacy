@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Diplomacy · plano de preparação de discursos e notas durante o debate</title>
+<style>
+  @page {
+    size:A4;
+    margin:20mm 18mm 22mm 18mm;
+    @bottom-left { content:"Diplomacy · preparação de discursos e notas"; font:8pt "Noto Sans",sans-serif; color:#7a8594; }
+    @bottom-right { content:counter(page) " / " counter(pages); font:8pt "Noto Sans",sans-serif; color:#7a8594; }
+  }
+  :root { --ink:#1b2430; --quiet:#5d6878; --line:#d5dbe3; --accent:#1f4e79; --tint:#eaf0f6; --gold:#8c6d2c; --gold-tint:#f7f0e1; --green:#3f6d55; --green-tint:#edf5ef; }
+  * { box-sizing:border-box; }
+  body { font:10pt/1.55 "Noto Sans","DejaVu Sans",sans-serif; color:var(--ink); margin:0; }
+  h1,h2,h3 { font-family:"Noto Serif","DejaVu Serif",serif; color:var(--accent); line-height:1.25; break-after:avoid; }
+  h1 { font-size:24pt; margin:6pt 0 4pt; }
+  h2 { font-size:15pt; margin:22pt 0 7pt; padding-bottom:3pt; border-bottom:1.5px solid var(--accent); }
+  h3 { font-size:11.5pt; margin:13pt 0 4pt; color:var(--ink); }
+  p { margin:0 0 7pt; }
+  ul,ol { margin:0 0 8pt; padding-left:16pt; }
+  li { margin-bottom:2.5pt; }
+  code { font-family:"DejaVu Sans Mono",monospace; font-size:8.5pt; }
+  table { width:100%; border-collapse:collapse; margin:6pt 0 10pt; font-size:8.7pt; break-inside:auto; }
+  th,td { border:1px solid var(--line); padding:5pt 7pt; vertical-align:top; }
+  th { background:var(--tint); color:var(--accent); text-align:left; }
+  tr { break-inside:avoid; }
+  .kicker { font-size:9pt; letter-spacing:.08em; text-transform:uppercase; color:var(--quiet); margin:0 0 4pt; }
+  .subtitle { font-size:12pt; color:var(--quiet); margin:0 0 4pt; }
+  .meta { font-size:9pt; color:var(--quiet); margin-bottom:16pt; }
+  .summary { background:var(--tint); border-left:4px solid var(--accent); padding:10pt 14pt; border-radius:0 6px 6px 0; break-inside:avoid; }
+  .summary p:last-child { margin-bottom:0; }
+  .note { background:var(--gold-tint); border-left:4px solid var(--gold); padding:8pt 12pt; border-radius:0 6px 6px 0; break-inside:avoid; margin:8pt 0 10pt; }
+  .note p:last-child { margin-bottom:0; }
+  .lead { font-size:10.5pt; break-inside:avoid; }
+  .muted { color:var(--quiet); }
+  .two { display:grid; grid-template-columns:1fr 1fr; gap:12pt; break-inside:avoid; }
+  .three { display:grid; grid-template-columns:repeat(3,1fr); gap:8pt; break-inside:avoid; }
+  .panel { border:1px solid var(--line); border-radius:7pt; padding:8pt 9pt 5pt; background:#fbfcfd; break-inside:avoid; }
+  .panel h3 { margin-top:0; }
+  .pill { display:inline-block; border:1px solid var(--accent); border-radius:999px; color:var(--accent); padding:1pt 7pt; margin:0 3pt 4pt 0; font-size:8pt; }
+  .pill.on { background:var(--accent); color:#fff; }
+  figure { margin:9pt 0 12pt; break-inside:avoid; }
+  figcaption { color:var(--quiet); font-size:8.5pt; margin-top:4pt; }
+  .checklist { list-style:none; padding-left:0; }
+  .checklist li::before { content:"☐"; color:var(--accent); margin-right:6pt; }
+  .workbench { border:1.5px solid #2b3542; border-radius:9pt; background:#fbfcfd; overflow:hidden; break-inside:avoid; }
+  .workbench-header { display:flex; justify-content:space-between; align-items:center; padding:7pt 9pt; background:var(--accent); color:#fff; }
+  .workbench-header strong { font-family:"Noto Serif",serif; }
+  .workbench-header span { color:#d5deea; font-size:7.5pt; }
+  .workbench-body { display:grid; grid-template-columns:.75fr 1.25fr; gap:8pt; padding:9pt; }
+  .live-panel,.speech-panel { border:1px solid var(--line); border-radius:6pt; background:#fff; padding:7pt; }
+  .speaker { border-left:3px solid var(--accent); background:var(--tint); border-radius:4pt; padding:5pt 6pt; margin:5pt 0; }
+  .speaker small { color:var(--quiet); }
+  .mini-label { color:var(--quiet); font-size:7.5pt; letter-spacing:.08em; text-transform:uppercase; }
+  .speech-line { display:flex; gap:5pt; margin-top:5pt; border:1px solid var(--line); border-radius:5pt; padding:5pt 6pt; font-size:8.5pt; }
+  .speech-line strong { color:var(--accent); min-width:58pt; }
+  .speech-line.gold { border-left:3px solid var(--gold); background:var(--gold-tint); }
+  .speech-actions { display:flex; justify-content:flex-end; gap:5pt; margin-top:6pt; }
+  .action { border:1px solid var(--accent); border-radius:4pt; padding:3pt 7pt; color:var(--accent); font-size:8pt; }
+  .action.primary { background:var(--accent); color:#fff; }
+  .timeline { display:grid; grid-template-columns:repeat(5,1fr); gap:5pt; break-inside:avoid; margin:8pt 0; }
+  .step { border-top:3px solid var(--line); padding:6pt 5pt 3pt; background:#fbfcfd; font-size:8pt; }
+  .step.current { border-top-color:var(--accent); background:var(--tint); }
+  .step.done { border-top-color:var(--green); }
+  .step strong { display:block; color:var(--accent); margin-bottom:2pt; }
+</style>
+</head>
+<body>
+
+<p class="kicker">Diplomacy · plano de evolução do trabalho da delegação</p>
+<h1>Preparação de discursos enquanto o debate acontece</h1>
+<p class="subtitle">Uma área única para acompanhar o debate, registrar o que cada delegação disse e construir uma fala pronta ao longo do tempo</p>
+<p class="meta">22 de novembro de 2026 · Plano baseado no caderno, na página da delegação e na sessão ao vivo já existentes</p>
+
+<div class="summary">
+  <p><b>Objetivo.</b> Permitir que um delegado acompanhe a sessão, escreva a fala seguinte e organize informações sobre as demais delegações sem ficar alternando entre páginas, procurando notas ou digitando tudo novamente.</p>
+  <p><b>Problema central.</b> Debates rápidos exigem atenção simultânea ao orador, à fila, ao tempo, às posições das delegações e aos documentos. A solução não deve criar uma tela cheia de caixas: deve separar apenas o que precisa ser visto agora e oferecer uma única ação rápida de registro.</p>
+  <p><b>Princípio central.</b> O debate entra no caderno automaticamente; a delegação decide o que merece ser guardado. Toda informação recente aparece perto do rascunho da fala, mas a autoria da fala continua inteiramente humana.</p>
+</div>
+
+<h2>1. Estado atual</h2>
+<p class="lead">Já existem recursos úteis e separados: caderno da delegação, notas rápidas da sessão, perfil de delegação, lista de oradores, cronômetros, tela da press e documentos da mesa.</p>
+<table>
+  <thead><tr><th>Recurso existente</th><th>Já permite</th><th>Limite para preparar fala ao vivo</th></tr></thead>
+  <tbody>
+    <tr><td>Caderno por delegação</td><td>Notas gerais, notas sobre delegações e rascunhos de fala</td><td>É uma página separada da sessão; exige voltar e escolher o tipo da anotação</td></tr>
+    <tr><td>Nota rápida na sessão</td><td>Salva texto com tópico e orador da época</td><td>Fica dentro de <code>details</code>; não mostra a próxima fala nem sugere estrutura</td></tr>
+    <tr><td>Página da delegação</td><td>Nome, documentos, votos, press e notas sobre ela</td><td>Exige entrar em outra página para consultar posição ou histórico recente</td></tr>
+    <tr><td>Sessão ao vivo</td><td>Orador, fila, tempo, voto e pontos</td><td>A sala ocupa uma coluna; o texto de preparação não tem uma área persistente</td></tr>
+    <tr><td>Estimativa de duração</td><td>Compara palavras com o tempo permitido</td><td>A estimativa é um cálculo isolado, sem divisão em partes da fala ou ensaio cronometrado</td></tr>
+    <tr><td>Compartilhamento do caderno</td><td>Uma delegação pode ler uma anotação escolhida por outra</td><td>Não existe uma visão preparada para construir fala em conjunto com aliados</td></tr>
+  </tbody>
+</table>
+
+<h2>2. Produto desejado</h2>
+<div class="three">
+  <div class="panel"><h3>Ver o debate</h3><p>Orador atual, próximo orador, tópico, cronômetro e mudanças importantes ficam visíveis.</p></div>
+  <div class="panel"><h3>Guardar o essencial</h3><p>Uma captura rápida transforma fala, posição ou documento em nota ligada ao contexto.</p></div>
+  <div class="panel"><h3>Escrever a próxima fala</h3><p>O delegado monta trechos curtos, adiciona fontes próprias e vê a duração em tempo real.</p></div>
+</div>
+
+<h2>3. Visão principal: mesa de trabalho da delegação</h2>
+<p class="lead">No computador, a sessão e a preparação ficam lado a lado. No celular, alternam por estado, aba curta ou painel inferior sem perder o rascunho.</p>
+
+<figure>
+<div class="workbench">
+  <div class="workbench-header"><strong>Minhas notas · França</strong><span>Sessão 3 · Tópico 1 · 03:12 para a próxima fala</span></div>
+  <div class="workbench-body">
+    <div class="live-panel">
+      <div class="mini-label">Debate ao vivo</div>
+      <div class="speaker"><strong>Com a palavra</strong><br>Japão · 01:42 restantes</div>
+      <div class="mini-label">Próximos</div>
+      <p style="font-size:8.5pt">1. Brasil<br>2. África do Sul<br>3. França</p>
+      <div class="mini-label">Captura rápida</div>
+      <p style="font-size:8.5pt"><span class="pill">Ponto</span><span class="pill">Contradição</span><span class="pill">Aliado</span><span class="pill">Dado</span></p>
+    </div>
+    <div class="speech-panel">
+      <div class="work-head"><strong>Rascunho da fala</strong><span class="pill on">~1 min 20 s</span></div>
+      <div class="speech-line gold"><strong>Resposta</strong><span>Ao Brasil: diferenciar ajuda humanitária de supervisão militar.</span></div>
+      <div class="speech-line"><strong>Abertura</strong><span>França reafirma a necessidade de monitoramento independente.</span></div>
+      <div class="speech-line"><strong>Argumento</strong><span>O relatório da semana anterior indicou atraso em dois pontos.</span></div>
+      <div class="speech-line"><strong>Fechamento</strong><span>Convidar o bloco a apoiar uma cláusula de prazo.</span></div>
+      <div class="speech-actions"><span class="action">Adicionar nota</span><span class="action">Ensaiar</span><span class="action primary">Usar na próxima fala</span></div>
+    </div>
+  </div>
+</div>
+<figcaption><b>Visual de referência.</b> O debate continua visível à esquerda e o rascunho da fala permanece à direita. O usuário trabalha em uma única tela, com ações que levam menos tempo que entrar em outra página.</figcaption>
+</figure>
+
+<h2>4. Captura rápida durante a fala de outro delegado</h2>
+<p>Ao ouvir ou ler uma fala, o delegado precisa registrar em poucos segundos. A captura não deve abrir uma página de caderno.</p>
+<table>
+  <thead><tr><th>Tipo</th><th>O que captura</th><th>Campos</th><th>Onde é ligado</th></tr></thead>
+  <tbody>
+    <tr><td>Ponto</td><td>Uma afirmação importante</td><td>Texto curto</td><td>Orador atual e tópico</td></tr>
+    <tr><td>Pedido</td><td>Uma medida proposta pela delegação</td><td>Ação, prazo ou documento</td><td>Delegação e fala atual</td></tr>
+    <tr><td>Contradição</td><td>Algo que diverge de voto, DPO ou fala anterior</td><td>Texto novo e fonte anterior</td><td>Delegação e evidência</td></tr>
+    <tr><td>Aliado</td><td>Ponto útil para encaminhar ou citar</td><td>Trecho e possível resposta</td><td>Delegação e rascunho da fala</td></tr>
+    <tr><td>Pergunta</td><td>Ponto que precisa ser esclarecido</td><td>Pergunta curta</td><td>Lista de perguntas da fala seguinte</td></tr>
+    <tr><td>Dado</td><td>Número, prazo ou referência citada</td><td>Valor e documento de origem</td><td>Nota da delegação e fala</td></tr>
+  </tbody>
+</table>
+
+<h3>Comportamento ideal</h3>
+<ol>
+  <li>Uma barra ou atalho abre o campo curto sobre a tela atual.</li>
+  <li>A delegação do orador já aparece preenchida, assim como o tópico e o horário.</li>
+  <li>O usuário escolhe um tipo, escreve uma frase curta e envia.</li>
+  <li>A nota recebe confirmação visual única e volta ao rascunho da fala.</li>
+  <li>Se não houver conexão, a nota continua no aparelho e é sincronizada depois.</li>
+</ol>
+
+<h2>5. Estrutura da fala em blocos</h2>
+<p>A fala não deve ser um único campo de texto do começo ao fim. Blocos permitem rearranjar argumentos sem reescrever tudo.</p>
+<table>
+  <thead><tr><th>Bloco</th><th>Função</th><th>Exemplo curto</th></tr></thead>
+  <tbody>
+    <tr><td>Abertura</td><td>Coloca a delegação e o tema</td><td>“A delegação da França reconhece…”</td></tr>
+    <tr><td>Posição</td><td>Define o que a delegação defende</td><td>“Propomos monitoramento independente…”</td></tr>
+    <tr><td>Resposta</td><td>Responde ao que acabou de ser dito</td><td>“Em resposta ao Brasil…”</td></tr>
+    <tr><td>Dados</td><td>Apresenta uma referência ou resultado</td><td>“O relatório aponta atraso de 30 dias…”</td></tr>
+    <tr><td>Proposta</td><td>Pede uma ação concreta</td><td>“Convidamos o comitê a aprovar um prazo…”</td></tr>
+    <tr><td>Fechamento</td><td>Fecha o argumento e indica próxima etapa</td><td>“França cede o chão à delegação…”</td></tr>
+  </tbody>
+</table>
+
+<p>Recursos por bloco:</p>
+<ul>
+  <li>Reordenar sem apagar texto.</li>
+  <li>Colapsar blocos secundários em uma lista curta.</li>
+  <li>Marcar pontos que dependem de confirmação factual.</li>
+  <li>Inserir uma nota sobre delegação já existente em um clique.</li>
+  <li>Mostrar a duração acumulada e o tempo restante da fala.</li>
+</ul>
+
+<h2>6. Contexto automático e fontes próprias</h2>
+<p>O rascunho deve receber contexto sem forçar a pessoa a sair da sessão.</p>
+<div class="two">
+  <div class="panel">
+    <h3>Contexto automático</h3>
+    <ul>
+      <li>Tópico em debate.</li>
+      <li>Orador atual e anterior.</li>
+      <li>Tempo da fala.</li>
+      <li>Proximidade na fila.</li>
+      <li>Votações ou documentos recentes relacionados.</li>
+    </ul>
+  </div>
+  <div class="panel">
+    <h3>Fonte adicionada pela delegação</h3>
+    <ul>
+      <li>DPO da própria delegação ou da outra.</li>
+      <li>Carta, working paper ou resolução.</li>
+      <li>Nota anterior sobre aquela delegação.</li>
+      <li>Voto anterior registrado pelo app.</li>
+      <li>Menção na press ou atualização de crise.</li>
+    </ul>
+  </div>
+</div>
+<p class="lead">Nenhum texto deve aparecer como fato confirmado sem explicitar a origem. Uma nota pessoal pode ser usada como argumento interno, mas não como prova pública.</p>
+
+<h2>7. Perfil curto da delegação dentro da fala</h2>
+<p>Ao tocar em uma delegação ou em seu nome na fila, mostrar um painel curto em vez de abrir uma página completa.</p>
+<table>
+  <thead><tr><th>Mostrar imediatamente</th><th>Mostrar sob demanda</th></tr></thead>
+  <tbody>
+    <tr><td>Nome, bandeira, posição atual e situação</td><td>Delegados responsáveis e biografia</td></tr>
+    <tr><td>Notas pessoais recentes sobre ela</td><td>Todos os documentos e votações</td></tr>
+    <tr><td>O que disse no debate atual</td><td>Histórico completo da edição anterior</td></tr>
+    <tr><td>Documentos relevantes já abertos</td><td>Lista completa de menções na press</td></tr>
+  </tbody>
+</table>
+
+<h2>8. Leituras e ensaio da fala</h2>
+<p>O modo de leitura transforma o rascunho em uma ajuda confiável no momento da fala.</p>
+<div class="timeline">
+  <div class="step done"><strong>Rascunho</strong>blocos organizados</div>
+  <div class="step done"><strong>Referências</strong>fontes vinculadas</div>
+  <div class="step current"><strong>Ensaio</strong>tempo por bloco</div>
+  <div class="step"><strong>Próxima fala</strong>texto em destaque</div>
+  <div class="step"><strong>Após falar</strong>debrief rápido</div>
+</div>
+<ul>
+  <li>Ensaiar em tela limpa com cronômetro e indicação de ritmo.</li>
+  <li>Mostrar o tempo restante por bloco e sinalizar quando o texto ficar longo.</li>
+  <li>Permitir uma versão curta automática baseada em remoção de detalhes, sem reescrever o argumento.</li>
+  <li>Ao tocar em uma palavra ou nota, ocultar temporariamente o rascunho completo e destacar o trecho seguinte.</li>
+  <li>A versão pronta não deve ser enviada a ninguém: ela permanece privada até a delegação falar.</li>
+</ul>
+
+<h2>9. Atualização ao vivo sem sobrecarregar</h2>
+<table>
+  <thead><tr><th>Evento</th><th>Comportamento recomendado</th><th>Comportamento a evitar</th></tr></thead>
+  <tbody>
+    <tr><td>Mudança de orador</td><td>Atualizar contexto e preservar o rascunho</td><td>Fechar a nota ou mover o texto</td></tr>
+    <tr><td>Nova posição na fila</td><td>Atualizar uma indicação discreta</td><td>Chamar atenção com animação contínua</td></tr>
+    <tr><td>Nova nota compartilhada</td><td>Adicionar a uma fila curta e sinalizar</td><td>Inserir automaticamente no discurso</td></tr>
+    <tr><td>Votação ou documento novo</td><td>Atualizar fonte disponível e indicar mudança</td><td>Interromper a digitação</td></tr>
+    <tr><td>Reconexão</td><td>Sincronizar notas pendentes e restaurar foco</td><td>Substituir um rascunho pelo conteúdo do servidor</td></tr>
+  </tbody>
+</table>
+
+<h2>10. Escritório móvel da delegação</h2>
+<p>No celular, o objetivo é o menor número possível de passos entre ouvir e registrar.</p>
+<div class="two">
+  <div class="panel">
+    <h3>Ao vivo</h3>
+    <ul>
+      <li>Orador atual e tempo em bloco compacto.</li>
+      <li>Botão grande “Anotar”.</li>
+      <li>Tipos em chips pequenos e claros.</li>
+      <li>Campo curto de uma frase.</li>
+      <li>Botão “Adicionar à fala”.</li>
+    </ul>
+  </div>
+  <div class="panel">
+    <h3>Preparação</h3>
+    <ul>
+      <li>Uma aba por fala ou tema.</li>
+      <li>Blocos colapsáveis.</li>
+      <li>Indicador compacto de duração.</li>
+      <li>Modo de leitura em tela cheia opcional.</li>
+      <li>Voltar ao debate em uma ação.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="note">
+  <p><b>Tecnologia restrita.</b> Em comitês onde delegados não podem usar notebooks durante a sessão, a experiência deve priorizar notas rápidas no celular ou acompanhamento da mesa. O app não pode criar uma vantagem que contrarie a tecnologia definida pelo comitê.</p>
+</div>
+
+<h2>11. Colaboração entre delegados da mesma delegação</h2>
+<p>Na mesma delegação, mais de uma pessoa pode trabalhar no texto. Na delegação, os papéis devem ser explícitos.</p>
+<table>
+  <thead><tr><th>Papel</th><th>Responsabilidade</th><th>Feedback no app</th></tr></thead>
+  <tbody>
+    <tr><td>Redator da fala</td><td>Monta o texto final</td><td>Mostra versão e duração</td></tr>
+    <tr><td>Apoiador</td><td>Adiciona notas e dados</td><td>Insere sugestões com origem</td></tr>
+    <tr><td>Responsável pela fala</td><td>Decide o texto que será usado</td><td>Pode selecionar uma versão e ensaiar</td></tr>
+  </tbody>
+</table>
+<p>Não mostrar cursos ou sugestão em tempo real para cada tecla. O texto final é salvo por versão; sugestões novas entram em uma fila curta e podem ser integradas pelo redator.</p>
+
+<h2>12. Arquitetura técnica proposta</h2>
+<table>
+  <thead><tr><th>Componente</th><th>Implementação recomendada</th></tr></thead>
+  <tbody>
+    <tr><td>Anotação rápida</td><td>Extensão da <code>anotacao</code>, com tipo, orador, tópico, hora e delegação relacionada</td></tr>
+    <tr><td>Discurso</td><td>Nova entidade com título, delegação, tópico, estado e blocos ordenados</td></tr>
+    <tr><td>Bloco da fala</td><td>Tipo, texto, ordem, fonte opcional e tempo estimado</td></tr>
+    <tr><td>Fonte</td><td>Referência a DPO, documento, voto, press, crise ou anotação própria</td></tr>
+    <tr><td>Versão</td><td>Salvar por pausa ou ação explícita; não por cada tecla</td></tr>
+    <tr><td>Presença</td><td>Broadcast efêmero indicando cláusula, fala ou caderno aberto</td></tr>
+    <tr><td>Offline</td><td>Usar caixa de saída e armazenamento local para rascunhos e notas</td></tr>
+  </tbody>
+</table>
+
+<h3>Dados deriváveis da sessão</h3>
+<ul>
+  <li>orador atual e delegado responsável;</li>
+  <li>posição na fila e próxima fala;</li>
+  <li>tópico atual e subtópico;</li>
+  <li>tempo definido e tempo restante;</li>
+  <li>documentos exibidos ou votações abertas;</li>
+  <li>notas anteriores já vinculadas à mesma delegação ou tópico.</li>
+</ul>
+
+<h2>13. Sequência de implementação</h2>
+<table>
+  <thead><tr><th>Etapa</th><th>Entrega</th><th>Duração</th><th>Validação</th></tr></thead>
+  <tbody>
+    <tr><td>1. Modelo do discurso</td><td>Discurso e blocos ligados à delegação e à sessão</td><td>P–M</td><td>Uma fala pode ser criada e encerrada sem perder dados</td></tr>
+    <tr><td>2. Captura rápida</td><td>Nota curta ligada ao orador, tópico e tipo</td><td>P</td><td>Uma nota leva menos de três ações</td></tr>
+    <tr><td>3. Painel durante o debate</td><td>Orador, fila e rascunho em uma tela no notebook</td><td>M</td><td>O rascunho não fecha ao mudar de orador</td></tr>
+    <tr><td>4. Contexto da delegação</td><td>Painel curto com notas, DPO, voto e press</td><td>M</td><td>Consultar um país não exige trocar de página</td></tr>
+    <tr><td>5. Estimativa avançada</td><td>Tempo por bloco e ensaio cronometrado</td><td>P–M</td><td>O tempo final é comparado ao limite real</td></tr>
+    <tr><td>6. Versão móvel</td><td>Anotar, organizar blocos e ensaiar em celular</td><td>M</td><td>Preserva o mesmo contexto que o notebook</td></tr>
+    <tr><td>7. Compartilhamento seguro</td><td>Sugestões entre delegados da mesma delegação e aliados</td><td>M</td><td>Permissões não permitem acesso da mesa</td></tr>
+  </tbody>
+</table>
+
+<h2>14. Testes obrigatórios</h2>
+<table>
+  <thead><tr><th>Tipo</th><th>Caso</th></tr></thead>
+  <tbody>
+    <tr><td>Ponta a ponta</td><td>Capturar uma fala, abrir o rascunho e responder ao orador sem mudar de página</td></tr>
+    <tr><td>Tempo real</td><td>Mudança de orador não perde texto nem altera a cláusula selecionada</td></tr>
+    <tr><td>Duração</td><td>Texto vazio, curto, médio e maior que o limite mostram duração correta</td></tr>
+    <tr><td>Offline</td><td>Nota e discurso são recuperados após reconexão sem duplicação</td></tr>
+    <tr><td>Permissão</td><td>Só delegados da delegação alteram o discurso privado</td></tr>
+    <tr><td>Compartilhamento</td><td>Aliado recebe somente a nota escolhida e não o caderno inteiro</td></tr>
+    <tr><td>Tecnologia restrita</td><td>Ferramentas de preparação seguem a regra do comitê</td></tr>
+    <tr><td>Acessibilidade</td><td>Captura, reorganização e ensaio funcionam por teclado e leitor de tela</td></tr>
+  </tbody>
+</table>
+
+<h2>15. Métricas de sucesso</h2>
+<ul>
+  <li>Tempo entre ouvir uma afirmação e guardar uma nota curta.</li>
+  <li>Porcentagem de notas que entram efetivamente no próximo discurso.</li>
+  <li>Tempo gasto alternando entre sessão, caderno e página da delegação.</li>
+  <li>Quantidade de falas que ficam dentro do limite por ensaio.</li>
+  <li>Notas perdidas após reconexão ou troca de página.</li>
+  <li>Uso de fontes e referências dentro dos discursos.</li>
+  <li>Tempo até criar uma resposta depois de mudar o orador.</li>
+</ul>
+
+<h2>Pronto quando</h2>
+<div class="summary">
+  <p><b>O delegado consegue acompanhar o debate e preparar a fala sem abrir várias páginas.</b> Uma ideia capturada durante a fala de outra delegação aparece no rascunho certo, ligada ao orador e ao tópico.</p>
+  <p>O texto é organizado em blocos curtos, o tempo é sempre visível e o usuário pode ensaiar. A interface mantém atenção na sessão, não em menus ou ferramentas de edição, e permite compartilhar somente o necessário.</p>
+</div>
+
+</body>
+</html>
