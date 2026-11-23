@@ -64,6 +64,12 @@
   .step.current { border-top-color:var(--accent); background:var(--tint); }
   .step.done { border-top-color:var(--green); }
   .step strong { display:block; color:var(--accent); margin-bottom:2pt; }
+  /* paginação: nunca uma linha sozinha no fim de tabela, nem item de lista partido */
+  tbody tr:last-child { break-before:avoid; }
+  li { break-inside:avoid; }
+  p { orphans:3; widows:3; }
+  p:has(+ ul), p:has(+ ol), p:has(+ table) { break-after:avoid; }
+  figure { zoom:.88; }
 </style>
 </head>
 <body>
@@ -288,7 +294,7 @@
     <tr><td>Responsável pela fala</td><td>Decide o texto que será usado</td><td>Pode selecionar uma versão e ensaiar</td></tr>
   </tbody>
 </table>
-<p>Não mostrar cursos ou sugestão em tempo real para cada tecla. O texto final é salvo por versão; sugestões novas entram em uma fila curta e podem ser integradas pelo redator.</p>
+<p>Não mostrar cursor ou sugestão em tempo real para cada tecla. O texto final é salvo por versão; sugestões novas entram em uma fila curta e podem ser integradas pelo redator.</p>
 
 <h2>12. Arquitetura técnica proposta</h2>
 <table>
@@ -299,7 +305,7 @@
     <tr><td>Bloco da fala</td><td>Tipo, texto, ordem, fonte opcional e tempo estimado</td></tr>
     <tr><td>Fonte</td><td>Referência a DPO, documento, voto, press, crise ou anotação própria</td></tr>
     <tr><td>Versão</td><td>Salvar por pausa ou ação explícita; não por cada tecla</td></tr>
-    <tr><td>Presença</td><td>Broadcast efêmero indicando cláusula, fala ou caderno aberto</td></tr>
+    <tr><td>Presença</td><td>Broadcast efêmero indicando a fala ou o caderno aberto</td></tr>
     <tr><td>Offline</td><td>Usar caixa de saída e armazenamento local para rascunhos e notas</td></tr>
   </tbody>
 </table>
@@ -334,7 +340,7 @@
   <thead><tr><th>Tipo</th><th>Caso</th></tr></thead>
   <tbody>
     <tr><td>Ponta a ponta</td><td>Capturar uma fala, abrir o rascunho e responder ao orador sem mudar de página</td></tr>
-    <tr><td>Tempo real</td><td>Mudança de orador não perde texto nem altera a cláusula selecionada</td></tr>
+    <tr><td>Tempo real</td><td>Mudança de orador não perde texto nem troca o bloco da fala em edição</td></tr>
     <tr><td>Duração</td><td>Texto vazio, curto, médio e maior que o limite mostram duração correta</td></tr>
     <tr><td>Offline</td><td>Nota e discurso são recuperados após reconexão sem duplicação</td></tr>
     <tr><td>Permissão</td><td>Só delegados da delegação alteram o discurso privado</td></tr>

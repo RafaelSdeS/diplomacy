@@ -18,6 +18,8 @@ table { width:100%; border-collapse:collapse; margin:8pt 0 12pt; font-size:8.7pt
 .phase { border:1px solid var(--line); border-radius:6pt; padding:8pt 10pt; margin:8pt 0; break-inside:avoid } .phase h3 { margin-top:0 }
 .flow { background:#1b2430; color:white; font-family:"DejaVu Sans Mono",monospace; white-space:pre-wrap; padding:10pt; font-size:8.5pt; break-inside:avoid }
 .muted { color:var(--quiet) }
+/* paginação: nunca uma linha sozinha no fim de tabela, nem item de lista partido */
+tbody tr:last-child { break-before:avoid } ul, ol { break-inside:avoid } p:has(+ ul), p:has(+ ol), p:has(+ table), p:has(+ p.muted) { break-after:avoid } p { orphans:3; widows:3 } h2 { margin-top:13pt } body { line-height:1.45 }
 </style>
 </head>
 <body>
@@ -71,6 +73,7 @@ table { width:100%; border-collapse:collapse; margin:8pt 0 12pt; font-size:8.7pt
 
 <h2>3 · Agora operacional e sessão unificada</h2>
 <p>A primeira tela do delegado deve responder “o que preciso fazer agora?” sem exigir navegação em várias abas.</p>
+<p class="muted"><strong>Já entregue nos passos 32 e 43:</strong> Agora por papel, “Precisa de você” e a sessão do delegado em duas colunas. <strong>Falta:</strong> tirar a nota rápida (hoje dentro de um <code>details</code>) e o rascunho da próxima fala para uma área sempre visível da sessão.</p>
 <ul>
 <li>delegado: orador, relógios, votação e pendência curta;</li>
 <li>mesa: chamada, pedidos e documentos;</li>
@@ -82,6 +85,7 @@ table { width:100%; border-collapse:collapse; margin:8pt 0 12pt; font-size:8.7pt
 
 <h2>4 · Modais e interface oficial</h2>
 <p>Usar modal para ações contextuais e painel lateral para objetos. Páginas completas continuam para tarefas prolongadas.</p>
+<p class="muted"><strong>Já entregue no passo 43:</strong> ficha da delegação em painel lateral, “Ir para…” (Ctrl+K) e o componente <code>Confirmar</code>. <strong>Falta:</strong> confirmar a saída (o botão <em>Sair</em> hoje sai direto), usar <code>Confirmar</code> em todas as ações irreversíveis (hoje só agenda e presidência) e os ícones do cabeçalho.</p>
 <table>
 <thead><tr><th>Modal ou painel</th><th>Página completa</th></tr></thead>
 <tbody>
@@ -117,14 +121,15 @@ table { width:100%; border-collapse:collapse; margin:8pt 0 12pt; font-size:8.7pt
 <div class="phase"><h3>Lote E — acabamento</h3><p>Acessibilidade, visual, capturas, estados vazios e melhoria gradual.</p></div>
 
 <h2>Dependências</h2>
-<div class="flow">Segurança
-  ├─ Coletiva oral
+<div class="flow">Segurança (cache, logout, RLS, Storage)
+  ├─ Coletiva oral ............ em paralelo, depois da segurança básica
   ├─ Agora e sessão unificada
-  └─ Modais e interface oficial
-       └─ Demonstração online
-            ├─ Edição por cláusula
-            └─ Preparação de discursos
-                 └─ Melhorias gerais e acabamento</div>
+  │    └─ Preparação de discursos
+  ├─ Modais e interface oficial  em paralelo com a sessão e a coletiva
+  ├─ Demonstração online ...... depois de sessão, documentos e coletiva
+  └─ Edição por cláusula ...... depende de sessão, documentos e RLS atuais
+
+Melhorias gerais ............... entram aos poucos, depois dos componentes principais</div>
 
 <h2>Critérios gerais</h2>
 <ul>

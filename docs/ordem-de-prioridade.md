@@ -110,6 +110,8 @@ Documentos relacionados:
 - [Passo 43 · sessão unificada](implementacao/43-facil-de-achar-e-voltar.md)
 - [Plano de interface](interface-e-demonstracao.md)
 
+**Já entregue nos passos 32 e 43:** Agora por papel, “Precisa de você” e a sessão do delegado em duas colunas. **Falta:** tirar a nota rápida (hoje dentro de um `<details>` na sessão) e o rascunho da próxima fala para uma área sempre visível.
+
 ### Primeira entrega
 
 - perguntar ao app “o que preciso fazer agora?”;
@@ -136,14 +138,15 @@ Documento: [Plano de interface oficial e demonstração](interface-e-demonstraca
 
 ### Ordem
 
-1. confirmar saída;
-2. padronizar confirmação irreversível;
-3. transformar ficha de delegação em painel lateral;
-4. usar modal para DPO, carta e busca curta;
-5. converter perfil e sair em ícones com rótulo acessível;
-6. criar “Ir para…” como central contextual;
-7. padronizar densidade, hierarquia e estados;
-8. revisar todas as páginas de links secundários.
+Já entregue no passo 43: ficha da delegação em painel lateral, “Ir para…” (Ctrl+K) e o componente `Confirmar`.
+
+1. confirmar saída (hoje o botão *Sair* sai direto);
+2. usar `Confirmar` em todas as ações irreversíveis (hoje só agenda e presidência);
+3. usar modal para DPO, carta e busca curta;
+4. converter perfil e sair em ícones com rótulo acessível;
+5. ampliar “Ir para…” (veículos, matérias, agrupamento por papel);
+6. padronizar densidade, hierarquia e estados;
+7. revisar todas as páginas de links secundários.
 
 Modais são adequados para consulta curta e ação contextual. Páginas completas continuam para:
 

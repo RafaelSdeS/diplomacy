@@ -68,7 +68,7 @@ await gerarPdf('prototipos-interface-demonstracao.pdf', ['demo', 'delegacao', 'm
 await gerarPdf('prototipos-seguranca.pdf', ['seguranca']);
 await gerarPdf('prototipos-editor-documentos.pdf', ['editor-clausulas', 'proposta-clausula', 'rodada-documento']);
 await gerarPdf('prototipos-preparacao-fala.pdf', ['mesa-preparacao-fala', 'captura-nota']);
-await gerarPdf('prototipos-agora-sessao.pdf', ['agora-unificado', 'sessao-unificada', 'delegacao']);
+await gerarPdf('prototipos-agora-sessao.pdf', ['agora-unificado', 'sessao-unificada']);
 await gerarPdf('prototipos-melhorias-interface.pdf', ['demo', 'mobile', 'delegacao', 'seguranca']);
 
 await browser.close();

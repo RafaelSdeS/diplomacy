@@ -14,9 +14,9 @@ Os controles abaixo estão organizados por ameaça. “Risco confirmado” signi
 
 Referências:
 
-- cache de API em [src/service-worker/index.ts](/home/rafael/Documents/diplomacy/src/service-worker/index.ts:64);
-- cache por URL em [src/service-worker/index.ts](/home/rafael/Documents/diplomacy/src/service-worker/index.ts:97);
-- limpeza somente no logout em [src/routes/+layout.svelte](/home/rafael/Documents/diplomacy/src/routes/+layout.svelte:116).
+- cache de API em [src/service-worker/index.ts](../src/service-worker/index.ts#L64);
+- cache por URL em [src/service-worker/index.ts](../src/service-worker/index.ts#L97);
+- limpeza somente no logout em [src/routes/+layout.svelte](../src/routes/+layout.svelte#L116).
 
 Nenhuma confirmação adicional de vulnerabilidade foi encontrada nesta revisão limitada ao código disponível. Os demais pontos abaixo são controles necessários ou lacunas de implantação que devem ser validados.
 
@@ -51,8 +51,8 @@ Recomendação:
 
 Arquivos envolvidos:
 
-- [src/service-worker/index.ts](/home/rafael/Documents/diplomacy/src/service-worker/index.ts:55);
-- [src/routes/+layout.svelte](/home/rafael/Documents/diplomacy/src/routes/+layout.svelte:116).
+- [src/service-worker/index.ts](../src/service-worker/index.ts#L55);
+- [src/routes/+layout.svelte](../src/routes/+layout.svelte#L116).
 
 ## Arquitetura de autorização
 
@@ -96,7 +96,7 @@ Toda tabela em `public` deve:
 - limitar ações por delegação ou comitê;
 - não depender apenas de IDs secretos.
 
-O teste geral já existe em [supabase/tests/00-rls-em-todas-as-tabelas.test.sql](/home/rafael/Documents/diplomacy/supabase/tests/00-rls-em-todas-as-tabelas.test.sql).
+O teste geral já existe em [supabase/tests/00-rls-em-todas-as-tabelas.test.sql](../supabase/tests/00-rls-em-todas-as-tabelas.test.sql).
 
 Ele deve continuar falhando para tabelas novas esquecidas.
 

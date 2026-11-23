@@ -380,6 +380,11 @@
   .telefone-mockup .destaque span {
     font-size: 7.5pt;
   }
+  /* paginação: nunca uma linha sozinha no fim de tabela, nem item de lista partido */
+  tbody tr:last-child { break-before: avoid; }
+  li { break-inside: avoid; }
+  p { orphans: 3; widows: 3; }
+  p:has(+ ul), p:has(+ ol), p:has(+ table) { break-after: avoid; }
 </style>
 </head>
 <body>

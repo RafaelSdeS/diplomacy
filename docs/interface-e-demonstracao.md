@@ -37,7 +37,7 @@ Abrir a delegação em painel lateral direito:
 - cartas visíveis;
 - contatos ou ações permitidas.
 
-A ficha já existe em [src/lib/ui/FichaDelegacao.svelte](/home/rafael/Documents/diplomacy/src/lib/ui/FichaDelegacao.svelte:52).
+A ficha já existe em [src/lib/ui/FichaDelegacao.svelte](../src/lib/ui/FichaDelegacao.svelte#L52).
 
 Ela deve continuar disponível por clique no nome da delegação, sem perder a página atual.
 
@@ -45,7 +45,7 @@ Ela deve continuar disponível por clique no nome da delegação, sem perder a p
 
 Manter a busca global como modal.
 
-O componente atual em [src/lib/ui/IrPara.svelte](/home/rafael/Documents/diplomacy/src/lib/ui/IrPara.svelte:77) já permite:
+O componente atual em [src/lib/ui/IrPara.svelte](../src/lib/ui/IrPara.svelte#L77) já permite:
 
 - buscar telas;
 - buscar delegações;
@@ -62,7 +62,7 @@ Ampliações possíveis:
 
 ### Confirmações
 
-Usar o componente compartilhado [src/lib/ui/Confirmar.svelte](/home/rafael/Documents/diplomacy/src/lib/ui/Confirmar.svelte:11) para ações irreversíveis:
+Usar o componente compartilhado [src/lib/ui/Confirmar.svelte](../src/lib/ui/Confirmar.svelte#L11) para ações irreversíveis:
 
 - sair;
 - encerrar sessão;
@@ -186,7 +186,7 @@ Após confirmação:
 
 ## Aparência das modals
 
-Manter os padrões já definidos em [src/app.css](/home/rafael/Documents/diplomacy/src/app.css:871):
+Manter os padrões já definidos em [src/app.css](../src/app.css#L871):
 
 - borda fina;
 - fundo sólido;
@@ -253,15 +253,15 @@ No comitê:
 - rodada com comentários;
 - notícias publicadas;
 - uma coletiva aberta;
-- uma pergunta por delegado;
-- uma resposta respondida;
-- uma resposta pendente;
+- uma pergunta já concluída (resposta oral, só com a nota curta da press);
+- uma pergunta na pauta, oculta da delegação;
+- uma delegação chamada neste momento;
 - uma notícia citando delegação;
 - sessão com chamada e presença;
 - agenda adotada;
 - votação demonstrativa.
 
-O script atual já cria esse tipo de conteúdo em [scripts/demonstracao.ts](/home/rafael/Documents/diplomacy/scripts/demonstracao.ts:180).
+O script atual já cria esse tipo de conteúdo em [scripts/demonstracao.ts](../scripts/demonstracao.ts#L180).
 
 ### Personas de acesso rápido
 
