@@ -806,6 +806,17 @@ export const EN: Record<string, string> = {
 	'{n} de {total} votaram': '{n} of {total} voted',
 	'{n} notas selecionadas': '{n} notes selected',
 	'{n} para enviar': '{n} to send',
+	// Passo 46
+	'avise a mesa que chegou': 'tell the bureau you have arrived',
+	'Seu ponto ou moção espera a mesa': 'Your point or motion is waiting for the bureau',
+	'rascunho guardado': 'draft saved',
+	'Sobre {delegacao}': 'About {delegacao}',
+	'Sobre quem fala': 'About the speaker',
+	'Minha próxima fala': 'My next speech',
+	'Rascunho da próxima fala': 'Draft of my next speech',
+	'Fala guardada no caderno.': 'Speech saved in the notebook.',
+	'Tópico {n}': 'Topic {n}',
+	'{delegacao} com a palavra': '{delegacao} has the floor',
 	// Passo 45
 	'a pergunta só é conhecida quando for feita em voz alta': 'the question is only known when it is asked aloud',
 	// Passo 44

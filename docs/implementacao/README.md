@@ -225,7 +225,7 @@ Cada passo tem uma seção "Testes" com os testes que provam que ele funciona e 
 | 43 | — | sim | sim (por tarefa) | sim |
 | 44 | sim | sim | sim | sim |
 | 45 | sim | — | sim | sim |
-| 46 | só se faltar coluna | sim | sim | sim |
+| 46 | — | sim | sim | sim |
 | 47 | — | — | sim | — |
 | 48 | — | — | sim | sim |
 | 49 | sim | sim | sim | — |

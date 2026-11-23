@@ -28,7 +28,7 @@
 	import Votar from '#lib/ui/Votar.svelte';
 	import AlertaCrise from '#lib/ui/AlertaCrise.svelte';
 	import { semVoz } from '#lib/crise.ts';
-	import { caixa, mensagemDoEnvio } from '#lib/caixa.ts';
+	import NotaRapida from '#lib/ui/NotaRapida.svelte';
 	import { assinaturasDesconfianca, escolhasPermitidas, ETAPAS, FASES, listaAtiva, presidenciaEmVigor, textoResultado } from '#lib/votacao.ts';
 	import type { PageProps } from './$types';
 
@@ -96,29 +96,6 @@
 		setTimeout(() => chamarAtencao('c-votacao'));
 	});
 	const naListaCurta = $derived((sessao?.proximos ?? []).findIndex((p) => p.delegacao?.id === eu?.delegacao_id));
-	// Passo 34: anotar sem sair da sessão; a nota guarda o tópico e quem falava.
-	let nota = $state('');
-	async function anotar(evento: SubmitEvent) {
-		evento.preventDefault();
-		erro = mensagem = '';
-		const id = crypto.randomUUID();
-		const resultado = await caixa.enviar({
-			id,
-			rpc: 'salvar_anotacao',
-			args: {
-				p_id: id,
-				p_comite: data.comite.id,
-				p_tipo: 'nota',
-				p_texto: nota,
-				p_topico: data.estado?.topico_atual ?? undefined,
-				p_orador: data.estado?.orador?.id ?? undefined
-			},
-			rotulo: t('Anotação')
-		});
-		({ erro, mensagem } = mensagemDoEnvio(resultado, t('Anotado no caderno.')));
-		if (!erro) nota = '';
-	}
-
 	function irAoPonto() {
 		const campo = document.getElementById('tipo-ponto');
 		campo?.scrollIntoView({ block: 'center' });
@@ -369,18 +346,6 @@
 				<form method="dialog"><button class="botao botao--secundario">{t('Fechar')}</button></form>
 			</dialog>
 		{/if}
-		{#if eu && !restrita && !representada}
-			<details class="anotar">
-				<summary>{t('Anotar')}</summary>
-				<form class="formulario" onsubmit={anotar} aria-label={t('Anotar no caderno')}>
-					<label class="campo">
-						{t('Nota rápida')}
-						<textarea required rows="2" maxlength="4000" bind:value={nota} {@attach contador(nota)}></textarea>
-					</label>
-					<button class="botao botao--secundario botao--pequeno">{t('Guardar no caderno')}</button>
-				</form>
-			</details>
-		{/if}
 		</div>
 		<div class="cartoes sessao-sala">
 			<article class="cartao cartao--ao-vivo" aria-labelledby="c-palavra">
@@ -399,6 +364,11 @@
 					<Cronometro cronometro={relogioDebate(data.estado)} avisoSeg={60} {diferenca} />
 				{/if}
 			</article>
+
+			<!-- Passo 46: anotar e preparar a próxima fala sem sair da sessão (no celular, uma folha). -->
+			{#if eu && !restrita && !representada}
+				<NotaRapida comite={data.comite} estado={data.estado} onresultado={(r) => ({ erro, mensagem } = r)} />
+			{/if}
 
 			{#if lista.length}
 				<article class="cartao" aria-labelledby="c-lista">

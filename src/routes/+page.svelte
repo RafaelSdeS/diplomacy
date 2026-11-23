@@ -74,6 +74,19 @@
 	const paraJulgar = $derived(
 		(sessao?.pontos ?? []).filter((p) => p.status === 'aberto' && p.aprovado_bureau == null).length
 	);
+	// Passo 46: o que a sala espera da delegação, sem abrir a sessão para descobrir.
+	const meusPontos = $derived(
+		(sessao?.pontos ?? []).filter((p) => p.status === 'aberto' && p.delegacao?.id === minhaDelegacao).length
+	);
+	const ausente = $derived(
+		!!sessao && !!minhaDelegacao && !sessao.presenca.some((p) => p.delegacao_id === minhaDelegacao)
+	);
+	const nadaParaDelegacao = $derived(
+		!data.rodadas.length && !dposPendentes.length && !data.bilhetes.length && !meusPontos && !ausente
+	);
+	// A mesa: três ações, e o que espera por ela em cada uma.
+	const documentosEnviados = $derived((data.mesa?.dpos ?? 0) + (data.mesa?.documentos ?? 0));
+	const nadaParaMesa = $derived(!sessao?.avisos.length && !paraJulgar && !documentosEnviados);
 </script>
 
 <svelte:head>
@@ -134,6 +147,18 @@
 		<article class="cartao cartao--destaque" aria-labelledby="c-caixa">
 			<h2 id="c-caixa">{t('Precisa de você')}</h2>
 			<ul class="lista">
+				{#if ausente}
+					<li>
+						<a href={`/comite/${sigla}/sessao`}>{t('Sua delegação está ausente na chamada')}</a>
+						<span class="detalhe">{t('avise a mesa que chegou')}</span>
+					</li>
+				{/if}
+				{#if meusPontos}
+					<li>
+						<a href={`/comite/${sigla}/sessao`}>{t('Seu ponto ou moção espera a mesa')}</a>
+						<span class="selo selo--info">{meusPontos}</span>
+					</li>
+				{/if}
 				{#each data.rodadas as r (r.documento?.id)}
 					<li>
 						<a href={`/documento/${r.documento?.id}`}>{r.documento?.titulo}</a>
@@ -149,7 +174,7 @@
 				{#each data.bilhetes as b (b.id)}
 					<li><span><strong>{b.de?.nome}</strong> {b.texto}</span> <a href={`/comite/${sigla}/mensagens`}>{t('Responder')}</a></li>
 				{/each}
-				{#if !data.rodadas.length && !dposPendentes.length && !data.bilhetes.length}
+				{#if nadaParaDelegacao}
 					<li class="suave">{t('Nada esperando você agora.')}</li>
 				{/if}
 			</ul>
@@ -162,22 +187,21 @@
 			<p>{sessao ? t('Sessão {n} aberta', { n: sessao.numero }) : t('Nenhuma sessão aberta.')}</p>
 			<ul class="lista">
 				<li>
-					<a href={`/comite/${sigla}/sessao/presidencia`}>{t('Chegadas a confirmar')}</a>
+					<a href={`/comite/${sigla}/sessao/chamada`}>{t('Chegadas a confirmar')}</a>
 					<span class="selo">{sessao?.avisos.length ?? 0}</span>
 				</li>
 				<li>
 					<a href={`/comite/${sigla}/sessao/presidencia`}>{t('Pedidos para o bureau')}</a>
 					<span class="selo">{paraJulgar}</span>
 				</li>
-				<li><a href={`/comite/${sigla}/dpo`}>{t('DPOs enviados')}</a> <span class="selo">{data.mesa?.dpos ?? 0}</span></li>
 				<li>
-					<a href={`/comite/${sigla}/blocos`}>{t('Documentos enviados à mesa')}</a>
-					<span class="selo">{data.mesa?.documentos ?? 0}</span>
+					<a href={`/comite/${sigla}/documentos`}>{t('Documentos enviados à mesa')}</a>
+					<span class="selo">{documentosEnviados}</span>
 				</li>
+				{#if nadaParaMesa}<li class="suave">{t('Nada esperando você agora.')}</li>{/if}
 			</ul>
 			<div class="acoes">
 				<a class="botao" href={`/comite/${sigla}/sessao/presidencia`}>{t('Abrir o painel')}</a>
-				<a class="botao botao--secundario" href={`/comite/${sigla}/sessao/chamada`}>{t('Chamada')}</a>
 			</div>
 		</article>
 	{/if}

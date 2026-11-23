@@ -30,6 +30,16 @@ Este passo reúne o que antes estava como "Escopo reduzido para o piloto" nos pa
 
 Situação, orador, fila curta, pedidos pendentes e votação ativa numa área só. Chamadas, ajustes de tempo e "assumir delegação" ficam recolhidos. Confirmar só o que é coletivo ou irreversível; o que dá para reverter oferece desfazer.
 
+## Estado (23/11/2026)
+
+Feito:
+
+- **Sessão:** o `<details>` "Anotar" virou o componente `src/lib/ui/NotaRapida.svelte`, logo abaixo de "Com a palavra". No notebook é um cartão aberto, à vista sem rolar; no celular, uma barra fixa acima do menu que abre como folha. Tipos "Nota", "Sobre {delegação}" e "Minha próxima fala". O contexto (tópico, quem falava, hora) é o de quando a nota começou (`src/lib/nota-rapida.ts`), então a troca de orador não muda de quem a nota fala. Texto, tipo e contexto ficam no aparelho a cada tecla (e saem no logout, passo 44). A próxima fala é uma só no caderno: guardar de novo atualiza a mesma.
+- **Agora:** "Precisa de você" do delegado ganhou "Sua delegação está ausente na chamada" e "Seu ponto ou moção espera a mesa", vindos dos dados que a tela já lia. O cartão da mesa tem três atalhos (chegadas, pedidos, documentos enviados) e "Nada esperando você agora." quando os três estão zerados.
+- **Banco:** nada novo. A tabela `anotacao` já guardava tipo, tópico, orador e hora; a sessão se deduz da hora, então não ganhou coluna.
+
+Ficou como estava, de propósito: o painel da mesa e da presidência (o passo 43 já reúne situação, orador, fila, pedidos e votação, com os ajustes recolhidos), e os cartões de press, crise e secretaria, que já mostram só o que pede ação. O teste manual com uma pessoa que nunca viu o app fica com você.
+
 ## Fora desta etapa
 
 Editor de discurso, favoritos, layouts configuráveis, presença por tecla, compartilhamento do caderno nesta área e ensaio completo (passo 50).
