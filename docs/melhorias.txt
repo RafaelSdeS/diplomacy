@@ -1,3 +1,5 @@
+> **Texto de partida, mantido por histórico.** A fonte única das regras de interface é [melhorias-interface.pdf](melhorias-interface.pdf) (HTML em `melhorias-interface.html`), que incorpora este texto e as decisões do piloto. Em caso de divergência, vale o PDF. Não atualize este arquivo.
+
 ## Melhorias de organização e interação
 
 O objetivo destas melhorias é transformar as áreas de **Comitê** e **Sessão** em ambientes de trabalho claros, elegantes e imersivos. As telas devem parecer parte de um único produto diplomático: não podem ter a aparência genérica de um painel administrativo, nem depender de menus extensos ou listas soltas de opções.

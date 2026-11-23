@@ -1,8 +1,8 @@
 # Ordem de prioridade dos próximos planos
 
-**Atualizado:** 22 de novembro de 2026
+**Atualizado:** 23 de novembro de 2026
 
-Este documento consolida os planos discutidos nas sessões de hoje e define uma ordem para o trabalho futuro.
+Este documento consolida os planos discutidos e define uma ordem para o trabalho futuro. Cada plano virou um passo do [plano de implementação](implementacao/README.md) (passos 44 a 51), com esforço e dependências.
 
 ## Critério
 
@@ -18,26 +18,36 @@ Recomendação geral: não começar todos os itens ao mesmo tempo. Trabalhar por
 
 ## Ordem recomendada
 
-| Prioridade | Plano | Por que agora | Escopo mínimo |
-|---:|---|---|---|
-| 1 | Segurança da sessão e dos dados | Impede vazamento e acesso indevido em aparelhos compartilhados | Remover cache autenticado, testar RLS, revogar participação e limpar sessão |
-| 2 | Coletiva de imprensa como fluxo oral | Corrige uma área hoje sem utilidade real | Pauta, chamada, delegação sem pergunta antecipada, cronômetro, telão e conclusão |
-| 3 | Agora operacional e sessão unificada | Reduz a maior dificuldade de uso durante o debate | Pendências por papel, estado ao vivo, rascunho curto e ações principais |
-| 4 | Modais, painel lateral e ícones | Reduz mudanças de página e melhora a aparência oficial | Ficha de delegação, confirmação, busca, perfil, sair e ações rápidas |
-| 5 | Demonstração online com acesso rápido por papel | Permite validar toda a experiência sem montar dados manualmente | Um comitê completo, contas fictícias, documentos, bureau e press |
-| 6 | Edição colaborativa por cláusula | Resolve o problema central de documentos sem discussões infinitas | Proposta por cláusula, revisão, rodada curta e fusão básica |
-| 7 | Preparação de discursos e notas | Permite acompanhar outras delegações enquanto prepara a próxima fala | Nota rápida ligada ao orador e ao tópico, caderno curto e fontes recentes |
-| 8 | Melhorias gerais já identificadas | Endereça problemas menores depois das bases acima | Voltar, estados vazios, placeholders, pesquisa, densidade e consistência |
+| Prioridade | Passo | Plano | Esforço | Por que agora | Escopo mínimo |
+|---:|---|---|:-:|---|---|
+| 1 | [44](implementacao/44-seguranca-dos-dados.md) | Segurança da sessão e dos dados | M | Impede vazamento e acesso indevido em aparelhos compartilhados | Cache offline por usuário, limpeza de sessão, testes de RLS e revogação de participação |
+| 2 | [45](implementacao/45-coletiva-oral.md) | Coletiva de imprensa como fluxo oral | M | Corrige uma área hoje sem utilidade real | Pauta, chamada, pergunta fora do alcance da delegação, cronômetro, telão e conclusão |
+| 3 | [46](implementacao/46-agora-e-sessao-unificadas.md) | Agora operacional e sessão unificada | M | Reduz a maior dificuldade de uso durante o debate | Nota rápida e próxima fala sempre visíveis; pendência que leva direto à ação |
+| 4 | [47](implementacao/47-modais-saida-e-icones.md) | Modais, saída segura e ícones | M | Reduz mudanças de página e melhora a aparência oficial | Saída com confirmação, `Confirmar` nas ações irreversíveis, ícones do cabeçalho |
+| 5 | [48](implementacao/48-demonstracao-online.md) | Demonstração online com acesso rápido por papel | M | Permite validar toda a experiência sem montar dados manualmente | Projeto separado, um comitê completo, `/demo` por papel e reinício |
+| 6 | [49](implementacao/49-edicao-por-clausula.md) | Edição colaborativa por cláusula | G | Resolve o problema central de documentos sem discussões infinitas | Proposta estruturada, rodada com prazo, comparação e fusão básica |
+| 7 | [50](implementacao/50-preparacao-da-fala.md) | Preparação de discursos e notas | M | Permite acompanhar outras delegações enquanto prepara a próxima fala | Captura rápida por tipo, painel curto da delegação e rascunho da fala |
+| 8 | [51](implementacao/51-melhorias-gerais-de-interface.md) | Melhorias gerais | G | Endereça problemas menores depois das bases acima | Voltar, estados vazios, placeholders, densidade e consistência |
+
+Esforço **P**, **M** ou **G** como nos passos 01 a 43. Os itens 6 e 7 só começam depois da validação com o piloto (abaixo).
+
+## Validação com o piloto antes dos itens 6 e 7
+
+A sessão do piloto ([piloto.md](piloto.md), passo 12) não está registrada como feita: os critérios de aceite do passo 12 seguem abertos. Os planos de edição por cláusula e de preparação de fala nasceram sem dados de uso. Construí-los antes de ver o piloto é apostar em duas das maiores entregas.
+
+Regra: **os passos 49 e 50 só começam depois que o questionário do piloto responder às perguntas deles.** O roteiro ganhou essas perguntas (a rodada de propostas deu conta? o que faltou ao preparar a fala?). Se o piloto não mostrar dor, os dois ficam para depois do evento. O que o passo 46 já entrega (nota e próxima fala visíveis) pode bastar.
+
+Os itens 1 a 5 e 8 não dependem do piloto: segurança, coletiva e sessão já têm requisitos claros.
 
 ## 1. Segurança da sessão e dos dados
 
-Documento: [Plano de segurança online](seguranca-online.md)
+Documento: [Plano de segurança online](seguranca-online.md) · Passo: [44](implementacao/44-seguranca-dos-dados.md)
 
 É a primeira prioridade porque o app já pode lidar com dados privados e pode ser usado em aparelhos compartilhados.
 
 ### Deve ser corrigido primeiro
 
-- cache do service worker não pode misturar contas;
+- o cache do service worker não pode misturar contas: um cache por usuário, com validade de 12 horas, e a leitura offline do passo 15 continua;
 - logout deve limpar dados autenticados;
 - RLS precisa continuar protegendo cada objeto;
 - revogação de participação deve revogar acesso no banco e na interface;
@@ -47,7 +57,7 @@ Documento: [Plano de segurança online](seguranca-online.md)
 
 ### Ordem dentro deste plano
 
-1. remover cache das APIs autenticadas;
+1. particionar o cache das APIs autenticadas por usuário e criar a lista de exclusão (pergunta da coletiva, nota de crise, voto individual);
 2. adicionar limpeza de sessão em troca de conta e logout;
 3. revisar RLS e políticas de Storage;
 4. adicionar testes de usuário errado, comitê errado e evento errado;
@@ -64,12 +74,12 @@ Documento: [Plano de segurança online](seguranca-online.md)
 
 ## 2. Coletiva de imprensa — implementação limitada ao momento real
 
-Documento: [Plano detalhado da coletiva de imprensa](coletiva-de-imprensa.md)
+Documento: [Plano detalhado da coletiva de imprensa](coletiva-de-imprensa.md) · Passo: [45](implementacao/45-coletiva-oral.md)
 
 A coletiva é uma dinâmica oral:
 
 - o jornalista prepara uma pergunta longa;
-- a delegação não conhece a pergunta antes de ser chamada;
+- a delegação não conhece a pergunta antes de a jornalista fazê-la em voz alta;
 - a pergunta é feita em voz alta;
 - a delegação responde em voz alta;
 - o app organiza a chamada, a ordem e a informação pública;
@@ -79,9 +89,9 @@ A coletiva é uma dinâmica oral:
 
 - abrir e fechar uma coletiva;
 - enviar até quatro perguntas por veículo;
-- ocultar a pergunta da delegação até a chamada;
+- guardar o texto em tabela própria (a RLS filtra linhas, não colunas), legível pela delegação só a partir de `Respondendo`;
 - chamar uma delegação;
-- mostrar a delegação e o veículo no telão;
+- mostrar a delegação e o veículo no telão e a pergunta só em `Respondendo`;
 - iniciar e concluir a resposta oral;
 - cronômetro opcional;
 - encerrar a coletiva;
@@ -107,10 +117,11 @@ Ela corrige uma área explicitamente sem utilidade e não exige um editor comple
 Documentos relacionados:
 
 - [Passo 32 · Agora por papel](implementacao/32-agora-por-papel.md)
-- [Passo 43 · sessão unificada](implementacao/43-facil-de-achar-e-voltar.md)
-- [Plano de interface](interface-e-demonstracao.md)
+- [Passo 43 · fácil de achar e de voltar](implementacao/43-facil-de-achar-e-voltar.md)
+- [Passo 46 · Agora e sessão unificadas](implementacao/46-agora-e-sessao-unificadas.md) (o que falta)
+- [Melhorias de interface](melhorias-interface.pdf), fonte única das regras de interface
 
-**Já entregue nos passos 32 e 43:** Agora por papel, “Precisa de você” e a sessão do delegado em duas colunas. **Falta:** tirar a nota rápida (hoje dentro de um `<details>` na sessão) e o rascunho da próxima fala para uma área sempre visível.
+**Já entregue nos passos 32 e 43:** Agora por papel, “Precisa de você” e a sessão do delegado em duas colunas. **Falta (passo 46):** tirar a nota rápida (hoje dentro de um `<details>` na sessão) e o rascunho da próxima fala para uma área sempre visível.
 
 ### Primeira entrega
 
@@ -134,7 +145,7 @@ Documentos relacionados:
 
 ## 4. Modais, painéis e aparência oficial
 
-Documento: [Plano de interface oficial e demonstração](interface-e-demonstracao.md)
+Documento: [Plano de interface oficial e demonstração](interface-e-demonstracao.md) · Passo: [47](implementacao/47-modais-saida-e-icones.md)
 
 ### Ordem
 
@@ -143,7 +154,7 @@ Já entregue no passo 43: ficha da delegação em painel lateral, “Ir para…�
 1. confirmar saída (hoje o botão *Sair* sai direto);
 2. usar `Confirmar` em todas as ações irreversíveis (hoje só agenda e presidência);
 3. usar modal para DPO, carta e busca curta;
-4. converter perfil e sair em ícones com rótulo acessível;
+4. ícones no cabeçalho: só a lupa e o sino sem texto; Perfil e Sair mantêm a palavra (no celular, em “Mais”). Usar o Lucide já instalado, ícone a ícone;
 5. ampliar “Ir para…” (veículos, matérias, agrupamento por papel);
 6. padronizar densidade, hierarquia e estados;
 7. revisar todas as páginas de links secundários.
@@ -160,7 +171,7 @@ Modais são adequados para consulta curta e ação contextual. Páginas completa
 
 ## 5. Demonstração online
 
-Documento: [Plano de interface oficial e demonstração](interface-e-demonstracao.md)
+Documento: [Plano de interface oficial e demonstração](interface-e-demonstracao.md) · Passo: [48](implementacao/48-demonstracao-online.md)
 
 O ambiente deve existir em projeto separado e usar somente dados fictícios.
 
@@ -193,7 +204,9 @@ Não misturar dados da demonstração com os dados reais do evento.
 
 ## 6. Edição colaborativa por cláusula
 
-Documento: [Plano de edição colaborativa](plano-editor-documentos.pdf)
+Documento: [Plano de edição colaborativa](plano-editor-documentos.pdf) · Passo: [49](implementacao/49-edicao-por-clausula.md)
+
+**Depende da validação com o piloto.**
 
 Fonte: [Plano HTML](plano-editor-documentos.html)
 
@@ -230,7 +243,9 @@ Não iniciar:
 
 ## 7. Preparação de discursos e notas
 
-Documento: [Plano de preparação de discursos](plano-preparacao-discursos.pdf)
+Documento: [Plano de preparação de discursos](plano-preparacao-discursos.pdf) · Passo: [50](implementacao/50-preparacao-da-fala.md)
+
+**Depende da validação com o piloto.** O passo 46 já cobre a nota rápida e a próxima fala visíveis.
 
 Fonte: [Plano HTML](plano-preparacao-discursos.html)
 
@@ -247,10 +262,12 @@ O recurso deve ficar dentro da área unificada da sessão, não como outra pági
 
 ## 8. Melhorias gerais
 
+Passo: [51](implementacao/51-melhorias-gerais-de-interface.md)
+
 Documentos relacionados:
 
-- [Melhorias gerais em texto](melhorias.txt)
-- [Melhorias gerais em PDF](melhorias-interface.pdf)
+- [Melhorias gerais em PDF](melhorias-interface.pdf): **fonte única** das regras de interface
+- [Melhorias gerais em texto](melhorias.txt): texto de partida, só histórico
 - [Melhorias depois da revisão](melhorias-pos-revisao.pdf)
 
 Entrar nesta etapa depois das bases anteriores:
@@ -292,6 +309,9 @@ Editor por cláusula
 Preparação de discursos
   └─ depende da sessão unificada e do caderno curto
 
+Editor por cláusula e preparação de discursos
+  └─ só depois de a sessão do piloto responder às perguntas deles
+
 Melhorias gerais
   └─ entram continuamente depois dos componentes principais
 ```
@@ -319,11 +339,13 @@ Melhorias gerais
 3. contas por papel;
 4. roteiro manual.
 
-### Lote D — produtividade
+### Lote D — produtividade (depois do piloto)
 
 1. editor por cláusula;
 2. preparação da fala;
 3. busca e documentação.
+
+Só entra o que o piloto confirmar.
 
 ### Lote E — acabamento
 
@@ -347,3 +369,15 @@ Nenhum plano deve avançar sem:
 - nenhuma chave secreta no browser;
 - teste manual do fluxo real;
 - documentação atualizada.
+
+## Calendário
+
+O [plano completo](plano-do-app.pdf) (seção 17) prevê validação de dezembro de 2026 a fevereiro de 2027, piloto de março a junho, evento completo de julho a setembro e ensaio em outubro de 2027. A data exata da edição de 2027 segue em aberto, e sem ela não há prazos para fixar.
+
+Proposta de encaixe, a confirmar quando a data sair:
+
+- **antes da sessão do piloto:** lotes A, B e C (passos 44 a 48);
+- **depois da sessão do piloto:** lote D (passos 49 e 50), só com o que o questionário confirmar;
+- **lote E (passo 51):** em lotes pequenos, o ano todo, e congelado antes do ensaio de outubro.
+
+Para cada passo o esforço (P, M ou G) está na tabela; a duração em semanas depende de quanto tempo por semana a pessoa do projeto tem, e isso o documento não sabe.

@@ -4,22 +4,11 @@
 
 Reforçar a aparência profissional do app e reduzir a navegação por abas. Criar uma demonstração pública em ambiente separado para mostrar comitê, delegações, documentos, bureau e fluxos de operação.
 
-## Diretriz visual
+## Fonte das regras de interface
 
-O app deve parecer um sistema oficial de uma organização, não uma rede social.
+As regras gerais de interface (hierarquia, direção visual, quando usar modal, página ou menu suspenso, densidade, estados vazios, navegação móvel) estão em um único lugar: [Melhorias de organização, visual e usabilidade](melhorias-interface.pdf), com fonte em [HTML](melhorias-interface.html). Em caso de divergência, vale esse documento.
 
-Manter:
-
-- azul-marinho;
-- dourado discreto;
-- Spectral nos títulos;
-- cantos retos;
-- bordas finas;
-- selos de estado;
-- bandeiras como principal elemento colorido;
-- interface clara e sem excesso de sombra.
-
-Preferir ações contextuais em modal ou painel. Navegar para outra página somente para conteúdo que mereça URL, histórico ou visualização completa.
+Este documento cobre só o que não está lá: o catálogo de modais com os componentes que já existem, a modal de saída, os ícones do cabeçalho e a demonstração online.
 
 ## Modals
 
@@ -122,32 +111,33 @@ Essas telas possuem URL própria e fazem sentido como destino do navegador.
 
 ## Ícones
 
-Substituir palavras por ícones quando o significado já estiver claro por posição e contexto.
+O passo 43 nasceu da queixa "é difícil de achar". Por isso o texto continua onde a pessoa procura uma ação; o ícone entra para reforçar, e só sozinho quando o significado é universal.
+
+O app já usa o conjunto Lucide (`@lucide/svelte`) com importação ícone a ícone, então só entram no pacote os ícones usados. Nenhuma biblioteca nova. Depois de adicionar ícones, rodar `npm run tamanho` (limite de 300 KB; a primeira abertura está em ~167 KB).
 
 ### Cabeçalho
 
-Prioridade:
+| Ação | Notebook | Celular | Ícone |
+|---|---|---|---|
+| Busca "Ir para…" | ícone | ícone | `Search` |
+| Notificações | ícone | ícone | `Bell` |
+| Perfil | ícone **e** a palavra "Perfil" | em "Mais", com texto | `CircleUser` |
+| Sair | ícone **e** a palavra "Sair" | em "Mais", com texto | `LogOut` |
+| Tema claro/escuro | ícone | em "Mais", com texto | `Sun`/`Moon` |
+| Idioma | código atual (PT/EN) | em "Mais", com texto | `Languages` |
 
-| Ação | Ícone | Fallback |
-|---|---|---|
-| Perfil | `CircleUser` | aria-label |
-| Sair | `LogOut` | tooltip e aria-label |
-| Busca | `Search` | aria-label |
-| Notificações | `Bell` | tooltip e aria-label |
-| Tema claro/escuro | `Sun`/`Moon` | aria-label |
-| Idioma | `Languages` | tooltip e código atual |
-
-O perfil e a saída podem ficar somente em ícone em notebook estreito e celular.
+Só a lupa e o sino ficam sozinhos. Perfil, Sair, tema e idioma sempre trazem texto: "Sair" por ser a ação que apaga dados do aparelho, e os outros porque o ícone não diz o que fazem.
 
 Manter nome da delegação ou papel em uma identidade visual separada.
 
-Nunca usar ícone sem:
+Todo ícone, com ou sem texto, tem:
 
-- `aria-label`;
+- `aria-label` quando estiver sozinho;
 - `title` ou tooltip;
 - foco visível;
-- teste de teclado;
-- fallback textual no mobile se o significado não for óbvio.
+- teste de teclado.
+
+Os protótipos usam os mesmos ícones. Os glifos `◯` e `◉` de versões anteriores não significam nada e saíram.
 
 ### Tarefas
 
@@ -179,7 +169,7 @@ O botão `Sair` deve abrir modal com:
 Após confirmação:
 
 - desativar push;
-- limpar cache autenticado;
+- apagar todos os caches de dados (`dados-*`, passo 44);
 - encerrar sessão;
 - esquecer dados locais;
 - mostrar página de login.
@@ -345,18 +335,15 @@ Não colocar ações principais fora da área acessível por rolagem.
 
 ## Navegação por tarefa
 
-O usuário deve alcançar uma tarefa sem passar por várias páginas.
+Exemplos de tarefas que abrem direto no lugar, sem trocar de página:
 
-Exemplos:
-
-- `Confirmar chamada` abre um modal curta diretamente no Agora;
-- `Ver delegação` abre ficha lateral;
-- `Criar documento` abre modal ou painel contextual;
+- `Confirmar chamada` abre uma modal curta no Agora;
+- `Ver delegação` abre a ficha lateral;
 - `Escolher destinatário` abre lista modal;
 - `Confirmar encerramento` abre confirmação;
 - `Buscar documento` abre Ir para.
 
-URL continua necessária para telas completas, compartilhamento e impressão.
+A regra de quando usar modal ou página está em [melhorias-interface](melhorias-interface.html), seções 5 e 11.
 
 ## Testes de interface
 

@@ -30,24 +30,20 @@ Em um aparelho compartilhado, uma conta pode usar uma resposta obtida por outra 
 
 Além disso, dados podem continuar disponíveis depois de troca de participação ou retirada de acesso enquanto o cache não for removido.
 
-### Correção obrigatória
+### Decisão: manter a leitura offline, com cache por usuário
 
-O cache offline deve seguir uma destas estratégias:
+A leitura offline é uma entrega do [passo 15](implementacao/15-offline-e-pwa.md) e o piloto testa Wi-Fi instável. Desligar o cache de dados quebraria isso. A correção, então, é isolar o cache, não removê-lo:
 
-1. não cachear nenhuma resposta REST autenticada;
-2. cachear apenas uma lista branca explícita de conteúdo público;
-3. particionar o cache por usuário e sessão;
-4. invalidar todo o cache ao trocar de conta, mudar participação ou encerrar sessão.
+1. **Um cache por usuário.** O service worker lê o `sub` do JWT enviado no cabeçalho `Authorization` do pedido e guarda a resposta em `dados-<sub>`. Ele só decodifica o JWT para dar nome ao cache; quem autoriza é o banco. Pedido sem JWT (anônimo) não é guardado.
+2. **Só o cache do usuário atual responde.** Sem rede, o worker procura apenas em `dados-<sub>` do pedido. Uma conta nunca recebe resposta guardada por outra.
+3. **Troca de conta apaga o resto.** Quando chega um pedido com um `sub` diferente do último visto, todos os outros `dados-*` são apagados antes de seguir.
+4. **Validade curta.** Cada resposta guarda o horário em que foi obtida e deixa de ser servida depois de 12 horas. É o limite do que uma participação revogada ainda consegue ler sem rede; com rede, a resposta nova (ou o `401/403`) substitui a antiga.
+5. **Revogação apaga.** Um `401` ou `403` do REST apaga o `dados-<sub>` daquele usuário, e revogar a participação encerra as sessões da conta (ver "Convites e contas").
+6. **Lista de exclusão.** Nunca entram no cache o texto das perguntas da coletiva, as notas de crise e os votos individuais, mesmo sendo do próprio usuário: um aparelho perdido não pode ler isso sem rede. Cronograma, perfis, pauta, documentos abertos e a sessão continuam guardados.
+7. **Cabeçalhos.** `Cache-Control: private, no-store` nas respostas sensíveis (a lista do item 6), por garantia. O cabeçalho sozinho não vale: o service worker ignora o HTTP e decide pelo código.
+8. **Sair apaga tudo.** O logout remove todos os `dados-*` (hoje só o cache `dados`, em `+layout.svelte`), desativa o push e limpa rascunhos e dados locais do aparelho.
 
-Recomendação:
-
-- nunca cachear documentos, cartas, bilhetes, mensagens, votos, crise, dados pessoais ou denúncias;
-- permitir cache somente de conteúdo preparado explicitamente como público;
-- incluir `Cache-Control: no-store` nas respostas sensíveis;
-- não confiar apenas no cabeçalho HTTP do navegador;
-- conferir a identidade atual antes de responder pelo cache;
-- limpar o cache ao logout e ao detectar mudança de usuário;
-- remover dados de sessão persistida em aparelho compartilhado quando o usuário sair.
+O cache `dados` atual, global e com a URL como chave, é removido na instalação da versão nova do service worker.
 
 Arquivos envolvidos:
 
@@ -193,7 +189,7 @@ Recarregar uma tela não pode restaurar dados que RLS removeu.
 Políticas:
 
 - logout visível e com confirmação;
-- no logout, remover cache autenticado;
+- no logout, remover todos os caches `dados-*`;
 - no logout, desativar push;
 - limpar dados locais e rascunhos do aparelho;
 - impedir que “voltar” mostre dados após logout;
@@ -320,7 +316,10 @@ Validar os scripts e fontes permitidos pela CSP antes de ativar bloqueio estrito
 - troca de sessão em duas abas;
 - logout de uma aba limpa a outra;
 - conta antiga não recebe alteração do tempo real;
-- cache offline não fornece dados da conta anterior;
+- cache offline não fornece dados da conta anterior (conta A lê online, sai, conta B entra e fica sem rede: não vê nada de A);
+- troca de conta sem logout (sessão expirada e novo login) apaga o cache da conta anterior;
+- resposta guardada há mais de 12 horas não é servida sem rede;
+- texto de pergunta da coletiva, nota de crise e voto individual não aparecem no cache;
 - press vê somente próprio veículo;
 - Diretoria vê somente moderação permitida.
 

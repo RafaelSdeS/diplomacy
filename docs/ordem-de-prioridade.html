@@ -26,7 +26,7 @@ tbody tr:last-child { break-before:avoid } ul, ol { break-inside:avoid } p:has(+
 <p class="kicker">Diplomacy · consolidação dos planos</p>
 <h1>Ordem de prioridade</h1>
 <p class="subtitle">O que trabalhar primeiro nas próximas etapas do app.</p>
-<p class="muted">22 de novembro de 2026</p>
+<p class="muted">23 de novembro de 2026</p>
 
 <div class="summary">
 <p><strong>A prioridade não é implementar tudo ao mesmo tempo.</strong> A primeira entrega deve corrigir vazamentos e tornar segura a sessão. Depois entram os dois fluxos com maior valor para o piloto: coletiva oral e painel operacional da sessão.</p>
@@ -34,23 +34,28 @@ tbody tr:last-child { break-before:avoid } ul, ol { break-inside:avoid } p:has(+
 
 <h2>Visão geral</h2>
 <table>
-<thead><tr><th>#</th><th>Plano</th><th>Por que nesta posição</th><th>Escopo mínimo</th></tr></thead>
+<thead><tr><th>#</th><th>Passo</th><th>Plano</th><th>Esforço</th><th>Por que nesta posição</th><th>Escopo mínimo</th></tr></thead>
 <tbody>
-<tr><td class="rank rank-1">1</td><td><strong>Segurança online</strong></td><td>Protege dados privados em contas, aparelhos e eventos compartilhados.</td><td>Cache seguro, logout, RLS, Storage e testes de acesso.</td></tr>
-<tr><td class="rank rank-2">2</td><td><strong>Coletiva oral</strong></td><td>Corrige uma área explicitamente sem utilidade no momento real.</td><td>Pauta, chamada, ocultação antecipada, cronômetro, telão e conclusão.</td></tr>
-<tr><td class="rank rank-2">3</td><td><strong>Agora e sessão unificada</strong></td><td>Reduz a dificuldade de achar a ação durante a sessão.</td><td>Pendências por papel e contexto persistente.</td></tr>
-<tr><td class="rank rank-3">4</td><td><strong>Modais e interface oficial</strong></td><td>Reduz mudanças de página e deixa o sistema mais formal.</td><td>Ficha lateral, confirmação, ícones e busca contextual.</td></tr>
-<tr><td class="rank rank-low">5</td><td><strong>Demonstração online</strong></td><td>Permite validar o app por papéis sem configurar dados manualmente.</td><td>Um comitê, documentos, bureau, press e coletiva.</td></tr>
-<tr><td class="rank rank-low">6</td><td><strong>Edição por cláusula</strong></td><td>Evita discussões intermináveis sobre documentos.</td><td>Proposta, comentário, revisão, prazo e fusão básica.</td></tr>
-<tr><td class="rank rank-low">7</td><td><strong>Preparação de discursos</strong></td><td>Ajuda delegados a acompanhar o debate e preparar a fala.</td><td>Nota curta ligada ao orador e ao tópico.</td></tr>
-<tr><td class="rank rank-low">8</td><td><strong>Melhorias gerais</strong></td><td>Acabamento das demais superfícies depois das bases.</td><td>Voltar, vazio, feedback, densidade e consistência.</td></tr>
+<tr><td class="rank rank-1">1</td><td>44</td><td><strong>Segurança online</strong></td><td>M</td><td>Protege dados privados em contas, aparelhos e eventos compartilhados.</td><td>Cache offline por usuário, logout, RLS, Storage e testes de acesso.</td></tr>
+<tr><td class="rank rank-2">2</td><td>45</td><td><strong>Coletiva oral</strong></td><td>M</td><td>Corrige uma área explicitamente sem utilidade no momento real.</td><td>Pauta, chamada, pergunta fora do alcance da delegação, cronômetro, telão e conclusão.</td></tr>
+<tr><td class="rank rank-2">3</td><td>46</td><td><strong>Agora e sessão unificada</strong></td><td>M</td><td>Reduz a dificuldade de achar a ação durante a sessão.</td><td>Nota e próxima fala sempre visíveis; pendência que leva direto à ação.</td></tr>
+<tr><td class="rank rank-3">4</td><td>47</td><td><strong>Modais, saída e ícones</strong></td><td>M</td><td>Reduz mudanças de página e deixa o sistema mais formal.</td><td>Saída com confirmação, <code>Confirmar</code> nas ações irreversíveis e ícones do cabeçalho.</td></tr>
+<tr><td class="rank rank-low">5</td><td>48</td><td><strong>Demonstração online</strong></td><td>M</td><td>Permite validar o app por papéis sem configurar dados manualmente.</td><td>Projeto separado, um comitê, <code>/demo</code> por papel e reinício.</td></tr>
+<tr><td class="rank rank-low">6</td><td>49</td><td><strong>Edição por cláusula</strong></td><td>G</td><td>Evita discussões intermináveis sobre documentos. <strong>Depois do piloto.</strong></td><td>Proposta estruturada, rodada com prazo, comparação e fusão básica.</td></tr>
+<tr><td class="rank rank-low">7</td><td>50</td><td><strong>Preparação de discursos</strong></td><td>M</td><td>Ajuda delegados a acompanhar o debate e preparar a fala. <strong>Depois do piloto.</strong></td><td>Captura rápida por tipo, painel curto da delegação e rascunho.</td></tr>
+<tr><td class="rank rank-low">8</td><td>51</td><td><strong>Melhorias gerais</strong></td><td>G</td><td>Acabamento das demais superfícies depois das bases.</td><td>Voltar, vazio, feedback, densidade e consistência.</td></tr>
 </tbody>
 </table>
+<p class="muted">Esforço P, M ou G como nos passos 01 a 43. Os passos 49 e 50 só começam depois da validação com o piloto.</p>
+
+<h2>Validação com o piloto antes dos itens 6 e 7</h2>
+<div class="note"><strong>A sessão do piloto não está registrada como feita</strong> (os critérios de aceite do passo 12 seguem abertos), e os planos de edição por cláusula e de preparação de fala nasceram sem dados de uso. Construí-los antes de ver o piloto é apostar em duas das maiores entregas.</div>
+<p>Regra: os passos 49 e 50 só começam depois que o questionário do piloto responder às perguntas deles (a rodada de propostas deu conta? o que faltou ao preparar a fala?). Se o piloto não mostrar dor, os dois ficam para depois do evento. Os itens 1 a 5 e 8 não dependem do piloto.</p>
 
 <h2>1 · Segurança online</h2>
 <p>Esta prioridade deve preceder a publicação de uma demonstração pública ou de uma nova área contendo dados privados.</p>
 <ul>
-<li>remover respostas REST autenticadas do cache;</li>
+<li>cache offline por usuário (validade de 12 horas e lista de exclusão), mantendo a leitura offline do passo 15;</li>
 <li>limpar cache e notificações no logout;</li>
 <li>testar RLS por usuário, comitê e evento;</li>
 <li>proteger Storage por participante e veículo;</li>
@@ -59,12 +64,13 @@ tbody tr:last-child { break-before:avoid } ul, ol { break-inside:avoid } p:has(+
 </ul>
 
 <h2>2 · Coletiva de imprensa como dinâmica oral</h2>
-<div class="note"><strong>Correção fundamental:</strong> a delegação não recebe uma pergunta por texto e não deve digitar uma resposta. Ela não sabe qual é a pergunta até ser chamada, ouve a pergunta feita pelo jornalista e responde falando.</div>
+<div class="note"><strong>Correção fundamental:</strong> a delegação não recebe uma pergunta por texto e não deve digitar uma resposta. Ela não sabe qual é a pergunta até a jornalista fazê-la em voz alta e responde falando.</div>
 <p>A primeira entrega permite à Diretoria organizar a fila e ao telão mostrar a delegação chamada. O app não substitui microfone, fala ou moderação presencial.</p>
 <ul>
 <li>pauta por veículo e delegação;</li>
 <li>até quatro perguntas por veículo;</li>
-<li>texto oculto da delegação até a chamada;</li>
+<li>texto da pergunta em tabela própria (a RLS filtra linhas, não colunas), legível pela delegação só a partir de <code>Respondendo</code>;</li>
+<li>telão com delegação e veículo na chamada e a pergunta só quando começa a resposta;</li>
 <li>estados chamado, respondendo e concluído;</li>
 <li>cronômetro opcional;</li>
 <li>nota curta da press após a fala;</li>
@@ -73,7 +79,7 @@ tbody tr:last-child { break-before:avoid } ul, ol { break-inside:avoid } p:has(+
 
 <h2>3 · Agora operacional e sessão unificada</h2>
 <p>A primeira tela do delegado deve responder “o que preciso fazer agora?” sem exigir navegação em várias abas.</p>
-<p class="muted"><strong>Já entregue nos passos 32 e 43:</strong> Agora por papel, “Precisa de você” e a sessão do delegado em duas colunas. <strong>Falta:</strong> tirar a nota rápida (hoje dentro de um <code>details</code>) e o rascunho da próxima fala para uma área sempre visível da sessão.</p>
+<p class="muted"><strong>Já entregue nos passos 32 e 43:</strong> Agora por papel, “Precisa de você” e a sessão do delegado em duas colunas. <strong>Falta (passo 46):</strong> tirar a nota rápida (hoje dentro de um <code>details</code>) e o rascunho da próxima fala para uma área sempre visível da sessão.</p>
 <ul>
 <li>delegado: orador, relógios, votação e pendência curta;</li>
 <li>mesa: chamada, pedidos e documentos;</li>
@@ -85,7 +91,7 @@ tbody tr:last-child { break-before:avoid } ul, ol { break-inside:avoid } p:has(+
 
 <h2>4 · Modais e interface oficial</h2>
 <p>Usar modal para ações contextuais e painel lateral para objetos. Páginas completas continuam para tarefas prolongadas.</p>
-<p class="muted"><strong>Já entregue no passo 43:</strong> ficha da delegação em painel lateral, “Ir para…” (Ctrl+K) e o componente <code>Confirmar</code>. <strong>Falta:</strong> confirmar a saída (o botão <em>Sair</em> hoje sai direto), usar <code>Confirmar</code> em todas as ações irreversíveis (hoje só agenda e presidência) e os ícones do cabeçalho.</p>
+<p class="muted"><strong>Já entregue no passo 43:</strong> ficha da delegação em painel lateral, “Ir para…” (Ctrl+K) e o componente <code>Confirmar</code>. <strong>Falta:</strong> confirmar a saída (o botão <em>Sair</em> hoje sai direto), usar <code>Confirmar</code> em todas as ações irreversíveis (hoje só agenda e presidência) e os ícones do cabeçalho: só a lupa e o sino sem texto; Perfil e Sair mantêm a palavra (no celular, em “Mais”), com o Lucide já instalado.</p>
 <table>
 <thead><tr><th>Modal ou painel</th><th>Página completa</th></tr></thead>
 <tbody>
@@ -105,19 +111,19 @@ tbody tr:last-child { break-before:avoid } ul, ol { break-inside:avoid } p:has(+
 </ul>
 
 <h2>6 · Edição por cláusula</h2>
-<p>Evitar edição livre simultânea confusa. A primeira entrega organiza proposta, comentário, aprovação e fusão por cláusula.</p>
+<p><strong>Depende da validação com o piloto.</strong> Evitar edição livre simultânea confusa. A primeira entrega organiza proposta, comentário, aprovação e fusão por cláusula.</p>
 
 <h2>7 · Preparação de discursos</h2>
-<p>Não criar um novo editor nesta primeira etapa. Reutilizar uma área curta no caderno da sessão, associada ao orador e ao tópico atuais.</p>
+<p><strong>Depende da validação com o piloto.</strong> Não criar um novo editor nesta primeira etapa. Reutilizar uma área curta no caderno da sessão, associada ao orador e ao tópico atuais.</p>
 
 <h2>8 · Acabamento geral</h2>
-<p>Voltar, objetos clicáveis, placeholders, estados vazios, densidade por papel e consistência visual entram como revisão contínua após as bases.</p>
+<p>As regras de interface têm uma fonte única: <code>melhorias-interface.pdf</code>. Voltar, objetos clicáveis, placeholders, estados vazios, densidade por papel e consistência visual entram como revisão contínua após as bases.</p>
 
 <h2>Sequência de execução</h2>
 <div class="phase"><h3>Lote A — segurança</h3><p>Cache, logout, RLS, Storage, testes de acesso e separação de demonstração.</p></div>
 <div class="phase"><h3>Lote B — piloto funcional</h3><p>Coletiva oral, Agora operacional, sessão unificada e modais principais.</p></div>
 <div class="phase"><h3>Lote C — demonstração</h3><p>Projeto separado, contas por papel, cenário CSNU-T e roteiro manual.</p></div>
-<div class="phase"><h3>Lote D — produtividade</h3><p>Edição por cláusula e preparação curta da fala.</p></div>
+<div class="phase"><h3>Lote D — produtividade (depois do piloto)</h3><p>Edição por cláusula e preparação curta da fala, só com o que o piloto confirmar.</p></div>
 <div class="phase"><h3>Lote E — acabamento</h3><p>Acessibilidade, visual, capturas, estados vazios e melhoria gradual.</p></div>
 
 <h2>Dependências</h2>
@@ -127,7 +133,8 @@ tbody tr:last-child { break-before:avoid } ul, ol { break-inside:avoid } p:has(+
   │    └─ Preparação de discursos
   ├─ Modais e interface oficial  em paralelo com a sessão e a coletiva
   ├─ Demonstração online ...... depois de sessão, documentos e coletiva
-  └─ Edição por cláusula ...... depende de sessão, documentos e RLS atuais
+  └─ Edição por cláusula ...... depende de sessão, documentos e RLS atuais,
+       e da validação do piloto (como a Preparação de discursos)
 
 Melhorias gerais ............... entram aos poucos, depois dos componentes principais</div>
 
@@ -143,5 +150,14 @@ Melhorias gerais ............... entram aos poucos, depois dos componentes princ
 <li>teste manual antes de considerar pronto;</li>
 <li>documentação atualizada junto ao código.</li>
 </ul>
+
+<h2>Calendário</h2>
+<p>O plano completo (seção 17) prevê validação de dez/2026 a fev/2027, piloto de mar a jun/2027, evento completo de jul a set e ensaio em out/2027. A data exata da edição de 2027 segue em aberto, e sem ela não há prazos para fixar. Proposta de encaixe, a confirmar quando a data sair:</p>
+<ul>
+<li>antes da sessão do piloto: lotes A, B e C (passos 44 a 48);</li>
+<li>depois da sessão do piloto: lote D (passos 49 e 50), só com o que o questionário confirmar;</li>
+<li>lote E (passo 51): em lotes pequenos, o ano todo, e congelado antes do ensaio de outubro.</li>
+</ul>
+<p class="muted">A duração em semanas depende de quanto tempo por semana a pessoa do projeto tem; o esforço P, M ou G está na tabela.</p>
 </body>
 </html>

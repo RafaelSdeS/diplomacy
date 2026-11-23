@@ -81,10 +81,13 @@ Para todos:
 Delegado:
 5. Levantar a placa, votar e mandar nota de crise pelo celular foi mais fácil ou mais difícil do que no papel?
 6. Você leu as matérias da press no app?
+7. Durante o debate, você anotou algo no app? O que faltou para preparar a sua fala sem sair da sessão?
+8. Se o seu bloco escreveu um working paper ou projeto: a rodada de propostas deu conta? O que travou (ver o que mudou, comparar versões, prazo, discussão que não acabava)?
 
 Mesa:
 5. O painel da presidência deu conta do ritmo da sessão? O que faltou?
 6. **Você usaria o app no evento?** Por quê?
+7. Os documentos dos blocos chegaram prontos para avaliar, ou faltou ver o que mudou entre as versões?
 
 Crise:
 5. A fila de notas deu conta? Alguma nota se perdeu ou chegou duplicada?
@@ -93,6 +96,10 @@ Crise:
 Press:
 5. Publicar do celular foi rápido o bastante para cobrir a sessão?
 6. O aviso de palavrão atrapalhou ou ajudou?
+
+### O que as respostas decidem
+
+As perguntas 7 e 8 do delegado e 7 da mesa decidem se os passos 49 (edição por cláusula) e 50 (preparação da fala) entram, e quais partes. Sem dor registrada nelas, os dois ficam para depois do evento. Veja [ordem-de-prioridade.md](ordem-de-prioridade.md).
 
 ## Critérios de aceite do piloto
 

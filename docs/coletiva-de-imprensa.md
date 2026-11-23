@@ -9,7 +9,7 @@ A coletiva de imprensa é um momento ao vivo e improvisado.
 - a pergunta é feita oralmente;
 - a delegação escolhida responde oralmente, sem preparação escrita prévia;
 - não existe formulário de resposta para substituir a fala;
-- o app organiza a ordem, revela a pergunta no momento certo e registra o resultado operacional;
+- o app organiza a ordem, mostra a pergunta ao público só depois de dita em voz alta e registra o resultado operacional;
 - a press pode transformar a informação oral em matéria depois da coletiva.
 
 Este plano não transforma a coletiva em uma entrevista por chat nem em um questionário escrito.
@@ -19,7 +19,7 @@ Este plano não transforma a coletiva em uma entrevista por chat nem em um quest
 Transformar `/press/coletiva` em uma ferramenta operacional para conduzir o momento real:
 
 - organizar veículos, delegações e perguntas;
-- ocultar a pergunta da delegação até a chamada;
+- ocultar a pergunta da delegação e do telão até a jornalista fazê-la em voz alta;
 - indicar claramente quem deve responder;
 - acompanhar a ordem da fala;
 - oferecer um cronômetro curto;
@@ -35,7 +35,7 @@ A Diretoria da Press continua moderando manualmente. O app reduz dúvidas e troc
 |---|---|
 | Diretoria da Press | Abre a coletiva, organiza a fila, chama a delegação e encerra o momento |
 | Jornalista / Press | Prepara uma pergunta detalhada, escolhe delegações do próprio comitê e faz a pergunta ao vivo |
-| Delegação escolhida | Não vê a pergunta antes da chamada e responde oralmente |
+| Delegação escolhida | Não vê a pergunta antes de ela ser feita em voz alta e responde oralmente |
 | Bureau | Pode acompanhar o andamento público |
 | Participantes | Veem apenas a pauta e o estado autorizados pela Diretoria |
 
@@ -57,9 +57,11 @@ Cada pergunta na pauta contém:
 - horário do encerramento da resposta;
 - observação opcional da press para redação posterior.
 
-A delegação não recebe o texto da pergunta antes da chamada.
+A delegação não recebe o texto da pergunta antes de a jornalista fazê-la em voz alta (estado `Respondendo`).
 
 O veículo pode preparar uma pergunta longa. Ela é usada pela Diretoria no controle de moderador e pelo jornalista que fará a fala.
+
+O texto fica numa tabela própria, `coletiva_pergunta_texto`, separada da pauta (ver "Banco e estados").
 
 ## Estados da coletiva
 
@@ -128,16 +130,14 @@ Quando a Diretoria chama uma pergunta:
 
 1. o status muda para `Chamando`;
 2. a delegação recebe apenas o aviso “Sua delegação foi chamada”;
-3. o nome da delegação aparece no telão;
-4. o nome do veículo e a pergunta são mostrados ao público;
-5. o microfone é entregue pela direção da sala;
-6. a jornalista faz a pergunta oralmente;
-7. a Diretoria inicia o estado `Respondendo`;
+3. o telão mostra a delegação e o veículo, sem a pergunta;
+4. o microfone é entregue pela direção da sala;
+5. a jornalista faz a pergunta oralmente;
+6. a Diretoria inicia o estado `Respondendo`;
+7. só então o texto da pergunta aparece no telão (quem não ouviu ou ouviu mal pode ler);
 8. opcionalmente, o cronômetro começa.
 
-Antes da chamada, o app não revela o texto da delegação.
-
-O jornalista pode ver o próprio texto no momento da chamada. A delegação pode ver o veículo e o estado, mas não o texto antecipadamente.
+Em `Chamando` a delegação ouve a pergunta antes de lê-la. Por isso o texto fica fora do telão e fora do celular da delegação até `Respondendo`. A jornalista vê sempre o próprio texto.
 
 ### 5. Responder oralmente
 
@@ -209,9 +209,9 @@ No celular:
 - título da coletiva;
 - indicador `Aguarde o microfone`;
 - cronômetro, se autorizado;
-- nenhuma pergunta escrita antecipada.
+- nenhuma pergunta escrita antes de `Respondendo`.
 
-No momento da pergunta oral, a delegação vê apenas a própria situação atual.
+Durante a pergunta oral, a delegação vê apenas a própria situação atual.
 
 Depois da fala:
 
@@ -227,10 +227,11 @@ Mostrar:
 - delegação chamada;
 - estado `Chamando` ou `Respondendo`;
 - cronômetro, se usado;
-- pergunta somente no momento autorizado pela Diretoria.
+- a pergunta, só a partir de `Respondendo`.
 
 Não mostrar:
 
+- a pergunta em `Chamando`;
 - perguntas não chamadas;
 - motivos internos;
 - respostas ou notas privadas;
@@ -292,6 +293,21 @@ Campos úteis:
 
 Não manter texto da resposta como campo obrigatório. A resposta é oral.
 
+### Onde fica o texto da pergunta
+
+A RLS filtra linhas, não colunas. Se o texto ficasse em `coletiva_pergunta`, o `select` que libera a pauta ao evento liberaria também a pergunta, e a delegação a leria antes de ouvi-la. Revogar o acesso à coluna não resolve: a Diretoria, a press e a delegação usam o mesmo papel do banco (`authenticated`) e o `select *` do app quebraria para todos.
+
+Por isso o texto sai da pauta:
+
+| Tabela | Colunas | Quem lê |
+|---|---|---|
+| `coletiva_pergunta` | `ordem`, `status`, veículo, delegação, horários, `presente`, `retirada_motivo` | o evento (a pauta, sem o texto) |
+| `coletiva_pergunta_texto` | `pergunta_id` (chave), `texto`, `atualizada_em` | a press autora; a Diretoria da Press; o evento inteiro quando a pergunta está em `respondendo` ou `concluida` |
+
+A regra de leitura de `coletiva_pergunta_texto` consulta o `status` da pergunta na tabela pai. A escrita é só da press autora, e só enquanto a pergunta está antes de `chamando`. O tempo real não carrega o texto: o gatilho `transmitir` só avisa o nome da tabela que mudou, sem dados da linha, e a tela relê o que a RLS permite. `coletiva_pergunta_texto` não ganha esse gatilho. `nota_press` também vai para uma tabela de leitura restrita (press autora e Diretoria), porque não pode seguir a pauta pública.
+
+Migração reversível, em três passos: criar a tabela e copiar `pergunta` para ela; trocar `perguntar_na_coletiva` e as telas; só depois remover a coluna `coletiva_pergunta.pergunta`.
+
 Funções RPC necessárias:
 
 - `abrir_coletiva`;
@@ -309,8 +325,8 @@ Todas devem conferir papel, evento, comitê e estado.
 
 ### Revelação da pergunta
 
-- delegação não recebe pergunta antes do estado `Chamando`;
-- público recebe pergunta somente conforme o estado autorizado;
+- delegação não recebe o texto antes do estado `Respondendo`, nem por `select`, nem por tempo real, nem pelo cache offline;
+- o público recebe o texto só em `Respondendo` e `Concluída`;
 - jornalista recebe sempre a própria pergunta;
 - Diretoria recebe todas as perguntas e ações;
 - outra delegação não recebe a pergunta dirigida a uma delegação diferente.
@@ -318,7 +334,7 @@ Todas devem conferir papel, evento, comitê e estado.
 ### RLS
 
 - press só insere no próprio veículo;
-- press só altera a própria pergunta antes da chamada;
+- press só altera a própria pergunta antes da chamada (`chamando`);
 - delegação só recebe chamadas dirigidas a ela;
 - Diretoria só chama e conclui;
 - usuário de outro evento não vê dados;
@@ -353,7 +369,9 @@ Não permitir que o cliente calcule sozinho o estado oficial da fila. O banco fo
 - press de outro veículo não insere;
 - quinto item ultrapassando limite é recusado;
 - delegação de outro comitê não pode ser escolhida;
-- delegação não vê pergunta antes da chamada;
+- delegação não lê `coletiva_pergunta_texto` em `Na pauta`, `Pronta` e `Chamando`, e lê a partir de `Respondendo`;
+- consulta direta ao texto de outra delegação, de outro veículo ou de outro evento volta vazia;
+- `select *` em `coletiva_pergunta` não devolve texto algum;
 - outra delegação não vê chamada;
 - usuário comum não chama;
 - usuário comum não inicia ou conclui resposta;
@@ -369,8 +387,8 @@ Não permitir que o cliente calcule sozinho o estado oficial da fila. O banco fo
 3. Quinta tentativa é recusada.
 4. Diretoria chama uma delegação.
 5. Delegação recebe apenas o aviso.
-6. Texto não aparece na delegação antes da chamada.
-7. Telão mostra delegação e pergunta no momento adequado.
+6. Texto não aparece na delegação nem no telão em `Chamando`.
+7. Telão mostra a pergunta quando a Diretoria inicia `Respondendo`.
 8. Diretoria inicia e conclui a resposta oral.
 9. Próxima chamada acontece.
 10. Coletiva é encerrada.
@@ -393,7 +411,7 @@ Casos adicionais:
 1. ajustar o modelo para estados sem resposta escrita;
 2. corrigir funções de entrada e chamada;
 3. implementar limite de perguntas;
-4. impedir revelação antecipada no banco e na interface;
+4. separar o texto em `coletiva_pergunta_texto` e impedir revelação antecipada no banco, no tempo real e na interface;
 5. criar painel compacto da Diretoria;
 6. criar cartão de chamada da delegação;
 7. adicionar cronômetro opcional;
@@ -406,7 +424,7 @@ Casos adicionais:
 ## Definição de pronto
 
 - o app organiza a fila sem tentar responder pela delegação;
-- a pergunta permanece escondida até a chamada;
+- a pergunta permanece escondida da delegação e do telão até `Respondendo`;
 - a delegação responde oralmente;
 - a Diretoria controla chamada, cronômetro e conclusão;
 - o telão mostra somente o que é público;

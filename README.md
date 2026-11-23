@@ -101,6 +101,15 @@ Cada passo traz os testes que provam que ele funciona. Um passo só termina quan
 | [41](docs/implementacao/41-pendencias.md) | Pendências |
 | [42](docs/implementacao/42-estilo-chancelaria.md) | Estilo chancelaria |
 | [43](docs/implementacao/43-facil-de-achar-e-voltar.md) | Fácil de achar e de voltar |
+| **Planos posteriores** ([ordem](docs/ordem-de-prioridade.pdf)) | |
+| [44](docs/implementacao/44-seguranca-dos-dados.md) | Segurança dos dados e das sessões |
+| [45](docs/implementacao/45-coletiva-oral.md) | Coletiva de imprensa como fluxo oral |
+| [46](docs/implementacao/46-agora-e-sessao-unificadas.md) | Agora operacional e sessão unificada |
+| [47](docs/implementacao/47-modais-saida-e-icones.md) | Modais, saída com confirmação e ícones |
+| [48](docs/implementacao/48-demonstracao-online.md) | Demonstração online com acesso por papel |
+| [49](docs/implementacao/49-edicao-por-clausula.md) | Edição colaborativa por cláusula |
+| [50](docs/implementacao/50-preparacao-da-fala.md) | Preparação de discursos durante o debate |
+| [51](docs/implementacao/51-melhorias-gerais-de-interface.md) | Melhorias gerais de interface |
 
 As fases do projeto (validação, piloto, evento e crescimento) e o calendário até a edição de 2027 estão na seção 17 do plano completo.
 
@@ -109,7 +118,8 @@ As fases do projeto (validação, piloto, evento e crescimento) e o calendário 
 - [Plano completo (PDF)](docs/plano-do-app.pdf): problema, módulos, regras, arquitetura, riscos e calendário.
 - [Plano da coletiva de imprensa](docs/coletiva-de-imprensa.md): dinâmica oral, chamada de delegação, pauta, telão e produção posterior.
 - [Plano de segurança online](docs/seguranca-online.md): revisão de riscos, RLS, cache offline, Storage, demo e incidente.
-- [Plano de interface oficial e demonstração](docs/interface-e-demonstracao.md): modals, ícones, ambiente público fictício e roteiro.
+- [Melhorias de interface (PDF)](docs/melhorias-interface.pdf): fonte única das regras de interface; [melhorias.txt](docs/melhorias.txt) é só o texto de partida.
+- [Plano de interface oficial e demonstração](docs/interface-e-demonstracao.md): catálogo de modais, ícones do cabeçalho, ambiente público fictício e roteiro.
 - [Ordem de prioridade dos planos](docs/ordem-de-prioridade.pdf): consolidação e sequência recomendada para o trabalho futuro.
 - Protótipos visuais: [coletiva de imprensa](docs/prototipos-coletiva.pdf), [interface e demonstração](docs/prototipos-interface-demonstracao.pdf) e [segurança ao sair](docs/prototipos-seguranca.pdf).
 - Propostas visuais adicionais: [edição colaborativa](docs/prototipos-editor-documentos.pdf), [preparação de fala](docs/prototipos-preparacao-fala.pdf), [Agora e sessão](docs/prototipos-agora-sessao.pdf) e [melhorias gerais de interface](docs/prototipos-melhorias-interface.pdf).

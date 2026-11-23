@@ -21,48 +21,9 @@ De quebra:
 - **Sem rede:** o service worker lê os arquivos com hash com `ignoreVary`. Antes, só abria a tela que a pessoa já tinha aberto com rede.
 - **Tamanho:** as bandeiras, a ficha e o "Ir para…" carregam sob demanda. A primeira abertura ficou em ~167 KB.
 
-## Prioridade para o piloto: sessão unificada
+## O que ficou para o passo 46
 
-Para o piloto, a área de trabalho da sessão não deve ganhar um conjunto novo de menus. Ela deve reunir somente o necessário para conduzir e participar da sessão sem trocar de página.
-
-### Delegado
-
-- No notebook, manter uma área dividida em duas partes: estado da sessão à esquerda e ações da delegação à direita.
-- Na sessão, mostrar em um bloco persistente: orador, dois relógios, tópico, estado do debate e votação ativa.
-- Manter uma área curta de **nota rápida** e **próxima fala** ligada ao orador e ao tópico atuais.
-- Um campo curto pode ser salvo no caderno existente; não criar um editor completo de discurso nesta etapa.
-- Não mostrar simultaneamente todas as ferramentas: ponto ou moção, placa, voto, caderno e crise aparecem conforme o estado.
-- Ao mudar de orador ou voltar a sessão ao vivo, preservar o rascunho digitado e a posição de leitura.
-
-### Mesa e presidência
-
-- Mostrar em uma única área: situação da sessão, orador, fila curta, pedidos pendentes e votação ativa.
-- Chamadas, ajustes de tempo e assumir delegação continuam fora da operação principal até serem necessários.
-- Confirmar apenas ações coletivas ou irreversíveis; ações reversíveis podem desaparecer ou indicar desfazer.
-- No celular da mesa, usar a versão curta do painel. Não empilhar todos os controles da sessão.
-
-### Caderno curto da sessão
-
-- Reutilizar a anotação já existente em vez de criar uma entidade ou produto paralelo.
-- A captura deve identificar automaticamente: comitê, sessão, tópico, orador atual e hora.
-- Usar tipos simples no piloto: “Nota”, “Sobre esta delegação” e “Fala”.
-- O campo do celular precisa caber em uma folha curta ou em um modal pequeno, com uma única ação principal.
-- Compartilhamento, presença entre editores e ensaio completo ficam fora da primeira entrega.
-
-### Navegação
-
-- A faixa interna da sessão não deve ser uma segunda barra permanente de sete links.
-- Manter como contexto uma área curta e abrir o recurso completo em página dedicada.
-- No celular, evitar barra fixa nova; usar os mesmos destinos “Agora”, “Sessão”, “Comitê” e “Mais”.
-- No notebook, manter o contexto da sessão e usar os demais destinos apenas na lateral.
-
-### Limites explícitos
-
-- Não criar um editor colaborativo completo dentro da sessão.
-- Não criar favoritos, layouts configuráveis ou muitos atalhos antes de validar o fluxo.
-- Não alterar o modelo de dados além da associação entre nota rápida e contexto já definido pelo caderno.
-- Não transformar presença por tecla, comentários por cláusula ou ensaio em tempo real em recursos obrigatórios do piloto.
-- Estilo formal e hierarquia clara importam mais do que funcionalidade nova.
+A sessão unificada (nota rápida e próxima fala sempre visíveis, o caderno curto da sessão, a mesa e a presidência numa área só) e os limites dessa entrega estão no [passo 46](46-agora-e-sessao-unificadas.md). Este passo entregou a sessão em duas colunas e a navegação por tarefa; o que está acima é o que existe hoje.
 
 ## Testes
 

@@ -1,6 +1,6 @@
 # Plano de implementação
 
-Ordem dos passos para construir o app. Os passos 01 a 12 formam o **piloto**: planos gratuitos, poucos usuários e dados fictícios. Os passos 13 a 19 levam o app à **escala do evento**. Os passos 20 a 38 são as **melhorias depois da revisão** do app, explicadas e priorizadas em [melhorias-pos-revisao.pdf](../melhorias-pos-revisao.pdf). Os passos 39 a 41 deixam o desenvolvimento mais rápido, o app mais leve na internet móvel e fecham as pendências. O passo 42 aplica o estilo "chancelaria", escolhido entre os protótipos de `docs/estilos/`.
+Ordem dos passos para construir o app. Os passos 01 a 12 formam o **piloto**: planos gratuitos, poucos usuários e dados fictícios. Os passos 13 a 19 levam o app à **escala do evento**. Os passos 20 a 38 são as **melhorias depois da revisão** do app, explicadas e priorizadas em [melhorias-pos-revisao.pdf](../melhorias-pos-revisao.pdf). Os passos 39 a 41 deixam o desenvolvimento mais rápido, o app mais leve na internet móvel e fecham as pendências. O passo 42 aplica o estilo "chancelaria", escolhido entre os protótipos de `docs/estilos/`. O passo 43 deixa o app fácil de achar e de voltar. Os passos 44 a 51 vêm dos planos posteriores, em [ordem de prioridade](../ordem-de-prioridade.md): segurança, coletiva oral, sessão unificada, modais e ícones, demonstração online, edição por cláusula, preparação da fala e melhorias gerais. Os passos 49 e 50 só começam depois que o piloto disser que valem a pena.
 
 Cada passo só começa quando os passos de que ele depende estão prontos. As regras de procedimento que o app segue estão resumidas em [regras-de-procedimento.md](../regras-de-procedimento.md).
 
@@ -54,6 +54,15 @@ Cada passo só começa quando os passos de que ele depende estão prontos. As re
 | **Aparência** | | |
 | [42](42-estilo-chancelaria.md) | Estilo chancelaria: faixa marinho, fio dourado, cantos retos e Spectral | 39 (depois de 40 e 41) |
 | [43](43-facil-de-achar-e-voltar.md) | Fácil de achar e de voltar: painel sem rolagem, país na faixa, menu por tarefa, Documentos, "Ir para…" e CSNU completo na demonstração | 42 |
+| **Planos posteriores** (ordem em [ordem-de-prioridade.md](../ordem-de-prioridade.md)) | | |
+| [44](44-seguranca-dos-dados.md) | Segurança dos dados e das sessões: cache offline por usuário, logout, RLS e Storage, revogação e incidente | 43 |
+| [45](45-coletiva-oral.md) | Coletiva de imprensa como fluxo oral: texto da pergunta em tabela própria, chamada, telão e conclusão | 17, 44 |
+| [46](46-agora-e-sessao-unificadas.md) | Agora operacional e sessão unificada: nota rápida e próxima fala sempre visíveis | 43 |
+| [47](47-modais-saida-e-icones.md) | Modais, saída com confirmação e ícones do cabeçalho | 43, 44 |
+| [48](48-demonstracao-online.md) | Demonstração online separada, com entrada por papel | 44, 45, 47 |
+| [49](49-edicao-por-clausula.md) | Edição colaborativa por cláusula (depois da validação do piloto) | 09, 44 |
+| [50](50-preparacao-da-fala.md) | Preparação de discursos durante o debate (depois da validação do piloto) | 34, 46 |
+| [51](51-melhorias-gerais-de-interface.md) | Melhorias gerais de interface | 47 |
 
 ## Melhorias depois da revisão
 
@@ -75,10 +84,14 @@ Cada passo só começa quando os passos de que ele depende estão prontos. As re
 
 ## Planos posteriores desta investigação
 
-- [Plano da coletiva de imprensa](../coletiva-de-imprensa.md): dinâmica oral, pergunta chamada ao vivo, pauta, telão, matéria e testes.
-- [Plano de segurança online](../seguranca-online.md): cache offline, RLS, Storage, sessões, demonstração e resposta a incidentes.
-- [Plano de interface oficial e demonstração](../interface-e-demonstracao.md): modals, ícones, ambiente separado, roteiro e cenário fictício.
-- [Ordem de prioridade consolidada](../ordem-de-prioridade.md): sequência recomendada de implementação dos planos discutidos.
+Viraram os passos 44 a 51. Cada plano detalhado continua sendo a referência do que o passo constrói:
+
+- [Plano de segurança online](../seguranca-online.md) → passo 44.
+- [Plano da coletiva de imprensa](../coletiva-de-imprensa.md) → passo 45.
+- [Melhorias de interface](../melhorias-interface.pdf) (fonte única das regras de interface) → passos 46 e 51.
+- [Plano de interface oficial e demonstração](../interface-e-demonstracao.md) → passos 47 e 48.
+- [Edição colaborativa](../plano-editor-documentos.pdf) → passo 49; [preparação de discursos](../plano-preparacao-discursos.pdf) → passo 50.
+- [Ordem de prioridade consolidada](../ordem-de-prioridade.md): esforço, dependências e a sequência de trabalho.
 
 ## Convenções
 
@@ -207,6 +220,14 @@ Cada passo tem uma seção "Testes" com os testes que provam que ele funciona e 
 | 41 | sim | — | sim | — |
 | 42 | — | — | capturas e axe | sim |
 | 43 | — | sim | sim (por tarefa) | sim |
+| 44 | sim | sim | sim | sim |
+| 45 | sim | — | sim | sim |
+| 46 | — | sim | sim | sim |
+| 47 | — | — | sim | — |
+| 48 | — | — | sim | sim |
+| 49 | sim | sim | sim | — |
+| 50 | sim | sim | sim | sim |
+| 51 | — | — | capturas e axe | sim |
 
 ## Aparência
 
@@ -228,7 +249,7 @@ Leve, profissional, diplomática, limpa e com cara de oficial. A referência é 
 - **Cores de situação:** verde, vermelho e âmbar só para situação (voto, prazo, fila), sempre com ícone e texto.
 - **Tipografia:** títulos e documentos com serifa (Spectral, servida pelo próprio app). Os títulos usam o arquivo 600, contado no limite de 300 KB. O 400 e o itálico só são baixados nas telas de documento e na impressão. A interface usa a fonte do sistema, que não precisa ser baixada.
 - **Espaço e linhas:** bastante espaço em branco, linhas finas de 1 px em vez de sombras e cantos retos (`--raio: 0`).
-- **Ícones:** traço fino, de um único conjunto (Lucide), só os usados.
+- **Ícones:** traço fino, de um único conjunto (Lucide, já instalado), importados um a um e só os usados. Só a lupa e o sino ficam sem texto; as demais ações trazem texto (passo 47).
 - **Movimento:** só transições curtas (até 150 ms) e nenhuma animação decorativa. Respeita a opção de reduzir movimento.
 - **Tom dos textos:** formal e simples, como "A palavra está com a delegação da França".
 - **Tema escuro:** azul-marinho profundo, com o mesmo contraste.
