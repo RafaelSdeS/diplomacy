@@ -39,11 +39,11 @@ A leitura offline é uma entrega do [passo 15](implementacao/15-offline-e-pwa.md
 3. **Troca de conta apaga o resto.** Quando chega um pedido com um `sub` diferente do último visto, todos os outros `dados-*` são apagados antes de seguir.
 4. **Validade curta.** Cada resposta guarda o horário em que foi obtida e deixa de ser servida depois de 12 horas. É o limite do que uma participação revogada ainda consegue ler sem rede; com rede, a resposta nova (ou o `401/403`) substitui a antiga.
 5. **Revogação apaga.** Um `401` ou `403` do REST apaga o `dados-<sub>` daquele usuário, e revogar a participação encerra as sessões da conta (ver "Convites e contas").
-6. **Lista de exclusão.** Nunca entram no cache o texto das perguntas da coletiva, as notas de crise e os votos individuais, mesmo sendo do próprio usuário: um aparelho perdido não pode ler isso sem rede. Cronograma, perfis, pauta, documentos abertos e a sessão continuam guardados.
+6. **Lista de exclusão.** Nunca entram no cache o texto das perguntas da coletiva (`coletiva_pergunta_texto`), as notas de crise (`nota_crise`) e os votos individuais (`voto`), mesmo sendo do próprio usuário: um aparelho perdido não pode ler isso sem rede. Cronograma, perfis, pauta, documentos abertos e a sessão continuam guardados. A regra olha a **URL inteira**, caminho e `select`: uma consulta como `/rest/v1/coletiva?select=*,coletiva_pergunta_texto(*)` traz o texto por embed (as consultas do `lerAoVivo`, passo 40, também juntam tabelas). Decidir se `anotacao` e `anotacao_compartilhada` (caderno privado) entram na lista.
 7. **Cabeçalhos.** `Cache-Control: private, no-store` nas respostas sensíveis (a lista do item 6), por garantia. O cabeçalho sozinho não vale: o service worker ignora o HTTP e decide pelo código.
 8. **Sair apaga tudo.** O logout remove todos os `dados-*` (hoje só o cache `dados`, em `+layout.svelte`), desativa o push e limpa rascunhos e dados locais do aparelho.
 
-O cache `dados` atual, global e com a URL como chave, é removido na instalação da versão nova do service worker.
+O cache `dados` atual, global e com a URL como chave, é removido na instalação da versão nova do service worker. O `activate` hoje apaga todo cache fora de `[APP, IMUTAVEIS, DADOS]`; ele passa a testar o prefixo `dados-`, senão cada versão nova do app esvaziaria o cache offline de todos.
 
 Arquivos envolvidos:
 
@@ -189,6 +189,7 @@ Recarregar uma tela não pode restaurar dados que RLS removeu.
 Políticas:
 
 - logout visível e com confirmação;
+- se a caixa de saída (passo 15) tiver itens não enviados, avisar antes de apagar e oferecer enviar agora; o `401`/`403` nunca apaga a caixa;
 - no logout, remover todos os caches `dados-*`;
 - no logout, desativar push;
 - limpar dados locais e rascunhos do aparelho;
@@ -270,7 +271,7 @@ O script de demonstração não deve funcionar no projeto real sem uma autoriza�
 Controles já existentes:
 
 - demonstração bloqueada em remoto por padrão;
-- variável `DEMO_PERMITIR_REMOTO=1`;
+- variável `DEMO_PERMITIR_REMOTO=1` (`scripts/admin.ts`, `conectarAdmin`). **Lacuna:** a flag sozinha não distingue a demonstração da produção; com a chave da produção no `.env`, o script semeia e reinicia dados reais. Passa a exigir também o `ref` do projeto (`DEMO_PROJETO_REF`, comparado com a URL), e a chave `service_role` da produção não fica no `.env` da demonstração (passo 44);
 - chave de serviço usada apenas pelos scripts administrativos;
 - seed limitado a local ou projeto de teste.
 
@@ -319,7 +320,9 @@ Validar os scripts e fontes permitidos pela CSP antes de ativar bloqueio estrito
 - cache offline não fornece dados da conta anterior (conta A lê online, sai, conta B entra e fica sem rede: não vê nada de A);
 - troca de conta sem logout (sessão expirada e novo login) apaga o cache da conta anterior;
 - resposta guardada há mais de 12 horas não é servida sem rede;
-- texto de pergunta da coletiva, nota de crise e voto individual não aparecem no cache;
+- texto de pergunta da coletiva, nota de crise e voto individual não aparecem no cache, nem quando vêm por embed numa consulta de outra tabela;
+- uma versão nova do service worker mantém o `dados-<sub>` do usuário atual;
+- sair com itens na caixa de saída mostra o aviso e não apaga a caixa sem confirmação;
 - press vê somente próprio veículo;
 - Diretoria vê somente moderação permitida.
 

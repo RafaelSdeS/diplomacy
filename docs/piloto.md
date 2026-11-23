@@ -24,7 +24,7 @@ Roteiro para testar o app com um grupo pequeno (passo 12), no formato do **mock*
    | Mesa | 1 ou 2 |
    | Crise | 1 |
    | Press | 1 |
-   | Diretoria da Press | a sua conta da secretaria (no piloto, a secretaria faz esse papel) |
+   | Diretoria da Press | a sua conta da secretaria (vale como Diretoria da Press; o papel `diretoria_press` próprio existe desde o passo 17, e a sua conta pode ter os dois) |
 
    Escreva cada e-mail e senha num papelzinho, para entregar na hora.
 
@@ -46,7 +46,14 @@ Roteiro para testar o app com um grupo pequeno (passo 12), no formato do **mock*
 | 20 min | Working paper e projeto | Um bloco escreve um working paper (o redator aceita propostas); a mesa aprova; o projeto junta as cláusulas, ganha 5 assinaturas e vai à mesa |
 | 10 min | Votação | A mesa assume a presidência, aprova o projeto e abre a votação no painel (**Projetos de resolução**); as delegações votam no celular; o telão mostra o resultado |
 | o tempo todo | Press | A press publica do celular; uma nota urgente vira plantão no telão; a delegação citada vê na Agora |
+| 5 min | Troca de conta (passo 44) | Num celular: sair, entrar com outra conta, ficar sem rede (modo avião) e conferir que nada da conta anterior aparece; sair com uma nota ainda na caixa de saída mostra o aviso |
 | 10 min | Fim | Questionário (abaixo) |
+
+**A coletiva fica de fora desta sessão.** Na ordem de execução ([ordem-de-prioridade.md](ordem-de-prioridade.md)), o piloto vem depois dos passos 44, 45 parte A (texto da pergunta protegido) e 46 (sessão unificada), e antes da parte B do 45 (fluxo oral). O que a imprensa precisa será visto na segunda sessão de teste, depois da parte B: o bloco de coletiva abaixo ("Para a sessão depois do passo 45 parte B") já está pronto. A press continua publicando matérias normalmente.
+
+### Para a sessão depois do passo 45 parte B
+
+Acrescente 10 minutos ao roteiro: a Diretoria abre a coletiva; a press envia 2 perguntas; a Diretoria chama uma delegação; o celular da delegação mostra só o aviso; a pergunta aparece no `/telao/coletiva` quando começa `Respondendo`; a delegação responde em voz alta; a Diretoria conclui. Use as perguntas marcadas "(coletiva)" do questionário.
 
 ## Plano B em papel
 
@@ -83,6 +90,7 @@ Delegado:
 6. Você leu as matérias da press no app?
 7. Durante o debate, você anotou algo no app? O que faltou para preparar a sua fala sem sair da sessão?
 8. Se o seu bloco escreveu um working paper ou projeto: a rodada de propostas deu conta? O que travou (ver o que mudou, comparar versões, prazo, discussão que não acabava)?
+9. (coletiva, só depois do passo 45 parte B) Se a sua delegação foi chamada na coletiva: Ficou claro quando falar, sem ver a pergunta antes?
 
 Mesa:
 5. O painel da presidência deu conta do ritmo da sessão? O que faltou?
@@ -96,6 +104,11 @@ Crise:
 Press:
 5. Publicar do celular foi rápido o bastante para cobrir a sessão?
 6. O aviso de palavrão atrapalhou ou ajudou?
+7. (coletiva, só depois do passo 45 parte B) Enviar as perguntas e acompanhar a chamada deu conta? Faltou saber algo da fila ou da hora de falar?
+
+Diretoria da Press (coletiva, só depois do passo 45 parte B):
+1. A ordem da pauta, a chamada e a conclusão foram claras? Você precisou de alguma ação que não existia?
+2. O telão da coletiva mostrou o que devia, na hora certa?
 
 ### O que as respostas decidem
 

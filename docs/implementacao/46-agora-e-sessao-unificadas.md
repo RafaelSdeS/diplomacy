@@ -21,7 +21,7 @@ Este passo reúne o que antes estava como "Escopo reduzido para o piloto" nos pa
 ## Sessão do delegado
 
 - Bloco persistente: orador, dois relógios, tópico, estado do debate e votação ativa.
-- **Área sempre visível de nota rápida e próxima fala**, ligada a comitê, sessão, tópico, orador e hora. Tipos: "Nota", "Sobre esta delegação" e "Fala". Reutiliza o caderno (passo 34); o modelo de dados não cresce além dessa associação.
+- **Área sempre visível de nota rápida e próxima fala**, ligada a comitê, sessão, tópico, orador e hora. Tipos: "Nota", "Sobre esta delegação" e "Fala". Reutiliza o caderno (passo 34); o modelo de dados não cresce além dessa associação. A tabela `anotacao` já guarda `topico` e `orador_delegacao_id` (`20261215090000_caderno.sql`): conferir se guarda também a sessão e a hora e acrescentar só o que faltar. O passo 50 traz mais tipos de captura (ponto, pedido, contradição, aliado, pergunta, dado); se `tipo` for uma restrição do banco, ela é ampliada lá, não aqui.
 - Preservar o texto digitado e a posição de leitura ao mudar de orador, atualizar ao vivo ou reconectar.
 - Ponto ou moção, placa, voto e crise aparecem conforme o estado da sessão.
 - Celular: folha curta ou modal pequeno, uma ação principal. Notebook: sessão à esquerda, ações e rascunho à direita.

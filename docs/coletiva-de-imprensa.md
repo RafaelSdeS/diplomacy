@@ -82,13 +82,12 @@ Nenhuma delegação é considerada “respondida” automaticamente pelo app. So
 
 ### 1. Abrir
 
-A Diretoria da Press:
+A coletiva é **do evento**, não de um comitê (`coletiva.evento_id`; cada pergunta leva o comitê do veículo e da delegação). A Diretoria da Press:
 
-1. abre a coletiva;
+1. abre a coletiva (abrir uma nova fecha a que estiver aberta);
 2. define o título;
-3. escolhe ou confirma o comitê;
-4. permite que a press envie perguntas;
-5. mostra o estado ao vivo no telão.
+3. permite que a press envie perguntas, cada veículo para delegações do próprio comitê;
+4. mostra o estado ao vivo no telão da coletiva.
 
 A coletiva continua um momento presencial. Abrir no app não cria a sala nem substitui o microfone.
 
@@ -220,6 +219,8 @@ Depois da fala:
 
 ### Telão público
 
+Como a coletiva é do evento e o telão atual é por comitê (`/telao/<sigla>`), a coletiva usa uma rota própria, `/telao/coletiva`, aberta numa conta participante do evento (mesa, press ou secretaria) no projetor da sala da coletiva. O telão de cada comitê não muda. Em `Chamando` e `Respondendo`, o telão do comitê da delegação chamada pode repetir a faixa de "Coletiva em andamento", sem pergunta (a decidir no ensaio).
+
 Mostrar:
 
 - título da coletiva;
@@ -278,6 +279,8 @@ Não fazer associação automática entre gravação e texto sem uma etapa expl�
 
 Manter `coletiva` e `coletiva_pergunta`.
 
+**Ponto de partida (migração `20261204100000_comunicacao.sql`):** `coletiva_pergunta` guarda hoje `pergunta` em texto, **legível por todo o evento**, e não tem `status`, `ordem` nem horários. Todos os campos da tabela abaixo, as RPCs de chamada e a tabela do texto são novos. O primeiro corte é separar o texto (menor e independente do resto), antes do piloto se a coletiva entrar nele.
+
 Campos úteis:
 
 | Campo | Uso |
@@ -307,6 +310,10 @@ Por isso o texto sai da pauta:
 A regra de leitura de `coletiva_pergunta_texto` consulta o `status` da pergunta na tabela pai. A escrita é só da press autora, e só enquanto a pergunta está antes de `chamando`. O tempo real não carrega o texto: o gatilho `transmitir` só avisa o nome da tabela que mudou, sem dados da linha, e a tela relê o que a RLS permite. `coletiva_pergunta_texto` não ganha esse gatilho. `nota_press` também vai para uma tabela de leitura restrita (press autora e Diretoria), porque não pode seguir a pauta pública.
 
 Migração reversível, em três passos: criar a tabela e copiar `pergunta` para ela; trocar `perguntar_na_coletiva` e as telas; só depois remover a coluna `coletiva_pergunta.pergunta`.
+
+A leitura do texto na tela entra numa consulta `lerAoVivo` (passo 40) etiquetada com `coletiva_pergunta`, porque `coletiva_pergunta_texto` não transmite. "A Diretoria da Press" nas regras de leitura é `eh_diretoria_press(evento)`, que já vale para os papéis `diretoria_press` e `secretaria` (`comunicacao.sql:14-24`); a regra de leitura do texto reaproveita essa função.
+
+**Limite de perguntas.** Hoje há `unique (coletiva_id, veiculo_id, delegacao_id)` e o limite de 4 dentro de `perguntar_na_coletiva`. Pergunta `Retirada` não conta no limite e não bloqueia outra para a mesma delegação: o `unique` passa a valer só para as não retiradas (índice único parcial).
 
 Funções RPC necessárias:
 
@@ -394,6 +401,8 @@ Não permitir que o cliente calcule sozinho o estado oficial da fila. O banco fo
 10. Coletiva é encerrada.
 11. Press cria o rascunho de matéria com notas digitadas manualmente.
 
+**Todos os testes de ponta a ponta da coletiva ficam num único arquivo serial.** `abrir_coletiva` fecha qualquer outra aberta do evento, então dois arquivos em paralelo se atrapalham, e o isolamento por comitê (`isolado('NN')`) não vale para um recurso do evento.
+
 Casos adicionais:
 
 - reconexão;
@@ -408,10 +417,11 @@ Casos adicionais:
 
 ## Sequência de implementação
 
+0. **primeiro**, separar o texto em `coletiva_pergunta_texto` e impedir revelação antecipada no banco, no tempo real e na interface (item 4 abaixo; hoje o texto é legível por todo o evento);
 1. ajustar o modelo para estados sem resposta escrita;
 2. corrigir funções de entrada e chamada;
 3. implementar limite de perguntas;
-4. separar o texto em `coletiva_pergunta_texto` e impedir revelação antecipada no banco, no tempo real e na interface;
+4. (feito no item 0) separar o texto;
 5. criar painel compacto da Diretoria;
 6. criar cartão de chamada da delegação;
 7. adicionar cronômetro opcional;

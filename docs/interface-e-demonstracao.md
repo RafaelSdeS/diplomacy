@@ -163,6 +163,7 @@ O botão `Sair` deve abrir modal com:
 - usuário atual;
 - comitê ou delegação;
 - texto “Os dados desta sessão serão removidos deste aparelho”;
+- se a caixa de saída tiver itens não enviados: “Há N itens não enviados”, com `Enviar agora` e `Sair mesmo assim`;
 - confirmação `Sair`;
 - cancelamento.
 
@@ -205,15 +206,21 @@ Criar uma instância separada da produção.
 
 Recomendações:
 
-- Cloudflare próprio;
-- Supabase próprio;
+- Cloudflare próprio (um segundo Worker, `wrangler.demo.jsonc`, com as próprias variáveis);
+- Supabase próprio, com as migrações aplicadas a cada passo que tenha migração;
 - domínio separado;
 - dados fictícios;
 - contas geradas pelo script;
-- reinstalação periódica;
+- reinstalação periódica **agendada** (todo dia de madrugada) e também sob demanda;
 - banner permanente `Ambiente de demonstração`.
 
 Nunca usar a demonstração para dados reais ou credenciais reais.
+
+Decisões do passo 48 antes de publicar:
+
+- **Plano do projeto.** O projeto gratuito do Supabase pausa depois de cerca de uma semana sem uso: usar um acesso agendado a cada poucos dias ou um plano pago só para a demonstração.
+- **Abuso.** As contas da demonstração são públicas, então qualquer pessoa escreve nela: Storage com cota pequena ou desligado, nenhum fluxo que mande e-mail, cadastro público desligado.
+- **Trava do script.** `DEMO_PERMITIR_REMOTO=1` sozinha não separa a demonstração da produção; o script também exige o `ref` do projeto (`DEMO_PROJETO_REF`).
 
 ### Escopo mínimo
 
@@ -270,7 +277,7 @@ Cada botão:
 - explica o que a pessoa verá;
 - redireciona para a tela principal adequada.
 
-Não disponibilizar esse recurso no projeto de produção real.
+Não disponibilizar esse recurso no projeto de produção real. Como toda pasta de `src/routes/` entra no build, a tela fica em `src/demo/` e o script `npm run build:demo` a copia para `src/routes/demo/` antes de compilar. As contas e senhas vêm de variáveis de build (`VITE_DEMO_*`) definidas só no Worker de demonstração.
 
 ### Reset do cenário
 

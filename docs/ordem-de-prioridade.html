@@ -13,7 +13,7 @@ p { margin:0 0 7pt } ul,ol { margin:0 0 8pt; padding-left:16pt } li { margin-bot
 .summary { background:var(--tint); border-left:4px solid var(--accent); padding:10pt 12pt; break-inside:avoid }
 table { width:100%; border-collapse:collapse; margin:8pt 0 12pt; font-size:8.7pt } th,td { border:1px solid var(--line); padding:5pt 6pt; vertical-align:top } th { background:var(--tint); color:var(--accent); text-align:left } tr { break-inside:avoid }
 .rank { width:28pt; text-align:center; font-family:"Noto Serif",serif; font-size:13pt; font-weight:bold }
-.rank-1 { background:#8a3d32; color:white } .rank-2 { background:var(--accent); color:white } .rank-3 { background:#3f6d55; color:white } .rank-low { background:#dfe5eb; color:var(--accent) }
+.rank-1 { background:#8a3d32; color:white } .rank-2 { background:var(--accent); color:white } .rank-3 { background:#3f6d55; color:white } .rank-low { background:#dfe5eb; color:var(--accent) } .rank-gate { background:var(--gold); color:white }
 .note { background:#f7f0e1; border-left:4px solid var(--gold); padding:8pt 12pt; margin:8pt 0; break-inside:avoid }
 .phase { border:1px solid var(--line); border-radius:6pt; padding:8pt 10pt; margin:8pt 0; break-inside:avoid } .phase h3 { margin-top:0 }
 .flow { background:#1b2430; color:white; font-family:"DejaVu Sans Mono",monospace; white-space:pre-wrap; padding:10pt; font-size:8.5pt; break-inside:avoid }
@@ -29,28 +29,38 @@ tbody tr:last-child { break-before:avoid } ul, ol { break-inside:avoid } p:has(+
 <p class="muted">23 de novembro de 2026</p>
 
 <div class="summary">
-<p><strong>A prioridade não é implementar tudo ao mesmo tempo.</strong> A primeira entrega deve corrigir vazamentos e tornar segura a sessão. Depois entram os dois fluxos com maior valor para o piloto: coletiva oral e painel operacional da sessão.</p>
+<p><strong>A prioridade não é implementar tudo ao mesmo tempo.</strong> A primeira entrega deve corrigir vazamentos e tornar segura a sessão, proteger o texto das perguntas da coletiva e dar ao delegado a sessão unificada. Em seguida vem o piloto. Só depois entram a coletiva completa, os modais e a demonstração, já com o que a sessão de teste mostrou.</p>
 </div>
 
 <h2>Visão geral</h2>
+<p>A sequência de execução tem o <strong>piloto no meio</strong>. A coletiva se divide em duas partes: o texto protegido vai antes do piloto, o fluxo oral completo depois.</p>
 <table>
 <thead><tr><th>#</th><th>Passo</th><th>Plano</th><th>Esforço</th><th>Por que nesta posição</th><th>Escopo mínimo</th></tr></thead>
 <tbody>
-<tr><td class="rank rank-1">1</td><td>44</td><td><strong>Segurança online</strong></td><td>M</td><td>Protege dados privados em contas, aparelhos e eventos compartilhados.</td><td>Cache offline por usuário, logout, RLS, Storage e testes de acesso.</td></tr>
-<tr><td class="rank rank-2">2</td><td>45</td><td><strong>Coletiva oral</strong></td><td>M</td><td>Corrige uma área explicitamente sem utilidade no momento real.</td><td>Pauta, chamada, pergunta fora do alcance da delegação, cronômetro, telão e conclusão.</td></tr>
-<tr><td class="rank rank-2">3</td><td>46</td><td><strong>Agora e sessão unificada</strong></td><td>M</td><td>Reduz a dificuldade de achar a ação durante a sessão.</td><td>Nota e próxima fala sempre visíveis; pendência que leva direto à ação.</td></tr>
-<tr><td class="rank rank-3">4</td><td>47</td><td><strong>Modais, saída e ícones</strong></td><td>M</td><td>Reduz mudanças de página e deixa o sistema mais formal.</td><td>Saída com confirmação, <code>Confirmar</code> nas ações irreversíveis e ícones do cabeçalho.</td></tr>
-<tr><td class="rank rank-low">5</td><td>48</td><td><strong>Demonstração online</strong></td><td>M</td><td>Permite validar o app por papéis sem configurar dados manualmente.</td><td>Projeto separado, um comitê, <code>/demo</code> por papel e reinício.</td></tr>
-<tr><td class="rank rank-low">6</td><td>49</td><td><strong>Edição por cláusula</strong></td><td>G</td><td>Evita discussões intermináveis sobre documentos. <strong>Depois do piloto.</strong></td><td>Proposta estruturada, rodada com prazo, comparação e fusão básica.</td></tr>
-<tr><td class="rank rank-low">7</td><td>50</td><td><strong>Preparação de discursos</strong></td><td>M</td><td>Ajuda delegados a acompanhar o debate e preparar a fala. <strong>Depois do piloto.</strong></td><td>Captura rápida por tipo, painel curto da delegação e rascunho.</td></tr>
-<tr><td class="rank rank-low">8</td><td>51</td><td><strong>Melhorias gerais</strong></td><td>G</td><td>Acabamento das demais superfícies depois das bases.</td><td>Voltar, vazio, feedback, densidade e consistência.</td></tr>
+<tr><td class="rank rank-1">1</td><td>44</td><td><strong>Segurança online</strong></td><td>M</td><td>Protege dados privados em contas, aparelhos e eventos compartilhados, e o piloto já os usa.</td><td>Cache offline por usuário, logout, RLS, Storage e testes de acesso.</td></tr>
+<tr><td class="rank rank-1">2</td><td>45 <strong>A</strong></td><td><strong>Texto da pergunta da coletiva protegido</strong></td><td>P</td><td>Hoje o texto da pergunta é legível por todo o evento.</td><td>Tabela <code>coletiva_pergunta_texto</code>, regra de leitura e migração em três passos.</td></tr>
+<tr><td class="rank rank-2">3</td><td>46</td><td><strong>Agora e sessão unificada</strong></td><td>M</td><td>Reduz a dificuldade de achar a ação durante a sessão, que é o que o piloto mede.</td><td>Nota e próxima fala sempre visíveis; pendência que leva direto à ação.</td></tr>
+<tr><td class="rank rank-gate">—</td><td>12</td><td><strong>Sessão de teste do piloto</strong></td><td>—</td><td>Valida o que existe antes de construir mais.</td><td>Roteiro, questionário e plano B em papel.</td></tr>
+<tr><td class="rank rank-2">4</td><td>45 <strong>B</strong></td><td><strong>Coletiva oral</strong></td><td>M</td><td>Corrige uma área sem utilidade no momento real, já com o que o piloto disse sobre a imprensa.</td><td>Estados, chamada, cartão da delegação, telão da coletiva, cronômetro e conclusão.</td></tr>
+<tr><td class="rank rank-3">5</td><td>47</td><td><strong>Modais, saída e ícones</strong></td><td>M</td><td>Reduz mudanças de página e deixa o sistema mais formal; a demonstração depende dele.</td><td>Saída com confirmação, <code>Confirmar</code> nas ações irreversíveis e ícones do cabeçalho.</td></tr>
+<tr><td class="rank rank-low">6</td><td>48</td><td><strong>Demonstração online</strong></td><td>M</td><td>Depende da segurança, da coletiva e dos modais; mostra o app por papéis sem configurar dados.</td><td>Projeto separado, um comitê, <code>/demo</code> por papel e reinício.</td></tr>
+<tr><td class="rank rank-low">7</td><td>49</td><td><strong>Edição por cláusula</strong></td><td>G</td><td>Evita discussões intermináveis sobre documentos. <strong>Só se o piloto confirmar.</strong></td><td>Proposta estruturada, rodada com prazo, comparação e fusão básica.</td></tr>
+<tr><td class="rank rank-low">8</td><td>50</td><td><strong>Preparação de discursos</strong></td><td>M</td><td>Ajuda delegados a acompanhar o debate e preparar a fala. <strong>Só se o piloto confirmar.</strong></td><td>Captura rápida por tipo, painel curto da delegação e rascunho.</td></tr>
+<tr><td class="rank rank-low">9</td><td>51</td><td><strong>Melhorias gerais</strong></td><td>G</td><td>Acabamento das demais superfícies depois das bases.</td><td>Voltar, vazio, feedback, densidade e consistência.</td></tr>
 </tbody>
 </table>
 <p class="muted">Esforço P, M ou G como nos passos 01 a 43. Os passos 49 e 50 só começam depois da validação com o piloto.</p>
 
-<h2>Validação com o piloto antes dos itens 6 e 7</h2>
-<div class="note"><strong>A sessão do piloto não está registrada como feita</strong> (os critérios de aceite do passo 12 seguem abertos), e os planos de edição por cláusula e de preparação de fala nasceram sem dados de uso. Construí-los antes de ver o piloto é apostar em duas das maiores entregas.</div>
-<p>Regra: os passos 49 e 50 só começam depois que o questionário do piloto responder às perguntas deles (a rodada de propostas deu conta? o que faltou ao preparar a fala?). Se o piloto não mostrar dor, os dois ficam para depois do evento. Os itens 1 a 5 e 8 não dependem do piloto.</p>
+<h2>O piloto vem no meio</h2>
+<div class="note"><strong>A sessão do piloto não está registrada como feita</strong> (os critérios de aceite do passo 12 seguem abertos). Cinco passos M ou G (45 parte B, 47, 48, 49 e 50) seriam construídos sem nenhum dado de uso. Por isso a sessão de teste fica entre o passo 46 e a coletiva completa.</div>
+<ul>
+<li><strong>Antes do piloto:</strong> 44, 45 parte A e 46, o que o roteiro exercita (sessão, notas, aparelho compartilhado) e o que não pode vazar.</li>
+<li><strong>Depois do piloto:</strong> 45 parte B, 47 e 48 têm requisitos claros e entram em seguida, ajustados ao que a sessão mostrar. A coletiva completa e a demonstração não fazem parte do roteiro do piloto.</li>
+<li><strong>Só com dor confirmada:</strong> os passos 49 e 50 só começam depois que o questionário do piloto responder às perguntas deles (a rodada de propostas deu conta? o que faltou ao preparar a fala?). Se o piloto não mostrar dor, os dois ficam para depois do evento. O que o passo 46 já entrega pode bastar.</li>
+<li>O passo 51 entra aos poucos, o ano todo.</li>
+</ul>
+<p>Se o piloto mostrar toques errados em ações sem confirmação (encerrar votação, retirar ponto), o item 2 do passo 47 (<code>Confirmar</code> nas ações irreversíveis) pode ser puxado para antes das demais partes do 47.</p>
+<p class="muted">As seções abaixo descrevem cada plano; a sequência de execução é a da tabela.</p>
 
 <h2>1 · Segurança online</h2>
 <p>Esta prioridade deve preceder a publicação de uma demonstração pública ou de uma nova área contendo dados privados.</p>
@@ -66,6 +76,7 @@ tbody tr:last-child { break-before:avoid } ul, ol { break-inside:avoid } p:has(+
 <h2>2 · Coletiva de imprensa como dinâmica oral</h2>
 <div class="note"><strong>Correção fundamental:</strong> a delegação não recebe uma pergunta por texto e não deve digitar uma resposta. Ela não sabe qual é a pergunta até a jornalista fazê-la em voz alta e responde falando.</div>
 <p>A primeira entrega permite à Diretoria organizar a fila e ao telão mostrar a delegação chamada. O app não substitui microfone, fala ou moderação presencial.</p>
+<p><strong>Duas partes.</strong> <strong>A (antes do piloto, esforço P):</strong> o texto da pergunta, hoje legível por todo o evento, vai para <code>coletiva_pergunta_texto</code>, legível só pela press autora e pela Diretoria da Press até existirem os estados. <strong>B (depois do piloto):</strong> estados, chamada, cartão da delegação, telão da coletiva (<code>/telao/coletiva</code>), cronômetro e conclusão. A parte A é pequena e fecha um vazamento que existe hoje; a B é um fluxo inteiro que o roteiro do piloto não exercita.</p>
 <ul>
 <li>pauta por veículo e delegação;</li>
 <li>até quatro perguntas por veículo;</li>
@@ -120,23 +131,30 @@ tbody tr:last-child { break-before:avoid } ul, ol { break-inside:avoid } p:has(+
 <p>As regras de interface têm uma fonte única: <code>melhorias-interface.pdf</code>. Voltar, objetos clicáveis, placeholders, estados vazios, densidade por papel e consistência visual entram como revisão contínua após as bases.</p>
 
 <h2>Sequência de execução</h2>
-<div class="phase"><h3>Lote A — segurança</h3><p>Cache, logout, RLS, Storage, testes de acesso e separação de demonstração.</p></div>
-<div class="phase"><h3>Lote B — piloto funcional</h3><p>Coletiva oral, Agora operacional, sessão unificada e modais principais.</p></div>
-<div class="phase"><h3>Lote C — demonstração</h3><p>Projeto separado, contas por papel, cenário CSNU-T e roteiro manual.</p></div>
+<div class="phase"><h3>Lote A — antes do piloto (passos 44, 45 parte A e 46)</h3><p>Cache, logout, RLS, Storage, aparelho compartilhado, texto da pergunta da coletiva protegido, Agora por pendências e nota rápida com próxima fala sempre visíveis.</p></div>
+<div class="phase"><h3>Piloto (passo 12)</h3><p>Roteiro de <code>piloto.md</code>, com a troca de conta no mesmo aparelho. A coletiva completa e a demonstração ainda não existem e ficam de fora.</p></div>
+<div class="phase"><h3>Lote B — depois do piloto (passos 45 parte B e 47)</h3><p>Coletiva oral completa; modais principais, saída com confirmação e ícones.</p></div>
+<div class="phase"><h3>Lote C — demonstração (passo 48)</h3><p>Projeto separado, contas por papel, cenário CSNU-T e roteiro manual.</p></div>
 <div class="phase"><h3>Lote D — produtividade (depois do piloto)</h3><p>Edição por cláusula e preparação curta da fala, só com o que o piloto confirmar.</p></div>
 <div class="phase"><h3>Lote E — acabamento</h3><p>Acessibilidade, visual, capturas, estados vazios e melhoria gradual.</p></div>
 
 <h2>Dependências</h2>
-<div class="flow">Segurança (cache, logout, RLS, Storage)
-  ├─ Coletiva oral ............ em paralelo, depois da segurança básica
-  ├─ Agora e sessão unificada
-  │    └─ Preparação de discursos
-  ├─ Modais e interface oficial  em paralelo com a sessão e a coletiva
-  ├─ Demonstração online ...... depois de sessão, documentos e coletiva
-  └─ Edição por cláusula ...... depende de sessão, documentos e RLS atuais,
-       e da validação do piloto (como a Preparação de discursos)
+<div class="flow">ANTES DO PILOTO
+Segurança (44: cache, logout, RLS, Storage)
+  ├─ Coletiva parte A: texto da pergunta protegido (45)
+  └─ Agora e sessão unificada (46)
 
-Melhorias gerais ............... entram aos poucos, depois dos componentes principais</div>
+PILOTO (passo 12) ── mostra o que ajustar e o que vale construir
+
+DEPOIS DO PILOTO
+Coletiva parte B: fluxo oral (45) ... depende da parte A e da segurança
+Modais, saída e ícones (47) ......... depende de 43 e 44
+  └─ Demonstração online (48) ....... depois de segurança, coletiva e modais
+Edição por cláusula (49) e
+Preparação de discursos (50) ........ só se o piloto confirmar a dor
+  (49: sessão, documentos e RLS; 50: sessão unificada e caderno)
+
+Melhorias gerais (51) ............... entram aos poucos, depois dos componentes principais</div>
 
 <h2>Critérios gerais</h2>
 <ul>
@@ -154,8 +172,8 @@ Melhorias gerais ............... entram aos poucos, depois dos componentes princ
 <h2>Calendário</h2>
 <p>O plano completo (seção 17) prevê validação de dez/2026 a fev/2027, piloto de mar a jun/2027, evento completo de jul a set e ensaio em out/2027. A data exata da edição de 2027 segue em aberto, e sem ela não há prazos para fixar. Proposta de encaixe, a confirmar quando a data sair:</p>
 <ul>
-<li>antes da sessão do piloto: lotes A, B e C (passos 44 a 48);</li>
-<li>depois da sessão do piloto: lote D (passos 49 e 50), só com o que o questionário confirmar;</li>
+<li>antes da sessão do piloto: lote A (passos 44, 45 parte A e 46);</li>
+<li>depois da sessão do piloto: lotes B e C (passos 45 parte B, 47 e 48), ajustados ao que a sessão mostrar, e em seguida o lote D (passos 49 e 50), só com o que o questionário confirmar;</li>
 <li>lote E (passo 51): em lotes pequenos, o ano todo, e congelado antes do ensaio de outubro.</li>
 </ul>
 <p class="muted">A duração em semanas depende de quanto tempo por semana a pessoa do projeto tem; o esforço P, M ou G está na tabela.</p>

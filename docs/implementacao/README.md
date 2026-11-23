@@ -2,6 +2,8 @@
 
 Ordem dos passos para construir o app. Os passos 01 a 12 formam o **piloto**: planos gratuitos, poucos usuários e dados fictícios. Os passos 13 a 19 levam o app à **escala do evento**. Os passos 20 a 38 são as **melhorias depois da revisão** do app, explicadas e priorizadas em [melhorias-pos-revisao.pdf](../melhorias-pos-revisao.pdf). Os passos 39 a 41 deixam o desenvolvimento mais rápido, o app mais leve na internet móvel e fecham as pendências. O passo 42 aplica o estilo "chancelaria", escolhido entre os protótipos de `docs/estilos/`. O passo 43 deixa o app fácil de achar e de voltar. Os passos 44 a 51 vêm dos planos posteriores, em [ordem de prioridade](../ordem-de-prioridade.md): segurança, coletiva oral, sessão unificada, modais e ícones, demonstração online, edição por cláusula, preparação da fala e melhorias gerais. Os passos 49 e 50 só começam depois que o piloto disser que valem a pena.
 
+**Ordem de execução dos passos 44 a 51:** 44, 45 parte A e 46; **sessão de teste do piloto (passo 12)**; 45 parte B, 47 e 48; 49 e 50 só com o que o piloto confirmar; 51 aos poucos, o ano todo. A tabela abaixo segue a numeração, não essa sequência.
+
 Cada passo só começa quando os passos de que ele depende estão prontos. As regras de procedimento que o app segue estão resumidas em [regras-de-procedimento.md](../regras-de-procedimento.md).
 
 | Passo | Entrega | Depende de |
@@ -56,7 +58,7 @@ Cada passo só começa quando os passos de que ele depende estão prontos. As re
 | [43](43-facil-de-achar-e-voltar.md) | Fácil de achar e de voltar: painel sem rolagem, país na faixa, menu por tarefa, Documentos, "Ir para…" e CSNU completo na demonstração | 42 |
 | **Planos posteriores** (ordem em [ordem-de-prioridade.md](../ordem-de-prioridade.md)) | | |
 | [44](44-seguranca-dos-dados.md) | Segurança dos dados e das sessões: cache offline por usuário, logout, RLS e Storage, revogação e incidente | 43 |
-| [45](45-coletiva-oral.md) | Coletiva de imprensa como fluxo oral: texto da pergunta em tabela própria, chamada, telão e conclusão | 17, 44 |
+| [45](45-coletiva-oral.md) | Coletiva de imprensa como fluxo oral: texto da pergunta em tabela própria (parte A, pode ir antes), estados, chamada, telão da coletiva e conclusão (parte B) | 17, 44 |
 | [46](46-agora-e-sessao-unificadas.md) | Agora operacional e sessão unificada: nota rápida e próxima fala sempre visíveis | 43 |
 | [47](47-modais-saida-e-icones.md) | Modais, saída com confirmação e ícones do cabeçalho | 43, 44 |
 | [48](48-demonstracao-online.md) | Demonstração online separada, com entrada por papel | 44, 45, 47 |
@@ -66,7 +68,7 @@ Cada passo só começa quando os passos de que ele depende estão prontos. As re
 
 ## Melhorias depois da revisão
 
-**Antes de começar:** as notificações push (bônus do passo 15) e os bilhetes mais rápidos já estão na `main` (13db7fb). As migrações dos passos novos começam em `20261208090000`. Regras de acesso de tabelas lidas em lista usam os conjuntos de `20261207100000_mensagens_rapidas.sql` (`minhas_delegacoes()`, `meus_comites()`), calculados uma vez por consulta, em vez de uma função chamada linha a linha.
+**Antes de começar:** as notificações push (bônus do passo 15) e os bilhetes mais rápidos já estão na `main` (13db7fb). As migrações dos passos 20 a 43 começaram em `20261208090000` e a última é `20261218090000_cronograma_tipo.sql`; as dos passos 44 em diante começam em `20261219090000`. Regras de acesso de tabelas lidas em lista usam os conjuntos de `20261207100000_mensagens_rapidas.sql` (`minhas_delegacoes()`, `meus_comites()`), calculados uma vez por consulta, em vez de uma função chamada linha a linha.
 
 **Decisões tomadas em 20/11/2026** (cada passo repete as suas):
 
@@ -136,6 +138,7 @@ tests/                 testes de ponta a ponta (Playwright)
 - [ ] Os testes listados no passo foram escritos junto com o código e passam no CI, junto com os de todos os passos anteriores.
 - [ ] A primeira abertura continua abaixo de 300 KB.
 - [ ] Migração versionada e tipos do banco regenerados.
+- [ ] Textos novos em português e inglês (`npm run textos` passa).
 - [ ] Segue a aparência definida abaixo: leve, profissional, diplomática, limpa e com cara de oficial.
 
 ## Testes
@@ -222,7 +225,7 @@ Cada passo tem uma seção "Testes" com os testes que provam que ele funciona e 
 | 43 | — | sim | sim (por tarefa) | sim |
 | 44 | sim | sim | sim | sim |
 | 45 | sim | — | sim | sim |
-| 46 | — | sim | sim | sim |
+| 46 | só se faltar coluna | sim | sim | sim |
 | 47 | — | — | sim | — |
 | 48 | — | — | sim | sim |
 | 49 | sim | sim | sim | — |
