@@ -3,6 +3,7 @@
 	import { invalidate } from '$app/navigation';
 	import { PAPEIS } from '#lib/papeis.ts';
 	import { supabase, type Papel } from '#lib/supabase.ts';
+	import Confirmar from '#lib/ui/Confirmar.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -53,6 +54,17 @@
 		const { error } = await supabase.from('convite').delete().eq('id', id);
 		if (error) {
 			erro = 'Não foi possível remover o convite.';
+			return;
+		}
+		await invalidate('app:participantes');
+	}
+
+	// Passo 44: tirar o acesso encerra as sessões da conta e as notificações dela (no banco).
+	async function removerAcesso(id: string) {
+		erro = '';
+		const { error } = await supabase.from('participacao').delete().eq('id', id);
+		if (error) {
+			erro = 'Não foi possível remover o acesso.';
 			return;
 		}
 		await invalidate('app:participantes');
@@ -150,6 +162,13 @@
 					{p.pessoa?.nome}
 					<span class="detalhe">{descrever(p)}</span>
 				</span>
+				<Confirmar
+					rotulo="Remover acesso"
+					classe="botao botao--secundario botao--pequeno"
+					pergunta={`Remover o acesso de ${p.pessoa?.nome ?? 'esta pessoa'} (${descrever(p)})?`}
+					explicacao="A pessoa sai do app em todos os aparelhos agora e para de receber notificações. Para voltar, precisa de um convite novo."
+					acao={() => removerAcesso(p.id)}
+				/>
 			</li>
 		{/each}
 	</ul>

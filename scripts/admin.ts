@@ -24,13 +24,26 @@ function credenciais(): Credenciais {
 	return { url: status.API_URL, chave: status.SERVICE_ROLE_KEY, chavePublica: status.ANON_KEY };
 }
 
+/**
+ * Passo 44: um projeto remoto só com a flag ligada **e** o ref dele liberado na variável
+ * irmã (DEMO_PERMITIR_REMOTO=1 + DEMO_PROJETO_REF=<ref>). Só a flag não distingue o
+ * projeto de teste do de produção. Devolve o motivo da recusa, ou null.
+ */
+export function recusaDoAlvo(url: string, variavelDeLiberacao: string, env: Record<string, string | undefined>) {
+	const host = new URL(url).hostname;
+	if (['127.0.0.1', 'localhost'].includes(host)) return null;
+	const variavelDoRef = variavelDeLiberacao.replace('PERMITIR_REMOTO', 'PROJETO_REF');
+	if (env[variavelDeLiberacao] !== '1' || !env[variavelDoRef] || host.split('.')[0] !== env[variavelDoRef]) {
+		return `Recusado: ${url} não é o Supabase local. Para um projeto de teste (nunca o de produção), use ${variavelDeLiberacao}=1 e ${variavelDoRef}=<ref do projeto>.`;
+	}
+	return null;
+}
+
 /** O cliente com o service role, depois de conferir que o alvo é local (ou liberado). */
 export async function conectarAdmin(variavelDeLiberacao: string) {
 	const { url, chave, chavePublica } = credenciais();
-	const local = ['127.0.0.1', 'localhost'].includes(new URL(url).hostname);
-	if (!local && process.env[variavelDeLiberacao] !== '1') {
-		throw new Error(`Recusado: ${url} não é o Supabase local. Use ${variavelDeLiberacao}=1 só num projeto de teste.`);
-	}
+	const recusa = recusaDoAlvo(url, variavelDeLiberacao, process.env);
+	if (recusa) throw new Error(recusa);
 	const db = createClient(url, chave, { auth: { persistSession: false, autoRefreshToken: false } });
 	// Logo depois de `db reset`, a API ainda se reconecta ao banco por alguns segundos.
 	for (let tentativa = 1; ; tentativa++) {

@@ -21,7 +21,12 @@ export default defineConfig({
 			},
 			// SPA: toda rota cai no index.html. Sem 404.html na raiz, o Cloudflare Pages
 			// trata o site como SPA. Não há páginas pré-renderizadas, então não há conflito.
-			adapter: adapter({ fallback: 'index.html' })
+			adapter: adapter({ fallback: 'index.html' }),
+			// Passo 44: caminhos absolutos (/_app/...), como no index.html publicado. O
+			// service worker serve a mesma página guardada em qualquer rota sem rede; com
+			// caminhos relativos (o padrão do preview), a página de "/" aberta numa rota
+			// funda pedia /comite/X/_app/... e ficava em branco.
+			paths: { relative: false }
 		})
 	]
 });

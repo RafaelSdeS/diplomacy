@@ -1,3 +1,15 @@
 # Passo 40: os arquivos com hash no nome nunca mudam; o navegador guarda por um ano.
 /_app/immutable/*
   Cache-Control: public, max-age=31536000, immutable
+
+# Passo 44: cabeçalhos de segurança de todas as telas. A CSP completa começa só em
+# relatório (o navegador avisa no console, nada é bloqueado); vira obrigatória depois de
+# conferir scripts, imagens e conexões no app publicado. O que já vale: ninguém põe o
+# app dentro de outro site, nem plugins, nem <base> de fora.
+/*
+  Content-Security-Policy: frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'
+  Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.supabase.co; font-src 'self'; connect-src 'self' https://*.supabase.co wss://*.supabase.co; worker-src 'self'; manifest-src 'self'; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Content-Type-Options: nosniff
+  Permissions-Policy: camera=(self), microphone=(), geolocation=(), payment=(), usb=()
+  Strict-Transport-Security: max-age=31536000

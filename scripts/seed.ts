@@ -3,8 +3,8 @@
 // fictício, para o "mock" do primeiro dia) e contas @exemplo.test.
 // Usa o fluxo real: cria os convites e depois as contas; o gatilho nova_conta
 // cria a pessoa e as participações. Pode rodar várias vezes sem duplicar nada.
-// Só roda no Supabase local, a menos que SEED_PERMITIR_REMOTO=1 (para um projeto
-// de teste, nunca o de produção).
+// Só roda no Supabase local, a menos que SEED_PERMITIR_REMOTO=1 e SEED_PROJETO_REF=<ref>
+// (para um projeto de teste, nunca o de produção).
 import { conectarAdmin, criarContas, SENHA, tipoDoItem, verificar } from './admin.ts';
 import { DELEGACOES, DELEGACOES_TREINO, ISOLADOS, isolado, TOPICOS_TREINO } from './delegacoes.ts';
 

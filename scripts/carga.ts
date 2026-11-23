@@ -10,12 +10,13 @@
 // como o plano gratuito: localmente, rode com poucos clientes (CARGA_CLIENTES=30). A
 // meta de 300 clientes é para um projeto de TESTE no plano Pro, nunca a produção:
 //
-//   SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... CARGA_PERMITIR_REMOTO=1 node scripts/carga.ts preparar
-//   SUPABASE_URL=... SUPABASE_CHAVE=<chave pública> CARGA_PERMITIR_REMOTO=1 node scripts/carga.ts rodar
+//   SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... CARGA_PERMITIR_REMOTO=1 CARGA_PROJETO_REF=<ref> node scripts/carga.ts preparar
+//   SUPABASE_URL=... SUPABASE_CHAVE=<chave pública> CARGA_PERMITIR_REMOTO=1 CARGA_PROJETO_REF=<ref> node scripts/carga.ts rodar
 //
 // No projeto de teste, aumente antes o limite de logins (Authentication → Rate Limits).
 import { execFileSync } from 'node:child_process';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { recusaDoAlvo } from './admin.ts';
 
 const SENHA = 'senha-de-carga';
 const COMITES = 6;
@@ -41,9 +42,8 @@ function local() {
 
 function destino() {
 	const url = process.env.SUPABASE_URL ?? local().url;
-	if (!['127.0.0.1', 'localhost'].includes(new URL(url).hostname) && process.env.CARGA_PERMITIR_REMOTO !== '1') {
-		throw new Error(`Recusado: ${url} não é o Supabase local. Use CARGA_PERMITIR_REMOTO=1 só num projeto de teste.`);
-	}
+	const recusa = recusaDoAlvo(url, 'CARGA_PERMITIR_REMOTO', process.env);
+	if (recusa) throw new Error(recusa);
 	return url;
 }
 

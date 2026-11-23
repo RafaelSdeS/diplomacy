@@ -3,7 +3,7 @@
 // IndexedDB antes de sair; o banco ignora um id repetido, então reenviar nunca duplica.
 // Reenvia ao voltar a rede, ao voltar o app para a frente e ao abrir o app (o Safari
 // não tem Background Sync, e nada depende dele).
-import { createStore, del, entries, set, type UseStore } from 'idb-keyval';
+import { clear, createStore, del, entries, set, type UseStore } from 'idb-keyval';
 
 export type Item = {
 	id: string;
@@ -72,6 +72,11 @@ export function criarCaixa(enviar: (item: Item) => Promise<Falha>, loja: UseStor
 		},
 		async pendentes() {
 			return (await entries<string, Item>(loja)).map(([, item]) => item);
+		},
+		/** Passo 44: ao sair da conta, nada do que ela escreveu fica no aparelho. */
+		async limpar() {
+			await clear(loja);
+			avisar();
 		},
 		ouvir(ouvinte: () => void) {
 			ouvintes.add(ouvinte);

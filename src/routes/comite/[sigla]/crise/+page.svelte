@@ -122,6 +122,9 @@
 
 		<section aria-labelledby="t-minhas">
 			<h2 id="t-minhas">{t('Notas de {delegacao}', { delegacao: eu.delegacao_nome ?? '' })}</h2>
+			{#if data.notasSemRede}
+				<p class="vazio">{t('Sem conexão: por segurança, as notas não ficam guardadas no aparelho. Elas aparecem quando a internet voltar.')}</p>
+			{/if}
 			<ul class="lista">
 				{#each data.notas as nota (nota.id)}
 					{@const status = nota.status as StatusNota}

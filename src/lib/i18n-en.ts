@@ -806,6 +806,16 @@ export const EN: Record<string, string> = {
 	'{n} de {total} votaram': '{n} of {total} voted',
 	'{n} notas selecionadas': '{n} notes selected',
 	'{n} para enviar': '{n} to send',
+	// Passo 45
+	'a pergunta só é conhecida quando for feita em voz alta': 'the question is only known when it is asked aloud',
+	// Passo 44
+	'Sem conexão: por segurança, as notas não ficam guardadas no aparelho. Elas aparecem quando a internet voltar.': 'Offline: for security, notes are not stored on the device. They will appear when the connection returns.',
+	'Itens não enviados: {n}': 'Unsent items: {n}',
+	'Eles estão só neste aparelho. Se sair agora, eles se perdem.': 'They are only on this device. If you sign out now, they will be lost.',
+	'Ainda sem conexão: os itens continuam guardados.': 'Still offline: the items are still saved.',
+	'Enviando…': 'Sending…',
+	'Enviar agora': 'Send now',
+	'Sair mesmo assim': 'Sign out anyway',
 	'{n}ª na fila': '#{n} in the queue',
 	'{veiculo} cita a sua delegação': '{veiculo} mentions your delegation',
 	'Última votação': 'Last vote',

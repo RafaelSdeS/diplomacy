@@ -11,6 +11,15 @@ export function lerRascunho(chave: string) {
 	}
 }
 
+/** Passo 44: ao sair da conta, nenhum rascunho fica no aparelho. */
+export function esquecerRascunhos() {
+	try {
+		for (const chave of Object.keys(localStorage)) if (chave.startsWith(CHAVE(''))) localStorage.removeItem(chave);
+	} catch {
+		// sem armazenamento: não há o que apagar
+	}
+}
+
 /** Guarda o texto; vazio (depois de enviar) apaga o rascunho. */
 export function guardarRascunho(chave: string, texto: string) {
 	try {

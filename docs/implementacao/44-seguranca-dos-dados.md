@@ -19,6 +19,19 @@ Ordem de trabalho:
 6. **Cabeçalhos no Cloudflare** (`static/_headers`): `Content-Security-Policy` (primeiro em modo só de relatório, depois estrito, depois de validar scripts e fontes), `Referrer-Policy`, `X-Content-Type-Options`, `Permissions-Policy`, `frame-ancestors`, e `Cache-Control: private` nas respostas autenticadas. Seguem o plano ([CSP e headers](../seguranca-online.md#csp-e-headers)).
 7. **Resposta a incidente:** o roteiro de 14 itens do plano, escrito em `docs/` e com o responsável nomeado.
 
+## Estado (23/11/2026)
+
+Feito: cache `dados-<sub>` com 12 horas e exclusão pela URL inteira (`src/lib/cache-dados.ts`, `src/service-worker/index.ts`); limpeza no logout e quando outra aba sai (`+layout.svelte`), com aviso da caixa de saída; "Remover acesso" em *Secretaria → Participantes*, que encerra sessões e notificações (gatilho em `20261219090000_seguranca.sql`); `Cache-Control: private, no-store` nas respostas sensíveis (`db_pre_request`); trava por `ref` nos scripts; cabeçalhos em `static/_headers`; roteiro em [incidente.md](../incidente.md).
+
+Decisões tomadas na implementação:
+
+- **Votos fora da lista de exclusão.** São públicos no comitê e vêm embutidos na consulta da sessão; excluí-los quebraria a sessão sem rede (passo 15). Ficam excluídos o texto da coletiva e as notas de crise.
+- **Leituras que nunca ficam no cache não tentam de novo** (`.retry(false)`): sem rede, a tela abre na hora, com o cartão vazio ou um aviso.
+- **Caminhos absolutos no build** (`paths.relative: false`): o service worker serve a mesma página em qualquer rota sem rede, e com caminhos relativos uma rota funda ficava em branco.
+- **A CSP completa está só em relatório.** Passa a obrigatória depois de conferir o console no app publicado (scripts embutidos precisam de hash antes).
+
+Fica com você: os testes manuais em aparelhos compartilhados (lista abaixo) e conferir os avisos da CSP no console do app publicado.
+
 ## Fora desta etapa
 
 Sistema de detecção, logs analíticos, auditoria externa e personalização de segurança por usuário. Ficam para depois: limites por pessoa (uploads, convites, denúncias) e a tabela de auditoria do plano, exceto o que a coletiva do passo 45 já registra.

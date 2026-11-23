@@ -6,8 +6,8 @@
 // Usa o fluxo real: convites, depois as contas (o gatilho nova_conta liga cada
 // uma); o conteúdo é criado entrando com as contas, porque as funções do banco
 // conferem quem chama. Pode rodar de novo sem duplicar nada.
-// Só roda no Supabase local, a menos que DEMO_PERMITIR_REMOTO=1 (num projeto de
-// teste, com SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY e SUPABASE_ANON_KEY).
+// Só roda no Supabase local, a menos que DEMO_PERMITIR_REMOTO=1 e DEMO_PROJETO_REF=<ref>
+// (num projeto de teste, com SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY e SUPABASE_ANON_KEY).
 import { randomUUID } from 'node:crypto';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { conectarAdmin, criarContas, SENHA, tipoDoItem, usuariosPorEmail, verificar } from './admin.ts';

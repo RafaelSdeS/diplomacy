@@ -1,3 +1,4 @@
+import { semRede } from '#lib/cache-dados.ts';
 import { papelPrincipal } from '#lib/papeis.ts';
 import { carregarIncidentes } from '#lib/crise.ts';
 import { carregarSessao } from '#lib/sessao.ts';
@@ -46,6 +47,8 @@ export const load: PageLoad = async ({ parent, depends }) => {
 				.not('resposta', 'is', null)
 				.order('respondida_em', { ascending: false })
 				.limit(3)
+				// Nunca está no cache (passo 44): sem rede, falha na hora em vez de tentar de novo.
+				.retry(false)
 		),
 		// Os DPOs da delegação da pessoa, um por tópico.
 		ler('dpos', ['dpo'], () => supabase.from('dpo').select('id, topico, status, comite_id').in('delegacao_id', delegacoes).order('topico')),
@@ -115,7 +118,8 @@ export const load: PageLoad = async ({ parent, depends }) => {
 	if (dpos.error) throw dpos.error;
 	if (citacoes.error) throw citacoes.error;
 	if (comitesAoVivo.error) throw comitesAoVivo.error;
-	if (respostasCrise.error) throw respostasCrise.error;
+	// Passo 44: as notas de crise nunca ficam no cache; sem rede, o cartão só fica vazio.
+	if (respostasCrise.error && !semRede(respostasCrise.error)) throw respostasCrise.error;
 	if (cronograma.error) throw cronograma.error;
 	if (avisos.error) throw avisos.error;
 	if (pessoa.error) throw pessoa.error;
@@ -125,7 +129,7 @@ export const load: PageLoad = async ({ parent, depends }) => {
 		avisos: avisos.data,
 		avisosVistosEm: pessoa.data.avisos_vistos_em,
 		comitesAoVivo: comitesAoVivo.data,
-		respostasCrise: respostasCrise.data,
+		respostasCrise: respostasCrise.data ?? [],
 		dpos: dpos.data,
 		citacoes: citacoes.data.map((c) => c.noticia),
 		principal,

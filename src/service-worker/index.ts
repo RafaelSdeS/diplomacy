@@ -1,9 +1,11 @@
 // Passo 15: o app abre sem internet. A interface de cada versão fica guardada no
 // aparelho; os dados lidos da API (cronograma, sessão, pauta, perfis...) também, para
 // mostrar a última versão conhecida quando a rede cai. Quem sai da conta apaga os dados.
+// Passo 44: cada conta tem o próprio cache de dados (dados-<sub>), válido por 12 horas.
 import { version } from '$app/env';
 import { assets, immutable } from '$app/manifest';
 import { self as sw } from '$app/service-worker';
+import { ehCacheDeDados, GUARDADO_EM, nomeDoCache, sensivel, sobreviveAAtualizacao, subDoPedido, vencida } from '#lib/cache-dados.ts';
 
 // Passo 40: menos dados. Os arquivos com hash no nome nunca mudam de conteúdo, então
 // ficam num cache que passa de uma versão para a outra: uma versão nova baixa só o que
@@ -11,7 +13,6 @@ import { self as sw } from '$app/service-worker';
 // a .woff2) não entram na instalação: vêm na primeira vez que aparecem.
 const APP = `app-${version}`; // a página inicial e os arquivos de static/ desta versão
 const IMUTAVEIS = 'imutaveis';
-const DADOS = 'dados';
 const caminho = (a: { path: string }) => `/${a.path.replace(/^\//, '')}`;
 const COM_HASH = new Set(immutable.map(caminho));
 // O _headers é configuração do Cloudflare, não um arquivo servido.
@@ -38,7 +39,7 @@ sw.addEventListener('activate', (evento) => {
 	evento.waitUntil(
 		(async () => {
 			const nomes = await caches.keys();
-			await Promise.all(nomes.filter((n) => ![APP, IMUTAVEIS, DADOS].includes(n)).map((n) => caches.delete(n)));
+			await Promise.all(nomes.filter((n) => !sobreviveAAtualizacao(n, [APP, IMUTAVEIS])).map((n) => caches.delete(n)));
 			const imutaveis = await caches.open(IMUTAVEIS);
 			for (const pedido of await imutaveis.keys()) if (!COM_HASH.has(new URL(pedido.url).pathname)) await imutaveis.delete(pedido);
 			await sw.clients.claim();
@@ -59,6 +60,41 @@ async function doCacheOuDaRede(pedido: Request, cache: string) {
 		void caches.open(cache).then((c) => c.put(pedido, copia));
 	}
 	return resposta;
+}
+
+// Passo 44: numa troca de conta, os dados da anterior saem do aparelho antes de seguir.
+let ultimoSub: string | null = null;
+async function soDestaConta(sub: string) {
+	if (sub === ultimoSub) return;
+	ultimoSub = sub;
+	const nomes = await caches.keys();
+	await Promise.all(nomes.filter((n) => ehCacheDeDados(n) && n !== nomeDoCache(sub)).map((n) => caches.delete(n)));
+}
+
+async function guardarComHorario(cache: string, pedido: Request, resposta: Response) {
+	const cabecalhos = new Headers(resposta.headers);
+	cabecalhos.set(GUARDADO_EM, String(Date.now()));
+	const copia = new Response(await resposta.blob(), { status: resposta.status, statusText: resposta.statusText, headers: cabecalhos });
+	await (await caches.open(cache)).put(pedido, copia);
+}
+
+/** Leituras da API: da rede; sem rede, a última resposta desta conta, com até 12 horas. */
+async function dadosDaConta(pedido: Request, sub: string) {
+	const cache = nomeDoCache(sub);
+	await soDestaConta(sub);
+	try {
+		const resposta = await fetch(pedido);
+		// Login recusado ou acesso retirado: o que a conta leu antes sai do aparelho.
+		if (resposta.status === 401 || resposta.status === 403) await caches.delete(cache);
+		else if (resposta.ok && !sensivel(pedido.url)) void guardarComHorario(cache, pedido, resposta.clone());
+		return resposta;
+	} catch (falha) {
+		const guardados = await caches.open(cache);
+		const guardada = await guardados.match(pedido);
+		if (guardada && !vencida(guardada.headers.get(GUARDADO_EM))) return guardada;
+		if (guardada) await guardados.delete(pedido);
+		throw falha;
+	}
 }
 
 async function daRedeOuDoCache(pedido: Request, cache: string, chave: Request | string = pedido) {
@@ -94,8 +130,11 @@ sw.addEventListener('fetch', (evento) => {
 		return;
 	}
 
-	// Leituras da API do Supabase: da rede; sem rede, a última resposta guardada.
-	if (url.pathname.startsWith('/rest/v1/')) evento.respondWith(daRedeOuDoCache(pedido, DADOS));
+	// Leituras da API do Supabase, só de quem está logado (anônimo vai direto à rede).
+	if (url.pathname.startsWith('/rest/v1/')) {
+		const sub = subDoPedido(pedido.headers.get('Authorization'));
+		if (sub) evento.respondWith(dadosDaConta(pedido, sub));
+	}
 });
 
 // Notificações (bônus): o texto vem do banco, pela Edge Function enviar-push.

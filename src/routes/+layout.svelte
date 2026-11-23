@@ -9,7 +9,9 @@
 	import { abrirIrPara, irPara } from '#lib/ir-para.svelte.ts';
 	import { menu } from '#lib/menu.ts';
 	import { caixa } from '#lib/caixa.ts';
+	import { ehCacheDeDados } from '#lib/cache-dados.ts';
 	import { esquecerConta } from '#lib/conta.ts';
+	import { esquecerRascunhos } from '#lib/rascunho.ts';
 	import { desativarPush } from '#lib/push.ts';
 	import { APP, marca } from '#lib/titulo.svelte.ts';
 	import { trilha } from '#lib/trilha.ts';
@@ -113,16 +115,65 @@
 		};
 	});
 
-	async function sair() {
-		// Os dados lidos ficam no aparelho para abrir sem internet; quem sai leva os seus.
-		await caches?.delete('dados').catch(() => {});
-		// O aparelho pode ser de outra pessoa: as notificações desta conta param aqui.
+	// Passo 44: o aparelho pode ser de outra pessoa. Quem sai leva tudo o que a conta
+	// deixou nele: dados lidos (todos os caches dados-*), notificações, caixa de saída e
+	// rascunhos.
+	async function limparAparelho() {
+		const nomes = await caches?.keys().catch(() => []);
+		await Promise.all((nomes ?? []).filter(ehCacheDeDados).map((n) => caches.delete(n)));
 		await desativarPush().catch(() => {});
-		await supabase.auth.signOut();
+		await caixa.limpar().catch(() => {});
+		esquecerRascunhos();
 		esquecerConta();
 		esquecerLeituras();
-		await goto('/entrar', { invalidateAll: true });
 	}
+
+	let saindo = false;
+	async function sair() {
+		saindo = true;
+		await limparAparelho();
+		await supabase.auth.signOut();
+		await goto('/entrar', { invalidateAll: true });
+		saindo = false;
+	}
+
+	// Com itens na caixa de saída, sair pergunta antes: eles se perderiam.
+	let avisoSaida = $state<HTMLDialogElement>();
+	let enviandoAntes = $state(false);
+	let semRedeAoSair = $state(false);
+	async function pedirSaida() {
+		pendentes = (await caixa.pendentes()).length;
+		if (!pendentes) return sair();
+		semRedeAoSair = false;
+		avisoSaida?.showModal();
+	}
+	async function enviarESair() {
+		enviandoAntes = true;
+		await caixa.reenviar().catch(() => {});
+		pendentes = (await caixa.pendentes()).length;
+		enviandoAntes = false;
+		if (pendentes) semRedeAoSair = true;
+		else {
+			avisoSaida?.close();
+			await sair();
+		}
+	}
+
+	// Sair numa aba (ou perder o acesso) leva as outras abas ao login, sem mostrar mais
+	// nada da conta.
+	$effect(() => {
+		const {
+			data: { subscription }
+		} = supabase.auth.onAuthStateChange((evento) => {
+			if (evento !== 'SIGNED_OUT' || saindo) return;
+			// Fora do callback: chamar o Supabase dentro dele trava o cliente.
+			setTimeout(async () => {
+				await limparAparelho();
+				await goto('/entrar', { invalidateAll: true });
+			});
+		});
+		return () => subscription.unsubscribe();
+	});
 </script>
 
 <svelte:window onkeydown={atalhoIrPara} />
@@ -184,7 +235,21 @@
 							aria-current={page.url.pathname === '/perfil' ? 'page' : undefined}>{t('Perfil')}</a
 						>
 					{/if}
-					<button class="botao botao--secundario botao--pequeno" type="button" onclick={sair}>{t('Sair')}</button>
+					<button class="botao botao--secundario botao--pequeno" type="button" onclick={pedirSaida}>{t('Sair')}</button>
+					<dialog bind:this={avisoSaida} aria-labelledby="aviso-saida-titulo">
+						<h3 id="aviso-saida-titulo">{t('Itens não enviados: {n}', { n: pendentes })}</h3>
+						<p>{t('Eles estão só neste aparelho. Se sair agora, eles se perdem.')}</p>
+						{#if semRedeAoSair}
+							<p class="erro" role="alert">{t('Ainda sem conexão: os itens continuam guardados.')}</p>
+						{/if}
+						<form method="dialog" class="acoes">
+							<button class="botao" type="button" disabled={enviandoAntes} onclick={enviarESair}>
+								{enviandoAntes ? t('Enviando…') : t('Enviar agora')}
+							</button>
+							<button class="botao botao--secundario" onclick={() => void sair()}>{t('Sair mesmo assim')}</button>
+							<button class="botao botao--secundario">{t('Cancelar')}</button>
+						</form>
+					</dialog>
 				</div>
 			{/if}
 		</header>
