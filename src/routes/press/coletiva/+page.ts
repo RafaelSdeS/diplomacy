@@ -1,4 +1,5 @@
 import { error } from '@sveltejs/kit';
+import { semRede } from '#lib/cache-dados.ts';
 import { supabase } from '#lib/supabase.ts';
 import type { PageLoad } from './$types';
 
@@ -16,22 +17,33 @@ export const load: PageLoad = async ({ parent, depends }) => {
 		.maybeSingle();
 	if (coletiva.error) throw coletiva.error;
 	const comitesPress = participacoes.filter((p) => p.papel === 'press' && p.comite_id).map((p) => p.comite_id!);
-	const [perguntas, delegacoes] = await Promise.all([
+	// Passo 45: o texto fica numa tabela à parte, que só a press do veículo e a Diretoria
+	// da Press leem (a RLS devolve só esses). Nunca vai para o cache do aparelho.
+	const [perguntas, textos, delegacoes] = await Promise.all([
 		coletiva.data
 			? supabase
 					.from('coletiva_pergunta')
-					.select('id, pergunta, veiculo(nome), delegacao(nome)')
+					.select('id, veiculo(nome), delegacao(nome)')
 					.eq('coletiva_id', coletiva.data.id)
 					.order('criada_em')
+			: Promise.resolve({ data: [], error: null }),
+		coletiva.data
+			? supabase
+					.from('coletiva_pergunta_texto')
+					.select('pergunta_id, texto, pergunta:coletiva_pergunta!inner(coletiva_id)')
+					.eq('pergunta.coletiva_id', coletiva.data.id)
+					.retry(false)
 			: Promise.resolve({ data: [], error: null }),
 		supabase.from('delegacao').select('id, nome').in('comite_id', comitesPress).neq('situacao', 'suspensa').order('nome')
 	]);
 	if (perguntas.error) throw perguntas.error;
+	if (textos.error && !semRede(textos.error)) throw textos.error;
+	const texto = new Map((textos.data ?? []).map((t) => [t.pergunta_id, t.texto]));
 	if (delegacoes.error) throw delegacoes.error;
 	return {
 		evento,
 		coletiva: coletiva.data,
-		perguntas: perguntas.data ?? [],
+		perguntas: (perguntas.data ?? []).map((p) => ({ ...p, texto: texto.get(p.id) ?? null })),
 		delegacoes: delegacoes.data,
 		diretoria: participacoes.some((p) => p.papel === 'diretoria_press' || p.papel === 'secretaria'),
 		souPress: comitesPress.length > 0

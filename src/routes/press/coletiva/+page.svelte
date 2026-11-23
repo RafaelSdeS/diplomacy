@@ -107,7 +107,14 @@
 		{#each porVeiculo as [veiculo, perguntas] (veiculo)}
 			<h3>{veiculo}</h3>
 			<ol class="lista">
-				{#each perguntas as p (p.id)}<li><span><strong>{p.delegacao?.nome}:</strong> {p.pergunta}</span></li>{/each}
+				{#each perguntas as p (p.id)}
+					<li>
+						<span>
+							<strong>{p.delegacao?.nome}:</strong>
+							{#if p.texto}{p.texto}{:else}<span class="suave">{t('a pergunta só é conhecida quando for feita em voz alta')}</span>{/if}
+						</span>
+					</li>
+				{/each}
 			</ol>
 		{:else}
 			<p class="suave">{t('Nenhuma pergunta na pauta ainda.')}</p>

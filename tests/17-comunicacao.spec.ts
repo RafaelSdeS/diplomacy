@@ -1,6 +1,6 @@
 import { expect, test, type Browser, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { contaDoTreino } from '../scripts/delegacoes.ts';
+import { contaDaDelegacao, contaDoTreino } from '../scripts/delegacoes.ts';
 import { clienteComo, CONTAS, entrar } from './ajuda.ts';
 
 // Passo 17: bilhetes (pela caixa de saída), entrevista, edição do dia e coletiva.
@@ -107,7 +107,12 @@ test('a Diretoria da Press abre a coletiva, e a press põe perguntas na pauta', 
 	await nova.getByRole('button', { name: 'Pôr na pauta' }).click();
 	await expect(press.getByRole('status')).toHaveText('Pergunta na pauta.');
 	await expect(diretoria.getByText(pergunta)).toBeVisible({ timeout: 10_000 });
-	await Promise.all([diretoria, press].map((p) => p.context().close()));
+
+	// Passo 45: a delegação chamada vê a pauta, mas não a pergunta, antes de ouvi-la.
+	const brasil = await abrir(browser, contaDaDelegacao('Brasil'), '/press/coletiva', { width: 360, height: 740 });
+	await expect(brasil.getByText('a pergunta só é conhecida quando for feita em voz alta').first()).toBeVisible();
+	await expect(brasil.getByText(pergunta)).toHaveCount(0);
+	await Promise.all([diretoria, press, brasil].map((p) => p.context().close()));
 });
 
 for (const tema of ['light', 'dark'] as const) {

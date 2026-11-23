@@ -28,6 +28,12 @@
 - Rascunho de matéria a partir da pauta e das notas digitadas.
 - O que já existe e muda: a tela `/press/coletiva` e `tests/17-comunicacao.spec.ts` (parte da coletiva) passam a usar os estados novos.
 
+## Estado (23/11/2026)
+
+**Parte A feita:** migração `20261220090000_coletiva_texto.sql` (cria `coletiva_pergunta_texto`, copia os textos, troca `perguntar_na_coletiva` e remove a coluna `pergunta`); a tela `/press/coletiva` lê o texto à parte, sem cache e sem nova tentativa sem rede; quem não pode ler vê "a pergunta só é conhecida quando for feita em voz alta". Testes: `supabase/tests/45-coletiva-texto.test.sql` e a delegação chamada em `tests/17-comunicacao.spec.ts`. A tela atual é a mesma do passo 17 (sem os cartões e o painel novos): ela recarrega a pauta inteira a cada mudança, então a leitura do texto não precisou de `lerAoVivo`.
+
+**Parte B:** depois do piloto, como na [ordem de prioridade](../ordem-de-prioridade.md).
+
 ## Fora desta etapa
 
 Gravação, transcrição, resposta escrita, reconhecimento de voz, matéria automática e chat entre jornalista e delegação.

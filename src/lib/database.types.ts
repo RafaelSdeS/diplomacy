@@ -531,14 +531,14 @@ isOneToOne: false
                   ]
                 },"coletiva_pergunta": {
                   Row: {
-                    "autor_id": string | null,"coletiva_id": string,"comite_id": string,"criada_em": string,"delegacao_id": string,"id": string,"pergunta": string,"veiculo_id": string
+                    "autor_id": string | null,"coletiva_id": string,"comite_id": string,"criada_em": string,"delegacao_id": string,"id": string,"veiculo_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "autor_id"?: string | null,"coletiva_id": string,"comite_id": string,"criada_em"?: string,"delegacao_id": string,"id"?: string,"pergunta": string,"veiculo_id": string
+                    "autor_id"?: string | null,"coletiva_id": string,"comite_id": string,"criada_em"?: string,"delegacao_id": string,"id"?: string,"veiculo_id": string
                   }
                   Update: {
-                    "autor_id"?: string | null,"coletiva_id"?: string,"comite_id"?: string,"criada_em"?: string,"delegacao_id"?: string,"id"?: string,"pergunta"?: string,"veiculo_id"?: string
+                    "autor_id"?: string | null,"coletiva_id"?: string,"comite_id"?: string,"criada_em"?: string,"delegacao_id"?: string,"id"?: string,"veiculo_id"?: string
                   }
                   Relationships: [
                     {
@@ -565,6 +565,26 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "veiculo"
       referencedColumns: ["id","comite_id"]
+    }
+                  ]
+                },"coletiva_pergunta_texto": {
+                  Row: {
+                    "atualizada_em": string,"pergunta_id": string,"texto": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "atualizada_em"?: string,"pergunta_id": string,"texto": string
+                  }
+                  Update: {
+                    "atualizada_em"?: string,"pergunta_id"?: string,"texto"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "coletiva_pergunta_texto_pergunta_id_fkey"
+      columns: ["pergunta_id"]
+isOneToOne: true
+      referencedRelation: "coletiva_pergunta"
+      referencedColumns: ["id"]
     }
                   ]
                 },"comentario": {
@@ -1935,6 +1955,9 @@ isOneToOne: false
                            },
 "bureau_preside":
 { Args: { "p_comite": string }; Returns: boolean
+                           },
+"cabecalhos_do_pedido":
+{ Args: Record<PropertyKey, never>; Returns: undefined
                            },
 "checkin_por_cracha":
 { Args: { "p_codigo": string,"p_evento": string }; Returns: string
