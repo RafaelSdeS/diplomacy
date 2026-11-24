@@ -1,7 +1,7 @@
 import { expect, test, type Browser, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { contaDaDelegacao, isolado } from '../scripts/delegacoes.ts';
-import { CONTAS, entrar } from './ajuda.ts';
+import { CONTAS, entrar, sair } from './ajuda.ts';
 
 // Passo 39: a cópia do CSNU-T só deste arquivo (scripts/delegacoes.ts).
 const C = isolado('06');
@@ -378,7 +378,7 @@ for (const tema of ['light', 'dark'] as const) {
 			await expect(page.getByRole('heading', { level: 1, name: titulo })).toBeVisible();
 			await semErrosDeAcessibilidade(page);
 		}
-		await page.getByRole('button', { name: 'Sair' }).click();
+		await sair(page);
 		await expect(page).toHaveURL(/\/entrar$/);
 
 		await entrar(page, C.conta(CONTAS.mesa));

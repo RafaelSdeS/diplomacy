@@ -1,6 +1,6 @@
 import { expect, test, type Browser, type BrowserContext, type Page } from '@playwright/test';
 import { contaDoTreino, isolado } from '../scripts/delegacoes.ts';
-import { clienteComo, entrar } from './ajuda.ts';
+import { clienteComo, entrar, sair } from './ajuda.ts';
 
 // Passo 44: num aparelho compartilhado, uma conta nunca vê o que outra leu; sair apaga
 // tudo; o cache offline vale 12 horas e nunca guarda o que é sensível.
@@ -50,7 +50,15 @@ test('sair apaga os dados da conta; quem entra depois, sem rede, não vê nada d
 	await expect(page.getByRole('heading', { level: 1, name: 'Cronograma' })).toBeVisible();
 	await expect.poll(() => cachesDeDados(page)).toEqual([expect.stringMatching(/^dados-/)]);
 
+	// Passo 47: Sair pede confirmação; cancelar mantém a sessão e os dados.
 	await sairPeloMenu(page);
+	const confirmacao = page.getByRole('dialog', { name: 'Sair da conta?' });
+	await expect(confirmacao).toContainText('Os dados desta sessão serão removidos deste aparelho.');
+	await confirmacao.getByRole('button', { name: 'Cancelar' }).click();
+	await expect(confirmacao).toBeHidden();
+	expect(await cachesDeDados(page)).toEqual([expect.stringMatching(/^dados-/)]);
+
+	await sair(page);
 	await expect(page).toHaveURL(/\/entrar$/);
 	expect(await cachesDeDados(page)).toEqual([]);
 
@@ -146,8 +154,9 @@ test('sair com itens na caixa de saída avisa; "enviar agora" envia e só depois
 	await expect(page).not.toHaveURL(/\/entrar$/);
 
 	await contexto.setOffline(false);
+	// A caixa pode ter se esvaziado sozinha na volta da rede: então vem a confirmação simples.
 	await sairPeloMenu(page);
-	if (await aviso.isVisible()) await aviso.getByRole('button', { name: 'Enviar agora' }).click();
+	await page.getByRole('dialog').getByRole('button', { name: /^(Enviar agora|Sair)$/ }).click();
 	await expect(page).toHaveURL(/\/entrar$/, { timeout: 15_000 });
 	const { count } = await (await clienteComo(PARAGUAI))
 		.from('nota_crise')
@@ -164,7 +173,7 @@ test('sair numa aba leva a outra aba ao login', async ({ browser }) => {
 	await segunda.goto('/cronograma');
 	await expect(segunda.getByRole('heading', { level: 1, name: 'Cronograma' })).toBeVisible();
 
-	await sairPeloMenu(primeira);
+	await sair(primeira);
 	await expect(primeira).toHaveURL(/\/entrar$/);
 	await expect(segunda).toHaveURL(/\/entrar$/, { timeout: 10_000 });
 	await contexto.close();

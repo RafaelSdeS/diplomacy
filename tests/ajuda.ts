@@ -28,6 +28,12 @@ export async function irPeloMenu(page: Page, nome: string) {
 	await page.getByRole('main').getByRole('link', { name: new RegExp(`^${nome}`) }).click();
 }
 
+// Passo 47: Sair pede confirmação, no modal.
+export async function sair(page: Page) {
+	await page.getByRole('button', { name: 'Sair', exact: true }).click();
+	await page.getByRole('dialog').getByRole('button', { name: 'Sair', exact: true }).click();
+}
+
 export async function entrar(page: Page, email: string) {
 	await page.goto('/entrar');
 	await page.getByLabel('E-mail', { exact: true }).fill(email);

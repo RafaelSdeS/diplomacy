@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { CONTAS, SENHA, entrar } from './ajuda.ts';
+import { CONTAS, SENHA, entrar, sair } from './ajuda.ts';
 
 const temas = ['light', 'dark'] as const;
 
@@ -24,7 +24,7 @@ test('entra e sai com e-mail e senha', async ({ page }) => {
 	await entrar(page, CONTAS.delegado);
 	await expect(page.getByRole('heading', { level: 1, name: 'Agora' })).toBeVisible();
 
-	await page.getByRole('button', { name: 'Sair' }).click();
+	await sair(page);
 	await expect(page).toHaveURL(/\/entrar$/);
 	await page.goto('/');
 	await expect(page).toHaveURL(/\/entrar$/);
@@ -120,7 +120,7 @@ for (const tema of temas) {
 		await expect(page.getByRole('heading', { level: 1, name: 'Participantes' })).toBeVisible();
 		await semErrosDeAcessibilidade(page);
 
-		await page.getByRole('button', { name: 'Sair' }).click();
+		await sair(page);
 		await expect(page).toHaveURL(/\/entrar$/); // espera a saída terminar
 		await entrar(page, CONTAS.semConvite);
 		await expect(page.getByRole('heading', { level: 1, name: 'Sem acesso' })).toBeVisible();

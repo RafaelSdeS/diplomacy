@@ -18,6 +18,7 @@
 	import { anterior, antesDeNavegar, depoisDeNavegar } from '#lib/voltar.svelte.ts';
 	import { ficha } from '#lib/ficha.svelte.ts';
 	import { papelPrincipal, rotuloPapel } from '#lib/papeis.ts';
+	import Modal from '#lib/ui/Modal.svelte';
 	import Trilha from '#lib/ui/Trilha.svelte';
 	import { supabase, type Papel } from '#lib/supabase.ts';
 	import { assinarAvisos, esquecerLeituras, recarregarAoVivo } from '#lib/tempo-real.ts';
@@ -137,15 +138,18 @@
 		saindo = false;
 	}
 
-	// Com itens na caixa de saída, sair pergunta antes: eles se perderiam.
-	let avisoSaida = $state<HTMLDialogElement>();
+	// Passo 47: sair sempre pergunta antes, dizendo de que conta e o que sai do aparelho. Com itens
+	// na caixa de saída, avisa que eles se perderiam e oferece enviar antes (passo 44).
+	let avisoSaida = $state<Modal>();
+	const quemSai = $derived(
+		[data.nome, eu?.papel === 'delegado' ? eu.delegacao_nome : eu && rotuloPapel(eu.papel), eu?.comite_sigla].filter(Boolean).join(' · ')
+	);
 	let enviandoAntes = $state(false);
 	let semRedeAoSair = $state(false);
 	async function pedirSaida() {
 		pendentes = (await caixa.pendentes()).length;
-		if (!pendentes) return sair();
 		semRedeAoSair = false;
-		avisoSaida?.showModal();
+		avisoSaida?.abrir();
 	}
 	async function enviarESair() {
 		enviandoAntes = true;
@@ -154,7 +158,7 @@
 		enviandoAntes = false;
 		if (pendentes) semRedeAoSair = true;
 		else {
-			avisoSaida?.close();
+			avisoSaida?.fechar();
 			await sair();
 		}
 	}
@@ -236,20 +240,28 @@
 						>
 					{/if}
 					<button class="botao botao--secundario botao--pequeno" type="button" onclick={pedirSaida}>{t('Sair')}</button>
-					<dialog bind:this={avisoSaida} aria-labelledby="aviso-saida-titulo">
-						<h3 id="aviso-saida-titulo">{t('Itens não enviados: {n}', { n: pendentes })}</h3>
-						<p>{t('Eles estão só neste aparelho. Se sair agora, eles se perdem.')}</p>
-						{#if semRedeAoSair}
-							<p class="erro" role="alert">{t('Ainda sem conexão: os itens continuam guardados.')}</p>
+					<Modal bind:this={avisoSaida} rotulo="aviso-saida-titulo">
+						<h3 id="aviso-saida-titulo">{pendentes ? t('Itens não enviados: {n}', { n: pendentes }) : t('Sair da conta?')}</h3>
+						{#if quemSai}<p class="suave">{quemSai}</p>{/if}
+						<p>{t('Os dados desta sessão serão removidos deste aparelho.')}</p>
+						{#if pendentes}
+							<p>{t('Eles estão só neste aparelho. Se sair agora, eles se perdem.')}</p>
+							{#if semRedeAoSair}
+								<p class="erro" role="alert">{t('Ainda sem conexão: os itens continuam guardados.')}</p>
+							{/if}
 						{/if}
 						<form method="dialog" class="acoes">
-							<button class="botao" type="button" disabled={enviandoAntes} onclick={enviarESair}>
-								{enviandoAntes ? t('Enviando…') : t('Enviar agora')}
-							</button>
-							<button class="botao botao--secundario" onclick={() => void sair()}>{t('Sair mesmo assim')}</button>
+							{#if pendentes}
+								<button class="botao" type="button" disabled={enviandoAntes} onclick={enviarESair}>
+									{enviandoAntes ? t('Enviando…') : t('Enviar agora')}
+								</button>
+								<button class="botao botao--secundario" onclick={() => void sair()}>{t('Sair mesmo assim')}</button>
+							{:else}
+								<button class="botao" onclick={() => void sair()}>{t('Sair')}</button>
+							{/if}
 							<button class="botao botao--secundario">{t('Cancelar')}</button>
 						</form>
-					</dialog>
+					</Modal>
 				</div>
 			{/if}
 		</header>

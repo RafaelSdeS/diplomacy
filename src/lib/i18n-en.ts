@@ -827,6 +827,9 @@ export const EN: Record<string, string> = {
 	'Enviando…': 'Sending…',
 	'Enviar agora': 'Send now',
 	'Sair mesmo assim': 'Sign out anyway',
+	// Passo 47
+	'Sair da conta?': 'Sign out?',
+	'Os dados desta sessão serão removidos deste aparelho.': 'The data from this session will be removed from this device.',
 	'{n}ª na fila': '#{n} in the queue',
 	'{veiculo} cita a sua delegação': '{veiculo} mentions your delegation',
 	'Última votação': 'Last vote',

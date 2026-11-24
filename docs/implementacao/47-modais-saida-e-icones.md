@@ -30,7 +30,9 @@ Em ordem:
 
 ## Estado (24/11/2026)
 
-**Item 1 feito:** `src/lib/ui/Modal.svelte`, com `abrir()` e `fechar()` por `bind:this`, `lateral` para as fichas (a regra `dialog.ficha` do CSS virou `dialog.modal-lateral`) e o clique no fundo protegido quando há texto digitado. `Confirmar`, `FichaDelegacao`, `IrPara` e o exemplo do `/estilo` já o usam, sem mudança visual. O foco inicial continua o nativo: no `Confirmar`, o botão da ação, porque o teste do piloto confirma com Tab e Enter. Testes em `tests/47-modais.spec.ts`. Ainda com `<dialog>` próprio: o aviso de saída do layout (vira o item 2), a placa da sessão e a leitura da fala no caderno.
+**Item 1 feito:** `src/lib/ui/Modal.svelte`, com `abrir()` e `fechar()` por `bind:this`, `lateral` para as fichas (a regra `dialog.ficha` do CSS virou `dialog.modal-lateral`) e o clique no fundo protegido quando há texto digitado. `Confirmar`, `FichaDelegacao`, `IrPara` e o exemplo do `/estilo` já o usam, sem mudança visual. O foco inicial continua o nativo: no `Confirmar`, o botão da ação, porque o teste do piloto confirma com Tab e Enter. Testes em `tests/47-modais.spec.ts`. Ainda com `<dialog>` próprio: a placa da sessão e a leitura da fala no caderno.
+
+**Item 2 feito:** *Sair* sempre abre o modal "Sair da conta?", com nome, delegação ou papel e comitê, e "Os dados desta sessão serão removidos deste aparelho". Com itens na caixa de saída, o mesmo modal vira o aviso do passo 44 ("Itens não enviados: N", enviar agora ou sair mesmo assim). Os testes que saem usam `sair()` de `tests/ajuda.ts`; `tests/44-seguranca.spec.ts` confere que cancelar mantém a sessão e os caches.
 
 ## Fora desta etapa
 
@@ -39,7 +41,8 @@ Favoritos, tamanho do texto e a revisão de rolagem, densidade e estados, tela p
 ## Testes
 
 - [x] Modal base: um teste de componente cobre foco inicial, Escape, clique no fundo (fecha vazio, não fecha com texto digitado) e retorno do foco; os modais do app herdam esse comportamento.
-- [ ] Ponta a ponta: *Sair* abre a confirmação, cancelar mantém a sessão, confirmar apaga os caches e volta ao login; com um item na caixa de saída a modal mostra o aviso e "enviar agora" envia antes de sair; cada ação irreversível da lista pede confirmação.
+- [x] Ponta a ponta: *Sair* abre a confirmação, cancelar mantém a sessão, confirmar apaga os caches e volta ao login; com um item na caixa de saída a modal mostra o aviso e "enviar agora" envia antes de sair.
+- [ ] Ponta a ponta: cada ação irreversível da lista do item 3 pede confirmação.
 - [ ] Ponta a ponta: clicar numa votação, num ponto e numa nota abre a ficha sem mudar a URL, e a ação da ficha (encerrar votação, retirar ponto) funciona dali.
 - [ ] Ponta a ponta: aceitar uma entrevista, escolher destinatários de carta e citar uma delegação numa matéria sem sair da página.
 - [ ] Ponta a ponta: escolher uma delegação digitando parte do nome no `Escolha`, só com o teclado.

@@ -1,7 +1,7 @@
 import { expect, test, type Browser, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { DELEGACOES_TREINO } from '../scripts/delegacoes.ts';
-import { clienteComo, CONTAS, entrar } from './ajuda.ts';
+import { clienteComo, CONTAS, entrar, sair } from './ajuda.ts';
 
 // Passo 14: login pelo crachá e pelo código da secretaria (Edge Function
 // entrar-com-cracha), e a verificação pública dos certificados.
@@ -70,7 +70,7 @@ test('quem perdeu o crachá entra com o código da secretaria, uma vez só', asy
 	await page.getByRole('button', { name: 'Entrar com o código' }).click();
 	await expect(page.getByRole('heading', { level: 1, name: 'Agora' })).toBeVisible({ timeout: 15_000 });
 
-	await page.getByRole('button', { name: 'Sair' }).click();
+	await sair(page);
 	await page.getByLabel('Código de 8 letras e números').fill(codigo!);
 	await page.getByRole('button', { name: 'Entrar com o código' }).click();
 	await expect(page.getByRole('alert')).toHaveText('Código inválido ou vencido. Peça um novo à secretaria.');

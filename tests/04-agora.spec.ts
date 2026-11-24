@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { CONTAS, entrar, irPeloMenu } from './ajuda.ts';
+import { CONTAS, entrar, irPeloMenu, sair } from './ajuda.ts';
 
 // Hora fixa no primeiro dia do evento de teste (seed), durante a Sessão 1. Fica no
 // passado: com o relógio depois do vencimento da sessão, o login seria renovado o tempo todo.
@@ -191,7 +191,7 @@ for (const tema of ['light', 'dark'] as const) {
 		}
 
 		// A secretaria vê os formulários do cronograma e dos avisos.
-		await page.getByRole('button', { name: 'Sair' }).click();
+		await sair(page);
 		await expect(page).toHaveURL(/\/entrar$/);
 		await entrar(page, CONTAS.secretaria);
 		for (const [rota, titulo] of [
