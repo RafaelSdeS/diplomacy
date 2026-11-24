@@ -20,6 +20,13 @@ export const CONTAS = {
  * Vai a uma tela do menu como a pessoa faria (passo 43): no notebook pela lateral; no
  * celular, o que não cabe na barra fica em "Mais".
  */
+/** Passo 51 (lote 1): abre uma linha do "Para decidir" do painel da presidência (um modal). */
+export async function abrirPainel(page: Page, nome: string) {
+	const inicio = new RegExp(`^${nome.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`);
+	await page.getByRole('region', { name: 'Para decidir' }).getByRole('button', { name: inicio }).click();
+	await expect(page.getByRole('dialog', { name: nome })).toBeVisible();
+}
+
 /** Passo 51: abre o modal de uma ação de criar ("Novo bilhete", "Escrever carta"). */
 export const abrirAcao = (escopo: Page | Locator, nome: string) => escopo.getByRole('button', { name: nome, exact: true }).click();
 

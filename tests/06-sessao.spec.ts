@@ -1,7 +1,7 @@
 import { expect, test, type Browser, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { contaDaDelegacao, isolado } from '../scripts/delegacoes.ts';
-import { CONTAS, entrar, sair, abrirAcao } from './ajuda.ts';
+import { CONTAS, entrar, sair, abrirAcao, abrirPainel } from './ajuda.ts';
 
 // Passo 39: a cópia do CSNU-T só deste arquivo (scripts/delegacoes.ts).
 const C = isolado('06');
@@ -132,12 +132,14 @@ test('plenária de abertura: discursos pela lista de oradores e moção do tópi
 
 	// Lista especial: a Rússia fala a favor.
 	const pontos = page.getByRole('region', { name: 'Pontos e moções' });
+	await abrirPainel(page, 'Pontos e moções');
 	await pontos.getByRole('button', { name: /^Abrir lista especial/ }).click();
 	const russia = await abrir(browser, C.conta(contaDaDelegacao('Rússia')), SESSAO);
 	await russia.getByRole('button', { name: 'Falar a favor' }).click();
 	await expect(page.getByRole('region', { name: 'Lista especial' })).toContainText('Rússia');
 
 	// Votação: o voto dado no celular aparece no telão.
+	await abrirPainel(page, 'Pontos e moções');
 	await pontos.getByRole('button', { name: /^Votar/ }).click();
 	const telao = await abrir(browser, C.conta(CONTAS.mesa), TELAO, { width: 1920, height: 1080 });
 	const grade = telao.getByRole('complementary', { name: 'Votação' });
@@ -218,7 +220,7 @@ test('Espaço pausa e retoma o cronômetro, mas não dentro de um campo', async 
 
 	// Digitar no campo não pausa nem retoma, e o valor digitado não some com os eventos ao vivo.
 	// Passo 43: o tempo de fala fica nos ajustes, recolhidos.
-	await painel.locator('summary', { hasText: 'Ajustes da fala e do debate' }).click();
+	await painel.getByRole('button', { name: 'Ajustes da fala e do debate' }).click();
 	await painel.getByLabel('Tempo de fala (segundos)').fill('120');
 	await painel.getByLabel('Tempo de fala (segundos)').press('Space');
 	await expect(palavra.getByRole('status')).toHaveText('Pausado');
@@ -226,6 +228,7 @@ test('Espaço pausa e retoma o cronômetro, mas não dentro de um campo', async 
 	await expect(painel.getByRole('region', { name: 'Pedidos de fala' })).toContainText(outra);
 	await expect(painel.getByLabel('Tempo de fala (segundos)')).toHaveValue('120');
 
+	await painel.keyboard.press('Escape'); // fecha os ajustes (passo 51: um modal)
 	await painel.locator('h1').click();
 	await painel.keyboard.press('Space');
 	await expect(palavra.getByRole('status')).toHaveText('');
@@ -243,9 +246,11 @@ test('um ponto chega à presidência, e a resposta volta à delegação', async 
 	// Passo 29: o bureau aprova, e só então a presidência vê o pedido.
 	const painel = await abrir(browser, C.conta(contaDaDelegacao(preside)), PRESIDENCIA);
 	const pontos = painel.getByRole('region', { name: 'Pontos e moções' });
+	await abrirPainel(painel, 'Pontos e moções');
 	await expect(pontos).not.toContainText('Qual é o tempo de fala?');
 	await expect(delegado.getByRole('list', { name: 'Seus pontos e moções' })).toContainText('Aguardando o bureau');
 	const mesa = await abrir(browser, C.conta(CONTAS.mesa), PRESIDENCIA);
+	await abrirPainel(mesa, 'Bureau · pedidos para aprovar');
 	await mesa
 		.getByRole('region', { name: 'Bureau · pedidos para aprovar' })
 		.getByRole('button', { name: `Em ordem: Ponto de dúvida, ${outra}` })
@@ -253,6 +258,8 @@ test('um ponto chega à presidência, e a resposta volta à delegação', async 
 	await expect(delegado.getByRole('list', { name: 'Seus pontos e moções' })).toContainText('Aprovado pelo bureau');
 	await expect(pontos).toContainText('Qual é o tempo de fala?');
 	await pontos.getByRole('button', { name: `Aceitar: Ponto de dúvida, ${outra}` }).click();
+	await expect(painel.getByRole('dialog', { name: 'Pontos e moções' })).toBeHidden();
+	await abrirPainel(painel, 'Pontos e moções');
 	await expect(pontos).toContainText('Nenhum ponto ou moção');
 
 	await expect(delegado.getByRole('list', { name: 'Seus pontos e moções' })).toContainText('Aceito');

@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { isolado } from '../scripts/delegacoes.ts';
-import { clienteComo, comiteEmDebate, entrar, desfazerRapido, abrirAcao } from './ajuda.ts';
+import { clienteComo, comiteEmDebate, entrar, desfazerRapido, abrirAcao, abrirPainel } from './ajuda.ts';
 
 // Passo 39: a cópia do CE-T só deste arquivo (scripts/delegacoes.ts).
 const C = isolado('29');
@@ -52,6 +52,7 @@ test('o bureau recusa um pedido com motivo, e o delegado vê a etapa e o motivo'
 	await entrar(page, MESA);
 	await page.goto(`/comite/${C.sigla}/sessao/presidencia`);
 	await aoVivo(page);
+	await abrirPainel(page, 'Bureau · pedidos para aprovar');
 	const julgar = page.getByRole('region', { name: 'Bureau · pedidos para aprovar' });
 	const nome = 'Moção de informal-informal: 10 minutos';
 	await julgar.getByRole('textbox', { name: `Motivo da recusa: ${nome}` }).last().fill('Fora de hora');

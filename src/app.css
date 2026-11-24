@@ -1694,6 +1694,35 @@ dialog.modal-acao {
 	width: min(36rem, calc(100vw - 2rem));
 }
 
+/* Passo 51 (lote 1): os cartões do painel dentro do modal, sem moldura dupla. */
+dialog.modal-painel {
+	width: min(44rem, calc(100vw - 2rem));
+}
+
+dialog.modal-painel .cartao {
+	padding: 0;
+	border: 0;
+	box-shadow: none;
+}
+
+.para-decidir {
+	padding-block: 0.75rem;
+}
+
+.para-decidir h2 {
+	margin-bottom: 0.4rem;
+}
+
+.para-decidir .lista li {
+	padding: 0.15rem 0;
+	border: 0;
+}
+
+.linha-decidir {
+	justify-content: space-between;
+	width: 100%;
+}
+
 /* O caderno de qualquer tela: escrever em cima, ler embaixo (passo 51). */
 dialog.modal-caderno {
 	width: min(44rem, calc(100vw - 2rem));

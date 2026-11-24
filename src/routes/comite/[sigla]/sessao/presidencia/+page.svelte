@@ -22,6 +22,8 @@
 	import GradeVotos from '#lib/ui/GradeVotos.svelte';
 	import FichaVotacao from '#lib/ui/FichaVotacao.svelte';
 	import FichaPonto from '#lib/ui/FichaPonto.svelte';
+	import Modal from '#lib/ui/Modal.svelte';
+	import SlidersHorizontal from '@lucide/svelte/icons/sliders-horizontal';
 	import {
 		escolhasPermitidas,
 		ESCOLHAS,
@@ -102,7 +104,16 @@
 	// Passo 43: o raro fica recolhido (assumir delegação, ajustes de tempo e forma), e o
 	// estado aberto sobrevive às recargas ao vivo.
 	let representarAberto = $state(false);
-	let ajustesAbertos = $state(false);
+	let modalAjustes = $state<Modal>();
+	let modalPontos = $state<Modal>();
+	let modalBureau = $state<Modal>();
+	let modalChegadas = $state<Modal>();
+	let modalProjetos = $state<Modal>();
+	let modalEmendas = $state<Modal>();
+	// Passo 51 (lote 1): uma ação dentro do modal fecha ele e volta ao painel (a ficha, não).
+	const fecharAoAgir = (m: Modal | undefined) => (e: MouseEvent) => {
+		if ((e.target as Element).closest('button:not(.abre-ficha)')) setTimeout(() => m?.fechar(), 400);
+	};
 	// A presidência em vigor, com a bandeira quando é uma delegação.
 	const quemPreside = $derived(
 		sessao && data.estado && !bureauPreside(data.fase, data.estado.mesa_assumiu, sessao.presidencia?.id) ? sessao.presidencia : null
@@ -426,24 +437,6 @@
 		</div>
 
 		<div class="painel-coluna">
-			{#if ehMesa && sessao.avisos.length}
-				<section class="cartao cartao--destaque" aria-labelledby="t-chegadas">
-					<h2 id="t-chegadas">{t('Chegadas')}</h2>
-					<ul class="lista">
-						{#each sessao.avisos as aviso (aviso.delegacao?.id)}
-							<li>
-								<span class="com-bandeira"><Bandeira codigo={aviso.delegacao?.bandeira} /> {aviso.delegacao?.nome}</span>
-								<button
-									class="botao botao--pequeno"
-									type="button"
-									aria-label={t('Confirmar presença: {delegacao}', { delegacao: aviso.delegacao?.nome ?? '' })}
-									onclick={() => confirmarPresenca(aviso.delegacao!.id)}>{t('Confirmar presença')}</button
-								>
-							</li>
-						{/each}
-					</ul>
-				</section>
-			{/if}
 			<AlertaCrise incidentes={data.incidentes} {diferenca} />
 			{#if momento === 'pausa' && data.estado}
 				<section class="cartao cartao--destaque pausa-pontos" aria-labelledby="t-pausa">
@@ -538,8 +531,13 @@
 						</div>
 					</div>
 				{/if}
-				<details class="ajustes" bind:open={ajustesAbertos}>
-					<summary>{t('Ajustes da fala e do debate')}</summary>
+				<!-- Passo 51 (lote 1): os ajustes num modal; ele fecha quando uma mudança é aplicada. -->
+				<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => modalAjustes?.abrir()}
+					><SlidersHorizontal aria-hidden="true" size={16} strokeWidth={1.75} /> {t('Ajustes da fala e do debate')}</button
+				>
+				<Modal bind:this={modalAjustes} nome={t('Ajustes da fala e do debate')} classe="modal-acao">
+					<h3>{t('Ajustes da fala e do debate')}</h3>
+					<div class="ajustes" onsubmit={() => setTimeout(() => modalAjustes?.fechar(), 300)}>
 					<div class="tempo-fala">
 						<label class="campo campo--curto">
 							{t('Tempo de fala (segundos)')}
@@ -585,7 +583,9 @@
 							</p>
 						</form>
 					{/if}
-				</details>
+					</div>
+					<div class="acoes"><button class="botao botao--secundario" type="button" onclick={() => modalAjustes?.fechar()}>{t('Fechar')}</button></div>
+				</Modal>
 			</section>
 		</div>
 
@@ -593,7 +593,8 @@
 			{#if votacao}
 				<section class="cartao cartao--destaque" aria-labelledby="t-votacao">
 					<h2 id="t-votacao">{votacao.aberta ? t('Votação aberta') : t('Última votação')}</h2>
-					<p class="destaque"><button class="abre-ficha" type="button" onclick={() => (verVotacao = true)}>{votacao.objeto}</button></p>
+					<!-- Passo 51 (lote 1): encerrada, a votação ocupa pouco; aberta, ganha destaque. -->
+					<p class={votacao.aberta ? 'destaque' : undefined}><button class="abre-ficha" type="button" onclick={() => (verVotacao = true)}>{votacao.objeto}</button></p>
 					{#if votacao.aberta}
 						<p>
 							<Contagem
@@ -668,45 +669,44 @@
 				</section>
 			{/if}
 
-			{#if ehMesa && !presidePeloBureau}
-				<section class="cartao cartao--destaque" aria-labelledby="t-julgar">
-					<h2 id="t-julgar">{t('Bureau · pedidos para aprovar')}</h2>
-					<ul class="lista">
-						{#each paraJulgar as ponto (ponto.id)}
-							<li>
-								<span
-									><button class="abre-ficha" type="button" onclick={() => (pontoVisto = ponto.id)}>{descreverPonto(ponto)}</button>
-									<span class="detalhe">{ponto.delegacao?.nome}{ponto.detalhe ? ` · ${ponto.detalhe}` : ''}</span></span
-								>
-								<span class="acoes">{@render julgarPonto(ponto)}</span>
-							</li>
-						{:else}
-							<li class="suave">{t('Nenhum pedido esperando o bureau.')}</li>
-						{/each}
-					</ul>
-				</section>
-			{/if}
-
-			<section class="cartao" aria-labelledby="t-pontos">
-				<h2 id="t-pontos">{t('Pontos e moções')}</h2>
-				{#if !presidePeloBureau}<p class="suave">{t('A presidência concede os pedidos que o bureau aprovou.')}</p>{/if}
+			<!-- Passo 51 (lote 1): o que espera uma decisão vira contagem; cada linha abre um modal no centro.
+				 Com zero, a linha some (menos pontos e moções, a entrada de sempre). -->
+			<section class="cartao para-decidir" aria-labelledby="t-para-decidir">
+				<h2 id="t-para-decidir">{t('Para decidir')}</h2>
 				<ul class="lista">
-					{#each paraConceder as ponto (ponto.id)}
+					<li>
+						<button class="botao botao--secundario botao--pequeno linha-decidir" type="button" onclick={() => modalPontos?.abrir()}
+							><span>{t('Pontos e moções')}</span><span class={['selo', paraConceder.length && 'selo--alerta']}>{paraConceder.length}</span></button
+						>
+					</li>
+					{#if ehMesa && !presidePeloBureau && paraJulgar.length}
 						<li>
-							<span>
-								<button class="abre-ficha" type="button" onclick={() => (pontoVisto = ponto.id)}>{descreverPonto(ponto)}</button>
-								{#if ponto.aprovado_bureau && ponto.status === 'aberto'}<span class="selo selo--ok">{t('Aprovado pelo bureau')}</span>{/if}
-								<span class="detalhe"
-									>{ponto.delegacao?.nome}{ponto.detalhe ? ` · ${ponto.detalhe}` : ''}{ponto.tipo === 'voto_desconfianca'
-										? ` · ${t('{n} de {total} assinaturas', { n: ponto.assinaturas.length, total: assinaturasDesconfianca(data.regras.assinaturas_desconfianca_fracao, data.delegacoes) })}`
-										: ''}</span
-								>
-							</span>
-							<span class="acoes">{@render concederPonto(ponto)}</span>
+							<button class="botao botao--secundario botao--pequeno linha-decidir" type="button" onclick={() => modalBureau?.abrir()}
+								><span>{t('Bureau · pedidos para aprovar')}</span><span class={['selo', paraJulgar.length && 'selo--alerta']}>{paraJulgar.length}</span></button
+							>
 						</li>
-					{:else}
-						<li class="suave">{t('Nenhum ponto ou moção.')}</li>
-					{/each}
+					{/if}
+					{#if ehMesa && sessao.avisos.length}
+						<li>
+							<button class="botao botao--secundario botao--pequeno linha-decidir" type="button" onclick={() => modalChegadas?.abrir()}
+								><span>{t('Chegadas')}</span><span class={['selo', sessao.avisos.length && 'selo--alerta']}>{sessao.avisos.length}</span></button
+							>
+						</li>
+					{/if}
+					{#if ehMesa && data.projetos.length}
+						<li>
+							<button class="botao botao--secundario botao--pequeno linha-decidir" type="button" onclick={() => modalProjetos?.abrir()}
+								><span>{t('Projetos de resolução')}</span><span class="selo">{data.projetos.length}</span></button
+							>
+						</li>
+					{/if}
+					{#if ehMesa && data.emendas.length && !votacao?.aberta}
+						<li>
+							<button class="botao botao--secundario botao--pequeno linha-decidir" type="button" onclick={() => modalEmendas?.abrir()}
+								><span>{t('Emendas')}</span><span class="selo">{data.emendas.length}</span></button
+							>
+						</li>
+					{/if}
 				</ul>
 				{#if data.fase === 'debate'}
 					<Confirmar
@@ -717,97 +717,182 @@
 					/>
 				{/if}
 			</section>
-			{#if ehMesa && data.projetos.length}
-				<section class="cartao" aria-labelledby="t-projetos">
-					<h2 id="t-projetos">{t('Projetos de resolução')}</h2>
-					<ul class="lista">
-						{#each data.projetos as p (p.id)}
-							<li>
-								<span>
-									{nomeDoDocumento(p)}
-									<span class="detalhe">
-										<span class="selo {STATUS_DOCUMENTO[p.status].selo}">{STATUS_DOCUMENTO[p.status].rotulo}</span>
-										{#if p.status === 'aprovado_mesa'}· {p.aprovacao === 'consenso' ? t('os signatários pedem consenso') : t('os signatários pedem votação')}{/if}
+			<Modal bind:this={modalPontos} nome={t('Pontos e moções')} classe="modal-acao modal-painel">
+				<!-- Agir aqui (aceitar, votar, julgar, confirmar) devolve ao painel. -->
+				<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
+				<div onclick={fecharAoAgir(modalPontos)}>
+					<section class="cartao" aria-labelledby="t-pontos">
+						<h2 id="t-pontos">{t('Pontos e moções')}</h2>
+						{#if !presidePeloBureau}<p class="suave">{t('A presidência concede os pedidos que o bureau aprovou.')}</p>{/if}
+						<ul class="lista">
+							{#each paraConceder as ponto (ponto.id)}
+								<li>
+									<span>
+										<button class="abre-ficha" type="button" onclick={() => (pontoVisto = ponto.id)}>{descreverPonto(ponto)}</button>
+										{#if ponto.aprovado_bureau && ponto.status === 'aberto'}<span class="selo selo--ok">{t('Aprovado pelo bureau')}</span>{/if}
+										<span class="detalhe"
+											>{ponto.delegacao?.nome}{ponto.detalhe ? ` · ${ponto.detalhe}` : ''}{ponto.tipo === 'voto_desconfianca'
+												? ` · ${t('{n} de {total} assinaturas', { n: ponto.assinaturas.length, total: assinaturasDesconfianca(data.regras.assinaturas_desconfianca_fracao, data.delegacoes) })}`
+												: ''}</span
+										>
 									</span>
-								</span>
-								{#if p.status === 'aprovado_mesa' || (p.status === 'em_votacao' && !votacao?.aberta)}
-									<span class="acoes">
-										{#if p.status === 'aprovado_mesa'}
+									<span class="acoes">{@render concederPonto(ponto)}</span>
+								</li>
+							{:else}
+								<li class="suave">{t('Nenhum ponto ou moção.')}</li>
+							{/each}
+						</ul>
+					</section>
+				</div>
+				<div class="acoes"><button class="botao botao--secundario" type="button" onclick={() => modalPontos?.fechar()}>{t('Fechar')}</button></div>
+			</Modal>
+			<Modal bind:this={modalBureau} nome={t('Bureau · pedidos para aprovar')} classe="modal-acao modal-painel">
+				<!-- Agir aqui (aceitar, votar, julgar, confirmar) devolve ao painel. -->
+				<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
+				<div onclick={fecharAoAgir(modalBureau)}>
+					<section class="cartao cartao--destaque" aria-labelledby="t-julgar">
+						<h2 id="t-julgar">{t('Bureau · pedidos para aprovar')}</h2>
+						<ul class="lista">
+							{#each paraJulgar as ponto (ponto.id)}
+								<li>
+									<span
+										><button class="abre-ficha" type="button" onclick={() => (pontoVisto = ponto.id)}>{descreverPonto(ponto)}</button>
+										<span class="detalhe">{ponto.delegacao?.nome}{ponto.detalhe ? ` · ${ponto.detalhe}` : ''}</span></span
+									>
+									<span class="acoes">{@render julgarPonto(ponto)}</span>
+								</li>
+							{:else}
+								<li class="suave">{t('Nenhum pedido esperando o bureau.')}</li>
+							{/each}
+						</ul>
+					</section>
+				</div>
+				<div class="acoes"><button class="botao botao--secundario" type="button" onclick={() => modalBureau?.fechar()}>{t('Fechar')}</button></div>
+			</Modal>
+			<Modal bind:this={modalChegadas} nome={t('Chegadas')} classe="modal-acao modal-painel">
+				<!-- Agir aqui (aceitar, votar, julgar, confirmar) devolve ao painel. -->
+				<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
+				<div onclick={fecharAoAgir(modalChegadas)}>
+					<section class="cartao cartao--destaque" aria-labelledby="t-chegadas">
+						<h2 id="t-chegadas">{t('Chegadas')}</h2>
+						<ul class="lista">
+							{#each sessao.avisos as aviso (aviso.delegacao?.id)}
+								<li>
+									<span class="com-bandeira"><Bandeira codigo={aviso.delegacao?.bandeira} /> {aviso.delegacao?.nome}</span>
+									<button
+										class="botao botao--pequeno"
+										type="button"
+										aria-label={t('Confirmar presença: {delegacao}', { delegacao: aviso.delegacao?.nome ?? '' })}
+										onclick={() => confirmarPresenca(aviso.delegacao!.id)}>{t('Confirmar presença')}</button
+									>
+								</li>
+							{:else}
+								<li class="suave">{t('Ninguém avisou que chegou.')}</li>
+							{/each}
+						</ul>
+					</section>
+				</div>
+				<div class="acoes"><button class="botao botao--secundario" type="button" onclick={() => modalChegadas?.fechar()}>{t('Fechar')}</button></div>
+			</Modal>
+			<Modal bind:this={modalProjetos} nome={t('Projetos de resolução')} classe="modal-acao modal-painel">
+				<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
+				<div onclick={fecharAoAgir(modalProjetos)}>
+					<section class="cartao" aria-labelledby="t-projetos">
+						<h2 id="t-projetos">{t('Projetos de resolução')}</h2>
+						<ul class="lista">
+							{#each data.projetos as p (p.id)}
+								<li>
+									<span>
+										{nomeDoDocumento(p)}
+										<span class="detalhe">
+											<span class="selo {STATUS_DOCUMENTO[p.status].selo}">{STATUS_DOCUMENTO[p.status].rotulo}</span>
+											{#if p.status === 'aprovado_mesa'}· {p.aprovacao === 'consenso' ? t('os signatários pedem consenso') : t('os signatários pedem votação')}{/if}
+										</span>
+									</span>
+									{#if p.status === 'aprovado_mesa' || (p.status === 'em_votacao' && !votacao?.aberta)}
+										<span class="acoes">
+											{#if p.status === 'aprovado_mesa'}
+												<button
+													class="botao botao--secundario botao--pequeno"
+													type="button"
+													aria-label={`Iniciar a votação (sala fechada): ${nomeDoDocumento(p)}`}
+													onclick={() => rpc('iniciar_votacao_projeto', { p_documento: p.id })}>{t('Iniciar a votação')}</button
+												>
+											{/if}
+											<button
+												class="botao botao--pequeno"
+												type="button"
+												aria-label={`Abrir a votação: ${nomeDoDocumento(p)}`}
+												onclick={() => rpc('abrir_votacao_projeto', { p_documento: p.id })}
+												>{p.status === 'em_votacao' ? t('Abrir a votação final') : t('Abrir votação')}</button
+											>
+											{#if p.status === 'aprovado_mesa'}
 											<button
 												class="botao botao--secundario botao--pequeno"
 												type="button"
-												aria-label={`Iniciar a votação (sala fechada): ${nomeDoDocumento(p)}`}
-												onclick={() => rpc('iniciar_votacao_projeto', { p_documento: p.id })}>{t('Iniciar a votação')}</button
+												aria-label={`Aprovar por consenso: ${nomeDoDocumento(p)}`}
+												onclick={() => rpc('aprovar_por_consenso', { p_documento: p.id })}>{t('Aprovar por consenso')}</button
 											>
-										{/if}
-										<button
-											class="botao botao--pequeno"
-											type="button"
-											aria-label={`Abrir a votação: ${nomeDoDocumento(p)}`}
-											onclick={() => rpc('abrir_votacao_projeto', { p_documento: p.id })}
-											>{p.status === 'em_votacao' ? t('Abrir a votação final') : t('Abrir votação')}</button
-										>
-										{#if p.status === 'aprovado_mesa'}
-										<button
-											class="botao botao--secundario botao--pequeno"
-											type="button"
-											aria-label={`Aprovar por consenso: ${nomeDoDocumento(p)}`}
-											onclick={() => rpc('aprovar_por_consenso', { p_documento: p.id })}>{t('Aprovar por consenso')}</button
-										>
-										{/if}
-									</span>
-								{/if}
-							</li>
-							{#if p.status === 'em_votacao' && !votacao?.aberta}
-								{@const ops = data.operativas.filter((o) => o.documento_id === p.id)}
-								<li>
-									<fieldset class="opcoes">
-										<legend>{t('Divisão da questão: operativas votadas em separado')}</legend>
-										{#each ops as o, i (o.id)}
-											<label class="opcao"><input type="checkbox" value={o.id} bind:group={parte} /> {i + 1}. {o.texto}</label>
-										{/each}
-										<button
-											class="botao botao--secundario botao--pequeno"
-											type="button"
-											disabled={!parte.length}
-											onclick={() => rpc('abrir_votacao_parte', { p_documento: p.id, p_clausulas: parte }).then(() => (parte = []))}
-											>{t('Votar esta parte')}</button
-										>
-									</fieldset>
+											{/if}
+										</span>
+									{/if}
 								</li>
-							{/if}
-						{/each}
-					</ul>
-				</section>
-			{/if}
-			{#if ehMesa && data.emendas.length && !votacao?.aberta}
-				<section class="cartao" aria-labelledby="t-emendas">
-					<h2 id="t-emendas">{t('Emendas')}</h2>
-					<ul class="lista">
-						{#each data.emendas as e (e.id)}
-							<li>
-								<span>
-									{ACOES_EMENDA[e.acao]}{e.clausula ? `: "${e.clausula.texto}"` : ''}{e.texto ? ` → "${e.texto}"` : ''}
-									<span class="detalhe"
-										>{e.delegacao?.nome} ·
-										<Contagem
-											rotulo={t('{n} de {total} assinaturas', { n: e.assinaturas.length, total: data.regras.assinaturas_emenda })}
-											itens={e.assinaturas.map((x) => ({ texto: nomeDe(x.delegacao_id), href: paginaDe(x.delegacao_id) }))}
-										/></span
+								{#if p.status === 'em_votacao' && !votacao?.aberta}
+									{@const ops = data.operativas.filter((o) => o.documento_id === p.id)}
+									<li>
+										<fieldset class="opcoes">
+											<legend>{t('Divisão da questão: operativas votadas em separado')}</legend>
+											{#each ops as o, i (o.id)}
+												<label class="opcao"><input type="checkbox" value={o.id} bind:group={parte} /> {i + 1}. {o.texto}</label>
+											{/each}
+											<button
+												class="botao botao--secundario botao--pequeno"
+												type="button"
+												disabled={!parte.length}
+												onclick={() => rpc('abrir_votacao_parte', { p_documento: p.id, p_clausulas: parte }).then(() => (parte = []))}
+												>{t('Votar esta parte')}</button
+											>
+										</fieldset>
+									</li>
+								{/if}
+							{/each}
+						</ul>
+					</section>
+				</div>
+				<div class="acoes"><button class="botao botao--secundario" type="button" onclick={() => modalProjetos?.fechar()}>{t('Fechar')}</button></div>
+			</Modal>
+			<Modal bind:this={modalEmendas} nome={t('Emendas')} classe="modal-acao modal-painel">
+				<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
+				<div onclick={fecharAoAgir(modalEmendas)}>
+					<section class="cartao" aria-labelledby="t-emendas">
+						<h2 id="t-emendas">{t('Emendas')}</h2>
+						<ul class="lista">
+							{#each data.emendas as e (e.id)}
+								<li>
+									<span>
+										{ACOES_EMENDA[e.acao]}{e.clausula ? `: "${e.clausula.texto}"` : ''}{e.texto ? ` → "${e.texto}"` : ''}
+										<span class="detalhe"
+											>{e.delegacao?.nome} ·
+											<Contagem
+												rotulo={t('{n} de {total} assinaturas', { n: e.assinaturas.length, total: data.regras.assinaturas_emenda })}
+												itens={e.assinaturas.map((x) => ({ texto: nomeDe(x.delegacao_id), href: paginaDe(x.delegacao_id) }))}
+											/></span
+										>
+									</span>
+									<button
+										class="botao botao--pequeno"
+										type="button"
+										disabled={e.assinaturas.length < data.regras.assinaturas_emenda}
+										aria-label={`Votar a emenda de ${e.delegacao?.nome}`}
+										onclick={() => rpc('abrir_votacao_emenda', { p_emenda: e.id })}>{t('Votar a emenda')}</button
 									>
-								</span>
-								<button
-									class="botao botao--pequeno"
-									type="button"
-									disabled={e.assinaturas.length < data.regras.assinaturas_emenda}
-									aria-label={`Votar a emenda de ${e.delegacao?.nome}`}
-									onclick={() => rpc('abrir_votacao_emenda', { p_emenda: e.id })}>{t('Votar a emenda')}</button
-								>
-							</li>
-						{/each}
-					</ul>
-				</section>
-			{/if}
+								</li>
+							{/each}
+						</ul>
+					</section>
+				</div>
+				<div class="acoes"><button class="botao botao--secundario" type="button" onclick={() => modalEmendas?.fechar()}>{t('Fechar')}</button></div>
+			</Modal>
 		</div>
 	</div>
 {/if}

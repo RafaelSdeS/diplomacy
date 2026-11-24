@@ -1,6 +1,6 @@
 import { expect, test, type Browser, type Page } from '@playwright/test';
 import { contaDoTreino, DELEGACOES_TREINO, isolado } from '../scripts/delegacoes.ts';
-import { clienteComo, entrar, escolher, abrirAcao } from './ajuda.ts';
+import { clienteComo, entrar, escolher, abrirAcao, abrirPainel } from './ajuda.ts';
 
 // Passo 39: a cópia do TREINO só deste arquivo (scripts/delegacoes.ts).
 const C = isolado('16');
@@ -60,12 +60,15 @@ test('uma votação nominal completa, do painel da mesa ao telão', async ({ bro
 	const celular = await abrir(browser, C.conta(contaDoTreino('Chile')), `/comite/${C.sigla}/sessao`, { width: 360, height: 740 });
 
 	// A mesa anuncia a votação: a sala fecha. O Chile pede a votação nominal pelo celular.
+	await abrirPainel(painel, 'Projetos de resolução');
 	await painel.getByRole('button', { name: new RegExp(`^Iniciar a votação \\(sala fechada\\): .*${TITULO}$`) }).click();
 	await abrirAcao(celular, 'Fazer um ponto ou moção');
 	await celular.getByRole('combobox', { name: /^Tipo/ }).selectOption('votacao_nominal');
 	await celular.getByRole('button', { name: /^Enviar/ }).click();
 	await expect(celular.getByText('Moção de votação nominal: enviado à mesa.')).toBeVisible();
+	await abrirPainel(painel, 'Pontos e moções');
 	await painel.getByRole('button', { name: /^Reconhecer: Moção de votação nominal/ }).click();
+	await abrirPainel(painel, 'Projetos de resolução');
 	await painel.getByRole('button', { name: new RegExp(`^Abrir a votação: .*${TITULO}$`) }).click();
 	await expect(painel.getByRole('region', { name: 'Votação aberta' })).toContainText('votação nominal');
 	await expect(telao.getByText(/^Votação nominal · /)).toBeVisible({ timeout: 10_000 });

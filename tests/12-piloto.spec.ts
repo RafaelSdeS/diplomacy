@@ -1,6 +1,6 @@
 import { expect, test, type Browser, type Page } from '@playwright/test';
 import { contaDoTreino, DELEGACOES_TREINO, isolado } from '../scripts/delegacoes.ts';
-import { clienteComo, entrar } from './ajuda.ts';
+import { clienteComo, entrar, abrirPainel } from './ajuda.ts';
 
 // Passo 39: a cópia do TREINO só deste arquivo (scripts/delegacoes.ts).
 const C = isolado('12');
@@ -96,14 +96,20 @@ test('a mesa abre a votação pelo teclado, o celular em 3G lento vota e o telã
 	const mesa = await abrir(browser, MESA, PRESIDENCIA);
 	await aoVivo(mesa);
 	const abrirVotacao = mesa.getByRole('button', { name: new RegExp(`^Abrir a votação: .*${TITULO}$`) });
+	// Passo 51: os projetos ficam no "Para decidir". Só com o teclado: Tab até a linha, Enter,
+	// Tab até o botão e Enter.
+	const linhaProjetos = mesa.getByRole('region', { name: 'Para decidir' }).getByRole('button', { name: /^Projetos de resolução/ });
+	const tabAte = async (alvo: typeof abrirVotacao, limite: number) => {
+		for (let i = 0; i < limite; i++) {
+			await mesa.keyboard.press('Tab');
+			if (await alvo.evaluate((el) => el === document.activeElement)) return true;
+		}
+		return false;
+	};
+	expect(await tabAte(linhaProjetos, 150), 'a linha dos projetos é alcançável pelo Tab').toBe(true);
+	await mesa.keyboard.press('Enter');
 	await expect(abrirVotacao).toBeVisible();
-	// Só com o teclado: Tab até o botão e Enter.
-	let chegou = false;
-	for (let i = 0; i < 150 && !chegou; i++) {
-		await mesa.keyboard.press('Tab');
-		chegou = await abrirVotacao.evaluate((botao) => botao === document.activeElement);
-	}
-	expect(chegou, 'o botão de abrir a votação é alcançável pelo Tab').toBe(true);
+	expect(await tabAte(abrirVotacao, 40), 'o botão de abrir a votação é alcançável pelo Tab').toBe(true);
 	await mesa.keyboard.press('Enter');
 	await expect(mesa.getByRole('region', { name: 'Votação aberta' })).toContainText(TITULO);
 
@@ -127,6 +133,7 @@ test('a mesa abre a votação pelo teclado, o celular em 3G lento vota e o telã
 	await expect(mesa.getByRole('dialog')).toBeVisible();
 	await mesa.keyboard.press('Enter');
 	await expect(telao.getByText(new RegExp(`${TITULO}\\. Aprovada: 5 a favor, 1 contra`))).toBeVisible({ timeout: 10_000 });
+	await abrirPainel(mesa, 'Projetos de resolução');
 	await expect(mesa.getByRole('region', { name: 'Projetos de resolução' }).getByRole('listitem').filter({ hasText: TITULO })).toContainText(
 		'Aprovado'
 	);

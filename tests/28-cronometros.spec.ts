@@ -28,7 +28,7 @@ test('o tempo do debate segue contando quando alguém recebe a palavra', async (
 	await page.goto(PAINEL);
 	await aoVivo(page);
 	// Passo 43: a forma de debate e o tempo de fala ficam nos ajustes, recolhidos.
-	await page.locator('summary', { hasText: 'Ajustes da fala e do debate' }).click();
+	await page.getByRole('button', { name: 'Ajustes da fala e do debate' }).click();
 	const formulario = page.getByRole('form', { name: 'Forma de debate' });
 	await formulario.getByRole('combobox', { name: /^Forma de debate/ }).selectOption('formal_informal');
 	await formulario.getByLabel('Minutos (opcional)').fill('20');
@@ -45,7 +45,8 @@ test('o tempo do debate segue contando quando alguém recebe a palavra', async (
 	await expect(page.getByRole('region', { name: 'Com a palavra' })).toContainText('Alemanha');
 	await expect(debate.locator('[data-cronometro]')).toHaveText(/^(20:00|19:[0-5]\d)$/);
 
-	// Valor rápido do tempo de fala, aplicado na hora.
+	// Valor rápido do tempo de fala, aplicado na hora (o modal de ajustes fechou ao mudar a forma).
+	await page.getByRole('button', { name: 'Ajustes da fala e do debate' }).click();
 	await page.getByRole('group', { name: 'Tempos rápidos' }).getByRole('button', { name: '60 s' }).click();
 	await expect(page.getByLabel('Tempo de fala (segundos)')).toHaveValue('60');
 });
@@ -55,7 +56,7 @@ test('o informal-informal esgotado oferece a volta ao formal-informal', async ({
 	await entrar(page, MESA);
 	await page.goto(PAINEL);
 	await aoVivo(page);
-	await page.locator('summary', { hasText: 'Ajustes da fala e do debate' }).click();
+	await page.getByRole('button', { name: 'Ajustes da fala e do debate' }).click();
 	const formulario = page.getByRole('form', { name: 'Forma de debate' });
 	await formulario.getByRole('combobox', { name: /^Forma de debate/ }).selectOption('informal_informal');
 	await formulario.getByLabel(/^Minutos \(até/).fill('1');
@@ -68,5 +69,7 @@ test('o informal-informal esgotado oferece a volta ao formal-informal', async ({
 	await expect(esgotado).toHaveCount(0);
 	await expect(page.getByText(/Formal-informal ·|· Formal-informal/).first()).toBeVisible();
 	// No servidor o informal durou segundos (o relógio adiantado é só do navegador): desconta 0 ou 1.
+	// Passo 51: a conta do informal-informal fica nos ajustes.
+	await page.getByRole('button', { name: 'Ajustes da fala e do debate' }).click();
 	await expect(page.getByText(/^Informal-informal encerrado nesta sessão: [01] de 45 min$/)).toBeVisible();
 });

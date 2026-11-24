@@ -1,7 +1,7 @@
 import { expect, test, type Browser, type Page } from '@playwright/test';
 import { isolado } from '../scripts/delegacoes.ts';
 import AxeBuilder from '@axe-core/playwright';
-import { entrar } from './ajuda.ts';
+import { entrar, abrirPainel } from './ajuda.ts';
 
 // Passo 39: a cópia do CE-T só deste arquivo (scripts/delegacoes.ts).
 const C = isolado('21');
@@ -77,6 +77,7 @@ test('a delegação que chega depois avisa, e a mesa confirma em um toque', asyn
 	await ausente.getByRole('button', { name: 'Cheguei' }).click();
 	await expect(ausente).toContainText('Aguardando a mesa confirmar a presença.');
 
+	await abrirPainel(page, 'Chegadas');
 	const chegadas = page.getByRole('region', { name: 'Chegadas' });
 	await chegadas.getByRole('button', { name: 'Confirmar presença: Alemanha' }).click();
 	await expect(chegadas).toHaveCount(0);

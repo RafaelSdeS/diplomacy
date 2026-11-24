@@ -23,14 +23,17 @@ test('no notebook, o painel da presidência cabe na tela: a página não rola', 
 	await page.goto(PAINEL);
 	await aoVivo(page);
 	const altura = page.viewportSize()!.height;
-	for (const nome of ['Com a palavra', 'Pedidos de fala', 'Pontos e moções']) {
+	for (const nome of ['Com a palavra', 'Pedidos de fala', 'Para decidir']) {
 		const caixa = await page.getByRole('region', { name: nome }).boundingBox();
 		expect(caixa!.y, `${nome} começa na primeira tela`).toBeLessThan(altura - 100);
 	}
 	expect(await page.evaluate(() => document.documentElement.scrollHeight - innerHeight)).toBeLessThanOrEqual(2);
+	// Passo 51 (lote 1): nem as colunas rolam; o que espera decisão é contagem no "Para decidir".
+	const sobras = await page.locator('.painel > .painel-coluna').evaluateAll((colunas) => colunas.map((c) => c.scrollHeight - c.clientHeight));
+	for (const sobra of sobras) expect(sobra).toBeLessThanOrEqual(2);
 	// O raro fica recolhido, mas a um clique.
 	await expect(page.getByLabel('Tempo de fala (segundos)')).toBeHidden();
-	await page.locator('summary', { hasText: 'Ajustes da fala e do debate' }).click();
+	await page.getByRole('button', { name: 'Ajustes da fala e do debate' }).click();
 	await expect(page.getByLabel('Tempo de fala (segundos)')).toBeVisible();
 });
 

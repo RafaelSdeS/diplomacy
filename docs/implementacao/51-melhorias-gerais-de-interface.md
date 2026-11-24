@@ -102,7 +102,18 @@
 - **DPO:** "Meu DPO" em cartões por tópico (situação, data de envio, palavras, comentário da mesa, Escrever ou Continuar, Ler, Imprimir). A escrita abre num modal largo, com a contagem de palavras e a prévia ao lado. Os DPOs do comitê aparecem em cartões com bandeira, e a mesa avalia num modal.
 - **Dados de exemplo online:** o CSNU-T tem DPOs, dois blocos com working papers e um projeto, cartas, bilhetes, notas de crise e anotações, criados entrando como as delegações de teste.
 
-**Antes do lote 1:** você usa o app online por uns minutos, com as contas de teste, e diz se ficou claro.
+**Lote 1 feito (presidência):**
+
+- **Sempre à vista:** pedidos de fala e lista, "Com a palavra" com o cronômetro, e a votação (grande quando aberta, compacta quando encerrada).
+- **"Para decidir":** um cartão com uma linha por tipo, com a contagem (destacada quando há algo):
+  - pontos e moções (sempre);
+  - pedidos do bureau, chegadas, projetos e emendas (só quando há).
+
+  Cada linha abre um modal no centro; agir dentro dele (aceitar, votar, julgar, confirmar, abrir votação) fecha o modal e devolve ao painel. "Passar a presidência" fica no cartão.
+- **Ajustes:** os da fala e do debate abrem num modal, que fecha quando uma mudança é aplicada.
+- **Teste:** no debate, a 1366 × 768, nem a página nem as colunas rolam (teste em `43-fluxo`).
+- **Limite conhecido:** com a votação aberta num comitê de 15 delegações, a coluna da votação ainda pode rolar (a grade de votos e a chamada ocupam espaço). O teste cobre o debate; a votação aberta fica para a revisão depois do piloto.
+- **Testes:** `abrirPainel()` em `tests/ajuda.ts`.
 
 ## Fora desta etapa
 
