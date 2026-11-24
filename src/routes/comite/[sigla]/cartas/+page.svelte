@@ -10,6 +10,7 @@
 	import { mensagemDeErro } from '#lib/sessao.ts';
 	import { supabase } from '#lib/supabase.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
+	import Escolha from '#lib/ui/Escolha.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -106,19 +107,14 @@
 			</label>
 			<label class="opcao"><input type="checkbox" bind:checked={publica} /> {t('Carta pública (todo o comitê lê)')}</label>
 			{#if !publica}
-				<fieldset class="opcoes voluntarias">
-					<legend>{t('Para as delegações')}</legend>
-					{#each data.delegacoes.filter((d) => d.id !== eu.delegacao_id) as d (d.id)}
-						<label class="opcao"><input type="checkbox" value={d.id} bind:group={delegacoes} /> {d.nome}</label>
-					{/each}
-				</fieldset>
+				<Escolha
+					rotulo={t('Para as delegações')}
+					botao={t('Escolher')}
+					opcoes={data.delegacoes.filter((d) => d.id !== eu.delegacao_id)}
+					bind:escolhidos={delegacoes}
+				/>
 				{#if data.blocos.length}
-					<fieldset class="opcoes voluntarias">
-						<legend>{t('Para os blocos')}</legend>
-						{#each data.blocos as b (b.id)}
-							<label class="opcao"><input type="checkbox" value={b.id} bind:group={blocos} /> {b.nome}</label>
-						{/each}
-					</fieldset>
+					<Escolha rotulo={t('Para os blocos')} botao={t('Escolher')} opcoes={data.blocos} bind:escolhidos={blocos} />
 				{/if}
 			{/if}
 			<label class="campo">

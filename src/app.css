@@ -1606,6 +1606,25 @@ kbd {
 	font-weight: 600;
 }
 
+/* Passo 47: a lista com filtro do Escolha (delegações, blocos) e o resumo do que foi escolhido. */
+.escolha-lista {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+	max-height: 55vh;
+	margin: 0.5rem 0 0;
+	padding: 0;
+	overflow-y: auto;
+	list-style: none;
+}
+
+.escolha-resumo {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0.25rem 0.75rem;
+	margin: 0.5rem 0;
+}
+
 .telao-plantao {
 	grid-area: plantao;
 	margin: 0;

@@ -13,6 +13,7 @@
 	import { mensagemDeErro } from '#lib/sessao.ts';
 	import { supabase } from '#lib/supabase.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
+	import ResponderEntrevista from '#lib/ui/ResponderEntrevista.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -80,8 +81,6 @@
 		bloqueados = !!data.regras.bilhetes_bloqueados;
 	});
 
-	// Entrevistas pedidas à delegação: a hora escolhida para cada uma.
-	let horario = $state<Record<string, string>>({});
 </script>
 
 <svelte:head>
@@ -254,32 +253,14 @@
 							</span>
 						</span>
 						{#if e.status === 'pedida'}
-							<span class="acoes">
-								<label class="campo campo--curto">
-									{t('Horário')}
-									<input type="datetime-local" bind:value={horario[e.id]} />
-								</label>
-								<button
-									class="botao botao--pequeno"
-									type="button"
-									disabled={!horario[e.id]}
-									onclick={() =>
-										executar(
-											supabase.rpc('responder_entrevista', {
-												p_entrevista: e.id,
-												p_aceitar: true,
-												p_horario: new Date(horario[e.id]).toISOString()
-											}),
-											t('Entrevista aceita.')
-										)}>{t('Aceitar')}</button
-								>
-								<button
-									class="botao botao--secundario botao--pequeno"
-									type="button"
-									onclick={() => executar(supabase.rpc('responder_entrevista', { p_entrevista: e.id, p_aceitar: false }), t('Entrevista recusada.'))}
-									>{t('Recusar')}</button
-								>
-							</span>
+							<ResponderEntrevista
+								entrevista={e}
+								onfeito={(m) => {
+									erro = '';
+									mensagem = m;
+									invalidate('app:mensagens');
+								}}
+							/>
 						{/if}
 					</li>
 				{/each}

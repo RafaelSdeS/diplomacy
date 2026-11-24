@@ -310,7 +310,7 @@
 			{@render children()}
 		</main>
 	</div>
-	{#if fichaDelegacao}{#await fichaDelegacao then { default: Ficha }}<Ficha />{/await}{/if}
+	{#if fichaDelegacao}{#await fichaDelegacao then { default: Ficha }}<Ficha participacoes={data.participacoes} />{/await}{/if}
 	{#if previaDocumento}{#await previaDocumento then { default: Previa }}<Previa />{/await}{/if}
 	{#if buscaIrPara}{#await buscaIrPara then { default: IrPara }}<IrPara participacoes={data.participacoes} />{/await}{/if}
 {/if}

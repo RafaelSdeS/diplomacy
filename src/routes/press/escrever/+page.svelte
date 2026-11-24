@@ -11,6 +11,7 @@
 	import { TIPOS_NOTICIA } from '#lib/press.ts';
 	import { mensagemDeErro } from '#lib/sessao.ts';
 	import { supabase } from '#lib/supabase.ts';
+	import Escolha from '#lib/ui/Escolha.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -148,12 +149,7 @@
 			</label>
 		{/if}
 		{#if delegacoes.length}
-			<fieldset class="opcoes voluntarias">
-				<legend>{t('Delegações citadas')}</legend>
-				{#each delegacoes as d (d.id)}
-					<label class="opcao"><input type="checkbox" value={d.id} bind:group={citadas} /> {d.nome}</label>
-				{/each}
-			</fieldset>
+			<Escolha rotulo={t('Delegações citadas')} botao={t('Escolher')} opcoes={delegacoes} bind:escolhidos={citadas} />
 		{/if}
 		{#if erro}
 			<p class="erro" role="alert">{erro}</p>

@@ -16,7 +16,7 @@ export const load: PageLoad = async ({ parent, depends }) => {
 			.eq('comite_id', comite.id)
 			.order('enviada_em', { ascending: false }),
 		supabase.from('bloco').select('id, nome, membros:bloco_membro(delegacao_id)').eq('comite_id', comite.id).order('nome'),
-		supabase.from('delegacao').select('id, nome').eq('comite_id', comite.id).order('nome')
+		supabase.from('delegacao').select('id, nome, nome_oficial, bandeira').eq('comite_id', comite.id).order('nome')
 	]);
 	for (const r of [cartas, blocos, delegacoes]) if (r.error) throw r.error;
 	return { cartas: cartas.data!, blocos: blocos.data!, delegacoes: delegacoes.data! };

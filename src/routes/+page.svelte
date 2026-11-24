@@ -17,6 +17,8 @@
 	import AlertaCrise from '#lib/ui/AlertaCrise.svelte';
 	import FichaVotacao from '#lib/ui/FichaVotacao.svelte';
 	import FichaNota from '#lib/ui/FichaNota.svelte';
+	import ResponderEntrevista from '#lib/ui/ResponderEntrevista.svelte';
+	import { invalidateAll } from '$app/navigation';
 	import { chamarAtencao } from '#lib/aparelho.ts';
 	import { untrack } from 'svelte';
 	import type { PageProps } from './$types';
@@ -88,7 +90,7 @@
 		!!sessao && !!minhaDelegacao && !sessao.presenca.some((p) => p.delegacao_id === minhaDelegacao)
 	);
 	const nadaParaDelegacao = $derived(
-		!data.rodadas.length && !dposPendentes.length && !data.bilhetes.length && !meusPontos && !ausente
+		!data.rodadas.length && !data.pedidosEntrevista.length && !dposPendentes.length && !data.bilhetes.length && !meusPontos && !ausente
 	);
 	// A mesa: três ações, e o que espera por ela em cada uma.
 	const documentosEnviados = $derived((data.mesa?.dpos ?? 0) + (data.mesa?.documentos ?? 0));
@@ -167,6 +169,12 @@
 						<span class="selo selo--info">{meusPontos}</span>
 					</li>
 				{/if}
+				{#each data.pedidosEntrevista as e (e.id)}
+					<li>
+						<span>{t('Pedido de entrevista de {veiculo}', { veiculo: e.veiculo?.nome ?? '' })} <span class="detalhe">{e.tema}</span></span>
+						<ResponderEntrevista entrevista={e} onfeito={() => invalidateAll()} />
+					</li>
+				{/each}
 				{#each data.rodadas as r (r.documento?.id)}
 					<li>
 						<a href={`/documento/${r.documento?.id}`}>{r.documento?.titulo}</a>

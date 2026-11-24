@@ -8,7 +8,7 @@ export const load: PageLoad = async ({ parent }) => {
 	if (!comites.length) error(403, 'Só a press escreve matérias.');
 	const [veiculos, delegacoes] = await Promise.all([
 		supabase.from('veiculo').select('id, nome, comite_id, comite(sigla)').in('comite_id', comites).order('nome'),
-		supabase.from('delegacao').select('id, nome, comite_id').in('comite_id', comites).order('nome')
+		supabase.from('delegacao').select('id, nome, nome_oficial, bandeira, comite_id').in('comite_id', comites).order('nome')
 	]);
 	if (veiculos.error) throw veiculos.error;
 	if (delegacoes.error) throw delegacoes.error;

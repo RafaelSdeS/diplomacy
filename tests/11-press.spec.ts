@@ -50,7 +50,9 @@ test('a matéria publicada no celular chega à capa sem recarregar, e a delegaç
 	await expect(press.getByText(/^Atenção: o texto tem palavras/)).toContainText('(merda)');
 	await press.getByLabel('Imagem (opcional)').setInputFiles({ name: 'foto.png', mimeType: 'image/png', buffer: PNG });
 	await press.getByLabel(/^Descrição da imagem/).fill('Plenário do Conselho');
+	await press.getByRole('button', { name: 'Escolher: Delegações citadas' }).click();
 	await press.getByRole('group', { name: 'Delegações citadas' }).getByLabel('Brasil', { exact: true }).check();
+	await press.getByRole('button', { name: 'Pronto' }).click();
 	await press.getByRole('button', { name: 'Publicar' }).click();
 
 	await expect(press).toHaveURL(/\/press\/CSNU-T\?n=/);

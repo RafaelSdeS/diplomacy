@@ -150,7 +150,9 @@ test('o projeto impresso tem a linha do comitê e os signatários', async ({ pag
 
 test('a carta privada só chega ao destinatário', async ({ browser }) => {
 	const eua = await abrir(browser, C.conta(CONTAS.delegado), CARTAS);
+	await eua.getByRole('button', { name: 'Escolher: Para as delegações' }).click();
 	await eua.getByRole('group', { name: 'Para as delegações' }).getByLabel('Brasil').check();
+	await eua.getByRole('button', { name: 'Pronto' }).click();
 	await eua.getByLabel('Título').fill(CARTA);
 	await eua.getByLabel('Carta', { exact: true }).fill('Propomos uma reunião bilateral.\n\nAguardamos a resposta.');
 	await eua.getByRole('button', { name: 'Enviar carta' }).click();

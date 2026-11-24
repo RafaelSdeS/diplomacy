@@ -57,11 +57,17 @@ test('um pedido de entrevista aceito aparece para os dois lados', async ({ brows
 	await expect(press.getByRole('status')).toHaveText('Pedido enviado à delegação.');
 	await expect(press.locator('[data-ao-vivo="sim"]')).toBeVisible({ timeout: 10_000 });
 
-	const eua = await abrir(browser, CONTAS.delegado, '/comite/CSNU-T/mensagens', { width: 360, height: 740 });
+	// Passo 47: a delegação responde num modal, direto do "Precisa de você" da Agora.
+	const eua = await abrir(browser, CONTAS.delegado, '/', { width: 360, height: 740 });
+	await eua.getByRole('article', { name: 'Precisa de você' }).getByRole('button', { name: new RegExp(`^Responder: .*${tema}`) }).click();
+	const modal = eua.getByRole('dialog', { name: /^Pedido de entrevista de/ });
+	await expect(modal).toContainText(tema);
+	await modal.getByLabel('Horário').fill('2027-10-20T15:30');
+	await modal.getByRole('button', { name: 'Aceitar' }).click();
+	await expect(modal).toBeHidden();
+	await expect(eua.getByRole('article', { name: 'Precisa de você' })).not.toContainText(tema);
+	await eua.goto('/comite/CSNU-T/mensagens');
 	const item = eua.getByRole('region', { name: 'Pedidos de entrevista' }).getByRole('listitem').filter({ hasText: tema });
-	await item.getByLabel('Horário').fill('2027-10-20T15:30');
-	await item.getByRole('button', { name: 'Aceitar' }).click();
-	await expect(eua.getByRole('status')).toHaveText('Entrevista aceita.');
 	await expect(item).toContainText('Aceita para');
 
 	await expect(press.getByRole('region', { name: 'Pedidos' }).getByRole('listitem').filter({ hasText: tema })).toContainText(

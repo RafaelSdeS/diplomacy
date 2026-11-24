@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { contaDoTreino, isolado } from '../scripts/delegacoes.ts';
-import { clienteComo, comiteEmDebate, entrar } from './ajuda.ts';
+import { CONTAS, clienteComo, comiteEmDebate, entrar } from './ajuda.ts';
 
 // Passo 47 (item 4): as fichas da votação, do ponto e da nota abrem por cima da tela, sem
 // mudar a URL, e a ação da ficha (encerrar a votação, retirar o ponto) funciona dali.
@@ -122,4 +122,55 @@ test('a prévia da carta abre na central de Documentos e na página de cartas, s
 		await page.keyboard.press('Escape');
 		await expect(previa).toBeHidden();
 	}
+});
+
+test('na matéria, a delegação citada sai só pelo teclado, digitando parte do nome', async ({ page }) => {
+	// O CSNU-T tem mais de seis delegações (a lista ganha o filtro); a tela só lê, nada publica.
+	await entrar(page, CONTAS.press);
+	await page.goto('/press/escrever');
+	await page.getByRole('button', { name: 'Escolher: Delegações citadas' }).focus();
+	await page.keyboard.press('Enter');
+	const modal = page.getByRole('dialog', { name: 'Delegações citadas' });
+	await expect(modal.getByRole('searchbox')).toBeFocused();
+	await page.keyboard.type('russ');
+	await page.keyboard.press('Enter');
+	await expect(modal.getByLabel('Rússia')).toBeChecked();
+	await expect(modal.getByLabel('Brasil')).toBeHidden();
+	await page.keyboard.press('ArrowDown');
+	await expect(modal.getByLabel('Rússia')).toBeFocused();
+	await semErrosDeAcessibilidade(page);
+	await page.keyboard.press('Escape');
+	await expect(modal).toBeHidden();
+	await expect(page.locator('.escolha-resumo')).toContainText('Rússia');
+});
+
+test('da ficha da delegação saem um bilhete e uma carta, sem ir a outra tela', async ({ page }) => {
+	const bilhete = `Podemos conversar no intervalo? ${Date.now()}`;
+	const titulo = `Proposta conjunta ${Date.now()}`;
+	await entrar(page, PARAGUAI);
+	await page.goto(`/comite/${C.sigla}/sessao`);
+	await aoVivo(page);
+	const url = page.url();
+	await page.keyboard.press('Control+K');
+	await page.getByRole('dialog', { name: 'Ir para…' }).getByRole('searchbox').fill('brasil');
+	await page.getByRole('dialog', { name: 'Ir para…' }).getByRole('button', { name: 'Brasil' }).click();
+	const ficha = page.getByRole('dialog', { name: 'Brasil' });
+	await ficha.getByRole('button', { name: 'Mandar bilhete' }).click();
+	const escrever = page.getByRole('dialog', { name: 'Bilhete para Brasil' });
+	await escrever.getByLabel('Bilhete').fill(bilhete);
+	await semErrosDeAcessibilidade(page);
+	await escrever.getByRole('button', { name: 'Enviar bilhete' }).click();
+	await expect(ficha.getByRole('status')).toHaveText('Bilhete enviado.');
+
+	await ficha.getByRole('button', { name: 'Escrever carta' }).click();
+	const carta = page.getByRole('dialog', { name: 'Carta para Brasil' });
+	await carta.getByLabel('Título').fill(titulo);
+	await carta.getByLabel('Carta').fill('O Paraguai propõe um projeto conjunto sobre as barragens.');
+	await carta.getByRole('button', { name: 'Enviar carta' }).click();
+	await expect(ficha.getByRole('status')).toHaveText('Carta enviada.');
+	expect(page.url()).toBe(url);
+
+	const brasil = await clienteComo(C.conta(contaDoTreino('Brasil')));
+	expect((await brasil.from('mensagem').select('id').eq('texto', bilhete)).data).toHaveLength(1);
+	expect((await brasil.from('carta').select('id').eq('titulo', titulo)).data).toHaveLength(1);
 });

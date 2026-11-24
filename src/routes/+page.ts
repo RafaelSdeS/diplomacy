@@ -64,7 +64,7 @@ export const load: PageLoad = async ({ parent, depends }) => {
 		)
 	]);
 	const minhaDelegacao = principal === 'delegado' ? (minha?.delegacao_id ?? null) : null;
-	const [aoVivo, bilhetes, rodadas, mesa, crise, entrevistas] = await Promise.all([
+	const [aoVivo, bilhetes, rodadas, mesa, crise, entrevistas, pedidosEntrevista] = await Promise.all([
 		comiteAoVivo
 			? Promise.all([
 					carregarSessao(comiteAoVivo),
@@ -112,9 +112,15 @@ export const load: PageLoad = async ({ parent, depends }) => {
 						.order('horario', { ascending: false })
 						.limit(10)
 				)
+			: { data: [], error: null },
+		// Passo 47: os pedidos de entrevista que esperam a resposta da delegação.
+		minhaDelegacao
+			? ler('pedidos-entrevista', ['entrevista'], () =>
+					supabase.from('entrevista').select('id, tema, veiculo(nome)').eq('delegacao_id', minhaDelegacao).eq('status', 'pedida').order('criada_em')
+				)
 			: { data: [], error: null }
 	]);
-	for (const r of [bilhetes, rodadas, entrevistas]) if (r.error) throw r.error;
+	for (const r of [bilhetes, rodadas, entrevistas, pedidosEntrevista]) if (r.error) throw r.error;
 	if (dpos.error) throw dpos.error;
 	if (citacoes.error) throw citacoes.error;
 	if (comitesAoVivo.error) throw comitesAoVivo.error;
@@ -139,6 +145,7 @@ export const load: PageLoad = async ({ parent, depends }) => {
 		rodadas: (rodadas.data ?? []).filter((r) => r.fim > agoraIso).reverse(),
 		mesa,
 		notasPendentes: crise,
-		entrevistas: (entrevistas.data ?? []).filter((e) => (e.horario ?? '') >= agoraIso).reverse().slice(0, 3)
+		entrevistas: (entrevistas.data ?? []).filter((e) => (e.horario ?? '') >= agoraIso).reverse().slice(0, 3),
+		pedidosEntrevista: pedidosEntrevista.data ?? []
 	};
 };
