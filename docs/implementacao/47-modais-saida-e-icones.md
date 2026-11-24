@@ -34,7 +34,7 @@ Em ordem:
 
 **Item 2 feito:** *Sair* sempre abre o modal "Sair da conta?", com nome, delegação ou papel e comitê, e "Os dados desta sessão serão removidos deste aparelho". Com itens na caixa de saída, o mesmo modal vira o aviso do passo 44 ("Itens não enviados: N", enviar agora ou sair mesmo assim). Os testes que saem usam `sair()` de `tests/ajuda.ts`; `tests/44-seguranca.spec.ts` confere que cancelar mantém a sessão e os caches.
 
-**Item 3 feito:** "Encerrar a coletiva" e "Ocultar notícia" passaram a usar `Confirmar` (o de encerrar a coletiva saiu de dentro do formulário de abrir, porque formulário não se aninha). O resto da lista já confirmava: encerrar sessão e votação, retirar adoção e remover acesso; o pedido de exclusão da conta tem confirmação própria na tela. Retirar ponto fica com o desfazer do item 10, porque dá para propor de novo. A troca de cenário entra com o passo 48. Falta teste de ponta a ponta para encerrar a coletiva.
+**Item 3 feito:** "Encerrar a coletiva" e "Ocultar notícia" passaram a usar `Confirmar` (o de encerrar a coletiva saiu de dentro do formulário de abrir, porque formulário não se aninha). O resto da lista já confirmava: encerrar sessão e votação, retirar adoção e remover acesso; o pedido de exclusão da conta tem confirmação própria na tela. Retirar ponto fica com o desfazer do item 10, porque dá para propor de novo. A troca de cenário entra com o passo 48. Teste de encerrar a coletiva (cancelar e confirmar) em `tests/17-comunicacao.spec.ts`; ocultar notícia, em `tests/11-press.spec.ts`.
 
 ## Fora desta etapa
 
@@ -44,7 +44,7 @@ Favoritos, tamanho do texto e a revisão de rolagem, densidade e estados, tela p
 
 - [x] Modal base: um teste de componente cobre foco inicial, Escape, clique no fundo (fecha vazio, não fecha com texto digitado) e retorno do foco; os modais do app herdam esse comportamento.
 - [x] Ponta a ponta: *Sair* abre a confirmação, cancelar mantém a sessão, confirmar apaga os caches e volta ao login; com um item na caixa de saída a modal mostra o aviso e "enviar agora" envia antes de sair.
-- [ ] Ponta a ponta: cada ação irreversível da lista do item 3 pede confirmação.
+- [x] Ponta a ponta: cada ação irreversível da lista do item 3 pede confirmação.
 - [ ] Ponta a ponta: clicar numa votação, num ponto e numa nota abre a ficha sem mudar a URL, e a ação da ficha (encerrar votação, retirar ponto) funciona dali.
 - [ ] Ponta a ponta: aceitar uma entrevista, escolher destinatários de carta e citar uma delegação numa matéria sem sair da página.
 - [ ] Ponta a ponta: escolher uma delegação digitando parte do nome no `Escolha`, só com o teclado.

@@ -112,6 +112,16 @@ test('a Diretoria da Press abre a coletiva, e a press põe perguntas na pauta', 
 	const brasil = await abrir(browser, contaDaDelegacao('Brasil'), '/press/coletiva', { width: 360, height: 740 });
 	await expect(brasil.getByText('a pergunta só é conhecida quando for feita em voz alta').first()).toBeVisible();
 	await expect(brasil.getByText(pergunta)).toHaveCount(0);
+
+	// Passo 47: encerrar a coletiva pede confirmação; cancelar não encerra.
+	await diretoria.getByRole('button', { name: 'Encerrar a coletiva' }).click();
+	const confirmacao = diretoria.getByRole('dialog', { name: 'Encerrar a coletiva?' });
+	await confirmacao.getByRole('button', { name: 'Cancelar' }).click();
+	await expect(confirmacao).toBeHidden();
+	await diretoria.getByRole('button', { name: 'Encerrar a coletiva' }).click();
+	await confirmacao.getByRole('button', { name: 'Encerrar a coletiva' }).click();
+	await expect(diretoria.getByRole('status')).toHaveText('Coletiva encerrada.');
+	await expect(diretoria.getByRole('button', { name: 'Encerrar a coletiva' })).toHaveCount(0);
 	await Promise.all([diretoria, press, brasil].map((p) => p.context().close()));
 });
 
