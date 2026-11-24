@@ -2323,8 +2323,10 @@ kbd {
 	color: inherit;
 }
 
-/* Passo 43: nas telas ao vivo, o nome abre a ficha por cima, sem sair da tela. */
-.nome-delegacao--ficha {
+/* Passo 43: nas telas ao vivo, o nome abre a ficha por cima, sem sair da tela.
+   Passo 47: o mesmo para votação, ponto e nota (.abre-ficha). */
+.nome-delegacao--ficha,
+.abre-ficha {
 	padding: 0;
 	border: 0;
 	background: none;
@@ -2336,7 +2338,8 @@ kbd {
 	cursor: pointer;
 }
 
-.nome-delegacao--ficha:hover {
+.nome-delegacao--ficha:hover,
+.abre-ficha:hover {
 	text-decoration-color: currentColor;
 }
 
@@ -2350,6 +2353,10 @@ dialog.modal-lateral {
 	border: 0;
 	border-left: 3px solid var(--cor-fio-dourado);
 	overflow-y: auto;
+}
+
+.ficha-texto {
+	white-space: pre-line;
 }
 
 .ficha-bandeira {

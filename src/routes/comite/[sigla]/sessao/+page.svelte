@@ -24,6 +24,8 @@
 	import { untrack } from 'svelte';
 	import ListaVotos from '#lib/ui/ListaVotos.svelte';
 	import Modal from '#lib/ui/Modal.svelte';
+	import FichaVotacao from '#lib/ui/FichaVotacao.svelte';
+	import FichaPonto from '#lib/ui/FichaPonto.svelte';
 	import Contagem from '#lib/ui/Contagem.svelte';
 	import BotaoPlaca from '#lib/ui/BotaoPlaca.svelte';
 	import Votar from '#lib/ui/Votar.svelte';
@@ -103,6 +105,10 @@
 		campo?.focus();
 	}
 	const minhaPresenca = $derived(sessao?.presenca.find((p) => p.delegacao_id === eu?.delegacao_id)?.situacao);
+	// Passo 47: as fichas da votação e do ponto, abertas pelo nome, sem mudar a URL.
+	let verVotacao = $state(false);
+	let pontoVisto = $state<string | null>(null);
+	const pontoDaFicha = $derived(data.estado?.sessao?.pontos.find((p) => p.id === pontoVisto));
 	const meuVoto = $derived(data.votacao?.votos.find((v) => v.delegacao_id === eu?.delegacao_id)?.escolha);
 	// Tecnologia restrita: durante a sessão, a mesa opera o app; o delegado acompanha.
 	const restrita = $derived(!!data.comite.tecnologia_restrita && !!data.estado);
@@ -256,7 +262,7 @@
 			{#if data.votacao}
 				<article class="cartao cartao--destaque" aria-labelledby="c-votacao">
 					<h2 id="c-votacao" tabindex="-1">{data.votacao.aberta ? t('Votação aberta') : t('Última votação')}</h2>
-					<p class="destaque">{data.votacao.objeto}</p>
+					<p class="destaque"><button class="abre-ficha" type="button" onclick={() => (verVotacao = true)}>{data.votacao.objeto}</button></p>
 					{#if data.votacao.aberta && data.votacao.nominal}<p><strong>{t('Votação nominal:')}</strong> {t('a mesa chama as delegações em ordem alfabética.')}</p>{/if}
 					{#if !data.votacao.aberta}
 						<p>{textoResultado(data.votacao)}</p>
@@ -322,19 +328,12 @@
 					<ul class="lista" aria-label={t('Seus pontos e moções')}>
 						{#each meusPontos as ponto (ponto.id)}
 							<li>
-								{descreverPonto(ponto)}
+								<button class="abre-ficha" type="button" onclick={() => (pontoVisto = ponto.id)}>{descreverPonto(ponto)}</button>
 								<span
 									class="selo {ponto.status === 'aceito' ? 'selo--ok' : ponto.status === 'recusado' ? 'selo--erro' : 'selo--info'}"
 									>{situacaoDoPonto(ponto)}</span
 								>
-								{#if ponto.status === 'aberto'}
-									<button
-										class="botao botao--secundario botao--pequeno"
-										type="button"
-										onclick={() => executar(supabase.rpc('retirar_ponto', { p_ponto: ponto.id }), t('Pedido retirado.'))}
-										>{t('Retirar')}</button
-									>
-								{/if}
+								{@render retirar(ponto)}
 							</li>
 						{/each}
 					</ul>
@@ -430,3 +429,21 @@
 	</div>
 {/if}
 
+{#snippet retirar(ponto: NonNullable<typeof pontoDaFicha>)}
+	{#if ponto.status === 'aberto' && ponto.delegacao?.id === eu?.delegacao_id}
+		<button
+			class="botao botao--secundario botao--pequeno"
+			type="button"
+			onclick={() => executar(supabase.rpc('retirar_ponto', { p_ponto: ponto.id }), t('Pedido retirado.'))}>{t('Retirar')}</button
+		>
+	{/if}
+{/snippet}
+
+<FichaVotacao
+	votacao={verVotacao ? data.votacao : null}
+	sigla={data.comite.sigla}
+	delegacoes={data.delegacoes}
+	{presentes}
+	onclose={() => (verVotacao = false)}
+/>
+<FichaPonto ponto={pontoDaFicha} sigla={data.comite.sigla} acoes={retirar} onclose={() => (pontoVisto = null)} />

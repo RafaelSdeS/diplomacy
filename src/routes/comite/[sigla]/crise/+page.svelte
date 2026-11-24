@@ -12,6 +12,7 @@
 	import { supabase } from '#lib/supabase.ts';
 	import { TABELAS_CRISE } from '#lib/tempo-real.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
+	import FichaNota from '#lib/ui/FichaNota.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -24,6 +25,8 @@
 	$effect(() => guardarRascunho(RASCUNHO, texto));
 	let erro = $state('');
 	let mensagem = $state('');
+	// Passo 47: a nota inteira (texto e resposta) na ficha, sem sair da página.
+	let notaVista = $state<string | null>(null);
 	let enviando = $state(false);
 	// O id nasce com o rascunho: se a rede cair no envio, reenviar não duplica a nota.
 	let id = $state(crypto.randomUUID());
@@ -132,7 +135,7 @@
 						<span>
 							<span class="selo {SELO_NOTA[status]}">{STATUS_NOTA[status]}</span>
 							{#if nota.posicao}<span class="selo">{t('{n}ª na fila', { n: nota.posicao })}</span>{/if}
-							<strong>{nota.titulo}</strong>
+							<strong><button class="abre-ficha" type="button" onclick={() => (notaVista = nota.id)}>{nota.titulo}</button></strong>
 							<span class="detalhe"
 								>{nota.tipo === 'nota' ? t('Nota') : t('Diretiva')} · {formatarEspera(minutosDesde(nota.criado_em, agora))}</span
 							>
@@ -148,3 +151,5 @@
 		</section>
 	{/if}
 {/if}
+
+<FichaNota nota={data.notas.find((n) => n.id === notaVista)} onclose={() => (notaVista = null)} />

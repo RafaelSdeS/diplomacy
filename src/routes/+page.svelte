@@ -14,6 +14,8 @@
 	import Cronometro from '#lib/ui/Cronometro.svelte';
 	import Votar from '#lib/ui/Votar.svelte';
 	import AlertaCrise from '#lib/ui/AlertaCrise.svelte';
+	import FichaVotacao from '#lib/ui/FichaVotacao.svelte';
+	import FichaNota from '#lib/ui/FichaNota.svelte';
 	import { chamarAtencao } from '#lib/aparelho.ts';
 	import { untrack } from 'svelte';
 	import type { PageProps } from './$types';
@@ -50,6 +52,9 @@
 	const preside = $derived(!!minhaDelegacao && sessao?.presidencia?.id === minhaDelegacao && data.aoVivo?.fase === 'debate');
 	const posicao = $derived((sessao?.pedidos ?? []).findIndex((p) => p.delegacao?.id === minhaDelegacao));
 	const votacao = $derived(data.aoVivo?.votacao?.aberta ? data.aoVivo.votacao : null);
+	// Passo 47: as fichas da votação e da nota, sem sair da Agora.
+	let verVotacao = $state(false);
+	let notaVista = $state<string | null>(null);
 	// Passo 38: a votação que abre depois de a tela estar aberta chama a atenção.
 	let votacaoVista = untrack(() => votacao?.id ?? '');
 	$effect(() => {
@@ -131,7 +136,9 @@
 					<Cronometro cronometro={relogioDebate(estado)} avisoSeg={60} {diferenca} />
 				{/if}
 				{#if votacao}
-					<p class="destaque" id="a-votacao" tabindex="-1">{t('Votação aberta')}: {votacao.objeto}</p>
+					<p class="destaque" id="a-votacao" tabindex="-1">{t('Votação aberta')}:
+						<button class="abre-ficha" type="button" onclick={() => (verVotacao = true)}>{votacao.objeto}</button></p
+					>
 					<Votar votacaoId={votacao.id} escolhas={posso} {meuVoto} onerro={(m) => (erro = m)} />
 				{/if}
 				{#if data.aoVivo.fase !== 'plenaria' && minhaDelegacao && !restrita}
@@ -293,7 +300,7 @@
 					<li>
 						<span>
 							<span class="selo {SELO_NOTA[nota.status as StatusNota]}">{STATUS_NOTA[nota.status as StatusNota]}</span>
-							{nota.titulo}
+							<button class="abre-ficha" type="button" onclick={() => (notaVista = nota.id)}>{nota.titulo}</button>
 							<span class="detalhe">{nota.resposta}</span>
 						</span>
 					</li>
@@ -324,3 +331,12 @@
 	{/if}
 
 </div>
+
+<FichaVotacao
+	votacao={verVotacao ? votacao : null}
+	{sigla}
+	delegacoes={data.aoVivo?.delegacoes ?? []}
+	presentes={new Set((sessao?.presenca ?? []).map((p) => p.delegacao_id))}
+	onclose={() => (verVotacao = false)}
+/>
+<FichaNota nota={data.respostasCrise.find((n) => n.id === notaVista)} onclose={() => (notaVista = null)} />

@@ -20,6 +20,8 @@
 	import { semVoz } from '#lib/crise.ts';
 	import { relogioDebate, restanteSeg, temDebate } from '#lib/cronometro.ts';
 	import GradeVotos from '#lib/ui/GradeVotos.svelte';
+	import FichaVotacao from '#lib/ui/FichaVotacao.svelte';
+	import FichaPonto from '#lib/ui/FichaPonto.svelte';
 	import {
 		escolhasPermitidas,
 		ESCOLHAS,
@@ -56,6 +58,10 @@
 		presidePeloBureau ? pontosAbertos : pontosAbertos.filter((p) => p.status !== 'aberto' || p.aprovado_bureau)
 	);
 	let motivo = $state<Record<string, string>>({});
+	// Passo 47: as fichas da votação e do ponto, abertas pelo nome, sem mudar a URL.
+	let verVotacao = $state(false);
+	let pontoVisto = $state<string | null>(null);
+	const pontoDaFicha = $derived(sessao?.pontos.find((p) => p.id === pontoVisto));
 	const julgar = (ponto: string, emOrdem: boolean) =>
 		rpc('julgar_ponto', { p_ponto: ponto, p_em_ordem: emOrdem, p_motivo: emOrdem ? undefined : motivo[ponto] || undefined });
 	const lista = $derived(listaAtiva(data.lista, emDiscussao?.id, data.fase));
@@ -593,7 +599,7 @@
 			{#if votacao}
 				<section class="cartao cartao--destaque" aria-labelledby="t-votacao">
 					<h2 id="t-votacao">{votacao.aberta ? t('Votação aberta') : t('Última votação')}</h2>
-					<p class="destaque">{votacao.objeto}</p>
+					<p class="destaque"><button class="abre-ficha" type="button" onclick={() => (verVotacao = true)}>{votacao.objeto}</button></p>
 					{#if votacao.aberta}
 						<p>
 							<Contagem
@@ -673,30 +679,12 @@
 					<h2 id="t-julgar">{t('Bureau · pedidos para aprovar')}</h2>
 					<ul class="lista">
 						{#each paraJulgar as ponto (ponto.id)}
-							{@const nome = descreverPonto(ponto)}
 							<li>
-								<span>{nome} <span class="detalhe">{ponto.delegacao?.nome}{ponto.detalhe ? ` · ${ponto.detalhe}` : ''}</span></span>
-								<span class="acoes">
-									<button
-										class="botao botao--pequeno"
-										type="button"
-										aria-label={t('Em ordem: {pedido}, {delegacao}', { pedido: nome, delegacao: ponto.delegacao?.nome ?? '' })}
-										onclick={() => julgar(ponto.id, true)}>{t('Em ordem')}</button
-									>
-									<input
-										class="motivo"
-										maxlength="200"
-										placeholder={t('Motivo (opcional)')}
-										aria-label={t('Motivo da recusa: {pedido}', { pedido: nome })}
-										bind:value={motivo[ponto.id]} {@attach contador(motivo[ponto.id])}
-									/>
-									<button
-										class="botao botao--secundario botao--pequeno"
-										type="button"
-										aria-label={t('Fora de ordem: {pedido}, {delegacao}', { pedido: nome, delegacao: ponto.delegacao?.nome ?? '' })}
-										onclick={() => julgar(ponto.id, false)}>{t('Fora de ordem')}</button
-									>
-								</span>
+								<span
+									><button class="abre-ficha" type="button" onclick={() => (pontoVisto = ponto.id)}>{descreverPonto(ponto)}</button>
+									<span class="detalhe">{ponto.delegacao?.nome}{ponto.detalhe ? ` · ${ponto.detalhe}` : ''}</span></span
+								>
+								<span class="acoes">{@render julgarPonto(ponto)}</span>
 							</li>
 						{:else}
 							<li class="suave">{t('Nenhum pedido esperando o bureau.')}</li>
@@ -710,10 +698,9 @@
 				{#if !presidePeloBureau}<p class="suave">{t('A presidência concede os pedidos que o bureau aprovou.')}</p>{/if}
 				<ul class="lista">
 					{#each paraConceder as ponto (ponto.id)}
-						{@const nome = descreverPonto(ponto)}
 						<li>
 							<span>
-								{nome}
+								<button class="abre-ficha" type="button" onclick={() => (pontoVisto = ponto.id)}>{descreverPonto(ponto)}</button>
 								{#if ponto.aprovado_bureau && ponto.status === 'aberto'}<span class="selo selo--ok">{t('Aprovado pelo bureau')}</span>{/if}
 								<span class="detalhe"
 									>{ponto.delegacao?.nome}{ponto.detalhe ? ` · ${ponto.detalhe}` : ''}{ponto.tipo === 'voto_desconfianca'
@@ -721,47 +708,7 @@
 										: ''}</span
 								>
 							</span>
-							<span class="acoes">
-								{#if ponto.tipo === 'votacao_nominal' && ponto.status === 'aberto'}
-									<button
-										class="botao botao--pequeno"
-										type="button"
-										aria-label={`Reconhecer: ${nome}`}
-										onclick={() => rpc('responder_ponto', { p_ponto: ponto.id, p_status: 'aceito' })}>{t('Reconhecer')}</button
-									>
-								{:else if ehPonto(ponto.tipo)}
-									<button
-										class="botao botao--pequeno"
-										type="button"
-										aria-label={`Aceitar: ${nome}, ${ponto.delegacao?.nome}`}
-										onclick={() => rpc('responder_ponto', { p_ponto: ponto.id, p_status: 'aceito' })}>{t('Aceitar')}</button
-									>
-								{:else if ponto.status !== 'em_votacao'}
-									{#if ponto.status === 'aberto' && MOCOES_COM_LISTA.includes(ponto.tipo as TipoPonto)}
-										<button
-											class="botao botao--pequeno"
-											type="button"
-											aria-label={`Abrir lista especial: ${nome}`}
-											onclick={() => rpc('abrir_lista_especial', { p_ponto: ponto.id })}>{t('Abrir lista especial')}</button
-										>
-									{/if}
-									<button
-										class="botao botao--pequeno"
-										type="button"
-										aria-label={`Votar: ${nome}`}
-										onclick={() => rpc('abrir_votacao', { p_ponto: ponto.id })}>{t('Votar')}</button
-									>
-								{/if}
-								{#if ponto.status !== 'em_votacao'}
-									<button
-										class="botao botao--secundario botao--pequeno"
-										type="button"
-										aria-label={`${ehPonto(ponto.tipo) ? t('Recusar') : t('Fora de ordem')}: ${nome}, ${ponto.delegacao?.nome}`}
-										onclick={() => rpc('responder_ponto', { p_ponto: ponto.id, p_status: 'recusado' })}
-										>{ehPonto(ponto.tipo) ? t('Recusar') : t('Fora de ordem')}</button
-									>
-								{/if}
-							</span>
+							<span class="acoes">{@render concederPonto(ponto)}</span>
 						</li>
 					{:else}
 						<li class="suave">{t('Nenhum ponto ou moção.')}</li>
@@ -870,3 +817,93 @@
 		</div>
 	</div>
 {/if}
+
+{#snippet julgarPonto(ponto: (typeof paraJulgar)[number])}
+	{@const nome = descreverPonto(ponto)}
+	<button
+		class="botao botao--pequeno"
+		type="button"
+		aria-label={t('Em ordem: {pedido}, {delegacao}', { pedido: nome, delegacao: ponto.delegacao?.nome ?? '' })}
+		onclick={() => julgar(ponto.id, true)}>{t('Em ordem')}</button
+	>
+	<input
+		class="motivo"
+		maxlength="200"
+		placeholder={t('Motivo (opcional)')}
+		aria-label={t('Motivo da recusa: {pedido}', { pedido: nome })}
+		bind:value={motivo[ponto.id]} {@attach contador(motivo[ponto.id])}
+	/>
+	<button
+		class="botao botao--secundario botao--pequeno"
+		type="button"
+		aria-label={t('Fora de ordem: {pedido}, {delegacao}', { pedido: nome, delegacao: ponto.delegacao?.nome ?? '' })}
+		onclick={() => julgar(ponto.id, false)}>{t('Fora de ordem')}</button
+	>
+{/snippet}
+
+{#snippet concederPonto(ponto: (typeof paraConceder)[number])}
+	{@const nome = descreverPonto(ponto)}
+	{#if ponto.tipo === 'votacao_nominal' && ponto.status === 'aberto'}
+		<button
+			class="botao botao--pequeno"
+			type="button"
+			aria-label={`Reconhecer: ${nome}`}
+			onclick={() => rpc('responder_ponto', { p_ponto: ponto.id, p_status: 'aceito' })}>{t('Reconhecer')}</button
+		>
+	{:else if ehPonto(ponto.tipo)}
+		<button
+			class="botao botao--pequeno"
+			type="button"
+			aria-label={`Aceitar: ${nome}, ${ponto.delegacao?.nome}`}
+			onclick={() => rpc('responder_ponto', { p_ponto: ponto.id, p_status: 'aceito' })}>{t('Aceitar')}</button
+		>
+	{:else if ponto.status !== 'em_votacao'}
+		{#if ponto.status === 'aberto' && MOCOES_COM_LISTA.includes(ponto.tipo as TipoPonto)}
+			<button
+				class="botao botao--pequeno"
+				type="button"
+				aria-label={`Abrir lista especial: ${nome}`}
+				onclick={() => rpc('abrir_lista_especial', { p_ponto: ponto.id })}>{t('Abrir lista especial')}</button
+			>
+		{/if}
+		<button
+			class="botao botao--pequeno"
+			type="button"
+			aria-label={`Votar: ${nome}`}
+			onclick={() => rpc('abrir_votacao', { p_ponto: ponto.id })}>{t('Votar')}</button
+		>
+	{/if}
+	{#if ponto.status !== 'em_votacao'}
+		<button
+			class="botao botao--secundario botao--pequeno"
+			type="button"
+			aria-label={`${ehPonto(ponto.tipo) ? t('Recusar') : t('Fora de ordem')}: ${nome}, ${ponto.delegacao?.nome}`}
+			onclick={() => rpc('responder_ponto', { p_ponto: ponto.id, p_status: 'recusado' })}
+			>{ehPonto(ponto.tipo) ? t('Recusar') : t('Fora de ordem')}</button
+		>
+	{/if}
+{/snippet}
+
+{#snippet acoesDaFicha(ponto: (typeof paraConceder)[number])}
+	{#if ehMesa && !presidePeloBureau && paraJulgar.some((p) => p.id === ponto.id)}
+		{@render julgarPonto(ponto)}
+	{:else if paraConceder.some((p) => p.id === ponto.id)}
+		{@render concederPonto(ponto)}
+	{/if}
+{/snippet}
+
+<FichaVotacao
+	votacao={verVotacao ? votacao : null}
+	sigla={data.comite.sigla}
+	delegacoes={data.delegacoes}
+	presentes={new Set((sessao?.presenca ?? []).map((p) => p.delegacao_id))}
+	encerrar={() => votacao && rpc('encerrar_votacao', { p_votacao: votacao.id })}
+	onclose={() => (verVotacao = false)}
+/>
+<FichaPonto
+	ponto={pontoDaFicha}
+	sigla={data.comite.sigla}
+	assinaturas={assinaturasDesconfianca(data.regras.assinaturas_desconfianca_fracao, data.delegacoes)}
+	acoes={acoesDaFicha}
+	onclose={() => (pontoVisto = null)}
+/>

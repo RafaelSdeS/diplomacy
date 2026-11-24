@@ -8,11 +8,12 @@
 		rotulo?: string; // id do título, que dá nome ao modal
 		nome?: string; // ou o nome direto, quando não há título à vista (placa, leitura)
 		lateral?: boolean; // painel na lateral direita (fichas), em vez da caixa central
+		aberto?: boolean; // ou aberto pelo estado de quem usa (as fichas): true abre, false fecha
 		classe?: string;
 		onclose?: () => void;
 		children: Snippet;
 	};
-	let { rotulo, nome, lateral = false, classe = '', onclose, children }: Props = $props();
+	let { rotulo, nome, lateral = false, aberto, classe = '', onclose, children }: Props = $props();
 	let caixa = $state<HTMLDialogElement>();
 
 	export function abrir() {
@@ -21,6 +22,10 @@
 	export function fechar() {
 		caixa?.close();
 	}
+	$effect(() => {
+		if (aberto) abrir();
+		else if (aberto === false) fechar();
+	});
 
 	// Clique no fundo fecha, menos com texto digitado num campo (a busca não conta): ele se perderia.
 	const CAMPOS = 'textarea, input:not([type]), input[type=text], input[type=email], input[type=url], input[type=number]';

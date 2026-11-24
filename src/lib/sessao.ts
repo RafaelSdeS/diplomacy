@@ -50,7 +50,7 @@ export async function carregarSessao(comiteId: string) {
 					avisos:aviso_chegada(delegacao(id, nome, bandeira)),
 					proximos:proximo_orador(ordem, delegacao(id, nome, bandeira)),
 					pedidos:pedido_fala(id, pela_mesa, delegacao(id, nome, bandeira)),
-					pontos:ponto_mocao(id, tipo, detalhe, status, topico, minutos, aprovado_bureau, motivo, pela_mesa, delegacao(id, nome), assinaturas:assinatura_mocao(delegacao_id)),
+					pontos:ponto_mocao(id, tipo, detalhe, status, topico, minutos, aprovado_bureau, motivo, pela_mesa, delegacao(id, nome, bandeira), assinaturas:assinatura_mocao(delegacao_id)),
 					votacoes:votacao(id, objeto, tipo, regra, aberta, a_favor, contra, abstencoes, necessario,
 						aprovada, encerrada_em, nominal, partes, votos:voto(delegacao_id, escolha, registrado_pela_mesa),
 						passes:passe(delegacao_id)))`

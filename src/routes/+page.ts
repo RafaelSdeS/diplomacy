@@ -42,7 +42,7 @@ export const load: PageLoad = async ({ parent, depends }) => {
 		ler('respostas-crise', ['nota_crise'], () =>
 			supabase
 				.from('nota_crise')
-				.select('id, titulo, status, resposta, comite_id')
+				.select('id, tipo, titulo, texto, status, resposta, criado_em, comite_id')
 				.in('delegacao_id', delegacoes)
 				.not('resposta', 'is', null)
 				.order('respondida_em', { ascending: false })
