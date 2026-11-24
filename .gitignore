@@ -2,6 +2,8 @@
 .env
 .env.*
 !.env.example
+# Senhas de contas de teste da versão online (o repositório é público)
+*.local.md
 
 # Dados reais de inscritos ou de comitês (LGPD): nunca versionar
 dados-reais/

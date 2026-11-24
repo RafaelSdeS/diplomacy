@@ -14,7 +14,7 @@ Roteiro para testar o app com um grupo pequeno (passo 12), no formato do **mock*
    - A crise do Rio Aurora: seca, barragens e fronteiras;
    - Refugiados climáticos na fronteira norte.
 
-2. **Contas.** Uma por pessoa, fictícias e entregues na hora:
+2. **Contas.** Uma por pessoa, fictícias e entregues na hora. (O CSNU-T online já tem contas de teste para experimentar o app antes do dia; veja o README. O TREINO ainda não tem nenhuma.)
    - Crie cada conta no painel do Supabase: **Authentication → Users → Add user**, com **Auto Confirm User**. Use variações do seu e-mail, como `voce+brasil@gmail.com`, e uma senha simples por pessoa.
    - Entre como secretaria e convide cada conta em **Participantes**, com o papel, o comitê TREINO e, para delegados, a delegação.
 
