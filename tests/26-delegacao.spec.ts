@@ -23,8 +23,8 @@ test('do comitê à página dos EUA, com os dois delegados e o bilhete pronto', 
 
 	await page.getByRole('link', { name: 'Mandar bilhete' }).click();
 	await expect(page).toHaveURL(/\/comite\/CSNU-T\/mensagens\?para=/);
-	const para = page.getByRole('form', { name: 'Novo bilhete' }).getByRole('combobox', { name: /^Para/ });
-	await expect(para.locator('option:checked')).toHaveText('EUA');
+	// Passo 47: o destinatário vem escolhido no resumo do Escolha.
+	await expect(page.getByRole('form', { name: 'Novo bilhete' }).locator('.escolha-resumo')).toContainText('EUA');
 });
 
 test('a própria delegação não tem as ações de bilhete na sua página', async ({ page }, info) => {

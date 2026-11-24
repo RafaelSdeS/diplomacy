@@ -841,6 +841,7 @@ export const EN: Record<string, string> = {
 	'Detalhe': 'Detail',
 	'Assinaturas': 'Signatures',
 	'Ninguém escolhido': 'No one chosen',
+	'Nenhuma escolhida': 'None chosen',
 	'Pronto': 'Done',
 	'Pedido de entrevista de {veiculo}': 'Interview request from {veiculo}',
 	'Carta para {delegacao}': 'Letter to {delegacao}',

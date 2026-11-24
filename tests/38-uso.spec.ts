@@ -17,8 +17,12 @@ test('o bilhete em edição volta depois de recarregar; o filtro acha sem acento
 	await expect(bilhete).toHaveValue('Proposta de aliança no tópico 1');
 	await bilhete.fill('');
 
-	await page.getByRole('searchbox', { name: 'Filtrar' }).fill('arabia');
-	await expect(page.getByRole('combobox', { name: 'Para' }).locator('option')).toHaveText(['Arábia Saudita']);
+	// Passo 47: o filtro fica dentro do Escolha do destinatário.
+	await page.getByRole('button', { name: 'Escolher: Para' }).click();
+	const lista = page.getByRole('dialog', { name: 'Para' });
+	await lista.getByRole('searchbox', { name: 'Filtrar' }).fill('arabia');
+	await expect(lista.getByRole('radio', { disabled: false }).filter({ visible: true })).toHaveCount(1);
+	await expect(lista.getByRole('radio', { name: /^Arábia Saudita/ })).toBeVisible();
 });
 
 test('o tema escolhido no perfil sobrevive à recarga', async ({ page }) => {

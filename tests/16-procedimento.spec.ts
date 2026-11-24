@@ -1,6 +1,6 @@
 import { expect, test, type Browser, type Page } from '@playwright/test';
 import { contaDoTreino, DELEGACOES_TREINO, isolado } from '../scripts/delegacoes.ts';
-import { clienteComo, entrar } from './ajuda.ts';
+import { clienteComo, entrar, escolher } from './ajuda.ts';
 
 // Passo 39: a cópia do TREINO só deste arquivo (scripts/delegacoes.ts).
 const C = isolado('16');
@@ -98,7 +98,7 @@ test('com tecnologia restrita, a mesa registra falas e votos, e o telão acompan
 	const telao = await abrir(browser, 'mesa-oea@exemplo.test', '/telao/OEA-T', { width: 1920, height: 1080 });
 	const painel = await abrir(browser, 'mesa-oea@exemplo.test', '/comite/OEA-T/sessao/presidencia');
 	const registro = painel.getByRole('form', { name: 'Registrar pedido de fala' });
-	await registro.getByLabel('Delegação que levantou a placa').selectOption({ label: 'Brasil' });
+	await escolher(registro, 'Delegação que levantou a placa', 'Brasil');
 	await registro.getByRole('button', { name: 'Registrar pedido de fala' }).click();
 	await expect(telao.getByRole('complementary', { name: 'Próximos oradores' })).toContainText('Brasil', { timeout: 10_000 });
 

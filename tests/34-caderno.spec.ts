@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { contaDaDelegacao } from '../scripts/delegacoes.ts';
-import { CONTAS, entrar } from './ajuda.ts';
+import { CONTAS, entrar, escolher } from './ajuda.ts';
 
 // Passo 34: o caderno da delegação. Os EUA (dois delegados no seed) anotam sobre o Irã,
 // compartilham com a França, e a França só lê. Comitê CSNU-T.
@@ -17,7 +17,7 @@ test('os EUA anotam sobre o Irã, o outro delegado vê, e a França lê só o co
 	await page.goto(CADERNO);
 	await page.getByRole('tab', { name: 'Sobre as delegações' }).click();
 	const formulario = page.getByRole('form', { name: 'Nova anotação' });
-	await formulario.getByRole('combobox', { name: /^Sobre a delegação/ }).selectOption({ label: 'Irã' });
+	await escolher(formulario, 'Sobre a delegação', 'Irã');
 	await formulario.getByLabel('Anotação').fill(TEXTO);
 	await formulario.getByRole('button', { name: 'Salvar no caderno' }).click();
 	await expect(page.getByRole('status').filter({ hasText: 'Anotação salva.' })).toBeVisible();

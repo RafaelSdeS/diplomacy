@@ -2,7 +2,6 @@
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import Quando from '#lib/ui/Quando.svelte';
 	import { contador } from '#lib/contador.ts';
-	import { filtrarDelegacoes, LISTA_LONGA } from '#lib/filtro.ts';
 	import { guardarRascunho, lerRascunho } from '#lib/rascunho.ts';
 	import { t } from '#lib/i18n.svelte.ts';
 	import { untrack } from 'svelte';
@@ -14,6 +13,7 @@
 	import { supabase } from '#lib/supabase.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import ResponderEntrevista from '#lib/ui/ResponderEntrevista.svelte';
+	import Escolha from '#lib/ui/Escolha.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -37,7 +37,6 @@
 	const RASCUNHO = `bilhete:${untrack(() => data.comite.sigla)}`;
 	let texto = $state<Record<string, string>>({ bilhete: lerRascunho(RASCUNHO), mesa: '', interno: '', resposta: '' });
 	$effect(() => guardarRascunho(RASCUNHO, texto.bilhete));
-	let busca = $state('');
 	let para = $state(page.url.searchParams.get('para') ?? '');
 	let responderA = $state('');
 	let bloquear = $state('');
@@ -145,19 +144,15 @@
 					void enviar('bilhete', 'bilhete', para, t('Bilhete enviado.'));
 				}}
 			>
-				{#if data.delegacoes.length > LISTA_LONGA}
-					<label class="campo">{t('Filtrar')} <input type="search" bind:value={busca} /></label>
-				{/if}
-				<label class="campo">
-					{t('Para')}
-					<select required bind:value={para}>
-						{#each filtrarDelegacoes(data.delegacoes, busca).filter((d) => d.id !== eu.delegacao_id) as d (d.id)}
-							<option value={d.id} disabled={meBloquearam.has(d.id)}
-								>{d.nome}{meBloquearam.has(d.id) ? ` · ${t('não aceita seus bilhetes')}` : ''}</option
-							>
-						{/each}
-					</select>
-				</label>
+				<Escolha
+					unica
+					rotulo={t('Para')}
+					botao={t('Escolher')}
+					opcoes={data.delegacoes
+						.filter((d) => d.id !== eu.delegacao_id)
+						.map((d) => ({ ...d, desabilitada: meBloquearam.has(d.id), detalhe: meBloquearam.has(d.id) ? t('não aceita seus bilhetes') : undefined }))}
+					bind:valor={para}
+				/>
 				<label class="campo">
 					{t('Bilhete')}
 					<textarea required rows="3" maxlength="1000" bind:value={texto.bilhete} {@attach contador(texto.bilhete)}></textarea>
@@ -193,15 +188,13 @@
 				if (bloquear) void bloquearBilhetes(bloquear, true).then(() => (bloquear = ''));
 			}}
 		>
-			<label class="campo">
-				{t('Delegação')}
-				<select required bind:value={bloquear}>
-					<option value="">{t('Escolha')}</option>
-					{#each data.delegacoes.filter((d) => d.id !== eu.delegacao_id && !bloqueei.has(d.id)) as d (d.id)}
-						<option value={d.id}>{d.nome}</option>
-					{/each}
-				</select>
-			</label>
+			<Escolha
+				unica
+				rotulo={t('Delegação')}
+				botao={t('Escolher')}
+				opcoes={data.delegacoes.filter((d) => d.id !== eu.delegacao_id && !bloqueei.has(d.id))}
+				bind:valor={bloquear}
+			/>
 			<button class="botao botao--secundario">{t('Bloquear bilhetes desta delegação')}</button>
 		</form>
 		{#if meBloquearam.size}
@@ -313,12 +306,7 @@
 				void enviar('mesa', 'resposta', responderA, t('Resposta enviada.'));
 			}}
 		>
-			<label class="campo">
-				{t('Para a delegação')}
-				<select required bind:value={responderA}>
-					{#each data.delegacoes as d (d.id)}<option value={d.id}>{d.nome}</option>{/each}
-				</select>
-			</label>
+			<Escolha unica rotulo={t('Para a delegação')} botao={t('Escolher')} opcoes={data.delegacoes} bind:valor={responderA} />
 			<label class="campo">
 				{t('Resposta')}
 				<textarea required rows="2" maxlength="1000" bind:value={texto.resposta} {@attach contador(texto.resposta)}></textarea>

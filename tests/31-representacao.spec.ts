@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { isolado } from '../scripts/delegacoes.ts';
-import { comiteEmDebate, entrar } from './ajuda.ts';
+import { comiteEmDebate, entrar, escolher } from './ajuda.ts';
 
 // Passo 39: a cópia do CE-T só deste arquivo (scripts/delegacoes.ts).
 const C = isolado('31');
@@ -30,7 +30,7 @@ test('a mesa assume a Itália, levanta a placa por ela e deixa', async ({ page }
 	// Passo 43: assumir uma delegação fica num menu recolhido da barra do painel.
 	await page.locator('summary', { hasText: 'Assumir uma delegação' }).click();
 	const assumir = page.getByRole('region', { name: 'Assumir uma delegação' });
-	await assumir.getByRole('combobox', { name: /^Delegação/ }).selectOption({ label: 'Itália' });
+	await escolher(assumir, 'Delegação', 'Itália');
 	await assumir.getByRole('button', { name: 'Assumir' }).click();
 	await expect(assumir).toContainText('Você está no lugar de Itália.');
 

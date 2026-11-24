@@ -32,6 +32,7 @@
 		textoResultado,
 		type Escolha
 	} from '#lib/votacao.ts';
+	import ListaEscolha from '#lib/ui/Escolha.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -295,15 +296,13 @@
 									if (assumir) void rpc('representar', { p_comite: comite, p_delegacao: assumir });
 								}}
 							>
-								<label class="campo">
-									{t('Delegação')}
-									<select bind:value={assumir} required>
-										<option value="">{t('Escolha')}</option>
-										{#each paraAssumir as d (d.id)}
-											<option value={d.id}>{d.nome}{ausentes.has(d.id) ? ` · ${t('ausente')}` : ''}</option>
-										{/each}
-									</select>
-								</label>
+								<ListaEscolha
+									unica
+									rotulo={t('Delegação')}
+									botao={t('Escolher')}
+									opcoes={paraAssumir.map((d) => ({ ...d, detalhe: ausentes.has(d.id) ? t('ausente') : undefined }))}
+									bind:valor={assumir}
+								/>
 								<button class="botao botao--secundario botao--pequeno">{t('Assumir')}</button>
 							</form>
 						{/if}
@@ -419,12 +418,7 @@
 							if (pedidoDe) void rpc('registrar_pedido_fala', { p_comite: comite, p_delegacao: pedidoDe });
 						}}
 					>
-						<label class="campo">
-							{t('Delegação que levantou a placa')}
-							<select bind:value={pedidoDe}>
-								{#each data.delegacoes as d (d.id)}<option value={d.id}>{d.nome}</option>{/each}
-							</select>
-						</label>
+						<ListaEscolha unica rotulo={t('Delegação que levantou a placa')} botao={t('Escolher')} opcoes={data.delegacoes} bind:valor={pedidoDe} />
 						<button class="botao botao--secundario botao--pequeno">{t('Registrar pedido de fala')}</button>
 					</form>
 				{/if}

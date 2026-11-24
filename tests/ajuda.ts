@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { expect, type Page } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '../src/lib/database.types.ts';
 
@@ -20,6 +20,14 @@ export const CONTAS = {
  * Vai a uma tela do menu como a pessoa faria (passo 43): no notebook pela lateral; no
  * celular, o que não cabe na barra fica em "Mais".
  */
+/** Passo 47: escolhe uma opção no `Escolha` ("Escolher: rótulo" abre a lista num modal, que fecha ao escolher). */
+export async function escolher(escopo: Page | Locator, rotulo: string, nome: string) {
+	await escopo.getByRole('button', { name: `Escolher: ${rotulo}`, exact: true }).click();
+	const modal = ('page' in escopo ? escopo.page() : escopo).locator('dialog[open]');
+	await modal.getByRole('radio', { name: new RegExp(`^${nome}`) }).check();
+	await expect(modal).toBeHidden();
+}
+
 export async function irPeloMenu(page: Page, nome: string) {
 	const menu = page.getByRole('navigation', { name: 'Principal' });
 	const link = menu.getByRole('link', { name: nome, exact: true });

@@ -22,6 +22,7 @@
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import Bandeira from '#lib/ui/Bandeira.svelte';
 	import AlertaCrise from '#lib/ui/AlertaCrise.svelte';
+	import Escolha from '#lib/ui/Escolha.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -317,13 +318,7 @@
 				<legend>{t('Delegações atingidas (ficam sem voz)')}</legend>
 				{#each efeitos as e, i (i)}
 					<div class="acoes efeito">
-						<label class="campo">
-							{t('Delegação')}
-							<select required bind:value={e.delegacao_id}>
-								<option value="">{t('Escolha')}</option>
-								{#each data.delegacoes as d (d.id)}<option value={d.id}>{d.nome}</option>{/each}
-							</select>
-						</label>
+						<Escolha unica rotulo={t('Delegação')} botao={t('Escolher')} opcoes={data.delegacoes} bind:valor={e.delegacao_id} />
 						<label class="campo">{t('O que aconteceu com ela')} <input required maxlength="200" bind:value={e.texto} {@attach contador(e.texto)} /></label>
 						<label class="campo campo--curto">
 							{t('Minutos (vazio: até o fim)')}

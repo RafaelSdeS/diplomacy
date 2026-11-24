@@ -4,6 +4,7 @@
 	import { PAPEIS } from '#lib/papeis.ts';
 	import { supabase, type Papel } from '#lib/supabase.ts';
 	import Confirmar from '#lib/ui/Confirmar.svelte';
+	import Escolha from '#lib/ui/Escolha.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -116,15 +117,7 @@
 			</label>
 		{/if}
 		{#if papel === 'delegado'}
-			<label class="campo">
-				Delegação
-				<select required bind:value={delegacao}>
-					<option value="" disabled>Escolha a delegação</option>
-					{#each delegacoesDoComite as d (d.id)}
-						<option value={d.id}>{d.nome}</option>
-					{/each}
-				</select>
-			</label>
+			<Escolha unica rotulo="Delegação" botao="Escolher" opcoes={delegacoesDoComite} bind:valor={delegacao} />
 		{/if}
 		{#if erro}
 			<p class="erro" role="alert">{erro}</p>

@@ -12,6 +12,7 @@
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import Modal from '#lib/ui/Modal.svelte';
 	import NomeDelegacao from '#lib/ui/NomeDelegacao.svelte';
+	import Escolha from '#lib/ui/Escolha.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -102,13 +103,7 @@
 	<div role="tabpanel" aria-label={ABAS.find((a) => a.chave === aba)?.rotulo}>
 		<form class="formulario formulario--largo" onsubmit={salvar} aria-label={t('Nova anotação')}>
 			{#if aba === 'sobre'}
-				<label class="campo">
-					{t('Sobre a delegação')}
-					<select required bind:value={sobre}>
-						<option value="">{t('Escolha')}</option>
-						{#each outras as d (d.id)}<option value={d.id}>{d.nome}</option>{/each}
-					</select>
-				</label>
+				<Escolha unica rotulo={t('Sobre a delegação')} botao={t('Escolher')} opcoes={outras} bind:valor={sobre} />
 			{:else if aba === 'fala'}
 				<label class="campo">{t('Título da fala')} <input maxlength="120" bind:value={titulo} {@attach contador(titulo)} /></label>
 			{/if}

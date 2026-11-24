@@ -4,9 +4,20 @@
 	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
 	import X from '@lucide/svelte/icons/x';
 	import Modal from '#lib/ui/Modal.svelte';
+	import Escolha from '#lib/ui/Escolha.svelte';
 
 	// Referência visual do app e base dos testes de aparência. Não tem dados e não fica no menu.
 	let dialogo = $state<Modal>();
+	let escolhida = $state('br');
+	const paises = [
+		['ar', 'Argentina'],
+		['bo', 'Bolívia'],
+		['br', 'Brasil'],
+		['cl', 'Chile'],
+		['py', 'Paraguai'],
+		['pe', 'Peru'],
+		['uy', 'Uruguai']
+	].map(([bandeira, nome]) => ({ id: bandeira, nome, bandeira }));
 
 	const cores = [
 		['--cor-fundo', 'Fundo'],
@@ -77,6 +88,22 @@
 	<div class="linha">
 		<span class="carimbo">Aprovada</span>
 		<span class="carimbo carimbo--confidencial">Confidencial</span>
+	</div>
+</section>
+
+<section aria-labelledby="t-menus">
+	<h2 id="t-menus">Menus de escolha</h2>
+	<p class="suave">Até seis opções curtas: o menu nativo, com o visual do app. Listas de delegações: o Escolha.</p>
+	<div class="formulario">
+		<label class="campo campo--curto">
+			Tipo
+			<select>
+				<option>Nota urgente</option>
+				<option>Reportagem</option>
+				<option>Opinião</option>
+			</select>
+		</label>
+		<Escolha unica rotulo="Delegação" botao="Escolher" opcoes={paises} bind:valor={escolhida} />
 	</div>
 </section>
 

@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { contaDoTreino, isolado } from '../scripts/delegacoes.ts';
-import { clienteComo, entrar } from './ajuda.ts';
+import { clienteComo, entrar, escolher } from './ajuda.ts';
 
 // Passo 39: a cópia do TREINO só deste arquivo (scripts/delegacoes.ts).
 const C = isolado('35');
@@ -53,7 +53,7 @@ test('a crise deixa o Brasil sem voz, toma o telão e, no fim, devolve a voz', a
 	await lancar.getByLabel('Título').fill(TITULO);
 	await lancar.getByLabel('Briefing').fill('O delegado brasileiro foi sequestrado. O comitê tem 20 minutos para negociar.');
 	await lancar.getByRole('button', { name: 'Adicionar uma delegação atingida' }).click();
-	await lancar.getByRole('combobox', { name: /^Delegação/ }).selectOption({ label: 'Brasil' });
+	await escolher(lancar, 'Delegação', 'Brasil');
 	await lancar.getByLabel('O que aconteceu com ela').fill('Delegado sequestrado');
 	await lancar.getByRole('button', { name: 'Lançar a crise' }).click();
 	await expect(page.getByRole('status').filter({ hasText: 'Crise lançada.' })).toBeVisible();

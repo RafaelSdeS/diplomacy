@@ -1,7 +1,7 @@
 import { expect, test, type Browser, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { contaDaDelegacao, contaDoTreino } from '../scripts/delegacoes.ts';
-import { clienteComo, CONTAS, entrar } from './ajuda.ts';
+import { clienteComo, CONTAS, entrar, escolher } from './ajuda.ts';
 
 // Passo 17: bilhetes (pela caixa de saída), entrevista, edição do dia e coletiva.
 
@@ -32,7 +32,7 @@ test('um bilhete escrito sem rede chega uma vez só', async ({ browser }) => {
 
 	await brasil.context().setOffline(true);
 	const novo = brasil.getByRole('form', { name: 'Novo bilhete' });
-	await novo.getByLabel('Para').selectOption({ label: 'Chile' });
+	await escolher(novo, 'Para', 'Chile');
 	await novo.getByLabel('Bilhete').fill(texto);
 	await novo.getByRole('button', { name: 'Enviar bilhete' }).click();
 	await expect(brasil.getByText('1 para enviar')).toBeVisible();
@@ -51,7 +51,7 @@ test('um pedido de entrevista aceito aparece para os dois lados', async ({ brows
 	const tema = `A posição sobre o Iêmen ${Date.now()}`;
 	const press = await abrir(browser, CONTAS.press, '/press/entrevistas');
 	const pedido = press.getByRole('form', { name: 'Pedir entrevista' });
-	await pedido.getByLabel('Delegação').selectOption({ label: 'EUA' });
+	await escolher(pedido, 'Delegação', 'EUA');
 	await pedido.getByLabel('Tema').fill(tema);
 	await pedido.getByRole('button', { name: 'Pedir entrevista' }).click();
 	await expect(press.getByRole('status')).toHaveText('Pedido enviado à delegação.');
@@ -108,7 +108,7 @@ test('a Diretoria da Press abre a coletiva, e a press põe perguntas na pauta', 
 	const press = await abrir(browser, CONTAS.press, '/press/coletiva');
 	const pergunta = `Qual a resposta ao bloqueio? ${Date.now()}`;
 	const nova = press.getByRole('form', { name: 'Nova pergunta' });
-	await nova.getByLabel('Delegação').selectOption({ label: 'Brasil' });
+	await escolher(nova, 'Delegação', 'Brasil');
 	await nova.getByLabel('Pergunta').fill(pergunta);
 	await nova.getByRole('button', { name: 'Pôr na pauta' }).click();
 	await expect(press.getByRole('status')).toHaveText('Pergunta na pauta.');

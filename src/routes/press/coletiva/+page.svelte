@@ -9,6 +9,7 @@
 	import { mensagemDeErro } from '#lib/sessao.ts';
 	import { supabase } from '#lib/supabase.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
+	import Escolha from '#lib/ui/Escolha.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -95,12 +96,7 @@
 						pergunta = '';
 				}}
 			>
-				<label class="campo">
-					{t('Delegação')}
-					<select required bind:value={delegacao}>
-						{#each data.delegacoes as d (d.id)}<option value={d.id}>{d.nome}</option>{/each}
-					</select>
-				</label>
+				<Escolha unica rotulo={t('Delegação')} botao={t('Escolher')} opcoes={data.delegacoes} bind:valor={delegacao} />
 				<label class="campo">
 					{t('Pergunta')}
 					<input required maxlength="300" bind:value={pergunta} {@attach contador(pergunta)} />

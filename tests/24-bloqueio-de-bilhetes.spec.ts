@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { contaDaDelegacao } from '../scripts/delegacoes.ts';
-import { clienteComo, CONTAS, entrar } from './ajuda.ts';
+import { clienteComo, CONTAS, entrar, escolher } from './ajuda.ts';
 
 // Passo 24: os EUA bloqueiam os bilhetes do Irã; o Irã fica sabendo; o desbloqueio
 // libera de novo. Comitê CSNU-T, só mensagens (não mexe na sessão).
@@ -27,7 +27,7 @@ test('os EUA bloqueiam o Irã, que fica sabendo e não consegue escrever; o desb
 	await page.goto(MENSAGENS);
 	await expect(page.locator('[data-ao-vivo="sim"]')).toBeVisible({ timeout: 10_000 });
 	const bloqueios = page.getByRole('region', { name: 'Bloqueios' });
-	await bloqueios.getByRole('combobox', { name: /^Delegação/ }).selectOption({ label: 'Irã' });
+	await escolher(bloqueios, 'Delegação', 'Irã');
 	await bloqueios.getByRole('button', { name: 'Bloquear bilhetes desta delegação' }).click();
 	await expect(page.getByRole('status').filter({ hasText: 'Bilhetes de Irã bloqueados.' })).toBeVisible();
 	await expect(bloqueios.getByRole('button', { name: 'Desbloquear Irã' })).toBeVisible();
@@ -37,15 +37,20 @@ test('os EUA bloqueiam o Irã, que fica sabendo e não consegue escrever; o desb
 	await ira.goto(MENSAGENS);
 	await expect(ira.locator('[data-ao-vivo="sim"]')).toBeVisible({ timeout: 10_000 });
 	await expect(ira.getByRole('list', { name: 'Não aceitam bilhetes da sua delegação' })).toContainText('EUA');
-	const para = ira.getByRole('form', { name: 'Novo bilhete' }).getByRole('combobox', { name: /^Para/ });
-	await expect(para.locator('option', { hasText: 'EUA' })).toBeDisabled();
-	await expect(para.locator('option', { hasText: 'EUA' })).toContainText('não aceita seus bilhetes');
+	const novo = ira.getByRole('form', { name: 'Novo bilhete' });
+	const eua = ira.getByRole('dialog', { name: 'Para' }).getByRole('radio', { name: /^EUA/ });
+	await novo.getByRole('button', { name: 'Escolher: Para' }).click();
+	await expect(eua).toBeDisabled();
+	await expect(ira.getByRole('dialog', { name: 'Para' }).getByText('não aceita seus bilhetes')).toBeVisible();
+	await ira.keyboard.press('Escape');
 
 	// O desbloqueio chega ao Irã ao vivo, e o bilhete passa.
 	await bloqueios.getByRole('button', { name: 'Desbloquear Irã' }).click();
 	await expect(page.getByRole('status').filter({ hasText: 'Bilhetes de Irã desbloqueados.' })).toBeVisible();
-	await expect(para.locator('option', { hasText: 'EUA' })).toBeEnabled();
-	await para.selectOption({ label: 'EUA' });
+	await novo.getByRole('button', { name: 'Escolher: Para' }).click();
+	await expect(eua).toBeEnabled();
+	await ira.keyboard.press('Escape');
+	await escolher(novo, 'Para', 'EUA');
 	await ira.getByRole('form', { name: 'Novo bilhete' }).getByLabel('Bilhete').fill('Podemos conversar no intervalo?');
 	await ira.getByRole('button', { name: 'Enviar bilhete' }).click();
 	await expect(ira.getByRole('status').filter({ hasText: 'Bilhete enviado.' })).toBeVisible();
