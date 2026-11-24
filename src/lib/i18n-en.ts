@@ -842,6 +842,8 @@ export const EN: Record<string, string> = {
 	'Assinaturas': 'Signatures',
 	'Ninguém escolhido': 'No one chosen',
 	'Nenhuma escolhida': 'None chosen',
+	'Preside a sessão': 'Chairing the session',
+	'Sua delegação preside a sessão': 'Your delegation chairs the session',
 	'Suas anotações sobre as outras delegações e o debate': 'Your notes on the other delegations and the debate',
 	'Ler e escrever cartas diplomáticas': 'Read and write diplomatic letters',
 	'Escrever e enviar o seu DPO': 'Write and submit your position paper',

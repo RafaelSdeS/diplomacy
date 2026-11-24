@@ -22,6 +22,14 @@
 - **Leitura:** a prévia do passo 47 abre o PDF (no celular, um link para baixar), e a página do comitê ganha a lista "DPOs" com bandeira e tópico.
 - **Saem:** o editor de texto do DPO, a tela de impressão e o "Para avaliar" de DPOs. Os rascunhos de texto que existirem viram um PDF gerado pela impressão atual, uma vez, na migração.
 
+## A aba do DPO (pedido de 24/11/2026, à noite)
+
+"A aba para escrever o DPO pode ser melhorada." Enquanto o formato (arquivo ou texto) não for decidido, a aba melhora o que já existe:
+
+- **No topo:** os DPOs do comitê em cartões, com bandeira, delegação, tópico e situação; cada um abre a prévia.
+- **"Meu DPO":** um cartão por tópico, com a situação, a data de envio e uma ação clara ("Escrever", "Continuar", "Ver o comentário da mesa").
+- **A escrita:** uma tela focada, com o texto em parágrafos, contagem de palavras, referências em lista e prévia do documento impresso ao lado (no notebook).
+
 ## Decidido por padrão (confirme ou mude)
 
 - **Formato do arquivo:** só PDF, para ler igual em todo aparelho. DOCX abriria diferente em cada um.

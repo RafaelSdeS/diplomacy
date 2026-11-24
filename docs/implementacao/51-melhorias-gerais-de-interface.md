@@ -37,6 +37,21 @@
 
   A aba Caderno fica para ler e buscar. O registro é o da nota rápida do passo 46 (caixa de saída, sem rede também).
 
+**Lote 0b · Depois de usar o lote 0** (pedido de 24/11/2026, à noite). Antes do lote 1:
+
+- **Quem preside, à vista de todos.** Uma faixa com a bandeira e o nome de quem preside a sessão (a delegação sorteada ou a mesa), na sessão, na Agora, no painel e no telão. Para a delegação que preside: "Sua delegação preside a sessão", com o caminho para o painel.
+- **Modal central como padrão.** As fichas (delegação, votação, ponto, nota) e a prévia de documentos passam a abrir no centro, como os outros modais. O painel lateral fica só para o que precisa conviver com a tela (nenhum caso hoje).
+- **Na sessão, o "Anotar" vira modal.** A nota rápida do passo 46 deixa de ser uma caixa de texto solta na tela: um botão "Anotar" abre o modal, que guarda o contexto (quem falava) e o rascunho como antes.
+- **Os links da sessão viram botões** com ícone (Agenda, Votações, Notas de crise, Telão, Chamada), no desenho da aba Comitê.
+- **O caderno de qualquer lugar, para escrever e para ler.** O ícone do cabeçalho abre o caderno num modal: as anotações (com filtro por delegação e busca) e a nova anotação. Aberto a partir de uma delegação, já mostra as notas sobre ela.
+- **"Compartilhar com" com bandeiras e modal**, pelo `Escolha`, como o "Para" do bilhete, que também passa a mostrar as bandeiras.
+- **Mensagens reformulada.** Hoje a aba mistura bilhetes, conversa com a mesa, bloqueios e entrevistas numa página longa. Passa a ter:
+  - no topo, as ações em cartões (novo bilhete, falar com a mesa);
+  - os bilhetes agrupados por delegação, como conversas, com bandeira, a última mensagem e responder;
+  - a conversa com a mesa à parte;
+  - bloqueios e entrevistas como seções recolhidas, com contagem.
+- **A aba Comitê fica como está.** Ela é o modelo das outras.
+
 **Lote 1 · Presidência** (`/comite/<sigla>/sessao/presidencia`). Hoje empilha cerca de 13 blocos numa página: lista de oradores, próximos, pedidos de fala, chegadas, pausa, plenária, com a palavra, ajustes, votação, pedidos para aprovar, pontos e moções, projetos e emendas.
 
 - Sempre à vista: com a palavra, o cronômetro e a lista com os próximos.

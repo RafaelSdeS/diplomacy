@@ -45,8 +45,8 @@ const segundos = (texto: string | null) => {
 /** A delegação que preside agora, lida na tela da sessão. */
 async function presidencia(page: Page) {
 	await page.goto(SESSAO);
-	const linha = await page.getByText(/Presidência: /).first().textContent();
-	return linha!.match(/Presidência: ([^·\n]+)/)![1].trim();
+	// Passo 51: a faixa "Preside a sessão" mostra a bandeira e o nome de quem preside.
+	return (await page.locator('.quem-preside strong').textContent())!.trim();
 }
 
 async function semErrosDeAcessibilidade(page: Page) {
@@ -400,7 +400,9 @@ test('a presidência passada vai para a próxima delegação sorteada', async ({
 	await painel.getByRole('button', { name: 'Passar a presidência' }).click();
 	await painel.getByRole('dialog').getByRole('button', { name: 'Passar a presidência' }).click();
 	await expect(painel.getByText('Você não preside esta sessão.')).toBeVisible();
-	await expect(mesa.getByText(/Presidência: /)).not.toContainText(`Presidência: ${preside}`);
-	await expect(mesa.getByText(/Presidência: /)).not.toContainText('Presidência: Mesa');
+	const quem = mesa.locator('.quem-preside strong');
+	await expect(quem).not.toHaveText(preside);
+	await expect(quem).not.toHaveText('Mesa');
+	await expect(quem).not.toBeEmpty();
 	await Promise.all([painel, mesa].map((p) => p.context().close()));
 });

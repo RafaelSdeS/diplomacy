@@ -33,9 +33,15 @@
 	import AlertaCrise from '#lib/ui/AlertaCrise.svelte';
 	import { semVoz } from '#lib/crise.ts';
 	import NotaRapida from '#lib/ui/NotaRapida.svelte';
-	import { assinaturasDesconfianca, escolhasPermitidas, ETAPAS, FASES, listaAtiva, presidenciaEmVigor, textoResultado } from '#lib/votacao.ts';
+	import { assinaturasDesconfianca, escolhasPermitidas, ETAPAS, FASES, listaAtiva, textoResultado } from '#lib/votacao.ts';
 	import AcaoEmModal from '#lib/ui/AcaoEmModal.svelte';
 	import Hand from '@lucide/svelte/icons/hand';
+	import ClipboardCheck from '@lucide/svelte/icons/clipboard-check';
+	import ListOrdered from '@lucide/svelte/icons/list-ordered';
+	import Presentation from '@lucide/svelte/icons/presentation';
+	import Siren from '@lucide/svelte/icons/siren';
+	import Vote from '@lucide/svelte/icons/vote';
+	import QuemPreside from '#lib/ui/QuemPreside.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -172,19 +178,37 @@
 	{#if data.podePresidir}
 		<a class="botao" href={`/comite/${data.comite.sigla}/sessao/presidencia`}>{t('Painel da presidência')}</a>
 	{/if}
-	{#if ehMesa}<a href={`/comite/${data.comite.sigla}/sessao/chamada`}>{t('Chamada e rodízio')}</a>{/if}
-	<a href={`/comite/${data.comite.sigla}/sessao/agenda`}>{t('Agenda')}</a>
-	<a href={`/comite/${data.comite.sigla}/votacoes`}>{t('Votações')}</a>
-	{#if data.comite.crise_ligada && eu}<a href={`/comite/${data.comite.sigla}/crise`}>{t('Notas de crise')}</a>{/if}
-	<a href={`/telao/${data.comite.sigla}`}>{t('Telão')}</a>
+	<!-- Passo 51: botões com ícone, não links soltos. -->
+	{#if ehMesa}<a class="botao botao--secundario botao--pequeno" href={`/comite/${data.comite.sigla}/sessao/chamada`}
+			><ClipboardCheck aria-hidden="true" size={16} strokeWidth={1.75} /> {t('Chamada e rodízio')}</a
+		>{/if}
+	<a class="botao botao--secundario botao--pequeno" href={`/comite/${data.comite.sigla}/sessao/agenda`}
+		><ListOrdered aria-hidden="true" size={16} strokeWidth={1.75} /> {t('Agenda')}</a
+	>
+	<a class="botao botao--secundario botao--pequeno" href={`/comite/${data.comite.sigla}/votacoes`}
+		><Vote aria-hidden="true" size={16} strokeWidth={1.75} /> {t('Votações')}</a
+	>
+	{#if data.comite.crise_ligada && eu}<a class="botao botao--secundario botao--pequeno" href={`/comite/${data.comite.sigla}/crise`}
+			><Siren aria-hidden="true" size={16} strokeWidth={1.75} /> {t('Notas de crise')}</a
+		>{/if}
+	<a class="botao botao--secundario botao--pequeno" href={`/telao/${data.comite.sigla}`}
+		><Presentation aria-hidden="true" size={16} strokeWidth={1.75} /> {t('Telão')}</a
+	>
 </nav>
 
 {#if !data.estado || !sessao}
 	<p class="suave">{t('Nenhuma sessão aberta. A mesa abre a sessão.')}</p>
 {:else}
+	<QuemPreside
+		fase={data.fase}
+		mesaAssumiu={data.estado.mesa_assumiu}
+		presidencia={sessao.presidencia}
+		minhaDelegacao={eu?.delegacao_id}
+		sigla={data.comite.sigla}
+	/>
 	<p class="suave">
 		{FASES[data.fase]}{data.fase === 'plenaria' ? ` · ${ETAPAS[data.estado.etapa_plenaria].rotulo}` : ''} ·
-		{FORMAS[data.estado.forma]} · {t('Presidência')}: {presidenciaEmVigor(data.fase, data.estado.mesa_assumiu, sessao.presidencia?.nome)}
+		{FORMAS[data.estado.forma]}
 	</p>
 	{#if topicoAtual}
 		<p class="topico-atual">

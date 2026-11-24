@@ -1669,6 +1669,27 @@ kbd {
 }
 
 /* Passo 51: os modais de criar algo (bilhete, carta, nota de crise, anotação). */
+/* Passo 51: as fichas e a prévia no centro, como os outros modais. */
+dialog.ficha {
+	width: min(40rem, calc(100vw - 2rem));
+}
+
+/* Passo 51: quem preside a sessão, à vista de todos. */
+.quem-preside {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.4rem 0.6rem;
+	margin: 0.5rem 0;
+	padding: 0.5rem 0.75rem;
+	border-left: 3px solid var(--cor-fio-dourado);
+	background: var(--cor-marinho-suave);
+}
+
+.quem-preside--eu {
+	border-left-color: var(--cor-marinho);
+}
+
 dialog.modal-acao {
 	width: min(36rem, calc(100vw - 2rem));
 }

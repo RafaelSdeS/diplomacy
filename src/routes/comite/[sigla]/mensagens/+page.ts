@@ -12,7 +12,7 @@ export const load: PageLoad = async ({ parent, depends }) => {
 			.select('id, tipo, texto, oculta, criado_em, de_delegacao_id, para_delegacao_id, autor:pessoa(nome)')
 			.eq('comite_id', comite.id)
 			.order('criado_em'),
-		supabase.from('delegacao').select('id, nome').eq('comite_id', comite.id).order('nome'),
+		supabase.from('delegacao').select('id, nome, nome_oficial, bandeira').eq('comite_id', comite.id).order('nome'),
 		supabase.rpc('regras', { p_comite: comite.id }, { get: true }),
 		supabase
 			.from('entrevista')

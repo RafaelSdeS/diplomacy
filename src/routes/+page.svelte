@@ -17,6 +17,7 @@
 	import AlertaCrise from '#lib/ui/AlertaCrise.svelte';
 	import FichaVotacao from '#lib/ui/FichaVotacao.svelte';
 	import FichaNota from '#lib/ui/FichaNota.svelte';
+	import QuemPreside from '#lib/ui/QuemPreside.svelte';
 	import ResponderEntrevista from '#lib/ui/ResponderEntrevista.svelte';
 	import { invalidateAll } from '$app/navigation';
 	import { chamarAtencao } from '#lib/aparelho.ts';
@@ -120,6 +121,9 @@
 	{#if data.principal === 'delegado' && data.aoVivo}
 		<article class="cartao cartao--ao-vivo cartao--largo" aria-labelledby="c-ao-vivo">
 			<h2 id="c-ao-vivo">{t('Sessão ao vivo')} · {sigla}</h2>
+			{#if sessao && estado && !preside}
+				<QuemPreside fase={data.aoVivo.fase} mesaAssumiu={estado.mesa_assumiu} presidencia={sessao.presidencia} {minhaDelegacao} {sigla} />
+			{/if}
 			{#if !sessao || !estado}
 				<p class="suave">{t('Nenhuma sessão aberta.')}</p>
 			{:else}
