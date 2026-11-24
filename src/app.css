@@ -1694,6 +1694,17 @@ dialog.modal-acao {
 	width: min(36rem, calc(100vw - 2rem));
 }
 
+/* O caderno de qualquer tela: escrever em cima, ler embaixo (passo 51). */
+dialog.modal-caderno {
+	width: min(44rem, calc(100vw - 2rem));
+}
+
+.caderno-notas {
+	margin-top: 1.5rem;
+	padding-top: 1rem;
+	border-top: var(--linha);
+}
+
 dialog.escolha-modal {
 	width: min(36rem, calc(100vw - 2rem));
 }
@@ -2669,47 +2680,9 @@ dialog.modal-lateral {
 	line-height: 1.5;
 }
 
-/* Nota rápida da sessão (passo 46): no notebook, um cartão sempre aberto; no celular,
-   uma barra fixa acima do menu que abre como folha, sem mudar a posição de leitura. */
-.nota-rapida-barra {
-	display: flex;
+/* Nota rápida da sessão (passo 46): passo 51, um botão "Anotar" que abre o modal. */
+.nota-rapida {
 	align-items: center;
-	gap: 0.5rem;
-}
-
-.nota-rapida-barra h2 {
-	margin: 0;
-	flex: 1;
-}
-
-@media (max-width: 1023px) {
-	.sessao-colunas:has(.nota-rapida) {
-		padding-bottom: 4rem;
-	}
-
-	.nota-rapida {
-		position: fixed;
-		inset: auto 0 calc(var(--altura-nav) + env(safe-area-inset-bottom)) 0;
-		z-index: 6;
-		margin: 0;
-		max-height: calc(100dvh - var(--altura-nav) - 4rem);
-		overflow-y: auto;
-		border-width: 1px 0 0;
-	}
-
-	.nota-rapida:not(.aberta) .nota-rapida-corpo {
-		display: none;
-	}
-}
-
-@media (min-width: 1024px) {
-	.nota-rapida-alternar {
-		display: none;
-	}
-
-	.nota-rapida-barra .selo {
-		display: none;
-	}
 }
 
 /* Crise com prazo (passo 35): sóbria, sem piscar. */

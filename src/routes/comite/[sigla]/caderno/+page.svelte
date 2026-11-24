@@ -160,38 +160,20 @@
 						{#if a.tipo === 'fala'}
 							<button class="botao botao--pequeno" type="button" onclick={() => usarNaFala(a)}>{t('Usar na próxima fala')}</button>
 						{/if}
-						<details class="compartilhar">
-							<summary>{t('Compartilhar com…')}</summary>
-							<fieldset class="opcoes">
-								<legend>{t('Delegações que podem ler')}</legend>
-								{#each outras as d (d.id)}
-									<label class="opcao">
-										<input
-											type="checkbox"
-											value={d.id}
-											checked={(compartilhar[a.id] ?? a.compartilhada.map((c) => c.delegacao_id)).includes(d.id)}
-											onchange={(e) => {
-												const atual = compartilhar[a.id] ?? a.compartilhada.map((c) => c.delegacao_id);
-												compartilhar[a.id] = e.currentTarget.checked ? [...atual, d.id] : atual.filter((x) => x !== d.id);
-											}}
-										/>
-										{d.nome}{d.id === a.sobre_delegacao_id ? ` · ${t('é sobre ela')}` : ''}
-									</label>
-								{/each}
-								<button
-									class="botao botao--secundario botao--pequeno"
-									type="button"
-									onclick={() =>
-										executar(
-											supabase.rpc('compartilhar_anotacao', {
-												p_id: a.id,
-												p_delegacoes: compartilhar[a.id] ?? a.compartilhada.map((c) => c.delegacao_id)
-											}),
-											t('Compartilhamento salvo.')
-										)}>{t('Salvar o compartilhamento')}</button
-								>
-							</fieldset>
-						</details>
+						<!-- Passo 51: com bandeiras e modal, como o "Para" do bilhete; salva ao fechar a lista. -->
+						<Escolha
+							rotulo={t('Compartilhada com')}
+							botao={t('Compartilhar')}
+							vazio={t('Só a sua delegação')}
+							opcoes={outras.map((d) => ({ ...d, detalhe: d.id === a.sobre_delegacao_id ? t('é sobre ela') : undefined }))}
+							bind:escolhidos={
+								() => compartilhar[a.id] ?? a.compartilhada.map((c) => c.delegacao_id),
+								(v) => (compartilhar[a.id] = v)
+							}
+							onpronto={() =>
+								compartilhar[a.id] &&
+								executar(supabase.rpc('compartilhar_anotacao', { p_id: a.id, p_delegacoes: compartilhar[a.id] }), t('Compartilhamento salvo.'))}
+						/>
 						<button
 							class="botao botao--secundario botao--pequeno"
 							type="button"

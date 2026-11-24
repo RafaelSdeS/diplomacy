@@ -104,13 +104,15 @@ test('o delegado anota sobre uma delegação de qualquer tela, sem ir à aba Cad
 	test.skip(info.project.name !== 'notebook', 'uma tela basta');
 	const texto = `O Brasil quer mudar a cláusula 3 ${Date.now()}`;
 	await entrar(page, CHILE);
-	await page.getByRole('banner').getByRole('button', { name: 'Anotar no caderno' }).click();
-	const modal = page.getByRole('dialog', { name: 'Anotar no caderno' });
+	await page.getByRole('banner').getByRole('button', { name: 'Caderno' }).click();
+	const modal = page.getByRole('dialog', { name: 'Caderno' });
 	await escolher(modal, 'Sobre a delegação (opcional)', 'Brasil');
 	await modal.getByLabel('Anotação').fill(texto);
 	expect((await new AxeBuilder({ page }).include('dialog[open]').analyze()).violations).toEqual([]);
 	await modal.getByRole('button', { name: 'Guardar no caderno' }).click();
-	await expect(modal).toBeHidden();
+	// Passo 51 (lote 0b): o caderno também lê; a nota aparece na lista do próprio modal.
+	await expect(modal.getByRole('region', { name: /^Anotações recentes/ })).toContainText(texto);
+	await page.keyboard.press('Escape');
 
 	// A página da delegação mostra a nota, e o botão dela abre o mesmo modal já com o Brasil.
 	const chile = await clienteComo(CHILE);
@@ -119,4 +121,5 @@ test('o delegado anota sobre uma delegação de qualquer tela, sem ir à aba Cad
 	await expect(page.getByRole('region', { name: /^Suas anotações sobre Brasil/ })).toContainText(texto);
 	await page.getByRole('button', { name: 'Anotar sobre Brasil' }).click();
 	await expect(modal.locator('.escolha-resumo')).toContainText('Brasil');
+	await expect(modal.getByRole('region', { name: 'Anotado sobre Brasil' })).toContainText(texto);
 });

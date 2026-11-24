@@ -6,10 +6,12 @@
 	import { argsDaNota, contextoAgora, type Contexto, type TipoNota } from '#lib/nota-rapida.ts';
 	import { guardarRascunho, lerRascunho } from '#lib/rascunho.ts';
 	import { untrack } from 'svelte';
+	import NotebookPen from '@lucide/svelte/icons/notebook-pen';
+	import Modal from './Modal.svelte';
 
-	// Passo 46: a nota rápida e o rascunho da próxima fala, sempre à vista na sessão. No
-	// notebook é um cartão aberto ao lado de "Com a palavra"; no celular, uma folha que
-	// abre por cima da sessão, sem mudar a posição de leitura.
+	// Passo 46: a nota rápida e o rascunho da próxima fala, sem sair da sessão. Passo 51: um
+	// botão "Anotar" abre o modal no centro (como o resto do app); o rascunho e o contexto
+	// (quem falava quando a nota começou) continuam guardados no aparelho.
 	type Props = {
 		comite: { id: string; sigla: string };
 		estado: Parameters<typeof contextoAgora>[0];
@@ -31,7 +33,7 @@
 	let tipo = $state<TipoNota>(inicial);
 	let texto = $state(untrack(() => lerRascunho(chave(inicial))));
 	let contexto = $state<Contexto | null>(untrack(() => lerContexto(inicial)));
-	let aberta = $state(false);
+	let modal = $state<Modal>();
 	let enviando = $state(false);
 	let campo = $state<HTMLTextAreaElement>();
 
@@ -82,23 +84,24 @@
 		if (r.erro) return;
 		if (tipo === 'fala') guardarRascunho(chave('fala', 'id'), id);
 		else texto = '';
+		modal?.fechar();
 	}
 
-	function alternar() {
-		aberta = !aberta;
-		if (aberta) setTimeout(() => campo?.focus());
+	function abrir() {
+		modal?.abrir();
+		setTimeout(() => campo?.focus());
 	}
 </script>
 
-<article class="cartao nota-rapida" class:aberta aria-labelledby="c-nota-rapida">
-	<div class="nota-rapida-barra">
-		<h2 id="c-nota-rapida">{t('Anotar')}</h2>
-		{#if !aberta && texto.trim()}<span class="selo selo--info">{t('rascunho guardado')}</span>{/if}
-		<button class="botao botao--secundario botao--pequeno nota-rapida-alternar" type="button" aria-expanded={aberta} onclick={alternar}>
-			{aberta ? t('Fechar') : t('Abrir')}
-		</button>
-	</div>
-	<form class="formulario nota-rapida-corpo" onsubmit={guardar} aria-label={t('Anotar no caderno')}>
+<div class="acoes nota-rapida">
+	<button class="botao botao--secundario" type="button" onclick={abrir}
+		><NotebookPen aria-hidden="true" size={18} strokeWidth={1.75} /> {t('Anotar')}</button
+	>
+	{#if texto.trim()}<span class="selo selo--info">{t('rascunho guardado')}</span>{/if}
+</div>
+<Modal bind:this={modal} rotulo="c-nota-rapida" classe="modal-acao">
+	<h3 id="c-nota-rapida">{t('Anotar')}</h3>
+	<form class="formulario" onsubmit={guardar} aria-label={t('Anotar no caderno')}>
 		<fieldset class="opcoes">
 			<legend>{t('Tipo')}</legend>
 			<label class="opcao">
@@ -121,8 +124,8 @@
 		</label>
 		{#if tipo !== 'fala'}<p class="detalhe">{descricao}</p>{/if}
 		<div class="acoes">
-			<button class="botao botao--secundario botao--pequeno" disabled={enviando}>{t('Guardar no caderno')}</button>
-			<a class="botao botao--secundario botao--pequeno" href={`/comite/${comite.sigla}/caderno`}>{t('Abrir o caderno')}</a>
+			<button class="botao" disabled={enviando}>{t('Guardar no caderno')}</button>
+			<button class="botao botao--secundario" type="button" onclick={() => modal?.fechar()}>{t('Fechar')}</button>
 		</div>
 	</form>
-</article>
+</Modal>

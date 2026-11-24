@@ -33,13 +33,16 @@ async function darPalavra(nome: string) {
 
 const aoVivo = (page: Page) => expect(page.locator('[data-ao-vivo="sim"]')).toBeVisible({ timeout: 10_000 });
 
-test('no notebook, a nota fica à vista e não se perde com a troca de orador, a reconexão e a recarga', async ({ page }) => {
+test('a nota rápida não se perde com a troca de orador, a reconexão e a recarga', async ({ page }) => {
 	await darPalavra('Brasil');
 	await entrar(page, PARAGUAI);
 	await page.goto(SESSAO);
 	await aoVivo(page);
-	const nota = page.getByRole('article', { name: 'Anotar' });
-	await expect(nota).toBeInViewport();
+	// Passo 51: um botão "Anotar" abre a nota num modal; o rascunho continua guardado.
+	const anotar = page.getByRole('main').getByRole('button', { name: 'Anotar', exact: true });
+	const nota = page.getByRole('dialog', { name: 'Anotar' });
+	await expect(anotar).toBeInViewport();
+	await anotar.click();
 
 	await nota.getByRole('radio', { name: 'Sobre Brasil' }).check();
 	const texto = `O Brasil propõe um fundo para as barragens ${Date.now()}`;
@@ -58,11 +61,14 @@ test('no notebook, a nota fica à vista e não se perde com a troca de orador, a
 	await expect(nota.getByLabel('Nota rápida')).toHaveValue(texto);
 	await page.reload();
 	await aoVivo(page);
+	await anotar.click();
 	await nota.getByRole('radio', { name: 'Sobre Brasil' }).check();
 	await expect(nota.getByLabel('Nota rápida')).toHaveValue(texto);
 
 	await nota.getByRole('button', { name: 'Guardar no caderno' }).click();
 	await expect(page.getByText('Anotado no caderno.')).toBeVisible();
+	await expect(nota).toBeHidden();
+	await anotar.click();
 	await expect(nota.getByLabel('Nota rápida')).toHaveValue('');
 	const salva = (await (await clienteComo(PARAGUAI)).from('anotacao').select('tipo, sobre_delegacao_id, orador_delegacao_id, topico').eq('texto', texto).single()).data!;
 	expect(salva).toEqual({ tipo: 'sobre', sobre_delegacao_id: delegacoes.Brasil, orador_delegacao_id: delegacoes.Brasil, topico: 1 });
@@ -72,15 +78,19 @@ test('a próxima fala é uma só no caderno: guardar de novo atualiza a mesma', 
 	await entrar(page, PARAGUAI);
 	await page.goto(SESSAO);
 	await aoVivo(page);
-	const nota = page.getByRole('article', { name: 'Anotar' });
+	const anotar = page.getByRole('main').getByRole('button', { name: 'Anotar', exact: true });
+	const nota = page.getByRole('dialog', { name: 'Anotar' });
+	await anotar.click();
 	await nota.getByRole('radio', { name: 'Minha próxima fala' }).check();
 	const campo = nota.getByLabel('Rascunho da próxima fala');
 	const marca = String(Date.now());
 	await campo.fill(`Senhora presidente, ${marca}.`);
 	await nota.getByRole('button', { name: 'Guardar no caderno' }).click();
 	await expect(page.getByText('Fala guardada no caderno.')).toBeVisible();
+	await anotar.click();
 	await campo.fill(`Senhora presidente, ${marca}. O Paraguai propõe uma comissão.`);
 	await nota.getByRole('button', { name: 'Guardar no caderno' }).click();
+	await anotar.click();
 	await expect(campo).toHaveValue(/comissão/);
 
 	const delegado = await clienteComo(PARAGUAI);
@@ -91,19 +101,18 @@ test('a próxima fala é uma só no caderno: guardar de novo atualiza a mesma', 
 	await campo.fill('');
 });
 
-test('no celular, a nota é uma folha acima do menu que abre sem sair do lugar', async ({ browser }) => {
+test('no celular, o botão "Anotar" abre a nota, e o rascunho fica guardado', async ({ browser }) => {
 	const page = await (await browser.newContext({ viewport: { width: 360, height: 740 }, isMobile: true })).newPage();
 	await entrar(page, PARAGUAI);
 	await page.goto(SESSAO);
 	await aoVivo(page);
-	const nota = page.getByRole('article', { name: 'Anotar' });
-	await expect(nota).toBeInViewport();
-	await expect(nota.getByLabel('Nota rápida')).toBeHidden();
-	await nota.getByRole('button', { name: 'Abrir', exact: true }).click();
+	const anotar = page.getByRole('main').getByRole('button', { name: 'Anotar', exact: true });
+	const nota = page.getByRole('dialog', { name: 'Anotar' });
+	await anotar.click();
 	await expect(nota.getByLabel('Nota rápida')).toBeFocused();
 	await nota.getByLabel('Nota rápida').fill('Ver o mapa das barragens.');
 	await nota.getByRole('button', { name: 'Fechar', exact: true }).click();
-	await expect(nota.getByText('rascunho guardado')).toBeVisible();
+	await expect(page.getByRole('main').getByText('rascunho guardado')).toBeVisible();
 	await page.context().close();
 });
 

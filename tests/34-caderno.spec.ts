@@ -33,9 +33,11 @@ test('os EUA anotam sobre o Irã, o outro delegado vê, e a França lê só o co
 	await expect(outro.getByText(TEXTO)).toBeVisible();
 
 	// Compartilhar com a França: ela lê, mas não ganha botões.
-	await anotacao.getByText('Compartilhar com…').click();
-	await anotacao.getByRole('checkbox', { name: 'França' }).check();
-	await anotacao.getByRole('button', { name: 'Salvar o compartilhamento' }).click();
+	// Passo 51: com bandeiras e modal; salva ao fechar a lista.
+	await anotacao.getByRole('button', { name: 'Compartilhar: Compartilhada com' }).click();
+	const lista = page.getByRole('dialog', { name: 'Compartilhada com' });
+	await lista.getByRole('checkbox', { name: /^França/ }).check();
+	await lista.getByRole('button', { name: 'Pronto' }).click();
 	await expect(page.getByRole('status').filter({ hasText: 'Compartilhamento salvo.' })).toBeVisible();
 
 	const franca = await (await browser.newContext()).newPage();

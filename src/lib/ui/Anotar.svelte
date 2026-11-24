@@ -6,17 +6,41 @@
 	import { contador } from '#lib/contador.ts';
 	import { guardarRascunho, lerRascunho } from '#lib/rascunho.ts';
 	import { supabase } from '#lib/supabase.ts';
+	import { semAcento } from '#lib/filtro.ts';
+	import Bandeira from './Bandeira.svelte';
 	import Escolha from './Escolha.svelte';
+	import Quando from './Quando.svelte';
 	import Modal from './Modal.svelte';
 
-	// Passo 51 (lote 0): o caderno sem ir à aba Caderno. A delegação vem preenchida quando
-	// a pessoa anota a partir da ficha ou da página dela; o texto fica salvo no aparelho.
+	// Passo 51 (lotes 0 e 0b): o caderno de qualquer tela, para escrever e para ler. A
+	// delegação vem preenchida quando a pessoa abre a partir da ficha ou da página dela, e
+	// então a lista mostra o que já foi anotado sobre ela. O texto fica salvo no aparelho.
 	type Participacao = { papel: string; comite_id: string | null; comite_sigla: string | null; delegacao_id: string | null };
 	let { participacoes }: { participacoes: Participacao[] } = $props();
 	const eu = $derived(participacoes.find((p) => p.papel === 'delegado' && p.comite_id));
 
 	let modal = $state<Modal>();
 	let delegacoes = $state<{ id: string; nome: string; nome_oficial: string; bandeira: string | null }[]>([]);
+	type Nota = { id: string; tipo: string; titulo: string | null; texto: string; criado_em: string; delegacao_id: string; sobre_delegacao_id: string | null };
+	let notas = $state<Nota[]>([]);
+	let busca = $state('');
+	const nomeDe = (id: string | null) => delegacoes.find((d) => d.id === id);
+	// Aberto a partir de uma delegação, só as notas sobre ela; a busca procura no texto.
+	const visiveis = $derived(
+		notas
+			.filter((n) => !anotacao.sobre || n.sobre_delegacao_id === anotacao.sobre)
+			.filter((n) => !busca.trim() || semAcento(n.texto).includes(semAcento(busca.trim())))
+			.slice(0, 30)
+	);
+	async function lerNotas(comite: string) {
+		const { data } = await supabase
+			.from('anotacao')
+			.select('id, tipo, titulo, texto, criado_em, delegacao_id, sobre_delegacao_id')
+			.eq('comite_id', comite)
+			.order('criado_em', { ascending: false })
+			.limit(100);
+		notas = data ?? [];
+	}
 	let sobre = $state('');
 	let texto = $state('');
 	let erro = $state('');
@@ -29,12 +53,15 @@
 		texto = lerRascunho(RASCUNHO);
 		erro = '';
 		modal.abrir();
+		busca = '';
+		const comite = eu.comite_id;
 		void supabase
 			.from('delegacao')
 			.select('id, nome, nome_oficial, bandeira')
-			.eq('comite_id', eu.comite_id)
+			.eq('comite_id', comite)
 			.order('nome')
 			.then(({ data }) => (delegacoes = (data ?? []).filter((d) => d.id !== eu.delegacao_id)));
+		void lerNotas(comite);
 	});
 	$effect(() => guardarRascunho(RASCUNHO, texto));
 
@@ -57,13 +84,12 @@
 			return;
 		}
 		texto = '';
-		modal?.fechar();
-		await invalidate('app:caderno');
+		await Promise.all([invalidate('app:caderno'), lerNotas(eu.comite_id)]);
 	}
 </script>
 
-<Modal bind:this={modal} rotulo="anotar-titulo" classe="modal-acao" onclose={() => (anotacao.aberta = false)}>
-	<h3 id="anotar-titulo">{t('Anotar no caderno')}</h3>
+<Modal bind:this={modal} rotulo="anotar-titulo" classe="modal-acao modal-caderno" onclose={() => (anotacao.aberta = false)}>
+	<h3 id="anotar-titulo">{t('Caderno')}</h3>
 	<p class="suave">{t('Só a sua delegação lê o que anotar aqui.')}</p>
 	<form class="formulario" onsubmit={salvar}>
 		<Escolha unica rotulo={t('Sobre a delegação (opcional)')} botao={t('Escolher')} opcoes={delegacoes} bind:valor={sobre} />
@@ -74,7 +100,35 @@
 		{#if erro}<p class="erro" role="alert">{erro}</p>{/if}
 		<div class="acoes">
 			<button class="botao" disabled={enviando}>{t('Guardar no caderno')}</button>
-			<button class="botao botao--secundario" type="button" onclick={() => modal?.fechar()}>{t('Cancelar')}</button>
+			<button class="botao botao--secundario" type="button" onclick={() => modal?.fechar()}>{t('Fechar')}</button>
 		</div>
 	</form>
+
+	<section class="caderno-notas" aria-labelledby="caderno-notas-titulo">
+		<h4 id="caderno-notas-titulo">
+			{anotacao.sobre && nomeDe(anotacao.sobre) ? t('Anotado sobre {delegacao}', { delegacao: nomeDe(anotacao.sobre)!.nome }) : t('Anotações recentes')}
+		</h4>
+		<label class="campo">{t('Buscar nas anotações')} <input type="search" bind:value={busca} /></label>
+		<ul class="lista">
+			{#each visiveis as n (n.id)}
+				{@const sobreQuem = nomeDe(n.sobre_delegacao_id)}
+				<li>
+					<div>
+						<p class="texto-nota">{n.titulo ? `${n.titulo}: ` : ''}{n.texto}</p>
+						<span class="detalhe">
+							<Quando iso={n.criado_em} />
+							{#if sobreQuem}· <span class="com-bandeira"><Bandeira codigo={sobreQuem.bandeira} /> {sobreQuem.nome}</span>{/if}
+							{#if n.tipo === 'fala'}· {t('fala')}{/if}
+							{#if n.delegacao_id !== eu?.delegacao_id}· {t('compartilhada com você')}{/if}
+						</span>
+					</div>
+				</li>
+			{:else}
+				<li class="suave">{t('Nada anotado ainda.')}</li>
+			{/each}
+		</ul>
+		{#if eu?.comite_sigla}
+			<p><a class="botao botao--secundario botao--pequeno" href={`/comite/${eu.comite_sigla}/caderno`} onclick={() => modal?.fechar()}>{t('Abrir o caderno completo')}</a></p>
+		{/if}
+	</section>
 </Modal>

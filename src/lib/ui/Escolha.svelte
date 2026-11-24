@@ -9,8 +9,17 @@
 	// as setas, o Enter e o filtro. Com `botao`, a lista abre num modal e a tela mostra só o
 	// resumo do que foi escolhido. Com `unica`, escolhe uma só (`valor`), e o modal fecha ao escolher.
 	type Opcao = { id: string; nome: string; nome_oficial?: string | null; bandeira?: string | null; detalhe?: string; desabilitada?: boolean };
-	type Props = { rotulo: string; opcoes: Opcao[]; escolhidos?: string[]; unica?: boolean; valor?: string; botao?: string };
-	let { rotulo, opcoes, escolhidos = $bindable([]), unica = false, valor = $bindable(''), botao }: Props = $props();
+	type Props = {
+		rotulo: string;
+		opcoes: Opcao[];
+		escolhidos?: string[];
+		unica?: boolean;
+		valor?: string;
+		botao?: string;
+		vazio?: string; // o resumo quando nada foi escolhido
+		onpronto?: () => void; // ao fechar a lista (o compartilhar do caderno salva aqui)
+	};
+	let { rotulo, opcoes, escolhidos = $bindable([]), unica = false, valor = $bindable(''), botao, vazio, onpronto }: Props = $props();
 	const grupo = $props.id();
 
 	let busca = $state('');
@@ -74,12 +83,12 @@
 {#if botao}
 	<div class="escolha-resumo">
 		<span class="rotulo">{rotulo}</span>
-		<span class={resumo ? '' : 'suave'}>{resumo || (unica ? t('Nenhuma escolhida') : t('Ninguém escolhido'))}</span>
+		<span class={resumo ? '' : 'suave'}>{resumo || vazio || (unica ? t('Nenhuma escolhida') : t('Ninguém escolhido'))}</span>
 		<button class="botao botao--secundario botao--pequeno" type="button" aria-label={`${botao}: ${rotulo}`} onclick={() => modal?.abrir()}
 			>{botao}</button
 		>
 	</div>
-	<Modal bind:this={modal} nome={rotulo} classe="escolha-modal">
+	<Modal bind:this={modal} nome={rotulo} classe="escolha-modal" onclose={onpronto}>
 		{@render escolha()}
 		<div class="acoes"><button class="botao" type="button" onclick={() => modal?.fechar()}>{t('Pronto')}</button></div>
 	</Modal>

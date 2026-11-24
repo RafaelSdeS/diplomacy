@@ -244,8 +244,8 @@
 							<button
 								class="botao botao--secundario botao--pequeno botao--icone"
 								type="button"
-								aria-label={t('Anotar no caderno')}
-								title={t('Anotar no caderno')}
+								aria-label={t('Caderno')}
+								title={t('Caderno: anotar e ler')}
 								onclick={() => abrirAnotacao()}
 							>
 								<NotebookPen aria-hidden="true" size={16} strokeWidth={1.75} />
