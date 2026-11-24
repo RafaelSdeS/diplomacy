@@ -2,6 +2,9 @@
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { contador } from '#lib/contador.ts';
 	import { t } from '#lib/i18n.svelte.ts';
+	import Confirmar from '#lib/ui/Confirmar.svelte';
+	// "Encerrar a coletiva" fica fora do formulário de abrir: o modal tem o próprio
+	// <form method="dialog">, e formulário não se aninha.
 	import { invalidate } from '$app/navigation';
 	import { mensagemDeErro } from '#lib/sessao.ts';
 	import { supabase } from '#lib/supabase.ts';
@@ -67,15 +70,16 @@
 			<input required maxlength="200" bind:value={titulo} {@attach contador(titulo)} />
 		</label>
 		<button class="botao">{t('Abrir uma coletiva')}</button>
-		{#if data.coletiva?.aberta}
-			<button
-				class="botao botao--secundario"
-				type="button"
-				onclick={() => executar(supabase.rpc('encerrar_coletiva', { p_coletiva: data.coletiva!.id }), t('Coletiva encerrada.'))}
-				>{t('Encerrar a coletiva')}</button
-			>
-		{/if}
 	</form>
+	{#if data.coletiva?.aberta}
+		<Confirmar
+			rotulo={t('Encerrar a coletiva')}
+			classe="botao botao--secundario"
+			pergunta={t('Encerrar a coletiva?')}
+			explicacao={t('A press não pode mais enviar perguntas a esta coletiva.')}
+			acao={() => executar(supabase.rpc('encerrar_coletiva', { p_coletiva: data.coletiva!.id }), t('Coletiva encerrada.'))}
+		/>
+	{/if}
 {/if}
 
 {#if data.coletiva}

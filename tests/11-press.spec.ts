@@ -98,6 +98,7 @@ test('denunciada, a matéria é ocultada pela Diretoria da Press e some para os 
 	await expect(diretoria.getByRole('region', { name: 'Denúncias (1)' })).toContainText('Linguagem ofensiva.');
 	await diretoria.getByLabel('Motivo da ocultação').fill('Fere o decoro.');
 	await diretoria.getByRole('button', { name: 'Ocultar notícia' }).click();
+	await diretoria.getByRole('dialog').getByRole('button', { name: 'Ocultar notícia' }).click();
 	await expect(diretoria.getByRole('status')).toHaveText('Notícia ocultada.');
 	await expect(diretoria.getByRole('note', { name: 'Motivo da ocultação' })).toHaveText('Fere o decoro.');
 

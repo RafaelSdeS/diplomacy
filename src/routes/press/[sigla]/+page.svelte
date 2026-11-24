@@ -3,6 +3,7 @@
 	import Quando from '#lib/ui/Quando.svelte';
 	import { contador } from '#lib/contador.ts';
 	import { locale, t } from '#lib/i18n.svelte.ts';
+	import Confirmar from '#lib/ui/Confirmar.svelte';
 	import { invalidate } from '$app/navigation';
 	import { paragrafos } from '#lib/impressao.ts';
 	import { gerarImagem, hashtags, type Formato } from '#lib/imagem-redes.ts';
@@ -163,12 +164,13 @@
 							{t('Motivo da ocultação')}
 							<textarea rows="2" maxlength="500" bind:value={motivo} {@attach contador(motivo)}></textarea>
 						</label>
-						<button
-							class="botao botao--secundario"
-							type="button"
-							onclick={() => executar(supabase.rpc('ocultar_noticia', { p_noticia: noticia.id, p_motivo: motivo }), t('Notícia ocultada.'))}
-							>{t('Ocultar notícia')}</button
-						>
+						<Confirmar
+							rotulo={t('Ocultar notícia')}
+							classe="botao botao--secundario"
+							pergunta={t('Ocultar “{titulo}”?', { titulo: noticia.titulo })}
+							explicacao={t('A notícia deixa de aparecer para o evento. O motivo fica registrado.')}
+							acao={() => executar(supabase.rpc('ocultar_noticia', { p_noticia: noticia.id, p_motivo: motivo }), t('Notícia ocultada.'))}
+						/>
 					{/if}
 				</div>
 			{:else if !souPress}

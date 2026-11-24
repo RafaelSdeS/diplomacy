@@ -830,6 +830,10 @@ export const EN: Record<string, string> = {
 	// Passo 47
 	'Sair da conta?': 'Sign out?',
 	'Os dados desta sessão serão removidos deste aparelho.': 'The data from this session will be removed from this device.',
+	'Encerrar a coletiva?': 'Close the press conference?',
+	'A press não pode mais enviar perguntas a esta coletiva.': 'The press can no longer send questions to this press conference.',
+	'Ocultar “{titulo}”?': 'Hide “{titulo}”?',
+	'A notícia deixa de aparecer para o evento. O motivo fica registrado.': 'The article is no longer shown to the event. The reason is recorded.',
 	'{n}ª na fila': '#{n} in the queue',
 	'{veiculo} cita a sua delegação': '{veiculo} mentions your delegation',
 	'Última votação': 'Last vote',
