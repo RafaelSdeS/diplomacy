@@ -64,6 +64,19 @@
 
 **Preferências** (seção 23 de [melhorias-interface](../melhorias-interface.pdf)), num lote próprio: até cinco destinos favoritos, que aparecem no topo do "Ir para…" e do "Mais"; tamanho do texto e densidade no Perfil, guardados no aparelho, sem configuração a cada sessão.
 
+## Estado (24/11/2026)
+
+**Lote 0 feito:**
+
+- **Botões com fundo:** o secundário ganhou fundo claro. Os nomes que abrem fichas e prévias têm fundo, borda e uma seta, e a seta fica fora do nome acessível (`content: '›' / ''`). "Ler", "Abrir", "Responder" e "Imprimir" das listas têm cara de botão.
+- **Cabeçalho:** Perfil e Sair só com ícone, também no celular. O delegado tem o "Anotar no caderno" (`Anotar.svelte`, aberto por `abrirAnotacao()` de `ficha.svelte.ts`), que também está na ficha e na página da delegação, com a delegação já escolhida.
+- **Formulário vira botão e modal** (`AcaoEmModal.svelte`): novo bilhete e falar com a mesa, escrever carta, escrever à crise, nova anotação ou fala no caderno, pedir entrevista, nova pergunta da coletiva, ponto ou moção, novo bloco, novo documento, novo aviso e novo item do cronograma. O modal fecha quando a ação dá certo; o erro aparece dentro dele. Vindo de "Mandar bilhete" (`?para=`), o bilhete já abre.
+  - A proposta de agenda continua na página: é um editor longo, e a seção 5 de [melhorias-interface](../melhorias-interface.html) manda tarefa longa para página ou painel.
+- **Abas no modelo da aba Comitê:** a grade de atalhos virou `GradeAtalhos.svelte`, que a aba Comitê e a central de Documentos usam (DPO, Blocos, Cartas e Caderno no topo; os links soltos do fim dos cartões saíram).
+- **Testes:** `abrirAcao()` de `tests/ajuda.ts` abre o modal de uma ação.
+
+**Antes do lote 1:** você usa o app online por uns minutos, com as contas de teste, e diz se ficou claro.
+
 ## Fora desta etapa
 
 Itens que dependem de um segundo evento, habilidades especiais para delegações, edição livre simultânea e telas inteiras de personalização.

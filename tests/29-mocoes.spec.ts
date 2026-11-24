@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { isolado } from '../scripts/delegacoes.ts';
-import { clienteComo, comiteEmDebate, entrar, desfazerRapido } from './ajuda.ts';
+import { clienteComo, comiteEmDebate, entrar, desfazerRapido, abrirAcao } from './ajuda.ts';
 
 // Passo 39: a cópia do CE-T só deste arquivo (scripts/delegacoes.ts).
 const C = isolado('29');
@@ -35,6 +35,7 @@ test('o bureau recusa um pedido com motivo, e o delegado vê a etapa e o motivo'
 	await entrar(delegada, ALEMANHA);
 	await delegada.goto(`/comite/${C.sigla}/sessao`);
 	await aoVivo(delegada);
+	await abrirAcao(delegada, 'Fazer um ponto ou moção');
 	await delegada.getByLabel('Tipo').selectOption({ label: 'Moção de informal-informal' });
 	await delegada.getByLabel(/^Minutos \(até/).fill('10');
 	await delegada.getByRole('button', { name: 'Enviar à mesa' }).click();
@@ -63,6 +64,7 @@ test('a delegação retira o próprio pedido enquanto ele espera (passo 38)', as
 	await entrar(page, ALEMANHA);
 	await page.goto(`/comite/${C.sigla}/sessao`);
 	await aoVivo(page);
+	await abrirAcao(page, 'Fazer um ponto ou moção');
 	await page.getByLabel('Tipo').selectOption({ label: 'Ponto de dúvida' });
 	await page.getByRole('button', { name: 'Enviar à mesa' }).click();
 	await expect(page.getByRole('status').filter({ hasText: 'enviado à mesa' })).toBeVisible();

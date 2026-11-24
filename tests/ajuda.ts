@@ -20,6 +20,9 @@ export const CONTAS = {
  * Vai a uma tela do menu como a pessoa faria (passo 43): no notebook pela lateral; no
  * celular, o que não cabe na barra fica em "Mais".
  */
+/** Passo 51: abre o modal de uma ação de criar ("Novo bilhete", "Escrever carta"). */
+export const abrirAcao = (escopo: Page | Locator, nome: string) => escopo.getByRole('button', { name: nome, exact: true }).click();
+
 /** Passo 47: escolhe uma opção no `Escolha` ("Escolher: rótulo" abre a lista num modal, que fecha ao escolher). */
 export async function escolher(escopo: Page | Locator, rotulo: string, nome: string) {
 	await escopo.getByRole('button', { name: `Escolher: ${rotulo}`, exact: true }).click();

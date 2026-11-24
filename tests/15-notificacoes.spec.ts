@@ -1,7 +1,7 @@
 import { createECDH, randomBytes } from 'node:crypto';
 import { expect, test } from '@playwright/test';
 import { contaDoTreino } from '../scripts/delegacoes.ts';
-import { clienteComo, CONTAS, entrar } from './ajuda.ts';
+import { clienteComo, CONTAS, entrar, abrirAcao } from './ajuda.ts';
 
 // Passo 15 (bônus): notificações Web Push. O navegador de teste não fala com um serviço
 // de push de verdade: a assinatura do navegador é simulada, com chaves válidas, e a
@@ -50,6 +50,7 @@ test('a pessoa ativa no perfil, um aviso dispara o envio, e ela desativa', async
 	const secretaria = await contexto.newPage();
 	await entrar(secretaria, CONTAS.secretaria);
 	await secretaria.goto('/avisos');
+	await abrirAcao(secretaria, 'Novo aviso');
 	await secretaria.getByLabel('Aviso', { exact: true }).fill(`Teste de notificação ${Date.now()}`);
 	const [envio] = await Promise.all([
 		secretaria.waitForResponse((r) => r.url().includes('/functions/v1/enviar-push') && r.request().method() === 'POST'),

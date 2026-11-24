@@ -11,6 +11,8 @@
 	import { supabase } from '#lib/supabase.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import Escolha from '#lib/ui/Escolha.svelte';
+	import AcaoEmModal from '#lib/ui/AcaoEmModal.svelte';
+	import MailPlus from '@lucide/svelte/icons/mail-plus';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -29,6 +31,7 @@
 	$effect(() => guardarRascunho(RASCUNHO, corpo));
 	let erro = $state('');
 	let mensagem = $state('');
+	let escrever = $state<AcaoEmModal>();
 
 	const de = (c: (typeof data.cartas)[number]) => c.bloco_remetente?.nome ?? c.remetente?.nome ?? '';
 	const para = (c: (typeof data.cartas)[number]) =>
@@ -53,6 +56,7 @@
 			return;
 		}
 		mensagem = t('Carta enviada.');
+		escrever?.fechar();
 		titulo = corpo = '';
 		delegacoes = [];
 		blocos = [];
@@ -70,8 +74,57 @@
 </p>
 <h1>{t('Cartas diplomáticas')}</h1>
 
+{#if mensagem}
+	<p class="sucesso" role="status">{mensagem}</p>
+{/if}
 {#if eu}
-	<p class="acoes"><a class="botao" href="#t-escrever">{t('Escrever carta')}</a></p>
+	<div class="acoes">
+		<AcaoEmModal
+			bind:this={escrever}
+			rotulo={t('Escrever carta')}
+			icone={MailPlus}
+			descricao={t('Carta formal a outras delegações ou blocos, ou pública para todo o comitê.')}
+		>
+			<form class="formulario formulario--largo" onsubmit={enviar}>
+				<label class="campo">
+					{t('Em nome de')}
+					<select bind:value={remetente}>
+						<option value="">{eu.delegacao_nome}</option>
+						{#each meusBlocos as b (b.id)}
+							<option value={b.id}>{b.nome}</option>
+						{/each}
+					</select>
+				</label>
+				<label class="opcao"><input type="checkbox" bind:checked={publica} /> {t('Carta pública (todo o comitê lê)')}</label>
+				{#if !publica}
+					<Escolha
+						rotulo={t('Para as delegações')}
+						botao={t('Escolher')}
+						opcoes={data.delegacoes.filter((d) => d.id !== eu.delegacao_id)}
+						bind:escolhidos={delegacoes}
+					/>
+					{#if data.blocos.length}
+						<Escolha rotulo={t('Para os blocos')} botao={t('Escolher')} opcoes={data.blocos} bind:escolhidos={blocos} />
+					{/if}
+				{/if}
+				<label class="campo">
+					{t('Título')}
+					<input required maxlength="200" bind:value={titulo} {@attach contador(titulo)} />
+				</label>
+				<label class="campo">
+					{t('Carta')}
+					<textarea required maxlength="8000" rows="8" bind:value={corpo} {@attach contador(corpo)}></textarea>
+				</label>
+				{#if erro}
+					<p class="erro" role="alert">{erro}</p>
+				{/if}
+				<div class="acoes">
+					<button class="botao">{t('Enviar carta')}</button>
+					<button class="botao botao--secundario" type="button" onclick={() => escrever?.fechar()}>{t('Cancelar')}</button>
+				</div>
+			</form>
+		</AcaoEmModal>
+	</div>
 {/if}
 
 <section aria-labelledby="t-cartas">
@@ -92,46 +145,4 @@
 	</ul>
 </section>
 
-{#if eu}
-	<section aria-labelledby="t-escrever">
-		<h2 id="t-escrever">{t('Escrever carta')}</h2>
-		<form class="formulario formulario--largo" onsubmit={enviar}>
-			<label class="campo">
-				{t('Em nome de')}
-				<select bind:value={remetente}>
-					<option value="">{eu.delegacao_nome}</option>
-					{#each meusBlocos as b (b.id)}
-						<option value={b.id}>{b.nome}</option>
-					{/each}
-				</select>
-			</label>
-			<label class="opcao"><input type="checkbox" bind:checked={publica} /> {t('Carta pública (todo o comitê lê)')}</label>
-			{#if !publica}
-				<Escolha
-					rotulo={t('Para as delegações')}
-					botao={t('Escolher')}
-					opcoes={data.delegacoes.filter((d) => d.id !== eu.delegacao_id)}
-					bind:escolhidos={delegacoes}
-				/>
-				{#if data.blocos.length}
-					<Escolha rotulo={t('Para os blocos')} botao={t('Escolher')} opcoes={data.blocos} bind:escolhidos={blocos} />
-				{/if}
-			{/if}
-			<label class="campo">
-				{t('Título')}
-				<input required maxlength="200" bind:value={titulo} {@attach contador(titulo)} />
-			</label>
-			<label class="campo">
-				{t('Carta')}
-				<textarea required maxlength="8000" rows="8" bind:value={corpo} {@attach contador(corpo)}></textarea>
-			</label>
-			{#if erro}
-				<p class="erro" role="alert">{erro}</p>
-			{/if}
-			{#if mensagem}
-				<p class="sucesso" role="status">{mensagem}</p>
-			{/if}
-			<button class="botao">{t('Enviar carta')}</button>
-		</form>
-	</section>
-{/if}
+

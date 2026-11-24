@@ -90,8 +90,10 @@ test('delegado: Documentos reúne o que se escreve, e o "Voltar" volta para lá'
 	await entrar(page, EUA);
 	await irPeloMenu(page, 'Documentos');
 	await expect(page.getByRole('heading', { level: 1, name: 'Documentos' })).toBeVisible();
-	for (const nome of ['Seu DPO', 'Dos seus blocos', 'Cartas', 'Caderno da delegação', 'Do comitê'])
+	for (const nome of ['Seu DPO', 'Dos seus blocos', 'Cartas', 'Do comitê'])
 		await expect(page.getByRole('region', { name: nome })).toBeVisible();
+	// Passo 51: as ações da área em cartões, como na aba Comitê.
+	await expect(page.getByRole('navigation', { name: 'Atalhos de documentos' }).getByRole('link')).toHaveText([/^\s*DPO/, /^\s*Blocos/, /^\s*Cartas/, /^\s*Caderno/]);
 	await semErrosDeAcessibilidade(page);
 
 	await page.getByRole('region', { name: 'Seu DPO' }).getByRole('link').first().click();

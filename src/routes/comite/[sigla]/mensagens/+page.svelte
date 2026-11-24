@@ -13,6 +13,9 @@
 	import { supabase } from '#lib/supabase.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import ResponderEntrevista from '#lib/ui/ResponderEntrevista.svelte';
+	import AcaoEmModal from '#lib/ui/AcaoEmModal.svelte';
+	import MessageSquarePlus from '@lucide/svelte/icons/message-square-plus';
+	import Send from '@lucide/svelte/icons/send';
 	import Escolha from '#lib/ui/Escolha.svelte';
 	import type { PageProps } from './$types';
 
@@ -33,6 +36,12 @@
 
 	let erro = $state('');
 	let mensagem = $state('');
+	let novoBilhete = $state<AcaoEmModal>();
+	let falarComMesa = $state<AcaoEmModal>();
+	// Vindo de "Mandar bilhete" (?para=), o bilhete já abre com o destinatário escolhido.
+	$effect(() => {
+		if (novoBilhete && untrack(() => page.url.searchParams.has('para'))) novoBilhete.abrir();
+	});
 	// O bilhete em edição fica guardado no aparelho (passo 38).
 	const RASCUNHO = `bilhete:${untrack(() => data.comite.sigla)}`;
 	let texto = $state<Record<string, string>>({ bilhete: lerRascunho(RASCUNHO), mesa: '', interno: '', resposta: '' });
@@ -60,7 +69,12 @@
 			rotulo: tipo === 'bilhete' ? t('Bilhete para {delegacao}', { delegacao: nome(destino) }) : t('Mensagem')
 		});
 		({ erro, mensagem } = mensagemDoEnvio(resultado, enviado));
-		if (!erro) texto[campo] = '';
+		if (!erro) {
+			texto[campo] = '';
+			// Passo 51: o modal fecha quando a mensagem sai (ou fica guardada para sair depois).
+			if (tipo === 'bilhete') novoBilhete?.fechar();
+			if (tipo === 'mesa') falarComMesa?.fechar();
+		}
 		await invalidate('app:mensagens');
 	}
 
@@ -112,6 +126,44 @@
 {#if eu}
 	<section aria-labelledby="t-bilhetes">
 		<h2 id="t-bilhetes">{t('Bilhetes')}</h2>
+		{#if !data.regras.bilhetes_bloqueados}
+			<div class="acoes">
+				<AcaoEmModal
+					bind:this={novoBilhete}
+					rotulo={t('Novo bilhete')}
+					icone={MessageSquarePlus}
+					descricao={t('Um recado curto para outra delegação, durante a sessão.')}
+				>
+					<form
+						class="formulario"
+						aria-label={t('Novo bilhete')}
+						onsubmit={(e) => {
+							e.preventDefault();
+							void enviar('bilhete', 'bilhete', para, t('Bilhete enviado.'));
+						}}
+					>
+						<Escolha
+							unica
+							rotulo={t('Para')}
+							botao={t('Escolher')}
+							opcoes={data.delegacoes
+								.filter((d) => d.id !== eu.delegacao_id)
+								.map((d) => ({ ...d, desabilitada: meBloquearam.has(d.id), detalhe: meBloquearam.has(d.id) ? t('não aceita seus bilhetes') : undefined }))}
+							bind:valor={para}
+						/>
+						<label class="campo">
+							{t('Bilhete')}
+							<textarea required rows="3" maxlength="1000" bind:value={texto.bilhete} {@attach contador(texto.bilhete)}></textarea>
+						</label>
+						{#if erro}<p class="erro">{erro}</p>{/if}
+						<div class="acoes">
+							<button class="botao">{t('Enviar bilhete')}</button>
+							<button class="botao botao--secundario" type="button" onclick={() => novoBilhete?.fechar()}>{t('Cancelar')}</button>
+						</div>
+					</form>
+				</AcaoEmModal>
+			</div>
+		{/if}
 		<ul class="lista">
 			{#each do_tipo('bilhete') as m (m.id)}
 				<li>
@@ -135,31 +187,6 @@
 				<li class="suave">{t('Nenhum bilhete.')}</li>
 			{/each}
 		</ul>
-		{#if !data.regras.bilhetes_bloqueados}
-			<form
-				class="formulario"
-				aria-label={t('Novo bilhete')}
-				onsubmit={(e) => {
-					e.preventDefault();
-					void enviar('bilhete', 'bilhete', para, t('Bilhete enviado.'));
-				}}
-			>
-				<Escolha
-					unica
-					rotulo={t('Para')}
-					botao={t('Escolher')}
-					opcoes={data.delegacoes
-						.filter((d) => d.id !== eu.delegacao_id)
-						.map((d) => ({ ...d, desabilitada: meBloquearam.has(d.id), detalhe: meBloquearam.has(d.id) ? t('não aceita seus bilhetes') : undefined }))}
-					bind:valor={para}
-				/>
-				<label class="campo">
-					{t('Bilhete')}
-					<textarea required rows="3" maxlength="1000" bind:value={texto.bilhete} {@attach contador(texto.bilhete)}></textarea>
-				</label>
-				<button class="botao">{t('Enviar bilhete')}</button>
-			</form>
-		{/if}
 	</section>
 
 	<section aria-labelledby="t-bloqueios">
@@ -209,6 +236,34 @@
 
 	<section aria-labelledby="t-com-mesa">
 		<h2 id="t-com-mesa">{t('Com a mesa')}</h2>
+		<div class="acoes">
+			<AcaoEmModal
+				bind:this={falarComMesa}
+				secundario
+				rotulo={t('Falar com a mesa')}
+				icone={Send}
+				descricao={t('Dúvidas e pedidos privados: só a mesa lê.')}
+			>
+				<form
+					class="formulario"
+					aria-label={t('Mensagem à mesa')}
+					onsubmit={(e) => {
+						e.preventDefault();
+						void enviar('mesa', 'mesa', null, t('Mensagem enviada à mesa.'));
+					}}
+				>
+					<label class="campo">
+						{t('Mensagem à mesa')}
+						<textarea required rows="3" maxlength="1000" bind:value={texto.mesa} {@attach contador(texto.mesa)}></textarea>
+					</label>
+					{#if erro}<p class="erro">{erro}</p>{/if}
+					<div class="acoes">
+						<button class="botao">{t('Enviar à mesa')}</button>
+						<button class="botao botao--secundario" type="button" onclick={() => falarComMesa?.fechar()}>{t('Cancelar')}</button>
+					</div>
+				</form>
+			</AcaoEmModal>
+		</div>
 		<ul class="lista">
 			{#each do_tipo('mesa') as m (m.id)}
 				<li><span><strong>{m.de_delegacao_id ? t('Sua delegação') : t('Mesa')}:</strong> {m.texto} <span class="detalhe"><Quando iso={m.criado_em} /></span></span></li>
@@ -216,20 +271,6 @@
 				<li class="suave">{t('Dúvidas e pedidos privados à mesa aparecem aqui.')}</li>
 			{/each}
 		</ul>
-		<form
-			class="formulario"
-			aria-label={t('Mensagem à mesa')}
-			onsubmit={(e) => {
-				e.preventDefault();
-				void enviar('mesa', 'mesa', null, t('Mensagem enviada à mesa.'));
-			}}
-		>
-			<label class="campo">
-				{t('Mensagem à mesa')}
-				<textarea required rows="2" maxlength="1000" bind:value={texto.mesa} {@attach contador(texto.mesa)}></textarea>
-			</label>
-			<button class="botao botao--secundario">{t('Enviar à mesa')}</button>
-		</form>
 	</section>
 
 	{@const minhas = data.entrevistas.filter((e) => e.delegacao_id === eu.delegacao_id)}

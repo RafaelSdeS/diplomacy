@@ -1,6 +1,6 @@
 import { expect, test, type Browser, type BrowserContext, type Page } from '@playwright/test';
 import { contaDoTreino, isolado } from '../scripts/delegacoes.ts';
-import { clienteComo, entrar, sair, pedirSaida } from './ajuda.ts';
+import { clienteComo, entrar, sair, pedirSaida, abrirAcao } from './ajuda.ts';
 
 // Passo 44: num aparelho compartilhado, uma conta nunca vê o que outra leu; sair apaga
 // tudo; o cache offline vale 12 horas e nunca guarda o que é sensível.
@@ -123,6 +123,7 @@ test('notas de crise e o texto da coletiva nunca ficam no cache; sem rede, a tel
 	await contexto.setOffline(true);
 	await page.goto(CRISE);
 	await expect(page.getByText('as notas não ficam guardadas no aparelho')).toBeVisible();
+	await abrirAcao(page, 'Escrever à crise');
 	await expect(page.getByLabel('Título')).toBeVisible();
 	await contexto.close();
 });
@@ -140,6 +141,7 @@ test('sair com itens na caixa de saída avisa; "enviar agora" envia e só depois
 	await expect(page.locator('[data-ao-vivo="sim"]')).toBeVisible({ timeout: 10_000 });
 	const titulo = `Comportas ${Date.now()}`;
 	await contexto.setOffline(true);
+	await abrirAcao(page, 'Escrever à crise');
 	await page.getByLabel('Título').fill(titulo);
 	await page.getByLabel('Texto').fill('O Paraguai pede a abertura das comportas.');
 	await page.getByRole('button', { name: 'Enviar à crise' }).click();

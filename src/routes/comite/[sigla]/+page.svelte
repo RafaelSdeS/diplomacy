@@ -15,6 +15,7 @@
 	import Siren from '@lucide/svelte/icons/siren';
 	import Users from '@lucide/svelte/icons/users';
 	import Vote from '@lucide/svelte/icons/vote';
+	import GradeAtalhos, { type Atalho } from '#lib/ui/GradeAtalhos.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -27,7 +28,6 @@
 	const minha = $derived(data.participacoes.find((p) => p.papel === 'delegado' && p.comite_id === data.comite.id)?.delegacao_id);
 
 	// Passo 43: o que se faz no comitê, em atalhos que dizem para que servem.
-	type Atalho = { href: string; rotulo: string; descricao: string; icone: typeof Gavel; externo?: boolean };
 	const atalhos = $derived(
 		[
 			ehMesa
@@ -69,19 +69,7 @@
 	</ol>
 </section>
 
-<nav aria-label={t('Atalhos do comitê')}>
-	<ul class="grade-atalhos">
-		{#each atalhos as a (a.href)}
-			<li>
-				<a href={a.href} target={a.externo ? '_blank' : undefined} rel={a.externo ? 'noopener' : undefined}>
-					<a.icone aria-hidden="true" size={24} strokeWidth={1.5} />
-					<span class="grade-atalhos-nome">{a.rotulo}</span>
-					<span class="grade-atalhos-descricao">{a.descricao}</span>
-				</a>
-			</li>
-		{/each}
-	</ul>
-</nav>
+<GradeAtalhos nome={t('Atalhos do comitê')} {atalhos} />
 
 <section aria-labelledby="t-mesa">
 	<h2 id="t-mesa">{t('Mesa')}</h2>

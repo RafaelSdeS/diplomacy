@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { CONTAS, entrar, irPeloMenu, sair } from './ajuda.ts';
+import { CONTAS, entrar, irPeloMenu, sair, abrirAcao } from './ajuda.ts';
 
 // Hora fixa no primeiro dia do evento de teste (seed), durante a Sessão 1. Fica no
 // passado: com o relógio depois do vencimento da sessão, o login seria renovado o tempo todo.
@@ -61,6 +61,7 @@ test('a secretaria adiciona e remove um item do cronograma', async ({ page }, in
 	await entrar(page, CONTAS.secretaria);
 	await page.goto('/cronograma');
 
+	await abrirAcao(page, 'Novo item');
 	await page.getByLabel('Título').fill(titulo);
 	await page.getByLabel('Local').fill('Sala 101');
 	await page.getByLabel('Início').fill('2026-11-11T15:00');
@@ -83,6 +84,7 @@ test('um aviso da secretaria chega ao delegado sem recarregar', async ({ page, b
 	const secretaria = await browser.newPage();
 	await entrar(secretaria, CONTAS.secretaria);
 	await secretaria.goto('/avisos');
+	await abrirAcao(secretaria, 'Novo aviso');
 	await secretaria.getByLabel('Aviso', { exact: true }).fill(texto);
 	await secretaria.getByRole('button', { name: 'Publicar' }).click();
 	await expect(secretaria.getByRole('listitem').filter({ hasText: texto })).toBeVisible();

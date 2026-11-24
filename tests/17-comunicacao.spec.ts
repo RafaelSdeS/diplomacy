@@ -1,7 +1,7 @@
 import { expect, test, type Browser, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { contaDaDelegacao, contaDoTreino } from '../scripts/delegacoes.ts';
-import { clienteComo, CONTAS, entrar, escolher } from './ajuda.ts';
+import { clienteComo, CONTAS, entrar, escolher, abrirAcao } from './ajuda.ts';
 
 // Passo 17: bilhetes (pela caixa de saída), entrevista, edição do dia e coletiva.
 
@@ -31,6 +31,7 @@ test('um bilhete escrito sem rede chega uma vez só', async ({ browser }) => {
 	const texto = `Apoiamos a comissão das águas? ${Date.now()}`;
 
 	await brasil.context().setOffline(true);
+	await abrirAcao(brasil, 'Novo bilhete');
 	const novo = brasil.getByRole('form', { name: 'Novo bilhete' });
 	await escolher(novo, 'Para', 'Chile');
 	await novo.getByLabel('Bilhete').fill(texto);
@@ -50,6 +51,7 @@ test('um bilhete escrito sem rede chega uma vez só', async ({ browser }) => {
 test('um pedido de entrevista aceito aparece para os dois lados', async ({ browser }) => {
 	const tema = `A posição sobre o Iêmen ${Date.now()}`;
 	const press = await abrir(browser, CONTAS.press, '/press/entrevistas');
+	await abrirAcao(press, 'Pedir entrevista');
 	const pedido = press.getByRole('form', { name: 'Pedir entrevista' });
 	await escolher(pedido, 'Delegação', 'EUA');
 	await pedido.getByLabel('Tema').fill(tema);
@@ -107,6 +109,7 @@ test('a Diretoria da Press abre a coletiva, e a press põe perguntas na pauta', 
 
 	const press = await abrir(browser, CONTAS.press, '/press/coletiva');
 	const pergunta = `Qual a resposta ao bloqueio? ${Date.now()}`;
+	await abrirAcao(press, 'Nova pergunta');
 	const nova = press.getByRole('form', { name: 'Nova pergunta' });
 	await escolher(nova, 'Delegação', 'Brasil');
 	await nova.getByLabel('Pergunta').fill(pergunta);

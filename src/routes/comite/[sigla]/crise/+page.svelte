@@ -13,6 +13,8 @@
 	import { TABELAS_CRISE } from '#lib/tempo-real.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import FichaNota from '#lib/ui/FichaNota.svelte';
+	import AcaoEmModal from '#lib/ui/AcaoEmModal.svelte';
+	import Siren from '@lucide/svelte/icons/siren';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -27,6 +29,7 @@
 	let mensagem = $state('');
 	// Passo 47: a nota inteira (texto e resposta) na ficha, sem sair da página.
 	let notaVista = $state<string | null>(null);
+	let escrever = $state<AcaoEmModal>();
 	let enviando = $state(false);
 	// O id nasce com o rascunho: se a rede cair no envio, reenviar não duplica a nota.
 	let id = $state(crypto.randomUUID());
@@ -53,6 +56,7 @@
 		if (erro) return;
 		titulo = texto = '';
 		id = crypto.randomUUID();
+		escrever?.fechar();
 		await invalidate('app:crise');
 	}
 </script>
@@ -92,37 +96,41 @@
 	{/if}
 
 	{#if eu}
-		<section aria-labelledby="t-escrever">
-			<h2 id="t-escrever">{t('Escrever à crise')}</h2>
-			<form class="formulario formulario--largo" onsubmit={enviar}>
-				<fieldset class="opcoes">
-					<legend>{t('Tipo')}</legend>
-					<label class="opcao"><input type="radio" value="nota" bind:group={tipo} /> {t('Nota (pergunta ou pedido)')}</label>
-					<label class="opcao"><input type="radio" value="diretiva" bind:group={tipo} /> {t('Diretiva (ação da delegação)')}</label>
-				</fieldset>
-				<label class="campo">
-					{t('Título')}
-					<input required maxlength="120" bind:value={titulo} {@attach contador(titulo)} />
-				</label>
-				<label class="campo">
-					{t('Texto')}
-					<textarea required maxlength="2000" rows="6" bind:value={texto} {@attach contador(texto)}></textarea>
-				</label>
-				{#if erro}
-					<p class="erro" role="alert">{erro}</p>
-				{/if}
-				{#if mensagem}
-					<p class="sucesso" role="status">{mensagem}</p>
-				{/if}
-				<button class="botao" disabled={enviando}>{t('Enviar à crise')}</button>
-			</form>
-			<p class="suave">
-				{t('Cada delegação pode ter até {n} notas esperando resposta. Só a sua delegação e a equipe de crise leem as suas notas.', {
-					n: data.regras.limite_notas_pendentes
-				})}
-			</p>
-		</section>
 
+		{#if mensagem}
+			<p class="sucesso" role="status">{mensagem}</p>
+		{/if}
+		<div class="acoes">
+			<AcaoEmModal bind:this={escrever} rotulo={t('Escrever à crise')} icone={Siren} descricao={t('Uma nota (pergunta ou pedido) ou uma diretiva (ação da sua delegação) para a equipe de crise.')}>
+				<form class="formulario formulario--largo" onsubmit={enviar}>
+					<fieldset class="opcoes">
+						<legend>{t('Tipo')}</legend>
+						<label class="opcao"><input type="radio" value="nota" bind:group={tipo} /> {t('Nota (pergunta ou pedido)')}</label>
+						<label class="opcao"><input type="radio" value="diretiva" bind:group={tipo} /> {t('Diretiva (ação da delegação)')}</label>
+					</fieldset>
+					<label class="campo">
+						{t('Título')}
+						<input required maxlength="120" bind:value={titulo} {@attach contador(titulo)} />
+					</label>
+					<label class="campo">
+						{t('Texto')}
+						<textarea required maxlength="2000" rows="6" bind:value={texto} {@attach contador(texto)}></textarea>
+					</label>
+					{#if erro}
+						<p class="erro" role="alert">{erro}</p>
+					{/if}
+					<div class="acoes">
+						<button class="botao" disabled={enviando}>{t('Enviar à crise')}</button>
+						<button class="botao botao--secundario" type="button" onclick={() => escrever?.fechar()}>{t('Cancelar')}</button>
+					</div>
+				</form>
+				<p class="suave">
+					{t('Cada delegação pode ter até {n} notas esperando resposta. Só a sua delegação e a equipe de crise leem as suas notas.', {
+						n: data.regras.limite_notas_pendentes
+					})}
+				</p>
+			</AcaoEmModal>
+		</div>
 		<section aria-labelledby="t-minhas">
 			<h2 id="t-minhas">{t('Notas de {delegacao}', { delegacao: eu.delegacao_nome ?? '' })}</h2>
 			{#if data.notasSemRede}

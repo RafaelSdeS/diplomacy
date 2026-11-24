@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { contaDaDelegacao } from '../scripts/delegacoes.ts';
-import { clienteComo, CONTAS, entrar, escolher } from './ajuda.ts';
+import { clienteComo, CONTAS, entrar, escolher, abrirAcao } from './ajuda.ts';
 
 // Passo 24: os EUA bloqueiam os bilhetes do Irã; o Irã fica sabendo; o desbloqueio
 // libera de novo. Comitê CSNU-T, só mensagens (não mexe na sessão).
@@ -37,6 +37,7 @@ test('os EUA bloqueiam o Irã, que fica sabendo e não consegue escrever; o desb
 	await ira.goto(MENSAGENS);
 	await expect(ira.locator('[data-ao-vivo="sim"]')).toBeVisible({ timeout: 10_000 });
 	await expect(ira.getByRole('list', { name: 'Não aceitam bilhetes da sua delegação' })).toContainText('EUA');
+	await abrirAcao(ira, 'Novo bilhete');
 	const novo = ira.getByRole('form', { name: 'Novo bilhete' });
 	const eua = ira.getByRole('dialog', { name: 'Para' }).getByRole('radio', { name: /^EUA/ });
 	await novo.getByRole('button', { name: 'Escolher: Para' }).click();

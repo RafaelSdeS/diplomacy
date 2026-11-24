@@ -8,9 +8,12 @@
 	import { supabase } from '#lib/supabase.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import Escolha from '#lib/ui/Escolha.svelte';
+	import AcaoEmModal from '#lib/ui/AcaoEmModal.svelte';
+	import Mic from '@lucide/svelte/icons/mic';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
+	let pedido = $state<AcaoEmModal>();
 	const agora = new Date();
 	let delegacao = $state('');
 	let tema = $state('');
@@ -27,6 +30,7 @@
 		else {
 			mensagem = t('Pedido enviado à delegação.');
 			tema = '';
+			pedido?.fechar();
 		}
 		await invalidate('app:entrevistas');
 	}
@@ -50,14 +54,22 @@
 	<p class="sucesso" role="status">{mensagem}</p>
 {/if}
 
-<form class="formulario" aria-label={t('Pedir entrevista')} onsubmit={pedir}>
-	<Escolha unica rotulo={t('Delegação')} botao={t('Escolher')} opcoes={data.delegacoes} bind:valor={delegacao} />
-	<label class="campo">
-		{t('Tema')}
-		<input required maxlength="300" bind:value={tema} {@attach contador(tema)} />
-	</label>
-	<button class="botao">{t('Pedir entrevista')}</button>
-</form>
+<div class="acoes">
+	<AcaoEmModal bind:this={pedido} rotulo={t('Pedir entrevista')} icone={Mic} descricao={t('A delegação recebe o pedido e escolhe o horário.')}>
+		<form class="formulario" aria-label={t('Pedir entrevista')} onsubmit={pedir}>
+			<Escolha unica rotulo={t('Delegação')} botao={t('Escolher')} opcoes={data.delegacoes} bind:valor={delegacao} />
+			<label class="campo">
+				{t('Tema')}
+				<input required maxlength="300" bind:value={tema} {@attach contador(tema)} />
+			</label>
+			{#if erro}<p class="erro">{erro}</p>{/if}
+			<div class="acoes">
+				<button class="botao">{t('Pedir entrevista')}</button>
+				<button class="botao botao--secundario" type="button" onclick={() => pedido?.fechar()}>{t('Cancelar')}</button>
+			</div>
+		</form>
+	</AcaoEmModal>
+</div>
 
 <section aria-labelledby="t-pedidos">
 	<h2 id="t-pedidos">{t('Pedidos')}</h2>

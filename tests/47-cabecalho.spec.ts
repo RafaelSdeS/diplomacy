@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { contaDoTreino, isolado } from '../scripts/delegacoes.ts';
-import { clienteComo, entrar, escolher, desfazerRapido } from './ajuda.ts';
+import { clienteComo, entrar, escolher, desfazerRapido, abrirAcao } from './ajuda.ts';
 
 // Passo 47 (item 8): o cabeçalho com ícones. Só a lupa e o sino ficam sem texto; no celular,
 // tema, idioma, Perfil e Sair ficam em "Mais". A conta é do comitê isolado 47: trocar o
@@ -79,6 +79,7 @@ test('um bilhete não enviado sai da caixa com "Remover", e "Desfazer" o traz de
 	await page.goto(`/comite/${isolado('47').sigla}/mensagens`);
 	await expect(page.locator('[data-ao-vivo="sim"]')).toBeVisible({ timeout: 10_000 });
 	await context.setOffline(true);
+	await abrirAcao(page, 'Novo bilhete');
 	const novo = page.getByRole('form', { name: 'Novo bilhete' });
 	await escolher(novo, 'Para', 'Brasil');
 	await novo.getByLabel('Bilhete').fill(texto);

@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { entrar } from './ajuda.ts';
+import { entrar, abrirAcao } from './ajuda.ts';
 
 // Passo 22: a agenda vem antes das resoluções; a mesa adota, edita e retira.
 // Usa o Conselho Europeu de teste (CE-T), tópico 1.
@@ -46,6 +46,7 @@ test('sem agenda adotada não há projeto; a mesa adota, e o projeto é liberado
 	await expect(alemanha.getByRole('status')).toHaveText('Proposta salva.');
 
 	await alemanha.goto(BLOCOS);
+	await abrirAcao(alemanha, 'Novo bloco');
 	await alemanha.getByLabel('Nome do novo bloco').fill(`Agenda ${Date.now()}`);
 	await alemanha.getByRole('button', { name: 'Criar bloco' }).click();
 	expect(await projetoLiberado(alemanha)).toBe(false);

@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { contaDaDelegacao, DELEGACOES, isolado } from '../scripts/delegacoes.ts';
-import { CONTAS, clienteComo, comiteEmDebate, entrar } from './ajuda.ts';
+import { CONTAS, clienteComo, comiteEmDebate, entrar, abrirAcao } from './ajuda.ts';
 
 // Passo 39: a cópia do CSNU-T só deste arquivo (scripts/delegacoes.ts).
 const C = isolado('41');
@@ -32,6 +32,7 @@ test('o cronograma e o Agora mostram o tipo do item, e a secretaria escolhe o ti
 	await expect(item('Credenciamento').locator('.etiqueta')).toHaveCount(0);
 
 	const titulo = `Café ${Date.now()}`;
+	await abrirAcao(page, 'Novo item');
 	await page.getByLabel('Título').fill(titulo);
 	await page.getByLabel('Tipo').selectOption({ label: 'Intervalo' });
 	await page.getByLabel('Início').fill('2026-11-11T15:00');

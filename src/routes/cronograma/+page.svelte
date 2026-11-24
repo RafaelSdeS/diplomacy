@@ -7,9 +7,12 @@
 	import { agruparPorDia, formatarHora, instanteNoFuso, itensAtuais, TIPOS_ITEM } from '#lib/cronograma.ts';
 	import TipoItem from '#lib/ui/TipoItem.svelte';
 	import { supabase } from '#lib/supabase.ts';
+	import AcaoEmModal from '#lib/ui/AcaoEmModal.svelte';
+	import CalendarPlus from '@lucide/svelte/icons/calendar-plus';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
+	let novoItem = $state<AcaoEmModal>();
 
 	let agora = $state(new Date());
 	$effect(() => {
@@ -53,6 +56,7 @@
 			return;
 		}
 		titulo = local = inicio = fim = comite = '';
+		novoItem?.fechar();
 		tipo = 'sessao';
 		await invalidate('app:cronograma');
 	}
@@ -110,46 +114,50 @@
 {/each}
 
 {#if data.eventoDaSecretaria}
-	<section aria-labelledby="t-novo-item">
-		<h2 id="t-novo-item">{t('Novo item')}</h2>
-		<form class="formulario" onsubmit={adicionar}>
-			<label class="campo">
-				{t('Título')}
-				<input required maxlength="120" bind:value={titulo} {@attach contador(titulo)} />
-			</label>
-			<label class="campo">
-				{t('Tipo')}
-				<select bind:value={tipo}>
-					{#each Object.keys(TIPOS_ITEM) as valor (valor)}
-						<option value={valor}>{TIPOS_ITEM[valor]}</option>
-					{/each}
-				</select>
-			</label>
-			<label class="campo">
-				{t('Local')}
-				<input maxlength="120" bind:value={local} {@attach contador(local)} />
-			</label>
-			<label class="campo">
-				{t('Início')}
-				<input type="datetime-local" required bind:value={inicio} />
-			</label>
-			<label class="campo">
-				{t('Fim')}
-				<input type="datetime-local" required bind:value={fim} />
-			</label>
-			<label class="campo">
-				{t('Para')}
-				<select bind:value={comite}>
-					<option value="">{t('Todos')}</option>
-					{#each data.comites as c (c.id)}
-						<option value={c.id}>{c.sigla}</option>
-					{/each}
-				</select>
-			</label>
-			{#if erro}
-				<p class="erro" role="alert">{erro}</p>
-			{/if}
-			<button class="botao">{t('Adicionar ao cronograma')}</button>
-		</form>
-	</section>
+	<div class="acoes">
+		<AcaoEmModal bind:this={novoItem} rotulo={t('Novo item')} icone={CalendarPlus} descricao={t('Um horário do evento: sessão, intervalo, cerimônia ou outro.')}>
+			<form aria-label={t('Novo item')} class="formulario" onsubmit={adicionar}>
+				<label class="campo">
+					{t('Título')}
+					<input required maxlength="120" bind:value={titulo} {@attach contador(titulo)} />
+				</label>
+				<label class="campo">
+					{t('Tipo')}
+					<select bind:value={tipo}>
+						{#each Object.keys(TIPOS_ITEM) as valor (valor)}
+							<option value={valor}>{TIPOS_ITEM[valor]}</option>
+						{/each}
+					</select>
+				</label>
+				<label class="campo">
+					{t('Local')}
+					<input maxlength="120" bind:value={local} {@attach contador(local)} />
+				</label>
+				<label class="campo">
+					{t('Início')}
+					<input type="datetime-local" required bind:value={inicio} />
+				</label>
+				<label class="campo">
+					{t('Fim')}
+					<input type="datetime-local" required bind:value={fim} />
+				</label>
+				<label class="campo">
+					{t('Para')}
+					<select bind:value={comite}>
+						<option value="">{t('Todos')}</option>
+						{#each data.comites as c (c.id)}
+							<option value={c.id}>{c.sigla}</option>
+						{/each}
+					</select>
+				</label>
+				{#if erro}
+					<p class="erro" role="alert">{erro}</p>
+				{/if}
+				<div class="acoes">
+					<button class="botao">{t('Adicionar ao cronograma')}</button>
+					<button class="botao botao--secundario" type="button" onclick={() => novoItem?.fechar()}>{t('Cancelar')}</button>
+				</div>
+			</form>
+		</AcaoEmModal>
+	</div>
 {/if}

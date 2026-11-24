@@ -1,7 +1,7 @@
 import { expect, test, type Browser, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { contaDaDelegacao, isolado } from '../scripts/delegacoes.ts';
-import { adotarAgenda, clienteComo, CONTAS, entrar } from './ajuda.ts';
+import { adotarAgenda, clienteComo, CONTAS, entrar, abrirAcao } from './ajuda.ts';
 
 // Passo 39: a cópia do CSNU-T só deste arquivo (scripts/delegacoes.ts).
 const C = isolado('10');
@@ -150,6 +150,7 @@ test('o projeto impresso tem a linha do comitê e os signatários', async ({ pag
 
 test('a carta privada só chega ao destinatário', async ({ browser }) => {
 	const eua = await abrir(browser, C.conta(CONTAS.delegado), CARTAS);
+	await abrirAcao(eua, 'Escrever carta');
 	await eua.getByRole('button', { name: 'Escolher: Para as delegações' }).click();
 	await eua.getByRole('group', { name: 'Para as delegações' }).getByLabel('Brasil').check();
 	await eua.getByRole('button', { name: 'Pronto' }).click();

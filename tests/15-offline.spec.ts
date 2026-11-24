@@ -1,6 +1,6 @@
 import { expect, test, type Browser, type Page } from '@playwright/test';
 import { contaDoTreino, isolado } from '../scripts/delegacoes.ts';
-import { clienteComo, entrar, irPeloMenu } from './ajuda.ts';
+import { clienteComo, entrar, irPeloMenu, abrirAcao } from './ajuda.ts';
 
 // Passo 39: a cópia do TREINO só deste arquivo (scripts/delegacoes.ts).
 const C = isolado('15');
@@ -61,6 +61,7 @@ test('uma nota escrita sem rede fica no aparelho, até depois de fechar o app, e
 
 	const titulo = `Barragem fechada ${Date.now()}`;
 	await page.context().setOffline(true);
+	await abrirAcao(page, 'Escrever à crise');
 	await page.getByLabel('Título').fill(titulo);
 	await page.getByLabel('Texto').fill('O Paraguai pede a abertura das comportas.');
 	await page.getByRole('button', { name: 'Enviar à crise' }).click();

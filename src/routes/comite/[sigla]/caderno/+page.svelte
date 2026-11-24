@@ -13,6 +13,9 @@
 	import Modal from '#lib/ui/Modal.svelte';
 	import NomeDelegacao from '#lib/ui/NomeDelegacao.svelte';
 	import Escolha from '#lib/ui/Escolha.svelte';
+	import AcaoEmModal from '#lib/ui/AcaoEmModal.svelte';
+	import Mic from '@lucide/svelte/icons/mic';
+	import NotebookPen from '@lucide/svelte/icons/notebook-pen';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -37,6 +40,7 @@
 	let sobre = $state('');
 	let compartilhar = $state<Record<string, string[]>>({});
 	let lendo = $state<{ titulo: string | null; texto: string } | null>(null);
+	let nova = $state<AcaoEmModal>();
 	let leitura = $state<Modal>();
 
 	async function salvar(evento: SubmitEvent) {
@@ -57,7 +61,10 @@
 			rotulo: t('Anotação')
 		});
 		({ erro, mensagem } = mensagemDoEnvio(resultado, t('Anotação salva.')));
-		if (!erro) texto = titulo = '';
+		if (!erro) {
+			texto = titulo = '';
+			nova?.fechar();
+		}
 		await invalidate('app:caderno');
 	}
 
@@ -101,24 +108,38 @@
 	</div>
 
 	<div role="tabpanel" aria-label={ABAS.find((a) => a.chave === aba)?.rotulo}>
-		<form class="formulario formulario--largo" onsubmit={salvar} aria-label={t('Nova anotação')}>
-			{#if aba === 'sobre'}
-				<Escolha unica rotulo={t('Sobre a delegação')} botao={t('Escolher')} opcoes={outras} bind:valor={sobre} />
-			{:else if aba === 'fala'}
-				<label class="campo">{t('Título da fala')} <input maxlength="120" bind:value={titulo} {@attach contador(titulo)} /></label>
-			{/if}
-			<label class="campo">
-				{aba === 'fala' ? t('Texto da fala') : t('Anotação')}
-				<textarea required rows={aba === 'fala' ? 8 : 3} maxlength="4000" bind:value={texto} {@attach contador(texto)}></textarea>
-			</label>
-			{#if aba === 'fala'}
-				{@const seg = estimarDuracao(texto)}
-				<p class={seg > data.tempoFalaSeg ? 'erro' : 'suave'} aria-live="polite">
-					{t('~{tempo} de {limite} de tempo de fala', { tempo: formatarTempo(seg), limite: formatarTempo(data.tempoFalaSeg) })}
-				</p>
-			{/if}
-			<button class="botao">{t('Salvar no caderno')}</button>
-		</form>
+		<!-- Passo 51: a aba mostra o que já foi anotado; escrever abre um modal. -->
+		<div class="acoes">
+			<AcaoEmModal
+				bind:this={nova}
+				rotulo={aba === 'fala' ? t('Escrever fala') : t('Nova anotação')}
+				icone={aba === 'fala' ? Mic : NotebookPen}
+				descricao={t('Só a sua delegação lê, a menos que você compartilhe.')}
+			>
+				<form class="formulario formulario--largo" onsubmit={salvar} aria-label={t('Nova anotação')}>
+					{#if aba === 'sobre'}
+						<Escolha unica rotulo={t('Sobre a delegação')} botao={t('Escolher')} opcoes={outras} bind:valor={sobre} />
+					{:else if aba === 'fala'}
+						<label class="campo">{t('Título da fala')} <input maxlength="120" bind:value={titulo} {@attach contador(titulo)} /></label>
+					{/if}
+					<label class="campo">
+						{aba === 'fala' ? t('Texto da fala') : t('Anotação')}
+						<textarea required rows={aba === 'fala' ? 8 : 3} maxlength="4000" bind:value={texto} {@attach contador(texto)}></textarea>
+					</label>
+					{#if aba === 'fala'}
+						{@const seg = estimarDuracao(texto)}
+						<p class={seg > data.tempoFalaSeg ? 'erro' : 'suave'} aria-live="polite">
+							{t('~{tempo} de {limite} de tempo de fala', { tempo: formatarTempo(seg), limite: formatarTempo(data.tempoFalaSeg) })}
+						</p>
+					{/if}
+					{#if erro}<p class="erro">{erro}</p>{/if}
+					<div class="acoes">
+						<button class="botao">{t('Salvar no caderno')}</button>
+						<button class="botao botao--secundario" type="button" onclick={() => nova?.fechar()}>{t('Cancelar')}</button>
+					</div>
+				</form>
+			</AcaoEmModal>
+		</div>
 
 		<ul class="lista anotacoes">
 			{#each minhas.filter((a) => a.tipo === aba) as a (a.id)}

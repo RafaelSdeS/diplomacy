@@ -10,9 +10,12 @@
 	import { supabase } from '#lib/supabase.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import Escolha from '#lib/ui/Escolha.svelte';
+	import AcaoEmModal from '#lib/ui/AcaoEmModal.svelte';
+	import MessageSquarePlus from '@lucide/svelte/icons/message-square-plus';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
+	let novaPergunta = $state<AcaoEmModal>();
 	let titulo = $state('Coletiva de imprensa');
 	let delegacao = $state('');
 	let pergunta = $state('');
@@ -87,22 +90,37 @@
 	<section aria-labelledby="t-pauta">
 		<h2 id="t-pauta">{data.coletiva.titulo} {data.coletiva.aberta ? '' : '(encerrada)'}</h2>
 		{#if data.souPress && data.coletiva.aberta}
-			<form
-				class="formulario"
-				aria-label={t('Nova pergunta')}
-				onsubmit={async (e) => {
-					e.preventDefault();
-					if (await executar(supabase.rpc('perguntar_na_coletiva', { p_coletiva: data.coletiva!.id, p_delegacao: delegacao, p_pergunta: pergunta }), t('Pergunta na pauta.')))
-						pergunta = '';
-				}}
-			>
-				<Escolha unica rotulo={t('Delegação')} botao={t('Escolher')} opcoes={data.delegacoes} bind:valor={delegacao} />
-				<label class="campo">
-					{t('Pergunta')}
-					<input required maxlength="300" bind:value={pergunta} {@attach contador(pergunta)} />
-				</label>
-				<button class="botao">{t('Pôr na pauta')}</button>
-			</form>
+			<div class="acoes">
+				<AcaoEmModal
+					bind:this={novaPergunta}
+					rotulo={t('Nova pergunta')}
+					icone={MessageSquarePlus}
+					descricao={t('A pergunta entra na pauta da coletiva, para a delegação escolhida.')}
+				>
+					<form
+						class="formulario"
+						aria-label={t('Nova pergunta')}
+						onsubmit={async (e) => {
+							e.preventDefault();
+							if (await executar(supabase.rpc('perguntar_na_coletiva', { p_coletiva: data.coletiva!.id, p_delegacao: delegacao, p_pergunta: pergunta }), t('Pergunta na pauta.'))) {
+								pergunta = '';
+								novaPergunta?.fechar();
+							}
+						}}
+					>
+						<Escolha unica rotulo={t('Delegação')} botao={t('Escolher')} opcoes={data.delegacoes} bind:valor={delegacao} />
+						<label class="campo">
+							{t('Pergunta')}
+							<input required maxlength="300" bind:value={pergunta} {@attach contador(pergunta)} />
+						</label>
+						{#if erro}<p class="erro">{erro}</p>{/if}
+						<div class="acoes">
+							<button class="botao">{t('Pôr na pauta')}</button>
+							<button class="botao botao--secundario" type="button" onclick={() => novaPergunta?.fechar()}>{t('Cancelar')}</button>
+						</div>
+					</form>
+				</AcaoEmModal>
+			</div>
 		{/if}
 		{#each porVeiculo as [veiculo, perguntas] (veiculo)}
 			<h3>{veiculo}</h3>

@@ -6,6 +6,11 @@
 	import { nomeDoDocumento, STATUS_DOCUMENTO } from '#lib/formatacao.ts';
 	import { STATUS_DPO } from '#lib/impressao.ts';
 	import Bandeira from '#lib/ui/Bandeira.svelte';
+	import GradeAtalhos, { type Atalho } from '#lib/ui/GradeAtalhos.svelte';
+	import Mail from '@lucide/svelte/icons/mail';
+	import NotebookPen from '@lucide/svelte/icons/notebook-pen';
+	import ScrollText from '@lucide/svelte/icons/scroll-text';
+	import Users from '@lucide/svelte/icons/users';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -23,6 +28,15 @@
 	const docsParaAvaliar = $derived(data.ehMesa ? data.documentos.filter((d) => d.status === 'enviado') : []);
 	const dposDoComite = $derived(data.dpos.filter((d) => d.delegacao?.id !== data.minha && (d.status === 'aprovado' || !data.ehMesa)));
 	const situacaoDoDpo = (topico: number) => meusDpos.find((d) => d.topico === topico);
+	// Passo 51: as ações da área em cartões, como na aba Comitê.
+	const atalhos = $derived(
+		[
+			{ href: `/comite/${sigla}/dpo`, rotulo: t('DPO'), descricao: data.ehMesa ? t('Ler e avaliar os DPOs') : t('Escrever e enviar o seu DPO'), icone: ScrollText },
+			{ href: `/comite/${sigla}/blocos`, rotulo: t('Blocos'), descricao: t('Formar blocos e escrever documentos'), icone: Users },
+			{ href: `/comite/${sigla}/cartas`, rotulo: t('Cartas'), descricao: t('Ler e escrever cartas diplomáticas'), icone: Mail },
+			data.minha ? { href: `/comite/${sigla}/caderno`, rotulo: t('Caderno'), descricao: t('Suas anotações sobre as outras delegações e o debate'), icone: NotebookPen } : null
+		].filter((a): a is Atalho => !!a)
+	);
 </script>
 
 <svelte:head>
@@ -31,6 +45,8 @@
 
 <p class="rotulo">{t('Comitê')} · {sigla}</p>
 <h1>{t('Documentos')}</h1>
+
+<GradeAtalhos nome={t('Atalhos de documentos')} {atalhos} />
 
 <div class="cartoes">
 	{#if data.ehMesa}
@@ -91,7 +107,6 @@
 					<li class="suave">{data.meusBlocos.length ? t('O seu bloco ainda não tem documentos.') : t('Sua delegação ainda não está num bloco.')}</li>
 				{/each}
 			</ul>
-			<p><a class="botao botao--secundario botao--pequeno" href={`/comite/${sigla}/blocos`}>{t('Blocos e novos documentos')}</a></p>
 		</section>
 	{/if}
 
@@ -104,16 +119,8 @@
 				<li class="suave">{t('Nenhuma carta ainda.')}</li>
 			{/each}
 		</ul>
-		<p><a class="botao botao--secundario botao--pequeno" href={`/comite/${sigla}/cartas`}>{t('Ler e escrever cartas')}</a></p>
 	</section>
 
-	{#if data.minha}
-		<section class="cartao" aria-labelledby="t-caderno">
-			<h2 id="t-caderno">{t('Caderno da delegação')}</h2>
-			<p class="suave">{t('Suas anotações sobre as outras delegações e o debate.')}</p>
-			<p><a class="botao botao--secundario botao--pequeno" href={`/comite/${sigla}/caderno`}>{t('Abrir o caderno')}</a></p>
-		</section>
-	{/if}
 
 	<section class="cartao cartao--largo" aria-labelledby="t-do-comite">
 		<h2 id="t-do-comite">{t('Do comitê')}</h2>

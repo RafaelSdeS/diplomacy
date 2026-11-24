@@ -8,9 +8,12 @@
 	import Bell from '@lucide/svelte/icons/bell';
 	import { pedirNotificacao } from '#lib/push.ts';
 	import { supabase } from '#lib/supabase.ts';
+	import AcaoEmModal from '#lib/ui/AcaoEmModal.svelte';
+	import Megaphone from '@lucide/svelte/icons/megaphone';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
+	let novoAviso = $state<AcaoEmModal>();
 
 	// "Novo" vale para esta visita: guarda quando a pessoa tinha visto antes de abrir.
 	const vistosAntes = untrack(() => (data.vistosEm ? new Date(data.vistosEm) : null));
@@ -41,6 +44,7 @@
 		}
 		pedirNotificacao('aviso', [aviso.id]);
 		texto = '';
+		novoAviso?.fechar();
 		await invalidate('app:avisos');
 	}
 
@@ -63,27 +67,31 @@
 <h1>{t('Avisos')}</h1>
 
 {#if data.destinos.length > 0}
-	<section aria-labelledby="t-publicar">
-		<h2 id="t-publicar">{t('Publicar aviso')}</h2>
-		<form class="formulario" onsubmit={publicar}>
-			<label class="campo">
-				{t('Aviso')}
-				<textarea required maxlength="1000" bind:value={texto} {@attach contador(texto)}></textarea>
-			</label>
-			<label class="campo">
-				{t('Para')}
-				<select bind:value={destino}>
-					{#each data.destinos as d (d.id)}
-						<option value={d.id}>{d.rotulo}</option>
-					{/each}
-				</select>
-			</label>
-			{#if erro}
-				<p class="erro" role="alert">{erro}</p>
-			{/if}
-			<button class="botao">{t('Publicar')}</button>
-		</form>
-	</section>
+	<div class="acoes">
+		<AcaoEmModal bind:this={novoAviso} rotulo={t('Novo aviso')} icone={Megaphone} descricao={t('O aviso aparece na Agora de quem você escolher e, para quem ativou, como notificação.')}>
+			<form aria-label={t('Novo aviso')} class="formulario" onsubmit={publicar}>
+				<label class="campo">
+					{t('Aviso')}
+					<textarea required maxlength="1000" bind:value={texto} {@attach contador(texto)}></textarea>
+				</label>
+				<label class="campo">
+					{t('Para')}
+					<select bind:value={destino}>
+						{#each data.destinos as d (d.id)}
+							<option value={d.id}>{d.rotulo}</option>
+						{/each}
+					</select>
+				</label>
+				{#if erro}
+					<p class="erro" role="alert">{erro}</p>
+				{/if}
+				<div class="acoes">
+					<button class="botao">{t('Publicar')}</button>
+					<button class="botao botao--secundario" type="button" onclick={() => novoAviso?.fechar()}>{t('Cancelar')}</button>
+				</div>
+			</form>
+		</AcaoEmModal>
+	</div>
 {/if}
 
 <section aria-labelledby="t-avisos">

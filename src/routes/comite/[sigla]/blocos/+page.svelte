@@ -9,9 +9,13 @@
 	import { TABELAS_BLOCOS } from '#lib/tempo-real.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import Bandeira from '#lib/ui/Bandeira.svelte';
+	import AcaoEmModal from '#lib/ui/AcaoEmModal.svelte';
+	import Users from '@lucide/svelte/icons/users';
+	import Modal from '#lib/ui/Modal.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
+	let novoBloco = $state<AcaoEmModal>();
 
 	const eu = $derived(data.participacoes.find((p) => p.comite_id === data.comite.id && p.papel === 'delegado'));
 	const souDo = (bloco: (typeof data.blocos)[number]) => bloco.membros.some((m) => m.delegacao?.id === eu?.delegacao_id);
@@ -47,7 +51,10 @@
 
 	async function criarBloco(evento: SubmitEvent) {
 		evento.preventDefault();
-		if (await executar(supabase.rpc('criar_bloco', { p_comite: data.comite.id, p_nome: nomeBloco }))) nomeBloco = '';
+		if (await executar(supabase.rpc('criar_bloco', { p_comite: data.comite.id, p_nome: nomeBloco }))) {
+			nomeBloco = '';
+			novoBloco?.fechar();
+		}
 	}
 
 	async function criarDocumento(evento: SubmitEvent) {
@@ -85,6 +92,23 @@
 
 <section aria-labelledby="t-blocos">
 	<h2 id="t-blocos">{t('Blocos')}</h2>
+	{#if eu}
+		<div class="acoes">
+			<AcaoEmModal bind:this={novoBloco} rotulo={t('Novo bloco')} icone={Users} descricao={t('Um grupo de delegações que escreve documentos juntas. Quem cria é o redator.')}>
+				<form class="formulario" onsubmit={criarBloco} aria-label={t('Novo bloco')}>
+					<label class="campo">
+						{t('Nome do novo bloco')}
+						<input required maxlength="80" bind:value={nomeBloco} placeholder={t('Aliança dos Estados do Sahel')} />
+					</label>
+					{#if erro}<p class="erro">{erro}</p>{/if}
+					<div class="acoes">
+						<button class="botao">{t('Criar bloco')}</button>
+						<button class="botao botao--secundario" type="button" onclick={() => novoBloco?.fechar()}>{t('Cancelar')}</button>
+					</div>
+				</form>
+			</AcaoEmModal>
+		</div>
+	{/if}
 	<div class="propostas">
 		{#each data.blocos as bloco (bloco.id)}
 			{@const membro = souDo(bloco)}
@@ -129,9 +153,10 @@
 		{/each}
 	</div>
 
-	{#if novoEm}
-		<form class="formulario formulario--largo cartao" onsubmit={criarDocumento} aria-label={t('Novo documento')}>
-			<h3>{t('Novo documento')} · {data.blocos.find((b) => b.id === novoEm)?.nome}</h3>
+	<!-- Passo 51: o novo documento abre num modal no centro, a partir do bloco. -->
+	<Modal aberto={!!novoEm} rotulo="novo-documento-titulo" classe="modal-acao" onclose={() => (novoEm = null)}>
+		<form class="formulario" onsubmit={criarDocumento} aria-label={t('Novo documento')}>
+			<h3 id="novo-documento-titulo">{t('Novo documento')} · {data.blocos.find((b) => b.id === novoEm)?.nome}</h3>
 			<label class="campo">
 				{t('Tipo')}
 				<select bind:value={tipo}>
@@ -186,17 +211,8 @@
 				<button class="botao botao--secundario" type="button" onclick={() => (novoEm = null)}>{t('Cancelar')}</button>
 			</div>
 		</form>
-	{/if}
+	</Modal>
 
-	{#if eu}
-		<form class="formulario" onsubmit={criarBloco}>
-			<label class="campo">
-				{t('Nome do novo bloco')}
-				<input required maxlength="80" bind:value={nomeBloco} placeholder={t('Aliança dos Estados do Sahel')} />
-			</label>
-			<button class="botao botao--secundario">{t('Criar bloco')}</button>
-		</form>
-	{/if}
 </section>
 
 <section aria-labelledby="t-documentos">

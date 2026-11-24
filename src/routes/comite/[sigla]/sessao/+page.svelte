@@ -34,6 +34,8 @@
 	import { semVoz } from '#lib/crise.ts';
 	import NotaRapida from '#lib/ui/NotaRapida.svelte';
 	import { assinaturasDesconfianca, escolhasPermitidas, ETAPAS, FASES, listaAtiva, presidenciaEmVigor, textoResultado } from '#lib/votacao.ts';
+	import AcaoEmModal from '#lib/ui/AcaoEmModal.svelte';
+	import Hand from '@lucide/svelte/icons/hand';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -100,15 +102,16 @@
 		setTimeout(() => chamarAtencao('c-votacao'));
 	});
 	const naListaCurta = $derived((sessao?.proximos ?? []).findIndex((p) => p.delegacao?.id === eu?.delegacao_id));
+	// Passo 51: o ponto ou moção abre no modal, com o foco já no tipo.
 	function irAoPonto() {
-		const campo = document.getElementById('tipo-ponto');
-		campo?.scrollIntoView({ block: 'center' });
-		campo?.focus();
+		novoPonto?.abrir();
+		document.getElementById('tipo-ponto')?.focus();
 	}
 	const minhaPresenca = $derived(sessao?.presenca.find((p) => p.delegacao_id === eu?.delegacao_id)?.situacao);
 	// Passo 47: as fichas da votação e do ponto, abertas pelo nome, sem mudar a URL.
 	let verVotacao = $state(false);
 	let pontoVisto = $state<string | null>(null);
+	let novoPonto = $state<AcaoEmModal>();
 	const pontoDaFicha = $derived(data.estado?.sessao?.pontos.find((p) => p.id === pontoVisto));
 	const meuVoto = $derived(data.votacao?.votos.find((v) => v.delegacao_id === eu?.delegacao_id)?.escolha);
 	// Tecnologia restrita: durante a sessão, a mesa opera o app; o delegado acompanha.
@@ -150,7 +153,10 @@
 			}),
 			t('{pedido}: enviado à mesa.', { pedido: PONTOS[tipoPonto] })
 		);
-		if (ok) detalhe = '';
+		if (ok) {
+			detalhe = '';
+			novoPonto?.fechar();
+		}
 	}
 </script>
 
@@ -295,36 +301,51 @@
 		{#if eu && !restrita && !impedida}
 			<section class="cartao" aria-labelledby="t-ponto">
 				<h2 id="t-ponto">{t('Ponto ou moção')}</h2>
-				<form class="formulario" onsubmit={enviarPonto}>
-					<label class="campo">
-						{t('Tipo')}
-						<select id="tipo-ponto" bind:value={tipoPonto}>
-							{#each tiposEmOrdem as tipo (tipo)}
-								<option value={tipo}>{PONTOS[tipo]}</option>
-							{/each}
-						</select>
-					</label>
-					{#if tipoPonto === 'topico_no_topo'}
-						<label class="campo">
-							{t('Tópico')}
-							<select bind:value={topico}>
-								{#each data.comite.topicos as tp, i (tp)}
-									<option value={i + 1}>{i + 1}. {tp}</option>
-								{/each}
-							</select>
-						</label>
-					{:else if tipoPonto === 'informal_informal'}
-						<label class="campo campo--curto">
-							{t('Minutos (até {n} por sessão)', { n: data.regras.informal_informal_max_min })}
-							<input type="number" min="1" max={data.regras.informal_informal_max_min} required bind:value={minutos} />
-						</label>
-					{/if}
-					<label class="campo">
-						{t('Detalhe (opcional)')}
-						<textarea maxlength="300" bind:value={detalhe} {@attach contador(detalhe)}></textarea>
-					</label>
-					<button class="botao">{t('Enviar à mesa')}</button>
-				</form>
+				<!-- Passo 51: o cartão mostra os seus pedidos; fazer um abre o modal. -->
+				<div class="acoes">
+					<AcaoEmModal
+						bind:this={novoPonto}
+						rotulo={t('Fazer um ponto ou moção')}
+						icone={Hand}
+						titulo={t('Ponto ou moção')}
+						descricao={t('O pedido vai à mesa, que julga se está em ordem.')}
+					>
+						<form class="formulario" onsubmit={enviarPonto} aria-label={t('Ponto ou moção')}>
+							<label class="campo">
+								{t('Tipo')}
+								<select id="tipo-ponto" bind:value={tipoPonto}>
+									{#each tiposEmOrdem as tipo (tipo)}
+										<option value={tipo}>{PONTOS[tipo]}</option>
+									{/each}
+								</select>
+							</label>
+							{#if tipoPonto === 'topico_no_topo'}
+								<label class="campo">
+									{t('Tópico')}
+									<select bind:value={topico}>
+										{#each data.comite.topicos as tp, i (tp)}
+											<option value={i + 1}>{i + 1}. {tp}</option>
+										{/each}
+									</select>
+								</label>
+							{:else if tipoPonto === 'informal_informal'}
+								<label class="campo campo--curto">
+									{t('Minutos (até {n} por sessão)', { n: data.regras.informal_informal_max_min })}
+									<input type="number" min="1" max={data.regras.informal_informal_max_min} required bind:value={minutos} />
+								</label>
+							{/if}
+							<label class="campo">
+								{t('Detalhe (opcional)')}
+								<textarea maxlength="300" bind:value={detalhe} {@attach contador(detalhe)}></textarea>
+							</label>
+							{#if erro}<p class="erro">{erro}</p>{/if}
+							<div class="acoes">
+								<button class="botao">{t('Enviar à mesa')}</button>
+								<button class="botao botao--secundario" type="button" onclick={() => novoPonto?.fechar()}>{t('Cancelar')}</button>
+							</div>
+						</form>
+					</AcaoEmModal>
+				</div>
 				{#if meusPontos.length}
 					<ul class="lista" aria-label={t('Seus pontos e moções')}>
 						{#each meusPontos as ponto (ponto.id)}

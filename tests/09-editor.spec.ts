@@ -1,7 +1,7 @@
 import { expect, test, type Browser, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { contaDaDelegacao, isolado } from '../scripts/delegacoes.ts';
-import { adotarAgenda, clienteComo, CONTAS, entrar } from './ajuda.ts';
+import { adotarAgenda, clienteComo, CONTAS, entrar, abrirAcao } from './ajuda.ts';
 
 // Passo 39: a cópia do CSNU-T só deste arquivo (scripts/delegacoes.ts).
 const C = isolado('09');
@@ -41,6 +41,7 @@ let projeto = '';
 test('um bloco escreve um working paper, com verbos sugeridos', async ({ page }) => {
 	await entrar(page, C.conta(CONTAS.delegado)); // EUA
 	await page.goto(BLOCOS);
+	await abrirAcao(page, 'Novo bloco');
 	await page.getByLabel('Nome do novo bloco').fill(BLOCO);
 	await page.getByRole('button', { name: 'Criar bloco' }).click();
 	const bloco = page.getByRole('article', { name: `Bloco ${BLOCO}` });
