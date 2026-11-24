@@ -23,6 +23,7 @@
 	import { guardarRascunho, lerRascunho } from '#lib/rascunho.ts';
 	import { untrack } from 'svelte';
 	import ListaVotos from '#lib/ui/ListaVotos.svelte';
+	import Modal from '#lib/ui/Modal.svelte';
 	import Contagem from '#lib/ui/Contagem.svelte';
 	import BotaoPlaca from '#lib/ui/BotaoPlaca.svelte';
 	import Votar from '#lib/ui/Votar.svelte';
@@ -41,7 +42,7 @@
 	let detalhe = $state(lerRascunho(`ponto:${untrack(() => data.comite.sigla)}`));
 	let topico = $state(1);
 	let minutos = $state(10);
-	let placa = $state<HTMLDialogElement>();
+	let placa = $state<Modal>();
 
 	// Passo 31: a mesa que assumiu uma delegação age como ela nesta tela.
 	const representada = $derived(data.representacoes.find((r) => r.pessoa_id === data.usuario?.id)?.delegacao ?? null);
@@ -277,7 +278,7 @@
 					{/if}
 					<BotaoPlaca comiteId={data.comite.id} {posicao} nome={eu.delegacao_nome ?? ''} onerro={(m) => (erro = m)} />
 					<p>
-						<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => placa?.showModal()}>
+						<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => placa?.abrir()}>
 							{t('Mostrar placa em tela cheia')}
 						</button>
 					</p>
@@ -340,11 +341,11 @@
 				{/if}
 			</section>
 
-			<dialog class="placa" bind:this={placa} aria-label="Placa de {eu.delegacao_nome}">
+			<Modal classe="placa" bind:this={placa} nome="Placa de {eu.delegacao_nome}">
 				<Bandeira codigo={eu.delegacao_bandeira} />
 				<p>{eu.delegacao_nome}</p>
 				<form method="dialog"><button class="botao botao--secundario">{t('Fechar')}</button></form>
-			</dialog>
+			</Modal>
 		{/if}
 		</div>
 		<div class="cartoes sessao-sala">

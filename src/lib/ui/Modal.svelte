@@ -5,13 +5,14 @@
 	// botão, ou o campo com autofocus), o Escape e a volta do foco a quem abriu; aqui entram o
 	// clique no fundo e o painel lateral. Quem usa abre com `abrir()` (bind:this).
 	type Props = {
-		rotulo: string; // id do título, que dá nome ao modal
+		rotulo?: string; // id do título, que dá nome ao modal
+		nome?: string; // ou o nome direto, quando não há título à vista (placa, leitura)
 		lateral?: boolean; // painel na lateral direita (fichas), em vez da caixa central
 		classe?: string;
 		onclose?: () => void;
 		children: Snippet;
 	};
-	let { rotulo, lateral = false, classe = '', onclose, children }: Props = $props();
+	let { rotulo, nome, lateral = false, classe = '', onclose, children }: Props = $props();
 	let caixa = $state<HTMLDialogElement>();
 
 	export function abrir() {
@@ -35,6 +36,6 @@
 
 <!-- O clique no fundo é um atalho do mouse; no teclado, o Escape faz o mesmo. -->
 <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
-<dialog bind:this={caixa} class={[lateral && 'modal-lateral', classe]} aria-labelledby={rotulo} {onclose} onclick={noFundo}>
+<dialog bind:this={caixa} class={[lateral && 'modal-lateral', classe]} aria-labelledby={rotulo} aria-label={nome} {onclose} onclick={noFundo}>
 	{@render children()}
 </dialog>

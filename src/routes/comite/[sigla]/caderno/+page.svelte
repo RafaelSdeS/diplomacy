@@ -10,6 +10,7 @@
 	import { mensagemDeErro } from '#lib/sessao.ts';
 	import { supabase } from '#lib/supabase.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
+	import Modal from '#lib/ui/Modal.svelte';
 	import NomeDelegacao from '#lib/ui/NomeDelegacao.svelte';
 	import type { PageProps } from './$types';
 
@@ -35,7 +36,7 @@
 	let sobre = $state('');
 	let compartilhar = $state<Record<string, string[]>>({});
 	let lendo = $state<{ titulo: string | null; texto: string } | null>(null);
-	let leitura = $state<HTMLDialogElement>();
+	let leitura = $state<Modal>();
 
 	async function salvar(evento: SubmitEvent) {
 		evento.preventDefault();
@@ -69,7 +70,7 @@
 
 	function usarNaFala(a: { titulo: string | null; texto: string }) {
 		lendo = a;
-		leitura?.showModal();
+		leitura?.abrir();
 	}
 </script>
 
@@ -206,11 +207,11 @@
 		</section>
 	{/if}
 
-	<dialog class="leitura-fala" bind:this={leitura} aria-label={t('Texto da fala')}>
+	<Modal classe="leitura-fala" bind:this={leitura} nome={t('Texto da fala')}>
 		{#if lendo}
 			{#if lendo.titulo}<h2>{lendo.titulo}</h2>{/if}
 			<p>{lendo.texto}</p>
 		{/if}
 		<form method="dialog"><button class="botao botao--secundario">{t('Fechar')}</button></form>
-	</dialog>
+	</Modal>
 {/if}

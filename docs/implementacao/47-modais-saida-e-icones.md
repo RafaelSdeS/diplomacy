@@ -30,7 +30,7 @@ Em ordem:
 
 ## Estado (24/11/2026)
 
-**Item 1 feito:** `src/lib/ui/Modal.svelte`, com `abrir()` e `fechar()` por `bind:this`, `lateral` para as fichas (a regra `dialog.ficha` do CSS virou `dialog.modal-lateral`) e o clique no fundo protegido quando há texto digitado. `Confirmar`, `FichaDelegacao`, `IrPara` e o exemplo do `/estilo` já o usam, sem mudança visual. O foco inicial continua o nativo: no `Confirmar`, o botão da ação, porque o teste do piloto confirma com Tab e Enter. Testes em `tests/47-modais.spec.ts`. Ainda com `<dialog>` próprio: a placa da sessão e a leitura da fala no caderno.
+**Item 1 feito:** `src/lib/ui/Modal.svelte`, com `abrir()` e `fechar()` por `bind:this`, `lateral` para as fichas (a regra `dialog.ficha` do CSS virou `dialog.modal-lateral`) e o clique no fundo protegido quando há texto digitado. `Confirmar`, `FichaDelegacao`, `IrPara` e o exemplo do `/estilo` já o usam, sem mudança visual. O foco inicial continua o nativo: no `Confirmar`, o botão da ação, porque o teste do piloto confirma com Tab e Enter. Testes em `tests/47-modais.spec.ts`. A placa da sessão e a leitura da fala no caderno também usam o modal base, com `nome` (o `aria-label`) no lugar de `rotulo`, porque não têm título à vista; nenhuma tela tem mais `<dialog>` próprio.
 
 **Item 2 feito:** *Sair* sempre abre o modal "Sair da conta?", com nome, delegação ou papel e comitê, e "Os dados desta sessão serão removidos deste aparelho". Com itens na caixa de saída, o mesmo modal vira o aviso do passo 44 ("Itens não enviados: N", enviar agora ou sair mesmo assim). Os testes que saem usam `sair()` de `tests/ajuda.ts`; `tests/44-seguranca.spec.ts` confere que cancelar mantém a sessão e os caches.
 
