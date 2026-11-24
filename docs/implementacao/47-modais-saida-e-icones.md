@@ -44,7 +44,13 @@ Em ordem:
 
 **Item 7 feito:** o `<select>` tem o visual do app em toda tela, só em CSS (`select` em `app.css`: seta própria na cor do texto, foco, erro e desabilitado nos dois temas; `.campo select` passou a usar `background-color`, para não apagar a seta). O `Escolha` ganhou a escolha única (`unica` e `valor`, com rádios; o modal fecha ao escolher com o mouse ou o Enter), detalhe e opção desabilitada, e substituiu os `<select>` de delegação: bilhete, bloqueio e resposta da mesa (mensagens), assumir uma delegação e registrar pedido de fala (presidência), caderno, participantes da secretaria, entrevistas, coletiva e delegações atingidas da crise. O filtro de notas da crise continua `<select>`, porque só filtra a tela. Nenhum `<select>` encerra ou aprova algo da sessão (o andamento da agenda é reversível). Exemplo no `/estilo`. Nos testes, `escolher()` de `tests/ajuda.ts` faz a escolha. As capturas de referência saem de `npm run capturas` (mesmo contêiner do CI), sem ramo.
 
-**Próximos (itens 8 a 10).** Começar pelo 8, o cabeçalho com ícones.
+**Item 8 feito:** o cabeçalho segue a tabela de ícones. A lupa ("Ir para…") e o sino (avisos) ficam só com o ícone, com `aria-label` e `title`; tema (lua ou sol), idioma (o código PT ou EN, com o nome na língua para onde leva), Perfil e Sair trazem texto ou código. No celular, tema, idioma, Perfil e Sair vão para "Mais" (`.so-largo`), que ganhou os três botões; sem "Mais" (sem acesso, ou até cinco telas), tudo fica no cabeçalho. Tema, idioma e o pedido de saída ficam em `src/lib/preferencias.svelte.ts`, que o perfil também usa. O sino ainda não mostra quantos avisos são novos (a contagem está na Agora). Nos testes, `pedirSaida()` e `sair()` de `tests/ajuda.ts` acham o Sair nos dois lugares; `tests/47-cabecalho.spec.ts` cobre nomes, Tab, tema, idioma e o "Mais".
+
+**Item 9 feito:** o "Ir para…" acha também comitês, veículos e matérias (a matéria abre a prévia). Ao abrir, só lê delegações, comitês e veículos; documentos e matérias chegam numa leitura só, quando a busca passa de uma letra, depois de 250 ms sem digitar, e são lidos de novo a cada abertura. As telas continuam as do menu do papel; separar por papel fica para quando alguém tiver dois papéis com menus diferentes.
+
+**Item 10 feito:** retirar ponto e remover um item não enviado usam desfazer (`src/lib/desfazer.svelte.ts`): a ação espera 5 segundos e "Desfazer" cancela; fechar o app antes também cancela. O aviso "N para enviar" do cabeçalho virou botão e abre a lista dos não enviados (`CaixaDeSaida.svelte`), com remover e enviar agora (`caixa.remover`, com teste de unidade).
+
+**Passo 47 pronto.** Próximo, pela ordem: os lotes 1 e 2 do passo 51 (presidência e Agora sem rolagem), antes do piloto.
 
 **Atenção no item 7 (menus).** O visual próprio do `<select>` muda as capturas de referência do CI (`presidencia.png`, `fila.png` e, com um exemplo de menu no `/estilo`, `estilo-*.png`). No mesmo trabalho, gerar as capturas de novo pelo CI, num ramo para a `main` não ficar vermelha: `gh workflow run ci.yml --ref <ramo> -f atualizar_capturas=true`, baixar os artefatos `capturas-N` para `tests/capturas/`, fazer o commit e só então levar à `main`. Só um `<select>` fica fora de `.campo` (o andamento da agenda), então a regra vale para o elemento `select`.
 
@@ -60,8 +66,8 @@ Favoritos, tamanho do texto e a revisão de rolagem, densidade e estados, tela p
 - [x] Ponta a ponta: clicar numa votação, num ponto e numa nota abre a ficha sem mudar a URL, e a ação da ficha (encerrar votação, retirar ponto) funciona dali.
 - [x] Ponta a ponta: aceitar uma entrevista, escolher destinatários de carta e citar uma delegação numa matéria sem sair da página.
 - [x] Ponta a ponta: escolher uma delegação digitando parte do nome no `Escolha`, só com o teclado.
-- [ ] Textos novos em português e inglês (`npm run textos` passa).
-- [ ] axe em cada modal; todo ícone com nome acessível.
-- [ ] Teclado: Tab e Enter percorrem o cabeçalho, as modais e o "Ir para…".
-- [ ] `npm run tamanho` abaixo de 300 KB depois dos ícones e do `Escolha`.
-- [ ] Capturas: cabeçalho (notebook e celular), modal de saída, fichas da delegação e da votação, `Escolha` aberto e um `<select>` curto, nos dois temas.
+- [x] Textos novos em português e inglês (`npm run textos` passa).
+- [x] axe nas fichas, na prévia, no `Escolha`, no "Ir para…" e no cabeçalho; todo ícone com nome acessível.
+- [x] Teclado: Tab e Enter percorrem o cabeçalho, as modais e o "Ir para…".
+- [x] `npm run tamanho` abaixo de 300 KB depois dos ícones e do `Escolha` (173 KB).
+- [x] Capturas: cabeçalho (notebook e celular, nas capturas de cada tela), diálogo e `Escolha` aberto (`47-modais`) e um `<select>` curto (`/estilo`), nos dois temas. As fichas ficam sem captura própria: os dados mudam a cada rodada.
