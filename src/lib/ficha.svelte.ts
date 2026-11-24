@@ -26,3 +26,13 @@ export function abrirPrevia(tipo: TipoPrevia, id: string) {
 export function fecharPrevia() {
 	previa.id = null;
 }
+
+// Passo 51 (lote 0): anotar no caderno de qualquer tela, num modal no centro. `sobre` já
+// traz a delegação (da ficha ou da página dela); vazio, a nota é geral.
+export const anotacao = $state({ aberta: false, sobre: '', usada: false });
+
+export function abrirAnotacao(sobre = '') {
+	anotacao.sobre = sobre;
+	anotacao.aberta = true;
+	anotacao.usada = true;
+}

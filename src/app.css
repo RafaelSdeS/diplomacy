@@ -483,12 +483,12 @@ main.main-sem-moldura {
 }
 
 .botao--secundario {
-	background: transparent;
+	background: var(--cor-marinho-suave); /* passo 51: com fundo, para não parecer link */
 	color: var(--cor-marinho);
 }
 
 .botao--secundario:hover {
-	background: var(--cor-marinho-suave);
+	background: color-mix(in srgb, var(--cor-marinho) 14%, var(--cor-fundo));
 }
 
 .botao--pequeno {
@@ -1668,6 +1668,11 @@ kbd {
 	list-style: none;
 }
 
+/* Passo 51: os modais de criar algo (bilhete, carta, nota de crise, anotação). */
+dialog.modal-acao {
+	width: min(36rem, calc(100vw - 2rem));
+}
+
 dialog.escolha-modal {
 	width: min(36rem, calc(100vw - 2rem));
 }
@@ -2398,23 +2403,32 @@ dialog.escolha-modal {
 }
 
 /* Passo 43: nas telas ao vivo, o nome abre a ficha por cima, sem sair da tela.
-   Passo 47: o mesmo para votação, ponto e nota (.abre-ficha). */
+   Passo 47: o mesmo para votação, ponto e nota (.abre-ficha).
+   Passo 51: com fundo e seta, para parecer o que é (um botão), não um link. */
 .nome-delegacao--ficha,
 .abre-ficha {
-	padding: 0;
-	border: 0;
-	background: none;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	padding: 0.1rem 0.5rem;
+	border: 1px solid var(--cor-linha);
+	border-radius: var(--raio);
+	background: var(--cor-marinho-suave);
+	color: inherit;
 	font: inherit;
 	text-align: left;
-	text-decoration: underline;
-	text-decoration-color: var(--cor-linha);
-	text-underline-offset: 3px;
 	cursor: pointer;
+}
+
+.nome-delegacao--ficha::after,
+.abre-ficha::after {
+	content: '›' / ''; /* texto alternativo vazio: a seta não entra no nome do botão */
+	color: var(--cor-texto-suave);
 }
 
 .nome-delegacao--ficha:hover,
 .abre-ficha:hover {
-	text-decoration-color: currentColor;
+	border-color: var(--cor-marinho);
 }
 
 /* Modal lateral (as fichas): um painel na lateral direita. */

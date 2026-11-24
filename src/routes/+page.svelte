@@ -126,7 +126,7 @@
 				<p class="suave">{t('Sessão {n}', { n: sessao.numero })} · {FASES[data.aoVivo.fase]} · {FORMAS[estado.forma]}</p>
 				{#if momento === 'pausa'}
 					<p class="telegrama" role="status">
-						{t('Há pontos ou moções?')} <a href={`/comite/${sigla}/sessao`}>{t('Fazer um ponto ou moção')}</a>
+						{t('Há pontos ou moções?')} <a class="botao botao--secundario botao--pequeno" href={`/comite/${sigla}/sessao`}>{t('Fazer um ponto ou moção')}</a>
 					</p>
 				{/if}
 				<p>
@@ -188,7 +188,7 @@
 					</li>
 				{/each}
 				{#each data.bilhetes as b (b.id)}
-					<li><span><strong>{b.de?.nome}</strong> {b.texto}</span> <a href={`/comite/${sigla}/mensagens`}>{t('Responder')}</a></li>
+					<li><span><strong>{b.de?.nome}</strong> {b.texto}</span> <a class="botao botao--secundario botao--pequeno" href={`/comite/${sigla}/mensagens`}>{t('Responder')}</a></li>
 				{/each}
 				{#if nadaParaDelegacao}
 					<li class="suave">{t('Nada esperando você agora.')}</li>
@@ -285,7 +285,7 @@
 		{:else}
 			<p class="suave">{t('Nada mais no cronograma.')}</p>
 		{/if}
-		<p><a href="/cronograma">{t('Ver o cronograma')}</a></p>
+		<p><a class="botao botao--secundario botao--pequeno" href="/cronograma">{t('Ver o cronograma')}</a></p>
 	</article>
 
 	<article class="cartao" aria-labelledby="c-avisos">
@@ -298,7 +298,7 @@
 		{:else}
 			<p class="suave">{t('Nenhum aviso.')}</p>
 		{/each}
-		<p><a href="/avisos">{t('Ver todos os avisos')}</a></p>
+		<p><a class="botao botao--secundario botao--pequeno" href="/avisos">{t('Ver todos os avisos')}</a></p>
 	</article>
 
 	{#if data.respostasCrise.length}
@@ -316,7 +316,7 @@
 				{/each}
 			</ul>
 			<p>
-				<a href={`/comite/${data.participacoes.find((p) => p.comite_id === data.respostasCrise[0].comite_id)?.comite_sigla}/crise`}
+				<a class="botao botao--secundario botao--pequeno" href={`/comite/${data.participacoes.find((p) => p.comite_id === data.respostasCrise[0].comite_id)?.comite_sigla}/crise`}
 					>{t('Ver as notas de crise')}</a
 				>
 			</p>

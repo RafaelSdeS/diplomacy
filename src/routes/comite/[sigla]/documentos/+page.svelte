@@ -40,13 +40,13 @@
 				{#each dposParaAvaliar as dpo (dpo.id)}
 					<li>
 						<span class="com-bandeira"><Bandeira codigo={dpo.delegacao?.bandeira} /> {t('DPO de {delegacao}', { delegacao: dpo.delegacao?.nome ?? '' })} · {t('Tópico')} {dpo.topico}</span>
-						<a href={`/comite/${sigla}/dpo`}>{t('Ler e avaliar')}</a>
+						<a class="botao botao--secundario botao--pequeno" href={`/comite/${sigla}/dpo`}>{t('Ler e avaliar')}</a>
 					</li>
 				{/each}
 				{#each docsParaAvaliar as d (d.id)}
 					<li>
 						<span>{nomeDoDocumento(d)} <span class="detalhe">{d.bloco?.nome}</span></span>
-						<a href={`/documento/${d.id}`}>{t('Ler e avaliar')}</a>
+						<a class="botao botao--secundario botao--pequeno" href={`/documento/${d.id}`}>{t('Ler e avaliar')}</a>
 					</li>
 				{/each}
 				{#if !dposParaAvaliar.length && !docsParaAvaliar.length}
@@ -67,7 +67,7 @@
 							{t('Tópico')} {i + 1}: {titulo}
 							{#if dpo}<span class="selo {STATUS_DPO[dpo.status].selo}">{STATUS_DPO[dpo.status].rotulo}</span>{/if}
 						</span>
-						<a href={`/comite/${sigla}/dpo`}>{dpo ? t('Abrir') : t('Escrever')}</a>
+						<a class="botao botao--secundario botao--pequeno" href={`/comite/${sigla}/dpo`}>{dpo ? t('Abrir') : t('Escrever')}</a>
 					</li>
 				{/each}
 			</ul>
@@ -91,7 +91,7 @@
 					<li class="suave">{data.meusBlocos.length ? t('O seu bloco ainda não tem documentos.') : t('Sua delegação ainda não está num bloco.')}</li>
 				{/each}
 			</ul>
-			<p><a href={`/comite/${sigla}/blocos`}>{t('Blocos e novos documentos')}</a></p>
+			<p><a class="botao botao--secundario botao--pequeno" href={`/comite/${sigla}/blocos`}>{t('Blocos e novos documentos')}</a></p>
 		</section>
 	{/if}
 
@@ -104,14 +104,14 @@
 				<li class="suave">{t('Nenhuma carta ainda.')}</li>
 			{/each}
 		</ul>
-		<p><a href={`/comite/${sigla}/cartas`}>{t('Ler e escrever cartas')}</a></p>
+		<p><a class="botao botao--secundario botao--pequeno" href={`/comite/${sigla}/cartas`}>{t('Ler e escrever cartas')}</a></p>
 	</section>
 
 	{#if data.minha}
 		<section class="cartao" aria-labelledby="t-caderno">
 			<h2 id="t-caderno">{t('Caderno da delegação')}</h2>
 			<p class="suave">{t('Suas anotações sobre as outras delegações e o debate.')}</p>
-			<p><a href={`/comite/${sigla}/caderno`}>{t('Abrir o caderno')}</a></p>
+			<p><a class="botao botao--secundario botao--pequeno" href={`/comite/${sigla}/caderno`}>{t('Abrir o caderno')}</a></p>
 		</section>
 	{/if}
 

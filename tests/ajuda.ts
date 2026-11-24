@@ -23,7 +23,8 @@ export const CONTAS = {
 /** Passo 47: escolhe uma opção no `Escolha` ("Escolher: rótulo" abre a lista num modal, que fecha ao escolher). */
 export async function escolher(escopo: Page | Locator, rotulo: string, nome: string) {
 	await escopo.getByRole('button', { name: `Escolher: ${rotulo}`, exact: true }).click();
-	const modal = ('page' in escopo ? escopo.page() : escopo).locator('dialog[open]');
+	// Pelo nome: o Escolha pode abrir por cima de outro modal (o "Anotar", por exemplo).
+	const modal = ('page' in escopo ? escopo.page() : escopo).getByRole('dialog', { name: rotulo, exact: true });
 	await modal.getByRole('radio', { name: new RegExp(`^${nome}`) }).check();
 	await expect(modal).toBeHidden();
 }

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '#lib/i18n.svelte.ts';
-	import { ficha, fecharFicha } from '#lib/ficha.svelte.ts';
+	import { abrirAnotacao, ficha, fecharFicha } from '#lib/ficha.svelte.ts';
 	import { caixa, mensagemDoEnvio } from '#lib/caixa.ts';
 	import { contador } from '#lib/contador.ts';
 	import { guardarRascunho, lerRascunho } from '#lib/rascunho.ts';
@@ -168,6 +168,7 @@
 		{#if dados?.delegacao && podeEscrever}
 			<button class="botao" type="button" onclick={() => comecar('bilhete')}>{t('Mandar bilhete')}</button>
 			<button class="botao botao--secundario" type="button" onclick={() => comecar('carta')}>{t('Escrever carta')}</button>
+			<button class="botao botao--secundario" type="button" onclick={() => ficha.id && abrirAnotacao(ficha.id)}>{t('Anotar')}</button>
 		{/if}
 		{#if dados?.delegacao}
 			<a class="botao botao--secundario" href={`/comite/${ficha.sigla}/delegacao/${dados.delegacao.id}`} onclick={() => modal?.fechar()}

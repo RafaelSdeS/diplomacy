@@ -24,7 +24,8 @@
 	import { APP, marca } from '#lib/titulo.svelte.ts';
 	import { trilha } from '#lib/trilha.ts';
 	import { anterior, antesDeNavegar, depoisDeNavegar } from '#lib/voltar.svelte.ts';
-	import { ficha, previa } from '#lib/ficha.svelte.ts';
+	import { abrirAnotacao, anotacao, ficha, previa } from '#lib/ficha.svelte.ts';
+	import NotebookPen from '@lucide/svelte/icons/notebook-pen';
 	import { papelPrincipal, rotuloPapel } from '#lib/papeis.ts';
 	import Modal from '#lib/ui/Modal.svelte';
 	import CaixaDeSaida from '#lib/ui/CaixaDeSaida.svelte';
@@ -74,6 +75,8 @@
 	const fichaDelegacao = $derived(ficha.usada ? import('#lib/ui/FichaDelegacao.svelte') : null);
 	// A prévia de documento (passo 47), também só na primeira vez.
 	const previaDocumento = $derived(previa.usada ? import('#lib/ui/Previa.svelte') : null);
+	// O "Anotar" de qualquer tela (passo 51), também só na primeira vez.
+	const anotar = $derived(anotacao.usada ? import('#lib/ui/Anotar.svelte') : null);
 	// "Ir para…" (passo 43): Ctrl+K (ou ⌘K) em qualquer tela; carrega na primeira vez.
 	const buscaIrPara = $derived(irPara.usado ? import('#lib/ui/IrPara.svelte') : null);
 	function atalhoIrPara(evento: KeyboardEvent) {
@@ -237,6 +240,17 @@
 						>
 							<Bell aria-hidden="true" size={16} strokeWidth={1.75} />
 						</a>
+						{#if data.participacoes.some((p) => p.papel === 'delegado')}
+							<button
+								class="botao botao--secundario botao--pequeno botao--icone"
+								type="button"
+								aria-label={t('Anotar no caderno')}
+								title={t('Anotar no caderno')}
+								onclick={() => abrirAnotacao()}
+							>
+								<NotebookPen aria-hidden="true" size={16} strokeWidth={1.75} />
+							</button>
+						{/if}
 					{/if}
 					{#if !online}<span class="selo selo--alerta">{t('Sem conexão')}</span>{/if}
 					<CaixaDeSaida {pendentes} />
@@ -279,15 +293,21 @@
 					</button>
 					{#if comMenu}
 						<a
-							class={['botao botao--secundario botao--pequeno', temMais && 'so-largo']}
+							class="botao botao--secundario botao--pequeno botao--icone"
 							href="/perfil"
+							aria-label={t('Perfil')}
+							title={t('Perfil')}
 							aria-current={page.url.pathname === '/perfil' ? 'page' : undefined}
-							><CircleUser aria-hidden="true" size={16} strokeWidth={1.75} /> {t('Perfil')}</a
+							><CircleUser aria-hidden="true" size={16} strokeWidth={1.75} /></a
 						>
 					{/if}
-					<!-- Sem "Mais" (sem acesso, ou até 5 telas), tudo fica no cabeçalho também no celular. -->
-					<button class={['botao botao--secundario botao--pequeno', temMais && 'so-largo']} type="button" onclick={pedirSaida}
-						><LogOut aria-hidden="true" size={16} strokeWidth={1.75} /> {t('Sair')}</button
+					<!-- Passo 51: Sair só com o ícone, também no celular (a confirmação evita sair sem querer). -->
+					<button
+						class="botao botao--secundario botao--pequeno botao--icone"
+						type="button"
+						aria-label={t('Sair')}
+						title={t('Sair')}
+						onclick={pedirSaida}><LogOut aria-hidden="true" size={16} strokeWidth={1.75} /></button
 					>
 					<Modal bind:this={avisoSaida} rotulo="aviso-saida-titulo">
 						<h3 id="aviso-saida-titulo">{pendentes ? t('Itens não enviados: {n}', { n: pendentes }) : t('Sair da conta?')}</h3>
@@ -359,5 +379,6 @@
 	</div>
 	{#if fichaDelegacao}{#await fichaDelegacao then { default: Ficha }}<Ficha participacoes={data.participacoes} />{/await}{/if}
 	{#if previaDocumento}{#await previaDocumento then { default: Previa }}<Previa />{/await}{/if}
+	{#if anotar}{#await anotar then { default: Anotar }}<Anotar participacoes={data.participacoes} />{/await}{/if}
 	{#if buscaIrPara}{#await buscaIrPara then { default: IrPara }}<IrPara participacoes={data.participacoes} />{/await}{/if}
 {/if}

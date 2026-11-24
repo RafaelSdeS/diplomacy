@@ -1,14 +1,13 @@
 <script lang="ts">
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
-	import { contador } from '#lib/contador.ts';
 	import { bilingue, locale, t } from '#lib/i18n.svelte.ts';
 	import { invalidateAll } from '$app/navigation';
 	import { STATUS_DPO } from '#lib/impressao.ts';
 	import { mensagemDeErro } from '#lib/sessao.ts';
 	import { supabase } from '#lib/supabase.ts';
 	import Bandeira from '#lib/ui/Bandeira.svelte';
-	import { caixa, mensagemDoEnvio } from '#lib/caixa.ts';
-	import { invalidate } from '$app/navigation';
+	import { abrirAnotacao, abrirPrevia } from '#lib/ficha.svelte.ts';
+	import NotebookPen from '@lucide/svelte/icons/notebook-pen';
 	import { ESCOLHAS } from '#lib/votacao.ts';
 	import type { PageProps } from './$types';
 
@@ -33,21 +32,6 @@
 	let mensagem = $state('');
 	// Passo 34: as anotações da sua delegação sobre esta.
 	const minhasSobre = $derived(data.anotacoes.filter((a) => a.delegacao_id === eu?.delegacao_id));
-	let nota = $state('');
-	async function anotar(evento: SubmitEvent) {
-		evento.preventDefault();
-		erro = mensagem = '';
-		const id = crypto.randomUUID();
-		const resultado = await caixa.enviar({
-			id,
-			rpc: 'salvar_anotacao',
-			args: { p_id: id, p_comite: data.comite.id, p_tipo: 'sobre', p_texto: nota, p_sobre: d.id },
-			rotulo: t('Anotação')
-		});
-		({ erro, mensagem } = mensagemDoEnvio(resultado, t('Anotado no caderno.')));
-		if (!erro) nota = '';
-		await invalidate('app:caderno');
-	}
 	async function bloquear() {
 		erro = '';
 		const { error } = await supabase.rpc('bloquear_bilhetes', { p_comite: data.comite.id, p_delegacao: d.id, p_bloquear: !bloqueei });
@@ -96,13 +80,11 @@
 				<li class="suave">{t('Só a sua delegação lê o que anotar aqui.')}</li>
 			{/each}
 		</ul>
-		<form class="formulario" onsubmit={anotar} aria-label={t('Nova anotação')}>
-			<label class="campo">
-				{t('Anotação')}
-				<textarea required rows="2" maxlength="4000" bind:value={nota} {@attach contador(nota)}></textarea>
-			</label>
-			<button class="botao botao--secundario botao--pequeno">{t('Guardar no caderno')}</button>
-		</form>
+		<p>
+			<button class="botao botao--secundario" type="button" onclick={() => abrirAnotacao(d.id)}
+				><NotebookPen aria-hidden="true" size={18} strokeWidth={1.75} /> {t('Anotar sobre {delegacao}', { delegacao: d.nome })}</button
+			>
+		</p>
 	</section>
 {/if}
 
@@ -133,13 +115,13 @@
 		{#each data.dpos as dpo (dpo.id)}
 			<li>
 				<span>{t('DPO')} · {t('Tópico')} {dpo.topico} <span class="selo {STATUS_DPO[dpo.status].selo}">{STATUS_DPO[dpo.status].rotulo}</span></span>
-				<a href={`/imprimir/dpo/${dpo.id}`}>{t('Ler')}</a>
+				<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => abrirPrevia('dpo', dpo.id)}>{t('Ler')}</button>
 			</li>
 		{/each}
 		{#each data.cartas as c (c.id)}
 			<li>
 				<span>{t('Carta')} · {c.titulo} <span class="detalhe">{quando(c.enviada_em)}</span></span>
-				<a href={`/imprimir/carta/${c.id}`}>{t('Ler')}</a>
+				<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => abrirPrevia('carta', c.id)}>{t('Ler')}</button>
 			</li>
 		{/each}
 		{#if !data.dpos.length && !data.cartas.length}

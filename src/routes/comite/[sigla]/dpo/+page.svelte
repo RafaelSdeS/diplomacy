@@ -104,7 +104,7 @@
 			<h2 id={`t-dpo-${topico}`}>{t('Tópico')} {topico}: {titulo}</h2>
 			<p class="cabecalho-documento">
 				<span class="selo {STATUS[d?.status ?? 'rascunho'].selo}">{STATUS[d?.status ?? 'rascunho'].rotulo}</span>
-				{#if d}<a href={`/imprimir/dpo/${d.id}`}>{t('Imprimir ou salvar como PDF')}</a>{/if}
+				{#if d}<a class="botao botao--secundario botao--pequeno" href={`/imprimir/dpo/${d.id}`}>{t('Imprimir ou salvar como PDF')}</a>{/if}
 			</p>
 			{#if d?.comentario_mesa}
 				<p class="telegrama" role="note" aria-label={t('Comentário da mesa')}>{d.comentario_mesa}</p>

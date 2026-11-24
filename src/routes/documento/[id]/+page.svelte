@@ -634,5 +634,5 @@
 		{/each}
 		{#if formatado.signatarios}<p class="signatarios">{formatado.signatarios}</p>{/if}
 	</article>
-	<p><a href={`/imprimir/documento/${d.id}`}>{t('Imprimir ou salvar como PDF')}</a></p>
+	<p><a class="botao botao--secundario botao--pequeno" href={`/imprimir/documento/${d.id}`}>{t('Imprimir ou salvar como PDF')}</a></p>
 </details>

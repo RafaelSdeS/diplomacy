@@ -122,7 +122,7 @@
 		{#if tipo !== 'fala'}<p class="detalhe">{descricao}</p>{/if}
 		<div class="acoes">
 			<button class="botao botao--secundario botao--pequeno" disabled={enviando}>{t('Guardar no caderno')}</button>
-			<a href={`/comite/${comite.sigla}/caderno`}>{t('Abrir o caderno')}</a>
+			<a class="botao botao--secundario botao--pequeno" href={`/comite/${comite.sigla}/caderno`}>{t('Abrir o caderno')}</a>
 		</div>
 	</form>
 </article>

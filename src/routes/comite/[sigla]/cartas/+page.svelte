@@ -84,7 +84,7 @@
 					{#if c.publica}<span class="selo selo--info">{t('Pública')}</span>{/if}
 					<span class="detalhe">{t('De')} {de(c)} · {t('para')} {para(c)} · {formatarQuando(c.enviada_em, agora)}</span>
 				</span>
-				<a href={`/imprimir/carta/${c.id}`} aria-label={`Abrir e imprimir a carta "${c.titulo}"`}>{t('Abrir')}</a>
+				<a class="botao botao--secundario botao--pequeno" href={`/imprimir/carta/${c.id}`} aria-label={`Abrir e imprimir a carta "${c.titulo}"`}>{t('Abrir')}</a>
 			</li>
 		{:else}
 			<li class="suave">{t('Nenhuma carta ainda.')}</li>

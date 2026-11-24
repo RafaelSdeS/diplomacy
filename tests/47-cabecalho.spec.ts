@@ -18,10 +18,11 @@ test('a lupa e o sino têm nome; tema e idioma trocam na hora; Tab percorre tudo
 	await expect(cabecalho.getByRole('button', { name: 'Ir para…' })).toBeVisible();
 	await expect(cabecalho.getByRole('link', { name: 'Avisos' })).toHaveAttribute('href', '/avisos');
 	if (info.project.name === 'celular') {
-		// No celular, tema, idioma, Perfil e Sair ficam em "Mais", com texto.
-		await expect(cabecalho.getByRole('button', { name: 'Sair', exact: true })).toBeHidden();
+		// Passo 51: Perfil e Sair só com o ícone, também no celular; tema e idioma ficam em "Mais".
+		await expect(cabecalho.getByRole('button', { name: 'Sair', exact: true })).toBeVisible();
+		await expect(cabecalho.getByRole('link', { name: 'Perfil' })).toBeVisible();
+		await expect(cabecalho.getByRole('button', { name: /^Usar o tema/ })).toBeHidden();
 		await page.getByRole('navigation', { name: 'Principal' }).getByRole('link', { name: 'Mais', exact: true }).click();
-		await expect(page.getByRole('main').getByRole('button', { name: /^Sair/ })).toBeVisible();
 		await page.getByRole('main').getByRole('button', { name: /^Usar o tema/ }).click();
 		await expect(page.locator('html')).toHaveAttribute('data-theme', /dark|light/);
 		return;
@@ -96,4 +97,25 @@ test('um bilhete não enviado sai da caixa com "Remover", e "Desfazer" o traz de
 	await context.setOffline(false);
 	const chile = await clienteComo(CHILE);
 	await expect.poll(async () => (await chile.from('mensagem').select('id').eq('texto', texto)).data?.length, { timeout: 5_000 }).toBe(0);
+});
+
+test('o delegado anota sobre uma delegação de qualquer tela, sem ir à aba Caderno', async ({ page }, info) => {
+	test.skip(info.project.name !== 'notebook', 'uma tela basta');
+	const texto = `O Brasil quer mudar a cláusula 3 ${Date.now()}`;
+	await entrar(page, CHILE);
+	await page.getByRole('banner').getByRole('button', { name: 'Anotar no caderno' }).click();
+	const modal = page.getByRole('dialog', { name: 'Anotar no caderno' });
+	await escolher(modal, 'Sobre a delegação (opcional)', 'Brasil');
+	await modal.getByLabel('Anotação').fill(texto);
+	expect((await new AxeBuilder({ page }).include('dialog[open]').analyze()).violations).toEqual([]);
+	await modal.getByRole('button', { name: 'Guardar no caderno' }).click();
+	await expect(modal).toBeHidden();
+
+	// A página da delegação mostra a nota, e o botão dela abre o mesmo modal já com o Brasil.
+	const chile = await clienteComo(CHILE);
+	const brasil = (await chile.from('delegacao').select('id').eq('nome', 'Brasil').eq('comite_id', (await chile.from('comite').select('id').eq('sigla', isolado('47').sigla).single()).data!.id).single()).data!.id;
+	await page.goto(`/comite/${isolado('47').sigla}/delegacao/${brasil}`);
+	await expect(page.getByRole('region', { name: /^Suas anotações sobre Brasil/ })).toContainText(texto);
+	await page.getByRole('button', { name: 'Anotar sobre Brasil' }).click();
+	await expect(modal.locator('.escolha-resumo')).toContainText('Brasil');
 });
