@@ -28,13 +28,17 @@ Em ordem:
 9. **"Ir para…" ampliado:** veículos, matérias, comitês e agrupamento por papel, começando só com dados leves e buscando mais conforme a digitação, com espera curta entre as teclas (hoje carrega até 200 documentos ao abrir, `IrPara.svelte:33`).
 10. **Desfazer no lugar de confirmar** quando a ação é reversível (retirar ponto, remover item não enviado).
 
+## Estado (24/11/2026)
+
+**Item 1 feito:** `src/lib/ui/Modal.svelte`, com `abrir()` e `fechar()` por `bind:this`, `lateral` para as fichas (a regra `dialog.ficha` do CSS virou `dialog.modal-lateral`) e o clique no fundo protegido quando há texto digitado. `Confirmar`, `FichaDelegacao`, `IrPara` e o exemplo do `/estilo` já o usam, sem mudança visual. O foco inicial continua o nativo: no `Confirmar`, o botão da ação, porque o teste do piloto confirma com Tab e Enter. Testes em `tests/47-modais.spec.ts`. Ainda com `<dialog>` próprio: o aviso de saída do layout (vira o item 2), a placa da sessão e a leitura da fala no caderno.
+
 ## Fora desta etapa
 
 Favoritos, tamanho do texto e a revisão de rolagem, densidade e estados, tela por tela (passo 51).
 
 ## Testes
 
-- [ ] Modal base: um teste de componente cobre foco inicial, Escape, clique no fundo (fecha vazio, não fecha com texto digitado) e retorno do foco; os modais do app herdam esse comportamento.
+- [x] Modal base: um teste de componente cobre foco inicial, Escape, clique no fundo (fecha vazio, não fecha com texto digitado) e retorno do foco; os modais do app herdam esse comportamento.
 - [ ] Ponta a ponta: *Sair* abre a confirmação, cancelar mantém a sessão, confirmar apaga os caches e volta ao login; com um item na caixa de saída a modal mostra o aviso e "enviar agora" envia antes de sair; cada ação irreversível da lista pede confirmação.
 - [ ] Ponta a ponta: clicar numa votação, num ponto e numa nota abre a ficha sem mudar a URL, e a ação da ficha (encerrar votação, retirar ponto) funciona dali.
 - [ ] Ponta a ponta: aceitar uma entrevista, escolher destinatários de carta e citar uma delegação numa matéria sem sair da página.

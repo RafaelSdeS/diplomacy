@@ -9,6 +9,7 @@
 	import type { Papel } from '#lib/supabase.ts';
 	import { supabase } from '#lib/supabase.ts';
 	import Bandeira from './Bandeira.svelte';
+	import Modal from './Modal.svelte';
 
 	// Passo 43: achar o que se quer sem saber onde fica. Telas do papel, delegações do
 	// comitê (abrem a ficha) e documentos pelo título. Uma consulta ao abrir.
@@ -21,7 +22,7 @@
 		{ href: '/perfil', rotulo: t('Perfil'), descricao: t('Seus dados, idioma, tema e notificações') }
 	]);
 
-	let caixa = $state<HTMLDialogElement>();
+	let modal = $state<Modal>();
 	let busca = $state('');
 	let delegacoes = $state<{ id: string; nome: string; nome_oficial: string; bandeira: string | null }[]>([]);
 	let documentos = $state<{ id: string; tipo: string; numero: number | null; titulo: string }[]>([]);
@@ -37,9 +38,9 @@
 	}
 
 	$effect(() => {
-		if (!irPara.aberto || !caixa) return;
+		if (!irPara.aberto || !modal) return;
 		busca = '';
-		if (!caixa.open) caixa.showModal();
+		modal.abrir();
 		void carregar();
 	});
 
@@ -53,7 +54,7 @@
 	});
 
 	function fechar() {
-		caixa?.close();
+		modal?.fechar();
 	}
 	function abrirDelegacao(id: string) {
 		fechar();
@@ -74,7 +75,7 @@
 	}
 </script>
 
-<dialog bind:this={caixa} class="ir-para" aria-labelledby="ir-para-titulo" onclose={() => (irPara.aberto = false)}>
+<Modal bind:this={modal} classe="ir-para" rotulo="ir-para-titulo" onclose={() => (irPara.aberto = false)}>
 	<form onsubmit={primeiro} role="search">
 		<label class="campo">
 			<span id="ir-para-titulo">{t('Ir para…')}</span>
@@ -115,4 +116,4 @@
 		<p class="suave">{t('Nada encontrado.')}</p>
 	{/if}
 	<form method="dialog" class="acoes"><button class="botao botao--secundario">{t('Fechar')}</button></form>
-</dialog>
+</Modal>

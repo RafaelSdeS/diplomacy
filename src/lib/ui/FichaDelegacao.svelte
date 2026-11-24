@@ -5,6 +5,7 @@
 	import { supabase } from '#lib/supabase.ts';
 	import { ESCOLHAS } from '#lib/votacao.ts';
 	import Bandeira from './Bandeira.svelte';
+	import Modal from './Modal.svelte';
 
 	// Passo 43: a ficha da delegação, aberta por cima da tela ao vivo. O resumo da página da
 	// delegação (a RLS decide o que aparece); a página completa fica a um clique.
@@ -30,17 +31,17 @@
 		};
 	}
 
-	let caixa = $state<HTMLDialogElement>();
+	let modal = $state<Modal>();
 	let dados = $state<Awaited<ReturnType<typeof carregar>> | null>(null);
 	let erro = $state('');
 	const SITUACAO: Record<string, string> = { observadora: 'Observadora', suspensa: 'Suspensa' };
 
 	$effect(() => {
 		const id = ficha.id;
-		if (!id || !caixa) return;
+		if (!id || !modal) return;
 		dados = null;
 		erro = '';
-		if (!caixa.open) caixa.showModal();
+		modal.abrir();
 		carregar(id)
 			.then((d) => {
 				if (ficha.id === id) dados = d;
@@ -49,7 +50,7 @@
 	});
 </script>
 
-<dialog bind:this={caixa} class="ficha" aria-labelledby="ficha-titulo" onclose={fecharFicha}>
+<Modal bind:this={modal} lateral classe="ficha" rotulo="ficha-titulo" onclose={fecharFicha}>
 	{#if dados?.delegacao}
 		{@const d = dados.delegacao}
 		<p class="ficha-bandeira"><Bandeira codigo={d.bandeira} /></p>
@@ -81,10 +82,10 @@
 	{/if}
 	<div class="acoes">
 		{#if dados?.delegacao}
-			<a class="botao botao--secundario" href={`/comite/${ficha.sigla}/delegacao/${dados.delegacao.id}`} onclick={() => caixa?.close()}
+			<a class="botao botao--secundario" href={`/comite/${ficha.sigla}/delegacao/${dados.delegacao.id}`} onclick={() => modal?.fechar()}
 				>{t('Abrir a página da delegação')}</a
 			>
 		{/if}
 		<form method="dialog"><button class="botao">{t('Fechar')}</button></form>
 	</div>
-</dialog>
+</Modal>

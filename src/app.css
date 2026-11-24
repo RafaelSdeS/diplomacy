@@ -2340,8 +2340,8 @@ kbd {
 	text-decoration-color: currentColor;
 }
 
-/* A ficha da delegação: um painel na lateral direita. */
-dialog.ficha {
+/* Modal lateral (as fichas): um painel na lateral direita. */
+dialog.modal-lateral {
 	margin: 0 0 0 auto;
 	width: min(26rem, 100vw);
 	max-width: 100vw;

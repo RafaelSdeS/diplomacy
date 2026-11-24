@@ -3,9 +3,10 @@
 	import Check from '@lucide/svelte/icons/check';
 	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
 	import X from '@lucide/svelte/icons/x';
+	import Modal from '#lib/ui/Modal.svelte';
 
 	// Referência visual do app e base dos testes de aparência. Não tem dados e não fica no menu.
-	let dialogo = $state<HTMLDialogElement>();
+	let dialogo = $state<Modal>();
 
 	const cores = [
 		['--cor-fundo', 'Fundo'],
@@ -81,17 +82,17 @@
 
 <section aria-labelledby="t-dialogo">
 	<h2 id="t-dialogo">Diálogo</h2>
-	<button class="botao botao--secundario" type="button" onclick={() => dialogo?.showModal()}>
+	<button class="botao botao--secundario" type="button" onclick={() => dialogo?.abrir()}>
 		Abrir diálogo
 	</button>
-	<dialog bind:this={dialogo} aria-labelledby="t-dialogo-titulo">
+	<Modal bind:this={dialogo} rotulo="t-dialogo-titulo">
 		<h3 id="t-dialogo-titulo">Encerrar a votação?</h3>
 		<p>Os votos não poderão mais ser alterados.</p>
 		<form method="dialog" class="linha">
 			<button class="botao">Encerrar</button>
 			<button class="botao botao--secundario">Cancelar</button>
 		</form>
-	</dialog>
+	</Modal>
 </section>
 
 <style>
