@@ -103,3 +103,23 @@ test('a ficha da nota mostra o texto inteiro, na página da crise', async ({ pag
 	expect(page.url()).toBe(url);
 	await semErrosDeAcessibilidade(page);
 });
+
+test('a prévia da carta abre na central de Documentos e na página de cartas, sem mudar a URL', async ({ page }) => {
+	const paraguai = await clienteComo(PARAGUAI);
+	const titulo = `Convite ao diálogo ${Date.now()}`;
+	const corpo = 'O Paraguai convida as delegações para uma reunião.\n\nAguardamos as respostas.';
+	expect((await paraguai.rpc('enviar_carta', { p_comite: comite, p_titulo: titulo, p_corpo: corpo, p_publica: true })).error).toBeNull();
+
+	await entrar(page, PARAGUAI);
+	for (const rota of [`/comite/${C.sigla}/documentos`, `/comite/${C.sigla}/cartas`]) {
+		await page.goto(rota);
+		await page.getByRole('button', { name: titulo }).click();
+		const previa = page.getByRole('dialog', { name: titulo });
+		await expect(previa).toContainText('Aguardamos as respostas.');
+		await expect(previa.getByRole('link', { name: 'Imprimir ou salvar como PDF' })).toHaveAttribute('href', /^\/imprimir\/carta\//);
+		expect(page.url()).toContain(rota);
+		await semErrosDeAcessibilidade(page);
+		await page.keyboard.press('Escape');
+		await expect(previa).toBeHidden();
+	}
+});

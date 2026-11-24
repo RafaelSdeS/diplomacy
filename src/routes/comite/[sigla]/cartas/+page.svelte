@@ -2,6 +2,7 @@
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { contador } from '#lib/contador.ts';
 	import { t } from '#lib/i18n.svelte.ts';
+	import { abrirPrevia } from '#lib/ficha.svelte.ts';
 	import { untrack } from 'svelte';
 	import { guardarRascunho, lerRascunho } from '#lib/rascunho.ts';
 	import { invalidate } from '$app/navigation';
@@ -78,7 +79,7 @@
 		{#each data.cartas as c (c.id)}
 			<li>
 				<span>
-					<strong>{c.titulo}</strong>
+					<strong><button class="abre-ficha" type="button" onclick={() => abrirPrevia('carta', c.id)}>{c.titulo}</button></strong>
 					{#if c.publica}<span class="selo selo--info">{t('Pública')}</span>{/if}
 					<span class="detalhe">{t('De')} {de(c)} · {t('para')} {para(c)} · {formatarQuando(c.enviada_em, agora)}</span>
 				</span>

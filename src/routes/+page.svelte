@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { t } from '#lib/i18n.svelte.ts';
+	import { abrirPrevia } from '#lib/ficha.svelte.ts';
 	import { formatarDia, formatarHora, formatarQuando, itensAtuais, proximoItem } from '#lib/cronograma.ts';
 	import { FASES } from '#lib/votacao.ts';
 	import { SELO_NOTA, STATUS_NOTA, type StatusNota } from '#lib/crise.ts';
@@ -321,7 +322,7 @@
 				{#each data.citacoes as n (n.id)}
 					<li>
 						<span>
-							<a href={`/press/${n.veiculo?.comite?.sigla}?n=${n.id}`}>{n.titulo}</a>
+							<button class="abre-ficha" type="button" onclick={() => abrirPrevia('noticia', n.id)}>{n.titulo}</button>
 							<span class="detalhe">{t('{veiculo} cita a sua delegação', { veiculo: n.veiculo?.nome ?? '' })}</span>
 						</span>
 					</li>

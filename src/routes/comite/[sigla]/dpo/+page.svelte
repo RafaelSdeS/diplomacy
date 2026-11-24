@@ -5,6 +5,7 @@
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { contador } from '#lib/contador.ts';
 	import { t } from '#lib/i18n.svelte.ts';
+	import { abrirPrevia } from '#lib/ficha.svelte.ts';
 	import { STATUS_DPO as STATUS } from '#lib/impressao.ts';
 	import { untrack } from 'svelte';
 	import { invalidate } from '$app/navigation';
@@ -146,7 +147,12 @@
 						<span class="detalhe">{t('Tópico')} {d.topico} · <span class="selo {STATUS[d.status].selo}">{STATUS[d.status].rotulo}</span></span>
 					</span>
 					<span class="acoes">
-						<a href={`/imprimir/dpo/${d.id}`} aria-label={`Imprimir o DPO de ${d.delegacao?.nome}, tópico ${d.topico}`}>{t('Imprimir')}</a>
+						<button
+							class="abre-ficha"
+							type="button"
+							aria-label={`${t('Ler')}: ${t('DPO de {delegacao}', { delegacao: d.delegacao?.nome ?? '' })}, ${t('Tópico')} ${d.topico}`}
+							onclick={() => abrirPrevia('dpo', d.id)}>{t('Ler')}</button
+						>
 						{#if ehMesa && (d.status === 'enviado' || d.status === 'aprovado')}
 							<button
 								class="botao botao--pequeno"

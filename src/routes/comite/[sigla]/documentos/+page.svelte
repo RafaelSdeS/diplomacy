@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { t } from '#lib/i18n.svelte.ts';
+	import { abrirPrevia } from '#lib/ficha.svelte.ts';
 	import { formatarHora } from '#lib/cronograma.ts';
 	import { nomeDoDocumento, STATUS_DOCUMENTO } from '#lib/formatacao.ts';
 	import { STATUS_DPO } from '#lib/impressao.ts';
@@ -98,7 +99,7 @@
 		<h2 id="t-cartas">{t('Cartas')}</h2>
 		<ul class="lista">
 			{#each data.cartas as c (c.id)}
-				<li><span>{c.titulo} <span class="detalhe">{c.remetente?.nome}</span></span></li>
+				<li><span><button class="abre-ficha" type="button" onclick={() => abrirPrevia('carta', c.id)}>{c.titulo}</button> <span class="detalhe">{c.remetente?.nome}</span></span></li>
 			{:else}
 				<li class="suave">{t('Nenhuma carta ainda.')}</li>
 			{/each}
@@ -119,14 +120,19 @@
 		<ul class="lista">
 			{#each doComite as d (d.id)}
 				<li>
-					<span><a href={`/documento/${d.id}`}>{nomeDoDocumento(d)}</a> <span class="detalhe">{d.bloco?.nome}</span></span>
+					<span><button class="abre-ficha" type="button" onclick={() => abrirPrevia('documento', d.id)}>{nomeDoDocumento(d)}</button> <span class="detalhe">{d.bloco?.nome}</span></span>
 					{#if STATUS_DOCUMENTO[d.status]}<span class="selo {STATUS_DOCUMENTO[d.status].selo}">{STATUS_DOCUMENTO[d.status].rotulo}</span>{/if}
 				</li>
 			{/each}
 			{#each dposDoComite as dpo (dpo.id)}
 				<li>
 					<span class="com-bandeira"><Bandeira codigo={dpo.delegacao?.bandeira} /> {t('DPO de {delegacao}', { delegacao: dpo.delegacao?.nome ?? '' })} · {t('Tópico')} {dpo.topico}</span>
-					<a href={`/comite/${sigla}/dpo`}>{t('Ler')}</a>
+					<button
+						class="abre-ficha"
+						type="button"
+						aria-label={`${t('Ler')}: ${t('DPO de {delegacao}', { delegacao: dpo.delegacao?.nome ?? '' })}, ${t('Tópico')} ${dpo.topico}`}
+						onclick={() => abrirPrevia('dpo', dpo.id)}>{t('Ler')}</button
+					>
 				</li>
 			{/each}
 			{#if !doComite.length && !dposDoComite.length}

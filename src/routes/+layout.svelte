@@ -16,7 +16,7 @@
 	import { APP, marca } from '#lib/titulo.svelte.ts';
 	import { trilha } from '#lib/trilha.ts';
 	import { anterior, antesDeNavegar, depoisDeNavegar } from '#lib/voltar.svelte.ts';
-	import { ficha } from '#lib/ficha.svelte.ts';
+	import { ficha, previa } from '#lib/ficha.svelte.ts';
 	import { papelPrincipal, rotuloPapel } from '#lib/papeis.ts';
 	import Modal from '#lib/ui/Modal.svelte';
 	import Trilha from '#lib/ui/Trilha.svelte';
@@ -63,6 +63,8 @@
 	const volta = $derived(anterior());
 	// A ficha da delegação (e as bandeiras dela) só carrega na primeira vez que alguém a abre.
 	const fichaDelegacao = $derived(ficha.usada ? import('#lib/ui/FichaDelegacao.svelte') : null);
+	// A prévia de documento (passo 47), também só na primeira vez.
+	const previaDocumento = $derived(previa.usada ? import('#lib/ui/Previa.svelte') : null);
 	// "Ir para…" (passo 43): Ctrl+K (ou ⌘K) em qualquer tela; carrega na primeira vez.
 	const buscaIrPara = $derived(irPara.usado ? import('#lib/ui/IrPara.svelte') : null);
 	function atalhoIrPara(evento: KeyboardEvent) {
@@ -309,5 +311,6 @@
 		</main>
 	</div>
 	{#if fichaDelegacao}{#await fichaDelegacao then { default: Ficha }}<Ficha />{/await}{/if}
+	{#if previaDocumento}{#await previaDocumento then { default: Previa }}<Previa />{/await}{/if}
 	{#if buscaIrPara}{#await buscaIrPara then { default: IrPara }}<IrPara participacoes={data.participacoes} />{/await}{/if}
 {/if}
