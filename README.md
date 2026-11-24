@@ -4,7 +4,7 @@ App web tudo em um para simulações da ONU (MUNs), começando pelo [UFRGSMUN](h
 
 **No ar:** [diplomacy.rafesilvadesouza.workers.dev](https://diplomacy.rafesilvadesouza.workers.dev). Não há cadastro livre: as contas são criadas pela secretaria.
 
-> **Status:** os passos 01 a 46 estão prontos (do 45, só a parte A), e o piloto está [publicado](https://diplomacy.rafesilvadesouza.workers.dev). Os comitês funcionam em português e em inglês; a secretaria, só em português. A próxima etapa é a sessão de teste com pessoas, pelo roteiro em [docs/piloto.md](docs/piloto.md); depois vêm o 45 parte B, o 47 e o 48.
+> **Status:** os passos 01 a 46 estão prontos (do 45, só a parte A), e o piloto está [publicado](https://diplomacy.rafesilvadesouza.workers.dev). Os comitês funcionam em português e em inglês; a secretaria, só em português. A próxima etapa é a interface: o passo 47 (modais, menus de escolha e confirmação) e a presidência e a Agora sem rolagem (passo 51). A sessão de teste com pessoas, pelo roteiro em [docs/piloto.md](docs/piloto.md), vem depois; em seguida, o 45 parte B e o 48.
 
 ## O problema
 
@@ -107,7 +107,7 @@ Cada passo traz os testes que provam que ele funciona. Um passo só termina quan
 | [44](docs/implementacao/44-seguranca-dos-dados.md) | Segurança dos dados e das sessões |
 | [45](docs/implementacao/45-coletiva-oral.md) | Coletiva de imprensa como fluxo oral |
 | [46](docs/implementacao/46-agora-e-sessao-unificadas.md) | Agora operacional e sessão unificada |
-| [47](docs/implementacao/47-modais-saida-e-icones.md) | Modais, saída com confirmação e ícones |
+| [47](docs/implementacao/47-modais-saida-e-icones.md) | Modais, menus de escolha, saída com confirmação e ícones |
 | [48](docs/implementacao/48-demonstracao-online.md) | Demonstração online com acesso por papel |
 | [49](docs/implementacao/49-edicao-por-clausula.md) | Edição colaborativa por cláusula |
 | [50](docs/implementacao/50-preparacao-da-fala.md) | Preparação de discursos durante o debate |

@@ -1,6 +1,6 @@
 # Ordem de prioridade dos próximos planos
 
-**Atualizado:** 23 de novembro de 2026
+**Atualizado:** 24 de novembro de 2026
 
 Este documento consolida os planos discutidos e define uma ordem para o trabalho futuro. Cada plano virou um passo do [plano de implementação](implementacao/README.md) (passos 44 a 51), com esforço e dependências.
 
@@ -18,33 +18,33 @@ Recomendação geral: não começar todos os itens ao mesmo tempo. Trabalhar por
 
 ## Ordem recomendada
 
-A sequência de execução tem o **piloto no meio**: primeiro o que protege os dados e dá ao delegado o que ele usa o tempo todo (passos 44, 45 parte A e 46); depois a sessão de teste do passo 12; só então o resto, já com o que o piloto mostrou. A coletiva se divide em duas partes (ver a seção 2): o texto protegido vai antes do piloto, o fluxo oral completo depois.
+A sequência de execução tem o **piloto depois da interface**. Os passos 44, 45 parte A e 46 estão feitos. Em 24/11/2026 a sessão de teste foi adiada: a interface ainda está carregada, com ações simples que levam a outra página, pedem rolagem ou passam por menus genéricos, e testar assim mediria esse excesso, não o app. Primeiro vêm o passo 47 ampliado e os lotes 1 e 2 do passo 51 (presidência e Agora); depois a sessão de teste do passo 12; só então o resto, já com o que o piloto mostrou. A coletiva segue dividida em duas partes (ver a seção 2): o texto protegido já está feito, o fluxo oral completo vem depois do piloto.
 
 | Ordem | Passo | Plano | Esforço | Por que nesta posição | Escopo mínimo |
 |---:|---|---|:-:|---|---|
-| 1 | [44](implementacao/44-seguranca-dos-dados.md) | Segurança da sessão e dos dados | M | Impede vazamento e acesso indevido em aparelhos compartilhados, e o piloto já os usa | Cache offline por usuário, limpeza de sessão, testes de RLS e revogação de participação |
-| 2 | [45](implementacao/45-coletiva-oral.md) **parte A** | Texto da pergunta da coletiva protegido | P | Hoje o texto da pergunta é legível por todo o evento | Tabela `coletiva_pergunta_texto`, regra de leitura e migração em três passos |
-| 3 | [46](implementacao/46-agora-e-sessao-unificadas.md) | Agora operacional e sessão unificada | M | Reduz a maior dificuldade de uso durante o debate, que é o que o piloto mede | Nota rápida e próxima fala sempre visíveis; pendência que leva direto à ação |
-| — | [12](implementacao/12-teste-do-piloto.md) | **Sessão de teste do piloto** ([piloto.md](piloto.md)) | — | Valida o que existe antes de construir mais | Roteiro, questionário e plano B em papel |
-| 4 | [45](implementacao/45-coletiva-oral.md) **parte B** | Coletiva de imprensa como fluxo oral | M | Corrige uma área hoje sem utilidade real, já com o que o piloto disse sobre a imprensa | Estados, chamada, cartão da delegação, telão da coletiva, cronômetro e conclusão |
-| 5 | [47](implementacao/47-modais-saida-e-icones.md) | Modais, saída segura e ícones | M | Reduz mudanças de página e melhora a aparência oficial; a demonstração depende dele | Saída com confirmação, `Confirmar` nas ações irreversíveis, ícones do cabeçalho |
-| 6 | [48](implementacao/48-demonstracao-online.md) | Demonstração online com acesso rápido por papel | M | Depende da segurança, da coletiva e dos modais; mostra o app inteiro por papel | Projeto separado, um comitê completo, `/demo` por papel e reinício |
-| 7 | [49](implementacao/49-edicao-por-clausula.md) | Edição colaborativa por cláusula | G | Resolve o problema central de documentos sem discussões infinitas, **se o piloto confirmar** | Proposta estruturada, rodada com prazo, comparação e fusão básica |
-| 8 | [50](implementacao/50-preparacao-da-fala.md) | Preparação de discursos e notas | M | Permite acompanhar outras delegações enquanto prepara a próxima fala, **se o piloto confirmar** | Captura rápida por tipo, painel curto da delegação e rascunho da fala |
-| 9 | [51](implementacao/51-melhorias-gerais-de-interface.md) | Melhorias gerais | G | Endereça problemas menores depois das bases acima | Voltar, estados vazios, placeholders, densidade e consistência |
+| 1 | [44](implementacao/44-seguranca-dos-dados.md) | Segurança da sessão e dos dados (**feito**) | M | Impede vazamento e acesso indevido em aparelhos compartilhados, e o piloto já os usa | Cache offline por usuário, limpeza de sessão, testes de RLS e revogação de participação |
+| 2 | [45](implementacao/45-coletiva-oral.md) **parte A** | Texto da pergunta da coletiva protegido (**feito**) | P | Hoje o texto da pergunta é legível por todo o evento | Tabela `coletiva_pergunta_texto`, regra de leitura e migração em três passos |
+| 3 | [46](implementacao/46-agora-e-sessao-unificadas.md) | Agora operacional e sessão unificada (**feito**) | M | Reduz a maior dificuldade de uso durante o debate, que é o que o piloto mede | Nota rápida e próxima fala sempre visíveis; pendência que leva direto à ação |
+| 4 | [47](implementacao/47-modais-saida-e-icones.md) | Modais, menus de escolha, saída segura e ícones | G | Ataca o que mais atrapalha hoje: ações que trocam de página, menus genéricos e interface carregada; a demonstração depende dele | Modal base; fichas de votação, ponto, moção e nota; modais de ação curta; menus de escolha; saída com confirmação; `Confirmar` nas ações irreversíveis; ícones do cabeçalho |
+| 5 | [51](implementacao/51-melhorias-gerais-de-interface.md) **lotes 1 e 2** | Presidência e Agora sem rolagem | M | São as telas que o roteiro do piloto mais usa, e hoje empilham blocos | Regra de rolagem a 1366 × 768; presidência por fase; Agora com o bloco do papel no topo |
+| — | [12](implementacao/12-teste-do-piloto.md) | **Sessão de teste do piloto** ([piloto.md](piloto.md)) | — | Valida o app já com a interface limpa, antes de construir mais | Roteiro, questionário e plano B em papel |
+| 6 | [45](implementacao/45-coletiva-oral.md) **parte B** | Coletiva de imprensa como fluxo oral | M | Corrige uma área hoje sem utilidade real, já com o que o piloto disse sobre a imprensa | Estados, chamada, cartão da delegação, telão da coletiva, cronômetro e conclusão |
+| 7 | [48](implementacao/48-demonstracao-online.md) | Demonstração online com acesso rápido por papel | M | Depende da segurança, da coletiva e dos modais; mostra o app inteiro por papel | Projeto separado, um comitê completo, `/demo` por papel e reinício |
+| 8 | [49](implementacao/49-edicao-por-clausula.md) | Edição colaborativa por cláusula | G | Resolve o problema central de documentos sem discussões infinitas, **se o piloto confirmar** | Proposta estruturada, rodada com prazo, comparação e fusão básica |
+| 9 | [50](implementacao/50-preparacao-da-fala.md) | Preparação de discursos e notas | M | Permite acompanhar outras delegações enquanto prepara a próxima fala, **se o piloto confirmar** | Captura rápida por tipo, painel curto da delegação e rascunho da fala |
+| 10 | [51](implementacao/51-melhorias-gerais-de-interface.md) **demais lotes** | Melhorias gerais | G | Acabamento das demais telas, aos poucos | Documento, mensagens, crise, blocos e secretaria; estados vazios, densidade e preferências |
 
-Esforço **P**, **M** ou **G** como nos passos 01 a 43. Os itens 7 e 8 só começam depois da validação com o piloto (abaixo).
+Esforço **P**, **M** ou **G** como nos passos 01 a 43. Os itens 8 e 9 só começam depois da validação com o piloto (abaixo).
 
-## O piloto vem no meio
+## O piloto depois da interface
 
-A sessão do piloto ([piloto.md](piloto.md), passo 12) não está registrada como feita: os critérios de aceite do passo 12 seguem abertos. Cinco passos M ou G (45 parte B, 47, 48, 49 e 50) seriam construídos sem nenhum dado de uso. Por isso a sessão de teste fica entre o passo 46 e a coletiva completa.
+A sessão do piloto ([piloto.md](piloto.md), passo 12) não está registrada como feita: os critérios de aceite do passo 12 seguem abertos. Ela ficava logo depois do passo 46, mas em 24/11/2026 foi adiada: a interface ainda está carregada, e uma sessão de teste agora mediria o excesso de páginas, rolagem e menus, que já se sabe que precisa mudar.
 
-- **Antes do piloto:** 44, 45 parte A e 46. São o que o roteiro exercita (sessão, notas, aparelho compartilhado) e o que não pode vazar.
-- **Depois do piloto:** 45 parte B, 47 e 48 têm requisitos claros e entram em seguida, ajustados ao que a sessão mostrar. A coletiva completa e a demonstração não fazem parte do roteiro do piloto.
+- **Feito:** 44, 45 parte A e 46, o que o roteiro exercita (sessão, notas, aparelho compartilhado) e o que não pode vazar.
+- **Antes do piloto:** 47 e os lotes 1 e 2 do 51 (presidência e Agora), as telas que o roteiro mais usa.
+- **Depois do piloto:** 45 parte B e 48 têm requisitos claros e entram em seguida, ajustados ao que a sessão mostrar. A coletiva completa e a demonstração não fazem parte do roteiro do piloto.
 - **Só com dor confirmada:** **os passos 49 e 50 só começam depois que o questionário do piloto responder às perguntas deles** (a rodada de propostas deu conta? o que faltou ao preparar a fala?). Se o piloto não mostrar dor, os dois ficam para depois do evento. O que o passo 46 já entrega (nota e próxima fala visíveis) pode bastar.
-- O passo 51 entra aos poucos, o ano todo.
-
-Se o piloto mostrar toques errados em ações sem confirmação (encerrar votação, retirar ponto), o item 2 do passo 47 (`Confirmar` nas ações irreversíveis) pode ser puxado para antes das demais partes do 47.
+- Os demais lotes do 51 entram aos poucos, o ano todo.
 
 As seções abaixo descrevem cada plano; a sequência de execução é a da tabela acima.
 
@@ -165,13 +165,18 @@ Documento: [Plano de interface oficial e demonstração](interface-e-demonstraca
 
 Já entregue no passo 43: ficha da delegação em painel lateral, “Ir para…” (Ctrl+K) e o componente `Confirmar`.
 
-1. confirmar saída (hoje o botão *Sair* sai direto);
-2. usar `Confirmar` em todas as ações irreversíveis (hoje só agenda e presidência);
-3. usar modal para DPO, carta e busca curta;
-4. ícones no cabeçalho: só a lupa e o sino sem texto; Perfil e Sair mantêm a palavra (no celular, em “Mais”). Usar o Lucide já instalado, ícone a ícone;
-5. ampliar “Ir para…” (veículos, matérias, agrupamento por papel);
-6. padronizar densidade, hierarquia e estados;
-7. revisar todas as páginas de links secundários.
+1. modal base, que todos os outros usam (hoje `Confirmar`, `FichaDelegacao` e `IrPara` têm cada um o seu `<dialog>`);
+2. confirmar saída (hoje o botão *Sair* sai direto);
+3. usar `Confirmar` em todas as ações irreversíveis (hoje só agenda e presidência);
+4. fichas de votação, ponto, moção e nota, no painel lateral da ficha da delegação;
+5. modal para prévia de DPO, carta, working paper, projeto e notícia;
+6. modais de ação curta: entrevista, destinatários de carta, delegações citadas, nova carta e novo bilhete;
+7. menus de escolha: `<select>` curto com o visual do app só em CSS; listas longas ou com bandeira no componente `Escolha`, com busca; nada que mude a sessão em `<select>`;
+8. ícones no cabeçalho: só a lupa e o sino sem texto; Perfil e Sair mantêm a palavra (no celular, em “Mais”). Usar o Lucide já instalado, ícone a ícone;
+9. ampliar “Ir para…” (veículos, matérias, agrupamento por papel);
+10. desfazer no lugar de confirmar quando a ação é reversível.
+
+Rolagem, densidade, estados e a revisão das páginas de links secundários ficam no passo 51.
 
 Modais são adequados para consulta curta e ação contextual. Páginas completas continuam para:
 
@@ -284,10 +289,9 @@ Documentos relacionados:
 - [Melhorias gerais em texto](melhorias.txt): texto de partida, só histórico
 - [Melhorias depois da revisão](melhorias-pos-revisao.pdf)
 
-Entrar nesta etapa depois das bases anteriores:
+Entra logo depois do passo 47, em lotes por tela. Os lotes 1 (presidência) e 2 (Agora) vêm antes do piloto, com a regra de rolagem: num notebook de 1366 × 768, a tarefa principal de cada papel cabe sem rolar. Os demais lotes entram aos poucos:
 
 - trilha de voltar;
-- objetos clicáveis;
 - números clicáveis;
 - placeholders;
 - estados vazios;
@@ -295,6 +299,7 @@ Entrar nesta etapa depois das bases anteriores:
 - densidade por papel;
 - consistência de estados;
 - indicadores de reconexão;
+- preferências: favoritos, tamanho do texto e densidade no Perfil;
 - ajustes menores de aparência.
 
 Não iniciar itens que dependem de um segundo evento, habilidades especiais ou edição livre simultânea.
@@ -302,20 +307,22 @@ Não iniciar itens que dependem de um segundo evento, habilidades especiais ou e
 ## Dependências
 
 ```text
-ANTES DO PILOTO
+FEITO
 Segurança (44)
   └─ RLS, cache, logout e Storage validados
        ├─ Coletiva parte A: texto da pergunta protegido (45)
        └─ Agora operacional e sessão unificada (46)
+
+ANTES DO PILOTO
+Modais, menus de escolha, saída e ícones (47)
+  └─ depende de 43 e 44
+       └─ Presidência e Agora sem rolagem (51, lotes 1 e 2)
 
 PILOTO (passo 12) ── mostra o que ajustar e o que vale construir
 
 DEPOIS DO PILOTO
 Coletiva parte B: fluxo oral (45)
   └─ depende da parte A e da segurança
-
-Modais, saída e ícones (47)
-  └─ depende de 43 e 44
 
 Demonstração (48)
   └─ depende de segurança (44), coletiva (45) e modais (47)
@@ -324,13 +331,13 @@ Editor por cláusula (49) e preparação de discursos (50)
   └─ só se o questionário do piloto confirmar a dor
   └─ 49 depende de sessão, documentos e RLS; 50, da sessão unificada (46) e do caderno
 
-Melhorias gerais (51)
-  └─ entram continuamente depois dos componentes principais
+Demais lotes das melhorias gerais (51)
+  └─ entram aos poucos, o ano todo
 ```
 
 ## Sequência recomendada de trabalho
 
-### Lote A — antes do piloto (passos 44, 45 parte A e 46)
+### Lote A — feito (passos 44, 45 parte A e 46)
 
 1. corrigir cache;
 2. limpar sessão;
@@ -340,21 +347,24 @@ Melhorias gerais (51)
 6. Agora por pendências;
 7. nota rápida e próxima fala sempre visíveis na sessão.
 
+### Lote B — interface, antes do piloto (passo 47 e lotes 1 e 2 do 51)
+
+1. modal base;
+2. saída com confirmação e `Confirmar` nas ações irreversíveis;
+3. fichas de votação, ponto, moção e nota;
+4. prévias de documentos e modais de ação curta;
+5. menus de escolha;
+6. ícones do cabeçalho e “Ir para…” ampliado;
+7. presidência e Agora sem rolagem.
+
 ### Piloto (passo 12)
 
 Roteiro de [piloto.md](piloto.md), com a troca de conta no mesmo aparelho. A coletiva completa e a demonstração ainda não existem e ficam de fora.
 
-### Lote B — depois do piloto (passos 45 parte B e 47)
+### Lote C — depois do piloto (passos 45 parte B e 48)
 
 1. coletiva oral completa;
-2. modais principais, saída com confirmação e ícones.
-
-### Lote C — demonstração (passo 48)
-
-1. ambiente separado;
-2. um comitê completo;
-3. contas por papel;
-4. roteiro manual.
+2. demonstração: ambiente separado, um comitê completo, contas por papel e roteiro manual.
 
 ### Lote D — produtividade (depois do piloto)
 
@@ -364,7 +374,7 @@ Roteiro de [piloto.md](piloto.md), com a troca de conta no mesmo aparelho. A col
 
 Só entra o que o piloto confirmar.
 
-### Lote E — acabamento
+### Lote E — acabamento (demais lotes do passo 51)
 
 1. visual oficial;
 2. consistência;
@@ -393,8 +403,8 @@ O [plano completo](plano-do-app.pdf) (seção 17) prevê validação de dezembro
 
 Proposta de encaixe, a confirmar quando a data sair:
 
-- **antes da sessão do piloto:** lote A (passos 44, 45 parte A e 46);
-- **depois da sessão do piloto:** lotes B e C (passos 45 parte B, 47 e 48), ajustados ao que a sessão mostrar, e em seguida o lote D (passos 49 e 50), só com o que o questionário confirmar;
-- **lote E (passo 51):** em lotes pequenos, o ano todo, e congelado antes do ensaio de outubro.
+- **antes da sessão do piloto:** lote A (feito) e lote B (passo 47 e lotes 1 e 2 do 51);
+- **depois da sessão do piloto:** lote C (passos 45 parte B e 48), ajustado ao que a sessão mostrar, e em seguida o lote D (passos 49 e 50), só com o que o questionário confirmar;
+- **lote E (demais lotes do passo 51):** em lotes pequenos, o ano todo, e congelado antes do ensaio de outubro.
 
 Para cada passo o esforço (P, M ou G) está na tabela; a duração em semanas depende de quanto tempo por semana a pessoa do projeto tem, e isso o documento não sabe.

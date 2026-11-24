@@ -2,7 +2,7 @@
 
 Ordem dos passos para construir o app. Os passos 01 a 12 formam o **piloto**: planos gratuitos, poucos usuários e dados fictícios. Os passos 13 a 19 levam o app à **escala do evento**. Os passos 20 a 38 são as **melhorias depois da revisão** do app, explicadas e priorizadas em [melhorias-pos-revisao.pdf](../melhorias-pos-revisao.pdf). Os passos 39 a 41 deixam o desenvolvimento mais rápido, o app mais leve na internet móvel e fecham as pendências. O passo 42 aplica o estilo "chancelaria", escolhido entre os protótipos de `docs/estilos/`. O passo 43 deixa o app fácil de achar e de voltar. Os passos 44 a 51 vêm dos planos posteriores, em [ordem de prioridade](../ordem-de-prioridade.md): segurança, coletiva oral, sessão unificada, modais e ícones, demonstração online, edição por cláusula, preparação da fala e melhorias gerais. Os passos 49 e 50 só começam depois que o piloto disser que valem a pena.
 
-**Ordem de execução dos passos 44 a 51:** 44, 45 parte A e 46; **sessão de teste do piloto (passo 12)**; 45 parte B, 47 e 48; 49 e 50 só com o que o piloto confirmar; 51 aos poucos, o ano todo. A tabela abaixo segue a numeração, não essa sequência.
+**Ordem de execução dos passos 44 a 51:** 44, 45 parte A e 46 (feitos); 47 e os lotes 1 e 2 do 51 (presidência e Agora); **sessão de teste do piloto (passo 12)**; 45 parte B e 48; 49 e 50 só com o que o piloto confirmar; os demais lotes do 51 aos poucos, o ano todo. O piloto foi adiado em 24/11/2026 para depois da interface, que ainda está carregada. A tabela abaixo segue a numeração, não essa sequência.
 
 Cada passo só começa quando os passos de que ele depende estão prontos. As regras de procedimento que o app segue estão resumidas em [regras-de-procedimento.md](../regras-de-procedimento.md).
 
@@ -60,11 +60,11 @@ Cada passo só começa quando os passos de que ele depende estão prontos. As re
 | [44](44-seguranca-dos-dados.md) | Segurança dos dados e das sessões: cache offline por usuário, logout, RLS e Storage, revogação e incidente | 43 |
 | [45](45-coletiva-oral.md) | Coletiva de imprensa como fluxo oral: texto da pergunta em tabela própria (parte A, pode ir antes), estados, chamada, telão da coletiva e conclusão (parte B) | 17, 44 |
 | [46](46-agora-e-sessao-unificadas.md) | Agora operacional e sessão unificada: nota rápida e próxima fala sempre visíveis | 43 |
-| [47](47-modais-saida-e-icones.md) | Modais, saída com confirmação e ícones do cabeçalho | 43, 44 |
+| [47](47-modais-saida-e-icones.md) | Modais, menus de escolha, saída com confirmação e ícones do cabeçalho: modal base, fichas de votação, ponto, moção e nota, modais de ação curta | 43, 44 |
 | [48](48-demonstracao-online.md) | Demonstração online separada, com entrada por papel | 44, 45, 47 |
 | [49](49-edicao-por-clausula.md) | Edição colaborativa por cláusula (depois da validação do piloto) | 09, 44 |
 | [50](50-preparacao-da-fala.md) | Preparação de discursos durante o debate (depois da validação do piloto) | 34, 46 |
-| [51](51-melhorias-gerais-de-interface.md) | Melhorias gerais de interface | 47 |
+| [51](51-melhorias-gerais-de-interface.md) | Melhorias gerais de interface, por tela: presidência e Agora sem rolagem (antes do piloto), estados, densidade e preferências | 47 |
 
 ## Melhorias depois da revisão
 
