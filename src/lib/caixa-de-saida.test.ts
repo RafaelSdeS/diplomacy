@@ -16,6 +16,19 @@ describe('caixa de saída', () => {
 		expect((await caixa.pendentes())[0].args).toEqual({ p_id: 'p', p_citadas: [] });
 	});
 
+	it('remove um item que ainda não saiu, e ele não é reenviado', async () => {
+		const enviados: string[] = [];
+		let rede = false;
+		const caixa = criarCaixa(async (item) => (rede ? (enviados.push(item.id), null) : SEM_REDE), novaLoja());
+		await caixa.enviar(nota('x'));
+		await caixa.enviar(nota('y'));
+		await caixa.remover('x');
+		rede = true;
+		await caixa.reenviar();
+		expect(enviados).toEqual(['y']);
+		expect(await caixa.pendentes()).toEqual([]);
+	});
+
 	it('guarda o que falhou por falta de rede e reenvia quando a rede volta', async () => {
 		let rede = false;
 		const enviados: string[] = [];

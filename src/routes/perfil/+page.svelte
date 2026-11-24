@@ -12,23 +12,13 @@
 	import Bandeira from '#lib/ui/Bandeira.svelte';
 	import type { PageProps } from './$types';
 
+	import { definirTema, tema } from '#lib/preferencias.svelte.ts';
 	let { data }: PageProps = $props();
 
 	let nome = $state(untrack(() => data.pessoa.nome));
 	let bio = $state(untrack(() => data.pessoa.bio ?? ''));
 	let idiomaEscolhido = $state(untrack(() => data.pessoa.idioma ?? ''));
-	// Tema deste aparelho (passo 38): vale na hora, sem salvar o perfil.
-	let tema = $state(document.documentElement.dataset.theme ?? '');
-	function mudarTema() {
-		if (tema) document.documentElement.dataset.theme = tema;
-		else delete document.documentElement.dataset.theme;
-		try {
-			if (tema) localStorage.setItem('tema', tema);
-			else localStorage.removeItem('tema');
-		} catch {
-			// sem armazenamento: o tema vale até fechar o app
-		}
-	}
+	// Tema deste aparelho (passo 38): vale na hora, sem salvar o perfil (o mesmo do cabeçalho).
 	let fotoUrl = $state(untrack(() => data.fotoUrl));
 	let mensagem = $state('');
 	let erro = $state('');
@@ -182,7 +172,7 @@
 	</form>
 	<label class="campo campo--curto">
 		{t('Tema neste aparelho')}
-		<select bind:value={tema} onchange={mudarTema}>
+		<select value={tema.escolhido} onchange={(e) => definirTema(e.currentTarget.value)}>
 			<option value="">{t('Automático (o do sistema)')}</option>
 			<option value="light">{t('Claro')}</option>
 			<option value="dark">{t('Escuro')}</option>

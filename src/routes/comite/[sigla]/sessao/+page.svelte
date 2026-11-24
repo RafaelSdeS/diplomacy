@@ -26,6 +26,7 @@
 	import Modal from '#lib/ui/Modal.svelte';
 	import FichaVotacao from '#lib/ui/FichaVotacao.svelte';
 	import FichaPonto from '#lib/ui/FichaPonto.svelte';
+	import { adiadas, adiar, desfazer } from '#lib/desfazer.svelte.ts';
 	import Contagem from '#lib/ui/Contagem.svelte';
 	import BotaoPlaca from '#lib/ui/BotaoPlaca.svelte';
 	import Votar from '#lib/ui/Votar.svelte';
@@ -429,13 +430,20 @@
 	</div>
 {/if}
 
+<!-- Passo 47: retirar tem volta (dá para pedir de novo), então desfaz em vez de confirmar. -->
 {#snippet retirar(ponto: NonNullable<typeof pontoDaFicha>)}
 	{#if ponto.status === 'aberto' && ponto.delegacao?.id === eu?.delegacao_id}
-		<button
-			class="botao botao--secundario botao--pequeno"
-			type="button"
-			onclick={() => executar(supabase.rpc('retirar_ponto', { p_ponto: ponto.id }), t('Pedido retirado.'))}>{t('Retirar')}</button
-		>
+		{#if adiadas[ponto.id]}
+			<span class="suave">{t('Retirando…')}</span>
+			<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => desfazer(ponto.id)}>{t('Desfazer')}</button>
+		{:else}
+			<button
+				class="botao botao--secundario botao--pequeno"
+				type="button"
+				onclick={() => adiar(ponto.id, () => executar(supabase.rpc('retirar_ponto', { p_ponto: ponto.id }), t('Pedido retirado.')))}
+				>{t('Retirar')}</button
+			>
+		{/if}
 	{/if}
 {/snippet}
 

@@ -116,7 +116,10 @@ test('a página do comitê mostra tópicos, mesa e as 15 delegações com bandei
 test('o perfil salva a minibiografia e envia a foto', async ({ page }, info) => {
 	const bio = `Minibiografia de teste ${Date.now()}`;
 	await entrar(page, CONTA_DO_PROJETO[info.project.name]);
-	await page.getByRole('link', { name: 'Perfil' }).click();
+	// Passo 47: no notebook, no cabeçalho; no celular, em "Mais".
+	const perfil = page.getByRole('banner').getByRole('link', { name: 'Perfil' });
+	if (await perfil.isVisible()) await perfil.click();
+	else await irPeloMenu(page, 'Perfil');
 
 	await page.getByLabel('Minibiografia').fill(bio);
 	await page.getByRole('button', { name: 'Salvar perfil' }).click();

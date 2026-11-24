@@ -54,7 +54,7 @@
 		{/if}
 		<ul class="escolha-lista" bind:this={lista}>
 			{#each opcoes as o (o.id)}
-				<!-- Na escolha única, o clique do mouse (detail > 0) já fecha; as setas e o Enter, não. -->
+				<!-- Na escolha única, o clique do mouse (com detail) já fecha; as setas e o Enter, não. -->
 				<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
 				<li hidden={!aparece(o)}>
 					<label class="opcao com-bandeira" onclick={(e) => unica && e.detail > 0 && modal?.fechar()}
@@ -79,7 +79,7 @@
 			>{botao}</button
 		>
 	</div>
-	<Modal bind:this={modal} nome={rotulo}>
+	<Modal bind:this={modal} nome={rotulo} classe="escolha-modal">
 		{@render escolha()}
 		<div class="acoes"><button class="botao" type="button" onclick={() => modal?.fechar()}>{t('Pronto')}</button></div>
 	</Modal>

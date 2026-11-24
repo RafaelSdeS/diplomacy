@@ -1,6 +1,6 @@
 import { expect, test, type Browser, type BrowserContext, type Page } from '@playwright/test';
 import { contaDoTreino, isolado } from '../scripts/delegacoes.ts';
-import { clienteComo, entrar, sair } from './ajuda.ts';
+import { clienteComo, entrar, sair, pedirSaida } from './ajuda.ts';
 
 // Passo 44: num aparelho compartilhado, uma conta nunca vê o que outra leu; sair apaga
 // tudo; o cache offline vale 12 horas e nunca guarda o que é sensível.
@@ -41,7 +41,7 @@ const guardadas = (page: Page) =>
 		return urls;
 	});
 
-const sairPeloMenu = (page: Page) => page.getByRole('button', { name: 'Sair', exact: true }).click();
+const sairPeloMenu = pedirSaida;
 
 test('sair apaga os dados da conta; quem entra depois, sem rede, não vê nada dela', async ({ browser }) => {
 	const contexto = await aparelho(browser);

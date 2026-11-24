@@ -3,12 +3,20 @@
 	import { t } from '#lib/i18n.svelte.ts';
 	import { menu } from '#lib/menu.ts';
 	import CircleUser from '@lucide/svelte/icons/circle-user';
+	import Languages from '@lucide/svelte/icons/languages';
+	import LogOut from '@lucide/svelte/icons/log-out';
+	import Moon from '@lucide/svelte/icons/moon';
+	import Sun from '@lucide/svelte/icons/sun';
+	import { idioma } from '#lib/i18n.svelte.ts';
+	import { alternarIdioma, alternarTema, pedirSaida, tema, temaAtual, TROCAR_IDIOMA } from '#lib/preferencias.svelte.ts';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 
 	// Passo 43: as telas que não cabem na barra do celular, cada uma dizendo para que serve.
 	const telas = $derived(menu(data.participacoes).filter((i) => i.mais));
+	// Passo 47: no celular, o que no notebook fica no cabeçalho (tema, idioma, Sair), com texto.
+	const escuro = $derived(tema.escolhido ? tema.escolhido === 'dark' : temaAtual() === 'dark');
 </script>
 
 <svelte:head>
@@ -33,5 +41,28 @@
 			<span class="grade-atalhos-nome">{t('Perfil')}</span>
 			<span class="grade-atalhos-descricao">{t('Seus dados, idioma, tema e notificações')}</span>
 		</a>
+	</li>
+	<li>
+		<button type="button" onclick={alternarTema}>
+			{#if escuro}<Sun aria-hidden="true" size={24} strokeWidth={1.5} />{:else}<Moon aria-hidden="true" size={24} strokeWidth={1.5} />{/if}
+			<span class="grade-atalhos-nome">{escuro ? t('Usar o tema claro') : t('Usar o tema escuro')}</span>
+			<span class="grade-atalhos-descricao">{t('Só neste aparelho')}</span>
+		</button>
+	</li>
+	<li>
+		<button type="button" onclick={() => data.usuario && alternarIdioma(data.usuario.id)}>
+			<Languages aria-hidden="true" size={24} strokeWidth={1.5} />
+			<span class="grade-atalhos-nome" lang={idioma.atual === 'en' ? 'pt-BR' : 'en'}
+				>{idioma.atual === 'en' ? TROCAR_IDIOMA.pt : TROCAR_IDIOMA.en}</span
+			>
+			<span class="grade-atalhos-descricao">{t('Fica salvo no seu perfil')}</span>
+		</button>
+	</li>
+	<li>
+		<button type="button" onclick={pedirSaida}>
+			<LogOut aria-hidden="true" size={24} strokeWidth={1.5} />
+			<span class="grade-atalhos-nome">{t('Sair')}</span>
+			<span class="grade-atalhos-descricao">{t('Remove os dados desta sessão do aparelho')}</span>
+		</button>
 	</li>
 </ul>

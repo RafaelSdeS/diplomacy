@@ -37,8 +37,16 @@ export async function irPeloMenu(page: Page, nome: string) {
 }
 
 // Passo 47: Sair pede confirmação, no modal.
+/** Abre a confirmação de saída: no cabeçalho ou, no celular, em "Mais" (passo 47). */
+export async function pedirSaida(page: Page) {
+	const noCabecalho = page.getByRole('banner').getByRole('button', { name: 'Sair', exact: true });
+	if (await noCabecalho.isVisible()) return noCabecalho.click();
+	await page.getByRole('navigation', { name: 'Principal' }).getByRole('link', { name: 'Mais', exact: true }).click();
+	await page.getByRole('main').getByRole('button', { name: /^Sair/ }).click();
+}
+
 export async function sair(page: Page) {
-	await page.getByRole('button', { name: 'Sair', exact: true }).click();
+	await pedirSaida(page);
 	await page.getByRole('dialog').getByRole('button', { name: 'Sair', exact: true }).click();
 }
 

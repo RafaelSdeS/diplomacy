@@ -73,8 +73,12 @@ test('a delegação abre a ficha do próprio ponto e o retira dali', async ({ pa
 	expect(page.url()).toBe(url);
 	await semErrosDeAcessibilidade(page);
 
+	// Passo 47 (item 10): retirar tem volta. "Desfazer" cancela; sem ele, vale em 5 segundos.
 	await ficha.getByRole('button', { name: 'Retirar' }).click();
-	await expect(ficha).toContainText('Retirado');
+	await ficha.getByRole('button', { name: 'Desfazer' }).click();
+	await expect(ficha).toContainText('Aguardando o bureau');
+	await ficha.getByRole('button', { name: 'Retirar' }).click();
+	await expect(ficha).toContainText('Retirado', { timeout: 10_000 });
 	await expect(ficha.getByRole('button', { name: 'Retirar' })).toHaveCount(0);
 });
 

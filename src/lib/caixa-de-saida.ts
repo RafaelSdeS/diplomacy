@@ -73,6 +73,11 @@ export function criarCaixa(enviar: (item: Item) => Promise<Falha>, loja: UseStor
 		async pendentes() {
 			return (await entries<string, Item>(loja)).map(([, item]) => item);
 		},
+		/** Passo 47: a pessoa desiste de um item que ainda não saiu. */
+		async remover(id: string) {
+			await del(id, loja);
+			avisar();
+		},
 		/** Passo 44: ao sair da conta, nada do que ela escreveu fica no aparelho. */
 		async limpar() {
 			await clear(loja);

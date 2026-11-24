@@ -6,6 +6,14 @@
 	import { page } from '$app/state';
 	import Ellipsis from '@lucide/svelte/icons/ellipsis';
 	import Search from '@lucide/svelte/icons/search';
+	import Bell from '@lucide/svelte/icons/bell';
+	import CircleUser from '@lucide/svelte/icons/circle-user';
+	import Languages from '@lucide/svelte/icons/languages';
+	import LogOut from '@lucide/svelte/icons/log-out';
+	import Moon from '@lucide/svelte/icons/moon';
+	import Sun from '@lucide/svelte/icons/sun';
+	import { idioma } from '#lib/i18n.svelte.ts';
+	import { alternarIdioma, alternarTema, saida, tema, temaAtual, TROCAR_IDIOMA } from '#lib/preferencias.svelte.ts';
 	import { abrirIrPara, irPara } from '#lib/ir-para.svelte.ts';
 	import { menu } from '#lib/menu.ts';
 	import { caixa } from '#lib/caixa.ts';
@@ -19,6 +27,7 @@
 	import { ficha, previa } from '#lib/ficha.svelte.ts';
 	import { papelPrincipal, rotuloPapel } from '#lib/papeis.ts';
 	import Modal from '#lib/ui/Modal.svelte';
+	import CaixaDeSaida from '#lib/ui/CaixaDeSaida.svelte';
 	import Trilha from '#lib/ui/Trilha.svelte';
 	import { supabase, type Papel } from '#lib/supabase.ts';
 	import { assinarAvisos, esquecerLeituras, recarregarAoVivo } from '#lib/tempo-real.ts';
@@ -148,6 +157,12 @@
 	);
 	let enviandoAntes = $state(false);
 	let semRedeAoSair = $state(false);
+	// Passo 47: o "Sair" do "Mais" (celular) pede a mesma confirmação do cabeçalho.
+	$effect(() => {
+		if (saida.pedida) void pedirSaida();
+	});
+	// O ícone do tema mostra para onde ele vai (a lua leva ao escuro).
+	const escuro = $derived(tema.escolhido ? tema.escolhido === 'dark' : typeof matchMedia !== 'undefined' && temaAtual() === 'dark');
 	async function pedirSaida() {
 		pendentes = (await caixa.pendentes()).length;
 		semRedeAoSair = false;
@@ -204,7 +219,7 @@
 				<div class="conta">
 					{#if comMenu}
 						<button
-							class="botao botao--secundario botao--pequeno ir-para-botao"
+							class="botao botao--secundario botao--pequeno botao--icone ir-para-botao"
 							type="button"
 							aria-label={t('Ir para…')}
 							aria-keyshortcuts="Control+K Meta+K"
@@ -212,11 +227,19 @@
 							onclick={abrirIrPara}
 						>
 							<Search aria-hidden="true" size={16} strokeWidth={1.75} />
-							<span class="ir-para-rotulo">{t('Ir para…')}</span>
 						</button>
+						<a
+							class="botao botao--secundario botao--pequeno botao--icone"
+							href="/avisos"
+							aria-label={t('Avisos')}
+							title={t('Avisos')}
+							aria-current={page.url.pathname === '/avisos' ? 'page' : undefined}
+						>
+							<Bell aria-hidden="true" size={16} strokeWidth={1.75} />
+						</a>
 					{/if}
 					{#if !online}<span class="selo selo--alerta">{t('Sem conexão')}</span>{/if}
-					{#if pendentes}<span class="selo selo--info" role="status">{t('{n} para enviar', { n: pendentes })}</span>{/if}
+					<CaixaDeSaida {pendentes} />
 					{#if eu?.papel === 'delegado' && eu.delegacao_id}
 						<a
 							class="identidade"
@@ -234,14 +257,38 @@
 							{#if eu.comite_sigla}<span class="identidade-comite">{eu.comite_sigla}</span>{/if}
 						</span>
 					{/if}
+					<!-- Passo 47: no celular, tema, idioma, Perfil e Sair ficam em "Mais" (.so-largo). -->
+					<button
+						class={['botao botao--secundario botao--pequeno botao--icone', temMais && 'so-largo']}
+						type="button"
+						aria-label={escuro ? t('Usar o tema claro') : t('Usar o tema escuro')}
+						title={escuro ? t('Usar o tema claro') : t('Usar o tema escuro')}
+						onclick={alternarTema}
+					>
+						{#if escuro}<Sun aria-hidden="true" size={16} strokeWidth={1.75} />{:else}<Moon aria-hidden="true" size={16} strokeWidth={1.75} />{/if}
+					</button>
+					<button
+						class={['botao botao--secundario botao--pequeno', temMais && 'so-largo']}
+						type="button"
+						aria-label={idioma.atual === 'en' ? `EN · ${TROCAR_IDIOMA.pt}` : `PT · ${TROCAR_IDIOMA.en}`}
+						title={idioma.atual === 'en' ? TROCAR_IDIOMA.pt : TROCAR_IDIOMA.en}
+						onclick={() => data.usuario && alternarIdioma(data.usuario.id)}
+					>
+						<Languages aria-hidden="true" size={16} strokeWidth={1.75} />
+						{idioma.atual === 'en' ? 'EN' : 'PT'}
+					</button>
 					{#if comMenu}
 						<a
-							class="botao botao--secundario botao--pequeno"
+							class={['botao botao--secundario botao--pequeno', temMais && 'so-largo']}
 							href="/perfil"
-							aria-current={page.url.pathname === '/perfil' ? 'page' : undefined}>{t('Perfil')}</a
+							aria-current={page.url.pathname === '/perfil' ? 'page' : undefined}
+							><CircleUser aria-hidden="true" size={16} strokeWidth={1.75} /> {t('Perfil')}</a
 						>
 					{/if}
-					<button class="botao botao--secundario botao--pequeno" type="button" onclick={pedirSaida}>{t('Sair')}</button>
+					<!-- Sem "Mais" (sem acesso, ou até 5 telas), tudo fica no cabeçalho também no celular. -->
+					<button class={['botao botao--secundario botao--pequeno', temMais && 'so-largo']} type="button" onclick={pedirSaida}
+						><LogOut aria-hidden="true" size={16} strokeWidth={1.75} /> {t('Sair')}</button
+					>
 					<Modal bind:this={avisoSaida} rotulo="aviso-saida-titulo">
 						<h3 id="aviso-saida-titulo">{pendentes ? t('Itens não enviados: {n}', { n: pendentes }) : t('Sair da conta?')}</h3>
 						{#if quemSai}<p class="suave">{quemSai}</p>{/if}

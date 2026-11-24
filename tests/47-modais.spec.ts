@@ -45,3 +45,24 @@ test('o clique no fundo fecha o modal, menos com texto digitado', async ({ page 
 	await page.mouse.click(5, 5);
 	await expect(modal).toBeHidden();
 });
+
+test.describe('aparência', () => {
+	test.skip(!process.env.CAPTURAS, 'capturas só no contêiner (npm run capturas)');
+
+	for (const tema of ['light', 'dark'] as const) {
+		test(`o Escolha aberto e o diálogo batem com as capturas (tema ${tema})`, async ({ page }) => {
+			await page.emulateMedia({ colorScheme: tema });
+			await page.goto('/estilo');
+			await page.evaluate(async () => {
+				await document.fonts.ready;
+			});
+			await page.getByRole('button', { name: 'Escolher: Delegação' }).click();
+			const escolha = page.getByRole('dialog', { name: 'Delegação' });
+			await expect(escolha.getByRole('radio', { name: 'Brasil' })).toBeChecked();
+			await expect(escolha).toHaveScreenshot(`escolha-${tema}.png`);
+			await page.keyboard.press('Escape');
+			await page.getByRole('button', { name: 'Abrir diálogo' }).click();
+			await expect(page.getByRole('dialog', { name: 'Encerrar a votação?' })).toHaveScreenshot(`dialogo-${tema}.png`);
+		});
+	}
+});

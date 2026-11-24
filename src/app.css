@@ -867,6 +867,15 @@ select:disabled {
 	font-weight: 600;
 }
 
+/* Passo 47: o aviso "N para enviar" é um botão que abre a lista dos não enviados. */
+.selo--botao {
+	border: 0;
+	font-family: inherit;
+	text-decoration: underline;
+	text-underline-offset: 3px;
+	cursor: pointer;
+}
+
 .selo--ok {
 	color: var(--cor-ok);
 	background: var(--cor-ok-fundo);
@@ -1657,6 +1666,10 @@ kbd {
 	padding: 0;
 	overflow-y: auto;
 	list-style: none;
+}
+
+dialog.escolha-modal {
+	width: min(36rem, calc(100vw - 2rem));
 }
 
 .escolha-resumo {
@@ -2794,7 +2807,8 @@ dialog.modal-lateral {
 	list-style: none;
 }
 
-.grade-atalhos a {
+.grade-atalhos a,
+.grade-atalhos button {
 	display: grid;
 	grid-template-columns: auto 1fr;
 	grid-template-rows: auto auto;
@@ -2809,7 +2823,15 @@ dialog.modal-lateral {
 	text-decoration: none;
 }
 
-.grade-atalhos a:hover {
+.grade-atalhos button {
+	width: 100%;
+	font: inherit;
+	text-align: left;
+	cursor: pointer;
+}
+
+.grade-atalhos a:hover,
+.grade-atalhos button:hover {
 	border-color: var(--cor-marinho);
 	background: var(--cor-marinho-suave);
 }
@@ -2912,8 +2934,14 @@ dialog.modal-lateral {
 	gap: 0.4rem;
 }
 
+/* Passo 47: botões só com ícone (lupa, sino, tema) e o que no celular vai para "Mais". */
+.botao--icone {
+	min-width: 2.25rem;
+	padding-inline: 0.5rem;
+}
+
 @media (max-width: 639px) {
-	.ir-para-rotulo {
+	.so-largo {
 		display: none;
 	}
 }

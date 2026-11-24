@@ -67,7 +67,9 @@ test('a delegação retira o próprio pedido enquanto ele espera (passo 38)', as
 	await expect(page.getByRole('status').filter({ hasText: 'enviado à mesa' })).toBeVisible();
 	const ultimo = page.getByRole('list', { name: 'Seus pontos e moções' }).getByRole('listitem').last();
 	await ultimo.getByRole('button', { name: 'Retirar' }).click();
-	await expect(ultimo).toContainText('Retirado');
+	// Passo 47: retirar tem desfazer e só vale depois de 5 segundos.
+	await expect(ultimo.getByRole('button', { name: 'Desfazer' })).toBeVisible();
+	await expect(ultimo).toContainText('Retirado', { timeout: 10_000 });
 	await expect(ultimo.getByRole('button', { name: 'Retirar' })).toHaveCount(0);
 });
 
