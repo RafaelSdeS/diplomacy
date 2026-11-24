@@ -4,7 +4,7 @@ App web tudo em um para simulações da ONU (MUNs), começando pelo [UFRGSMUN](h
 
 **No ar:** [diplomacy.rafesilvadesouza.workers.dev](https://diplomacy.rafesilvadesouza.workers.dev). Não há cadastro livre: as contas são criadas pela secretaria.
 
-> **Status:** os passos 01 a 47 estão prontos (do 45, só a parte A), e o piloto está [publicado](https://diplomacy.rafesilvadesouza.workers.dev). Os comitês funcionam em português e em inglês; a secretaria, só em português. A etapa atual é a interface: o passo 47 (modais, fichas, menus de escolha, confirmação e desfazer, cabeçalho com ícones) está pronto; agora vêm a presidência e a Agora sem rolagem (lotes 1 e 2 do passo 51). A sessão de teste com pessoas, pelo roteiro em [docs/piloto.md](docs/piloto.md), vem depois; em seguida, o 45 parte B e o 48.
+> **Status:** os passos 01 a 47 estão prontos (do 45, só a parte A), e o piloto está [publicado](https://diplomacy.rafesilvadesouza.workers.dev). Os comitês funcionam em português e em inglês; a secretaria, só em português. A etapa atual é a interface: o passo 47 (modais, fichas, menus de escolha, confirmação e desfazer, cabeçalho com ícones) está pronto; agora vêm os testes rápidos (passo 52) e os lotes 0, 1 e 2 do passo 51 (ações em botões e modais, cabeçalho só com ícones, caderno de qualquer lugar, presidência e Agora sem rolagem). A sessão de teste com pessoas, pelo roteiro em [docs/piloto.md](docs/piloto.md), vem depois; em seguida, o 45 parte B e o 48.
 
 ## O problema
 
@@ -112,6 +112,8 @@ Cada passo traz os testes que provam que ele funciona. Um passo só termina quan
 | [49](docs/implementacao/49-edicao-por-clausula.md) | Edição colaborativa por cláusula |
 | [50](docs/implementacao/50-preparacao-da-fala.md) | Preparação de discursos durante o debate |
 | [51](docs/implementacao/51-melhorias-gerais-de-interface.md) | Melhorias gerais de interface |
+| [52](docs/implementacao/52-testes-do-dia-a-dia.md) | Testes rápidos no dia a dia |
+| [53](docs/implementacao/53-dpo-como-arquivo.md) | DPO como arquivo público |
 
 As fases do projeto (validação, piloto, evento e crescimento) e o calendário até a edição de 2027 estão na seção 17 do plano completo.
 

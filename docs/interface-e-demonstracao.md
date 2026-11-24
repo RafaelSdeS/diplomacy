@@ -121,12 +121,12 @@ O app já usa o conjunto Lucide (`@lucide/svelte`) com importação ícone a íc
 |---|---|---|---|
 | Busca "Ir para…" | ícone | ícone | `Search` |
 | Notificações | ícone | ícone | `Bell` |
-| Perfil | ícone **e** a palavra "Perfil" | em "Mais", com texto | `CircleUser` |
-| Sair | ícone **e** a palavra "Sair" | em "Mais", com texto | `LogOut` |
+| Perfil | ícone | ícone | `CircleUser` |
+| Sair | ícone (abre a confirmação) | ícone | `LogOut` |
 | Tema claro/escuro | ícone | em "Mais", com texto | `Sun`/`Moon` |
 | Idioma | código atual (PT/EN) | em "Mais", com texto | `Languages` |
 
-Só a lupa e o sino ficam sozinhos. Perfil, Sair, tema e idioma sempre trazem texto: "Sair" por ser a ação que apaga dados do aparelho, e os outros porque o ícone não diz o que fazem.
+Lupa, sino, Perfil e Sair ficam só com o ícone (revisto em 24/11/2026, a pedido: o passo 47 dava texto a Perfil e Sair). O Sair continua seguro porque sempre pede confirmação. Tema e idioma trazem o código ou o texto, porque o ícone não diz o que fazem; no celular, ficam em "Mais".
 
 Manter nome da delegação ou papel em uma identidade visual separada.
 

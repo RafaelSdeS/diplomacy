@@ -64,7 +64,9 @@ Cada passo só começa quando os passos de que ele depende estão prontos. As re
 | [48](48-demonstracao-online.md) | Demonstração online separada, com entrada por papel | 44, 45, 47 |
 | [49](49-edicao-por-clausula.md) | Edição colaborativa por cláusula (depois da validação do piloto) | 09, 44 |
 | [50](50-preparacao-da-fala.md) | Preparação de discursos durante o debate (depois da validação do piloto) | 34, 46 |
-| [51](51-melhorias-gerais-de-interface.md) | Melhorias gerais de interface, por tela: presidência e Agora sem rolagem (antes do piloto), estados, densidade e preferências | 47 |
+| [51](51-melhorias-gerais-de-interface.md) | Melhorias gerais de interface, por tela: ações em botões e modais, presidência e Agora sem rolagem (antes do piloto), troca de redator, estados, densidade e preferências | 47, 52 |
+| [52](52-testes-do-dia-a-dia.md) | Testes rápidos no dia a dia: só os testes da tela mexida, sem build à toa, sem espera fixa, capturas de uma tela | 39 |
+| [53](53-dpo-como-arquivo.md) | DPO como arquivo público: PDF por tópico, aberto ao comitê, sem aprovação | 10, 44, 47 |
 
 ## Melhorias depois da revisão
 
