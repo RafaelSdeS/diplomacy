@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { isolado } from '../scripts/delegacoes.ts';
-import { clienteComo, comiteEmDebate, entrar } from './ajuda.ts';
+import { clienteComo, comiteEmDebate, entrar, desfazerRapido } from './ajuda.ts';
 
 // Passo 39: a cópia do CE-T só deste arquivo (scripts/delegacoes.ts).
 const C = isolado('29');
@@ -59,6 +59,7 @@ test('o bureau recusa um pedido com motivo, e o delegado vê a etapa e o motivo'
 });
 
 test('a delegação retira o próprio pedido enquanto ele espera (passo 38)', async ({ page }) => {
+	await desfazerRapido(page);
 	await entrar(page, ALEMANHA);
 	await page.goto(`/comite/${C.sigla}/sessao`);
 	await aoVivo(page);
@@ -67,9 +68,9 @@ test('a delegação retira o próprio pedido enquanto ele espera (passo 38)', as
 	await expect(page.getByRole('status').filter({ hasText: 'enviado à mesa' })).toBeVisible();
 	const ultimo = page.getByRole('list', { name: 'Seus pontos e moções' }).getByRole('listitem').last();
 	await ultimo.getByRole('button', { name: 'Retirar' }).click();
-	// Passo 47: retirar tem desfazer e só vale depois de 5 segundos.
+	// Passo 47: retirar tem desfazer e só vale depois da espera (1 s nos testes).
 	await expect(ultimo.getByRole('button', { name: 'Desfazer' })).toBeVisible();
-	await expect(ultimo).toContainText('Retirado', { timeout: 10_000 });
+	await expect(ultimo).toContainText('Retirado');
 	await expect(ultimo.getByRole('button', { name: 'Retirar' })).toHaveCount(0);
 });
 

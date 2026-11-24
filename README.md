@@ -153,6 +153,8 @@ npm run seed         # dados fictícios: contas @exemplo.test, senha "senha-de-t
 npm run demo         # evento de demonstração: os 6 comitês, 147 delegações, contas demo.*@exemplo.test
 npm run dev          # app em http://localhost:5173
 npm run testar       # tipos, unidade, banco, build, tamanho e ponta a ponta
+npm run testar:mudou # só os testes de ponta a ponta ligados ao que mudou (build só se preciso)
+SEM_RESET=1 npm run capturas -- tests/06-sessao.spec.ts  # regrava as capturas de um arquivo
 ```
 
 Contas do seed para entrar: `delegado01@exemplo.test` a `delegado16`, `mesa01`, `crise01`, `press01`, `secretaria01` e `semconvite` (sem convite), todas `@exemplo.test` com a senha `senha-de-teste`. No evento de demonstração (`npm run demo`), as contas seguem o padrão `demo.<sigla>.<nn>@exemplo.test` (delegação `nn` do comitê, em ordem; `01b` e `02b` são segundos delegados), `demo.<sigla>.mesa1`, `.press`, `.crise1`, mais `demo.secretaria` e `demo.diretoria-press`. O CSNU da demonstração tem conteúdo completo para testar: `demo.csnu.mesa1` (mesa), `demo.csnu.08` (Dinamarca, primeira presidência do sorteio), `demo.csnu.03` (França). Não há cadastro livre: as contas são criadas pelo seed ou pelo administrador, e os convites da secretaria definem o papel.

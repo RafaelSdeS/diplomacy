@@ -29,6 +29,8 @@ export default defineConfig({
 	workers: ci ? 2 : undefined,
 	forbidOnly: ci,
 	retries: ci ? 1 : 0,
+	// Passo 52: um teste que só passa na segunda tentativa é defeito, não sorte.
+	failOnFlakyTests: ci,
 	reporter: ci ? [['github'], ['html', { open: 'never' }]] : 'list',
 	// Capturas de referência geradas só no CI (mesmo contêiner), por isso sem o sistema no nome.
 	snapshotPathTemplate: '{testDir}/capturas/{testFileName}/{arg}-{projectName}{ext}',
@@ -43,8 +45,9 @@ export default defineConfig({
 		testIgnore: name === 'notebook' ? [] : SO_NOTEBOOK
 	})),
 	webServer: {
-		// No CI o build já foi feito (e medido) antes dos testes.
-		command: ci ? 'npm run preview' : 'npm run build && npm run preview',
+		// No CI o build já foi feito (e medido) antes dos testes. No computador, só refaz a
+		// build se o app mudou (passo 52).
+		command: ci ? 'npm run preview' : 'node scripts/build-se-preciso.ts && npm run preview',
 		port: 4173,
 		reuseExistingServer: !ci
 	}

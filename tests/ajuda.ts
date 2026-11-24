@@ -55,8 +55,12 @@ export async function entrar(page: Page, email: string) {
 	await page.getByLabel('E-mail', { exact: true }).fill(email);
 	await page.getByLabel('Senha').fill(SENHA);
 	await page.getByRole('button', { name: 'Entrar', exact: true }).click();
-	await expect(page).not.toHaveURL(/\/entrar$/);
+	// Passo 52: com 10 processos no mesmo Supabase, o login às vezes passa de 5 s.
+	await expect(page).not.toHaveURL(/\/entrar$/, { timeout: 15_000 });
 }
+
+/** Passo 52: o desfazer espera 1 s nos testes, em vez de 5 s (chamar antes de abrir a tela). */
+export const desfazerRapido = (page: Page) => page.addInitScript(() => Object.assign(window, { __esperaDesfazer: 1000 }));
 
 /**
  * Um cliente do Supabase logado como a conta, para preparar dados pela API (como o

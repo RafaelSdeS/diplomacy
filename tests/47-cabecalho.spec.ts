@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { contaDoTreino, isolado } from '../scripts/delegacoes.ts';
-import { clienteComo, entrar, escolher } from './ajuda.ts';
+import { clienteComo, entrar, escolher, desfazerRapido } from './ajuda.ts';
 
 // Passo 47 (item 8): o cabeçalho com ícones. Só a lupa e o sino ficam sem texto; no celular,
 // tema, idioma, Perfil e Sair ficam em "Mais". A conta é do comitê isolado 47: trocar o
@@ -73,6 +73,7 @@ test('"Ir para…" acha comitês, e documentos e matérias só chegam quando a p
 test('um bilhete não enviado sai da caixa com "Remover", e "Desfazer" o traz de volta', async ({ page, context }, info) => {
 	test.skip(info.project.name !== 'notebook', 'uma tela basta');
 	const texto = `Bilhete que não vai sair ${Date.now()}`;
+	await desfazerRapido(page);
 	await entrar(page, CHILE);
 	await page.goto(`/comite/${isolado('47').sigla}/mensagens`);
 	await expect(page.locator('[data-ao-vivo="sim"]')).toBeVisible({ timeout: 10_000 });
@@ -88,7 +89,7 @@ test('um bilhete não enviado sai da caixa com "Remover", e "Desfazer" o traz de
 	await caixa.getByRole('button', { name: 'Remover: Bilhete para Brasil' }).click();
 	await caixa.getByRole('button', { name: 'Desfazer' }).click();
 	await caixa.getByRole('button', { name: 'Remover: Bilhete para Brasil' }).click();
-	await expect(caixa).toContainText('Nada esperando.', { timeout: 10_000 });
+	await expect(caixa).toContainText('Nada esperando.');
 	await expect(page.getByRole('banner').getByRole('button', { name: /para enviar/ })).toHaveCount(0);
 
 	// Com a rede de volta, nada sai: o bilhete foi removido do aparelho.

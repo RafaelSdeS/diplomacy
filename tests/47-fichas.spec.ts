@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { contaDoTreino, isolado } from '../scripts/delegacoes.ts';
-import { CONTAS, clienteComo, comiteEmDebate, entrar } from './ajuda.ts';
+import { CONTAS, clienteComo, comiteEmDebate, entrar, desfazerRapido } from './ajuda.ts';
 
 // Passo 47 (item 4): as fichas da votação, do ponto e da nota abrem por cima da tela, sem
 // mudar a URL, e a ação da ficha (encerrar a votação, retirar o ponto) funciona dali.
@@ -60,6 +60,7 @@ test('a delegação abre a ficha do próprio ponto e o retira dali', async ({ pa
 	const paraguai = await clienteComo(PARAGUAI);
 	expect((await paraguai.rpc('enviar_ponto', { p_comite: comite, p_tipo: 'ponto_duvida', p_detalhe: detalhe })).error).toBeNull();
 
+	await desfazerRapido(page);
 	await entrar(page, PARAGUAI);
 	await page.goto(`/comite/${C.sigla}/sessao`);
 	await aoVivo(page);
@@ -73,12 +74,12 @@ test('a delegação abre a ficha do próprio ponto e o retira dali', async ({ pa
 	expect(page.url()).toBe(url);
 	await semErrosDeAcessibilidade(page);
 
-	// Passo 47 (item 10): retirar tem volta. "Desfazer" cancela; sem ele, vale em 5 segundos.
+	// Passo 47 (item 10): retirar tem volta. "Desfazer" cancela; sem ele, vale depois da espera.
 	await ficha.getByRole('button', { name: 'Retirar' }).click();
 	await ficha.getByRole('button', { name: 'Desfazer' }).click();
 	await expect(ficha).toContainText('Aguardando o bureau');
 	await ficha.getByRole('button', { name: 'Retirar' }).click();
-	await expect(ficha).toContainText('Retirado', { timeout: 10_000 });
+	await expect(ficha).toContainText('Retirado');
 	await expect(ficha.getByRole('button', { name: 'Retirar' })).toHaveCount(0);
 });
 
