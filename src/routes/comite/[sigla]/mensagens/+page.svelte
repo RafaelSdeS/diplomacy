@@ -14,6 +14,7 @@
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import ResponderEntrevista from '#lib/ui/ResponderEntrevista.svelte';
 	import AcaoEmModal from '#lib/ui/AcaoEmModal.svelte';
+	import Bandeira from '#lib/ui/Bandeira.svelte';
 	import MessageSquarePlus from '@lucide/svelte/icons/message-square-plus';
 	import Send from '@lucide/svelte/icons/send';
 	import Escolha from '#lib/ui/Escolha.svelte';
@@ -33,6 +34,23 @@
 	]);
 	const nome = (id: string | null) => data.delegacoes.find((d) => d.id === id)?.nome ?? t('Mesa');
 	const do_tipo = (tipo: string) => data.mensagens.filter((m) => m.tipo === tipo);
+	// Passo 51 (lote 0b): os bilhetes agrupados pela outra delegação, a conversa mais recente primeiro.
+	const conversas = $derived.by(() => {
+		const porDelegacao = new Map<string, (typeof data.mensagens)[number][]>();
+		for (const m of do_tipo('bilhete')) {
+			const outra = m.de_delegacao_id === eu?.delegacao_id ? m.para_delegacao_id : m.de_delegacao_id;
+			if (!outra) continue;
+			porDelegacao.set(outra, [...(porDelegacao.get(outra) ?? []), m]);
+		}
+		const quando = (m: { criado_em: string }) => Date.parse(m.criado_em);
+		return [...porDelegacao]
+			.map(([id, msgs]) => ({ id, delegacao: data.delegacoes.find((d) => d.id === id), msgs: msgs.sort((a, b) => quando(a) - quando(b)) }))
+			.sort((a, b) => quando(b.msgs[b.msgs.length - 1]) - quando(a.msgs[a.msgs.length - 1]));
+	});
+	function responder(delegacao: string) {
+		para = delegacao;
+		novoBilhete?.abrir();
+	}
 
 	let erro = $state('');
 	let mensagem = $state('');
@@ -124,8 +142,38 @@
 {/if}
 
 {#if eu}
+	{@const minhas = data.entrevistas.filter((e) => e.delegacao_id === eu.delegacao_id)}
+	{#if minhas.length}
+		<section aria-labelledby="t-entrevistas">
+			<h2 id="t-entrevistas">{t('Pedidos de entrevista')}</h2>
+			<ul class="lista">
+				{#each minhas as e (e.id)}
+					<li>
+						<span>
+							<strong>{e.veiculo?.nome}</strong>: {e.tema}
+							<span class="detalhe">
+								{e.status === 'aceita' && e.horario ? `${t('Aceita para')} ${formatarQuando(e.horario, agora)}` : e.status === 'recusada' ? t('Recusada') : t('Esperando a sua resposta')}
+							</span>
+						</span>
+						{#if e.status === 'pedida'}
+							<ResponderEntrevista
+								entrevista={e}
+								onfeito={(m) => {
+									erro = '';
+									mensagem = m;
+									invalidate('app:mensagens');
+								}}
+							/>
+						{/if}
+					</li>
+				{/each}
+			</ul>
+		</section>
+	{/if}
+
 	<section aria-labelledby="t-bilhetes">
 		<h2 id="t-bilhetes">{t('Bilhetes')}</h2>
+		<p class="suave">{t('Recados curtos entre delegações, em personagem. Cada conversa reúne os bilhetes com uma delegação.')}</p>
 		{#if !data.regras.bilhetes_bloqueados}
 			<div class="acoes">
 				<AcaoEmModal
@@ -164,30 +212,95 @@
 				</AcaoEmModal>
 			</div>
 		{/if}
-		<ul class="lista">
-			{#each do_tipo('bilhete') as m (m.id)}
+		<!-- Passo 51 (lote 0b): os bilhetes como conversas, uma por delegação, a mais recente aberta. -->
+		<ul class="lista conversas">
+			{#each conversas as c, i (c.id)}
+				{@const ultima = c.msgs[c.msgs.length - 1]}
 				<li>
-					<span>
-						<strong>{nome(m.de_delegacao_id)} → {nome(m.para_delegacao_id)}</strong>
-						{m.texto}
-						<span class="detalhe"><Quando iso={m.criado_em} /></span>
-					</span>
-					<details class="denunciar">
-						<summary>{t('Denunciar')}</summary>
+					<details class="conversa" open={i === 0}>
+						<summary>
+							<span class="com-bandeira"><Bandeira codigo={c.delegacao?.bandeira} /> <strong>{c.delegacao?.nome ?? t('Mesa')}</strong></span>
+							<span class="conversa-ultima">{ultima.de_delegacao_id === eu.delegacao_id ? `${t('Você')}: ` : ''}{ultima.texto}</span>
+							<span class="detalhe"><Quando iso={ultima.criado_em} /> · {c.msgs.length === 1 ? t('1 bilhete') : t('{n} bilhetes', { n: c.msgs.length })}</span>
+						</summary>
+						<ol class="lista conversa-mensagens">
+							{#each c.msgs as m (m.id)}
+								{@const minha = m.de_delegacao_id === eu.delegacao_id}
+								<li class={minha ? 'conversa-minha' : ''}>
+									<span><strong>{minha ? t('Você') : c.delegacao?.nome}:</strong> {m.texto} <span class="detalhe"><Quando iso={m.criado_em} /></span></span>
+									{#if !minha}
+										<details class="denunciar">
+											<summary>{t('Denunciar')}</summary>
+											<button
+												class="botao botao--secundario botao--pequeno"
+												type="button"
+												onclick={() =>
+													executar(
+														supabase.rpc('denunciar_mensagem', { p_mensagem: m.id, p_motivo: t('Fora do personagem ou ofensivo') }),
+														t('Bilhete denunciado à mesa.')
+													)}>{t('Denunciar à mesa')}</button
+											>
+										</details>
+									{/if}
+								</li>
+							{/each}
+						</ol>
+					</details>
+					{#if !data.regras.bilhetes_bloqueados && c.delegacao && !meBloquearam.has(c.id)}
 						<button
 							class="botao botao--secundario botao--pequeno"
 							type="button"
-							onclick={() =>
-								executar(supabase.rpc('denunciar_mensagem', { p_mensagem: m.id, p_motivo: t('Fora do personagem ou ofensivo') }), t('Bilhete denunciado à mesa.'))}
-							>{t('Denunciar à mesa')}</button
+							aria-label={t('Responder a {delegacao}', { delegacao: c.delegacao.nome })}
+							onclick={() => responder(c.id)}>{t('Responder')}</button
 						>
-					</details>
+					{/if}
 				</li>
 			{:else}
-				<li class="suave">{t('Nenhum bilhete.')}</li>
+				<li class="suave">{t('Nenhum bilhete ainda. "Novo bilhete" escreve a outra delegação.')}</li>
 			{/each}
 		</ul>
 	</section>
+
+
+	<section aria-labelledby="t-com-mesa">
+		<h2 id="t-com-mesa">{t('Com a mesa')}</h2>
+		<div class="acoes">
+			<AcaoEmModal
+				bind:this={falarComMesa}
+				secundario
+				rotulo={t('Falar com a mesa')}
+				icone={Send}
+				descricao={t('Dúvidas e pedidos privados: só a mesa lê.')}
+			>
+				<form
+					class="formulario"
+					aria-label={t('Mensagem à mesa')}
+					onsubmit={(e) => {
+						e.preventDefault();
+						void enviar('mesa', 'mesa', null, t('Mensagem enviada à mesa.'));
+					}}
+				>
+					<label class="campo">
+						{t('Mensagem à mesa')}
+						<textarea required rows="3" maxlength="1000" bind:value={texto.mesa} {@attach contador(texto.mesa)}></textarea>
+					</label>
+					{#if erro}<p class="erro">{erro}</p>{/if}
+					<div class="acoes">
+						<button class="botao">{t('Enviar à mesa')}</button>
+						<button class="botao botao--secundario" type="button" onclick={() => falarComMesa?.fechar()}>{t('Cancelar')}</button>
+					</div>
+				</form>
+			</AcaoEmModal>
+		</div>
+		<ul class="lista">
+			{#each do_tipo('mesa') as m (m.id)}
+				<li><span><strong>{m.de_delegacao_id ? t('Sua delegação') : t('Mesa')}:</strong> {m.texto} <span class="detalhe"><Quando iso={m.criado_em} /></span></span></li>
+			{:else}
+				<li class="suave">{t('Dúvidas e pedidos privados à mesa aparecem aqui.')}</li>
+			{/each}
+		</ul>
+	</section>
+
 
 	<section aria-labelledby="t-bloqueios">
 		<h2 id="t-bloqueios">{t('Bloqueios')}</h2>
@@ -233,74 +346,6 @@
 			</ul>
 		{/if}
 	</section>
-
-	<section aria-labelledby="t-com-mesa">
-		<h2 id="t-com-mesa">{t('Com a mesa')}</h2>
-		<div class="acoes">
-			<AcaoEmModal
-				bind:this={falarComMesa}
-				secundario
-				rotulo={t('Falar com a mesa')}
-				icone={Send}
-				descricao={t('Dúvidas e pedidos privados: só a mesa lê.')}
-			>
-				<form
-					class="formulario"
-					aria-label={t('Mensagem à mesa')}
-					onsubmit={(e) => {
-						e.preventDefault();
-						void enviar('mesa', 'mesa', null, t('Mensagem enviada à mesa.'));
-					}}
-				>
-					<label class="campo">
-						{t('Mensagem à mesa')}
-						<textarea required rows="3" maxlength="1000" bind:value={texto.mesa} {@attach contador(texto.mesa)}></textarea>
-					</label>
-					{#if erro}<p class="erro">{erro}</p>{/if}
-					<div class="acoes">
-						<button class="botao">{t('Enviar à mesa')}</button>
-						<button class="botao botao--secundario" type="button" onclick={() => falarComMesa?.fechar()}>{t('Cancelar')}</button>
-					</div>
-				</form>
-			</AcaoEmModal>
-		</div>
-		<ul class="lista">
-			{#each do_tipo('mesa') as m (m.id)}
-				<li><span><strong>{m.de_delegacao_id ? t('Sua delegação') : t('Mesa')}:</strong> {m.texto} <span class="detalhe"><Quando iso={m.criado_em} /></span></span></li>
-			{:else}
-				<li class="suave">{t('Dúvidas e pedidos privados à mesa aparecem aqui.')}</li>
-			{/each}
-		</ul>
-	</section>
-
-	{@const minhas = data.entrevistas.filter((e) => e.delegacao_id === eu.delegacao_id)}
-	{#if minhas.length}
-		<section aria-labelledby="t-entrevistas">
-			<h2 id="t-entrevistas">{t('Pedidos de entrevista')}</h2>
-			<ul class="lista">
-				{#each minhas as e (e.id)}
-					<li>
-						<span>
-							<strong>{e.veiculo?.nome}</strong>: {e.tema}
-							<span class="detalhe">
-								{e.status === 'aceita' && e.horario ? `${t('Aceita para')} ${formatarQuando(e.horario, agora)}` : e.status === 'recusada' ? t('Recusada') : t('Esperando a sua resposta')}
-							</span>
-						</span>
-						{#if e.status === 'pedida'}
-							<ResponderEntrevista
-								entrevista={e}
-								onfeito={(m) => {
-									erro = '';
-									mensagem = m;
-									invalidate('app:mensagens');
-								}}
-							/>
-						{/if}
-					</li>
-				{/each}
-			</ul>
-		</section>
-	{/if}
 {/if}
 
 {#if ehMesa}

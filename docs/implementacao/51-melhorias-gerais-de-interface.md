@@ -90,6 +90,18 @@
 - **Abas no modelo da aba Comitê:** a grade de atalhos virou `GradeAtalhos.svelte`, que a aba Comitê e a central de Documentos usam (DPO, Blocos, Cartas e Caderno no topo; os links soltos do fim dos cartões saíram).
 - **Testes:** `abrirAcao()` de `tests/ajuda.ts` abre o modal de uma ação.
 
+**Lote 0b feito:**
+
+- **Quem preside:** `QuemPreside.svelte` mostra a faixa na sessão e na Agora (o painel e o telão já mostravam). Para a delegação que preside, a faixa diz "Sua delegação preside a sessão" e leva ao painel.
+- **Modais no centro:** fichas e prévia abrem no centro.
+- **Botões na sessão:** Chamada, Agenda, Votações, Notas de crise e Telão viram botões com ícone.
+- **"Anotar" na sessão:** abre a nota rápida num modal.
+- **O caderno de qualquer tela:** o ícone do cabeçalho abre o "Caderno", com a nova anotação em cima e as notas embaixo, com busca; aberto a partir de uma delegação, mostra só o que foi anotado sobre ela.
+- **Compartilhar com bandeiras:** "Compartilhar com" e o "Para" do bilhete usam o `Escolha` com bandeiras; o compartilhar salva ao fechar a lista (`onpronto`).
+- **Mensagens:** no topo, os pedidos de entrevista que esperam resposta. Depois, os bilhetes como conversas por delegação (bandeira, última mensagem, contagem, a mais recente aberta, "Responder"), a conversa com a mesa e, no fim, os bloqueios.
+- **DPO:** "Meu DPO" em cartões por tópico (situação, data de envio, palavras, comentário da mesa, Escrever ou Continuar, Ler, Imprimir). A escrita abre num modal largo, com a contagem de palavras e a prévia ao lado. Os DPOs do comitê aparecem em cartões com bandeira, e a mesa avalia num modal.
+- **Dados de exemplo online:** o CSNU-T tem DPOs, dois blocos com working papers e um projeto, cartas, bilhetes, notas de crise e anotações, criados entrando como as delegações de teste.
+
 **Antes do lote 1:** você usa o app online por uns minutos, com as contas de teste, e diz se ficou claro.
 
 ## Fora desta etapa

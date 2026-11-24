@@ -47,16 +47,21 @@ test('o DPO escrito no celular vai à mesa, que pede ajustes e depois aprova', a
 
 	const celular = await abrir(browser, C.conta(CONTAS.delegado), DPO, { width: 360, height: 740 });
 	await expect(celular.locator('[data-ao-vivo="sim"]')).toBeVisible({ timeout: 10_000 });
+	// Passo 51: o cartão do tópico mostra a situação; escrever abre o modal, com a prévia ao lado.
 	const topico = celular.getByRole('region', { name: /^Tópico 1:/ });
-	await topico.getByLabel(/^Texto/).fill(
+	const escrita = celular.getByRole('dialog', { name: /^DPO · Tópico 1/ });
+	await topico.getByRole('button', { name: /^(Escrever|Continuar)$/ }).click();
+	await escrita.getByLabel(/^Texto/).fill(
 		'Os Estados Unidos condenam os ataques no Mar Vermelho.\n\nPropomos uma força naval conjunta.'
 	);
-	await topico.getByLabel(/^Referências/).fill('Resolução 2722 (2024)\nCarta das Nações Unidas');
-	await topico.getByRole('button', { name: 'Salvar rascunho' }).click();
-	await expect(celular.getByRole('status')).toHaveText('DPO salvo.');
-	await topico.getByRole('button', { name: 'Enviar à mesa' }).click();
+	await expect(escrita).toContainText('Propomos uma força naval conjunta.');
+	await escrita.getByLabel(/^Referências/).fill('Resolução 2722 (2024)\nCarta das Nações Unidas');
+	await escrita.getByRole('button', { name: 'Salvar rascunho' }).click();
+	await expect(escrita.getByRole('status')).toHaveText('DPO salvo.');
+	await escrita.getByRole('button', { name: 'Enviar à mesa' }).click();
+	await expect(escrita).toBeHidden();
 	await expect(celular.getByRole('status')).toHaveText('DPO enviado à mesa.');
-	await expect(topico.getByLabel(/^Texto/)).toBeDisabled();
+	await expect(topico.getByRole('button', { name: /^(Escrever|Continuar)$/ })).toHaveCount(0);
 
 	const mesa = await abrir(browser, C.conta(CONTAS.mesa), DPO);
 	await mesa.getByRole('button', { name: 'Avaliar o DPO de EUA, tópico 1' }).click();
@@ -70,8 +75,9 @@ test('o DPO escrito no celular vai à mesa, que pede ajustes e depois aprova', a
 	await expect(topico.getByRole('note', { name: 'Comentário da mesa' })).toHaveText('Cite a fonte da força naval.', {
 		timeout: 10_000
 	});
-	await topico.getByLabel(/^Referências/).fill('Resolução 2722 (2024)\nCarta das Nações Unidas\nRelatório do Secretário-Geral');
-	await topico.getByRole('button', { name: 'Enviar à mesa' }).click();
+	await topico.getByRole('button', { name: 'Continuar' }).click();
+	await escrita.getByLabel(/^Referências/).fill('Resolução 2722 (2024)\nCarta das Nações Unidas\nRelatório do Secretário-Geral');
+	await escrita.getByRole('button', { name: 'Enviar à mesa' }).click();
 	await expect(celular.getByRole('status')).toHaveText('DPO enviado à mesa.');
 
 	await mesa.getByRole('button', { name: 'Avaliar o DPO de EUA, tópico 1' }).click();

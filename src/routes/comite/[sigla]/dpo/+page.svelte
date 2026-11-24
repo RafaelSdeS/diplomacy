@@ -6,7 +6,10 @@
 	import { contador } from '#lib/contador.ts';
 	import { t } from '#lib/i18n.svelte.ts';
 	import { abrirPrevia } from '#lib/ficha.svelte.ts';
-	import { STATUS_DPO as STATUS } from '#lib/impressao.ts';
+	import { paragrafos, STATUS_DPO as STATUS } from '#lib/impressao.ts';
+	import Modal from '#lib/ui/Modal.svelte';
+	import Quando from '#lib/ui/Quando.svelte';
+	import PenLine from '@lucide/svelte/icons/pen-line';
 	import { untrack } from 'svelte';
 	import { invalidate } from '$app/navigation';
 	import { mensagemDeErro } from '#lib/sessao.ts';
@@ -42,8 +45,12 @@
 
 	let erro = $state('');
 	let mensagem = $state('');
-	let aberto = $state<string | null>(null);
 	let comentario = $state('');
+	// Passo 51 (lote 0b): escrever o DPO e avaliar abrem no centro, num modal largo.
+	let escrevendo = $state<number | null>(null);
+	let avaliando = $state<string | null>(null);
+	const emAvaliacao = $derived(outros.find((d) => d.id === avaliando));
+	const palavras = (texto: string) => texto.trim().split(/\s+/).filter(Boolean).length;
 
 	async function executar(acao: PromiseLike<{ error: { code?: string; message?: string } | null }>, ok = '') {
 		erro = mensagem = '';
@@ -68,13 +75,14 @@
 	// Avaliado, o DPO fecha o painel da mesa.
 	async function avaliar(dpo: string, status: 'aprovado' | 'pede_ajustes', ok: string) {
 		if (await executar(supabase.rpc('avaliar_dpo', { p_dpo: dpo, p_status: status, p_comentario: comentario }), ok)) {
-			aberto = null;
+			avaliando = null;
 			comentario = '';
 		}
 	}
 
 	async function enviar(topico: number) {
-		if (await salvar(topico)) await executar(supabase.rpc('enviar_dpo', { p_dpo: meu(topico)!.id }), t('DPO enviado à mesa.'));
+		if ((await salvar(topico)) && (await executar(supabase.rpc('enviar_dpo', { p_dpo: meu(topico)!.id }), t('DPO enviado à mesa.'))))
+			escrevendo = null;
 	}
 </script>
 
@@ -88,45 +96,80 @@
 </p>
 <h1>{t('Documento de posição oficial')}</h1>
 
-{#if erro}
-	<p class="erro" role="alert">{erro}</p>
-{/if}
-{#if mensagem}
-	<p class="sucesso" role="status">{mensagem}</p>
+<!-- Com um modal aberto, o aviso aparece dentro dele. -->
+{#if escrevendo === null && !avaliando}
+	{#if erro}<p class="erro" role="alert">{erro}</p>{/if}
+	{#if mensagem}<p class="sucesso" role="status">{mensagem}</p>{/if}
 {/if}
 
 {#if eu}
-	{#each data.comite.topicos as titulo, i (titulo)}
-		{@const topico = i + 1}
-		{@const d = meu(topico)}
-		{@const editavel = !d || d.status === 'rascunho' || d.status === 'pede_ajustes'}
-		<section class="cartao dpo-editor" aria-labelledby={`t-dpo-${topico}`}>
-			<h2 id={`t-dpo-${topico}`}>{t('Tópico')} {topico}: {titulo}</h2>
-			<p class="cabecalho-documento">
-				<span class="selo {STATUS[d?.status ?? 'rascunho'].selo}">{STATUS[d?.status ?? 'rascunho'].rotulo}</span>
-				{#if d}<a class="botao botao--secundario botao--pequeno" href={`/imprimir/dpo/${d.id}`}>{t('Imprimir ou salvar como PDF')}</a>{/if}
-			</p>
+	<section aria-labelledby="t-meu-dpo">
+		<h2 id="t-meu-dpo">{t('Meu DPO')}</h2>
+		<div class="cartoes">
+			{#each data.comite.topicos as titulo, i (titulo)}
+				{@const topico = i + 1}
+				{@const d = meu(topico)}
+				{@const editavel = !d || d.status === 'rascunho' || d.status === 'pede_ajustes'}
+				<section class="cartao" aria-labelledby={`t-dpo-${topico}`}>
+					<h3 id={`t-dpo-${topico}`}>{t('Tópico')} {topico}: {titulo}</h3>
+					<p class="cabecalho-documento">
+						<span class="selo {STATUS[d?.status ?? 'rascunho'].selo}">{STATUS[d?.status ?? 'rascunho'].rotulo}</span>
+						{#if d?.enviado_em}<span class="detalhe">{t('enviado')} <Quando iso={d.enviado_em} /></span>{/if}
+					</p>
+					{#if d?.comentario_mesa}
+						<p class="telegrama" role="note" aria-label={t('Comentário da mesa')}>{d.comentario_mesa}</p>
+					{/if}
+					<p class="suave">{d?.texto.trim() ? t('{n} palavras', { n: palavras(d.texto) }) : t('Ainda não escrito.')}</p>
+					<div class="acoes">
+						{#if editavel}
+							<button class="botao" type="button" onclick={() => (escrevendo = topico)}
+								><PenLine aria-hidden="true" size={18} strokeWidth={1.75} /> {d?.texto.trim() ? t('Continuar') : t('Escrever')}</button
+							>
+						{/if}
+						{#if d?.texto.trim()}
+							<button class="botao botao--secundario" type="button" onclick={() => abrirPrevia('dpo', d.id)}>{t('Ler')}</button>
+							<a class="botao botao--secundario" href={`/imprimir/dpo/${d.id}`}>{t('Imprimir ou salvar como PDF')}</a>
+						{/if}
+					</div>
+				</section>
+			{/each}
+		</div>
+	</section>
+
+	<Modal aberto={escrevendo !== null} rotulo="t-escrevendo" classe="modal-dpo" onclose={() => (escrevendo = null)}>
+		{#if escrevendo !== null && rascunhos[escrevendo]}
+			{@const topico = escrevendo}
+			{@const d = meu(topico)}
+			<h3 id="t-escrevendo">{t('DPO · Tópico {n}', { n: topico })}: {data.comite.topicos[topico - 1]}</h3>
 			{#if d?.comentario_mesa}
 				<p class="telegrama" role="note" aria-label={t('Comentário da mesa')}>{d.comentario_mesa}</p>
 			{/if}
-			{#if rascunhos[topico]}
-				<label class="campo">
-					{t('Texto (parágrafos separados por uma linha em branco)')}
-					<textarea rows="12" maxlength="12000" disabled={!editavel} bind:value={rascunhos[topico].texto} {@attach contador(rascunhos[topico].texto)}></textarea>
-				</label>
-				<label class="campo">
-					{t('Referências (uma por linha)')}
-					<textarea rows="4" disabled={!editavel} bind:value={rascunhos[topico].referencias}></textarea>
-				</label>
-			{/if}
-			{#if editavel}
-				<div class="acoes">
-					<button class="botao botao--secundario" type="button" onclick={() => salvar(topico)}>{t('Salvar rascunho')}</button>
-					<button class="botao" type="button" onclick={() => enviar(topico)}>{t('Enviar à mesa')}</button>
+			<div class="dpo-escrita">
+				<div class="formulario">
+					<label class="campo">
+						{t('Texto (parágrafos separados por uma linha em branco)')}
+						<textarea rows="14" maxlength="12000" bind:value={rascunhos[topico].texto} {@attach contador(rascunhos[topico].texto)}></textarea>
+					</label>
+					<p class="detalhe">{t('{n} palavras', { n: palavras(rascunhos[topico].texto) })}</p>
+					<label class="campo">
+						{t('Referências (uma por linha)')}
+						<textarea rows="4" bind:value={rascunhos[topico].referencias}></textarea>
+					</label>
 				</div>
-			{/if}
-		</section>
-	{/each}
+				<div class="dpo-previa folha" aria-label={t('Prévia')}>
+					<p class="rotulo">{t('Prévia')}</p>
+					{#each paragrafos(rascunhos[topico].texto) as p, n (n)}<p>{p}</p>{:else}<p class="suave">{t('O texto aparece aqui.')}</p>{/each}
+				</div>
+			</div>
+			{#if erro}<p class="erro" role="alert">{erro}</p>{/if}
+			{#if mensagem}<p class="sucesso" role="status">{mensagem}</p>{/if}
+			<div class="acoes">
+				<button class="botao" type="button" onclick={() => enviar(topico)}>{t('Enviar à mesa')}</button>
+				<button class="botao botao--secundario" type="button" onclick={() => salvar(topico)}>{t('Salvar rascunho')}</button>
+				<button class="botao botao--secundario" type="button" onclick={() => (escrevendo = null)}>{t('Fechar')}</button>
+			</div>
+		{/if}
+	</Modal>
 {/if}
 
 {#if ehMesa || outros.length}
@@ -139,16 +182,14 @@
 					: t('Os DPOs ficam fechados: só a delegação e a mesa leem.')}
 			</p>
 		{/if}
-		<ul class="lista">
+		<ul class="cartoes-dpo">
 			{#each outros as d (d.id)}
-				<li>
-					<span>
-						<NomeDelegacao sigla={data.comite.sigla} delegacao={d.delegacao} />
-						<span class="detalhe">{t('Tópico')} {d.topico} · <span class="selo {STATUS[d.status].selo}">{STATUS[d.status].rotulo}</span></span>
-					</span>
-					<span class="acoes">
+				<li class="cartao">
+					<p class="com-bandeira"><Bandeira codigo={d.delegacao?.bandeira} /> <strong>{d.delegacao?.nome}</strong></p>
+					<p class="detalhe">{t('Tópico')} {d.topico} · <span class="selo {STATUS[d.status].selo}">{STATUS[d.status].rotulo}</span></p>
+					<div class="acoes">
 						<button
-							class="abre-ficha"
+							class="botao botao--secundario botao--pequeno"
 							type="button"
 							aria-label={`${t('Ler')}: ${t('DPO de {delegacao}', { delegacao: d.delegacao?.nome ?? '' })}, ${t('Tópico')} ${d.topico}`}
 							onclick={() => abrirPrevia('dpo', d.id)}>{t('Ler')}</button
@@ -158,39 +199,35 @@
 								class="botao botao--pequeno"
 								type="button"
 								aria-label={`Avaliar o DPO de ${d.delegacao?.nome}, tópico ${d.topico}`}
-								onclick={() => (aberto = aberto === d.id ? null : d.id)}>{t('Avaliar')}</button
+								onclick={() => {
+									erro = mensagem = '';
+									avaliando = d.id;
+								}}>{t('Avaliar')}</button
 							>
 						{/if}
-					</span>
+					</div>
 				</li>
-				{#if aberto === d.id}
-					<li class="avaliacao">
-						<div class="formulario formulario--largo">
-							<p class="texto-nota folha">{d.texto}</p>
-							<label class="campo">
-								{t('Comentário para a delegação')}
-								<textarea rows="3" maxlength="1000" bind:value={comentario} {@attach contador(comentario)}></textarea>
-							</label>
-							<div class="acoes">
-								<button
-									class="botao"
-									type="button"
-									onclick={() => avaliar(d.id, 'aprovado', t('DPO aprovado.'))}
-									>{t('Aprovar')}</button
-								>
-								<button
-									class="botao botao--secundario"
-									type="button"
-									onclick={() => avaliar(d.id, 'pede_ajustes', t('Ajustes pedidos.'))}
-									>{t('Pedir ajustes')}</button
-								>
-							</div>
-						</div>
-					</li>
-				{/if}
 			{:else}
 				<li class="suave">{t('Nenhum DPO por aqui ainda.')}</li>
 			{/each}
 		</ul>
+		<Modal aberto={!!emAvaliacao} rotulo="t-avaliando" classe="modal-dpo" onclose={() => (avaliando = null)}>
+			{#if emAvaliacao}
+				<h3 id="t-avaliando">{t('DPO de {delegacao}', { delegacao: emAvaliacao.delegacao?.nome ?? '' })} · {t('Tópico')} {emAvaliacao.topico}</h3>
+				<div class="texto-nota folha">{#each paragrafos(emAvaliacao.texto) as p, n (n)}<p>{p}</p>{/each}</div>
+				<label class="campo">
+					{t('Comentário para a delegação')}
+					<textarea rows="3" maxlength="1000" bind:value={comentario} {@attach contador(comentario)}></textarea>
+				</label>
+				{#if erro}<p class="erro" role="alert">{erro}</p>{/if}
+				<div class="acoes">
+					<button class="botao" type="button" onclick={() => avaliar(emAvaliacao.id, 'aprovado', t('DPO aprovado.'))}>{t('Aprovar')}</button>
+					<button class="botao botao--secundario" type="button" onclick={() => avaliar(emAvaliacao.id, 'pede_ajustes', t('Ajustes pedidos.'))}
+						>{t('Pedir ajustes')}</button
+					>
+					<button class="botao botao--secundario" type="button" onclick={() => (avaliando = null)}>{t('Fechar')}</button>
+				</div>
+			{/if}
+		</Modal>
 	</section>
 {/if}
