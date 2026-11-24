@@ -1,6 +1,8 @@
 {
 	"name": "diplomacy",
 	"version": "0.0.1",
+	"description": "App web tudo em um para simulações da ONU (MUNs), começando pelo UFRGSMUN",
+	"homepage": "https://diplomacy.rafesilvadesouza.workers.dev",
 	"private": true,
 	"type": "module",
 	"license": "MIT",

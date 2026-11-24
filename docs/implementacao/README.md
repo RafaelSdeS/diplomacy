@@ -97,7 +97,7 @@ Viraram os passos 44 a 51. Cada plano detalhado continua sendo a referência do 
 
 ## Convenções
 
-**Stack:** SvelteKit 3 com Svelte 5, em modo SPA (`adapter-static`), TypeScript, Supabase (Postgres, Auth, Realtime e Storage) e Cloudflare Pages. Node 24 (`.nvmrc`).
+**Stack:** SvelteKit 3 com Svelte 5, em modo SPA (`adapter-static`), TypeScript, Supabase (Postgres, Auth, Realtime e Storage) e Cloudflare Workers (só arquivos estáticos). Node 24 (`.nvmrc`).
 
 **Estrutura de pastas:**
 

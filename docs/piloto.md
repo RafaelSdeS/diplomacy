@@ -26,9 +26,9 @@ Roteiro para testar o app com um grupo pequeno (passo 12), no formato do **mock*
    | Press | 1 |
    | Diretoria da Press | a sua conta da secretaria (vale como Diretoria da Press; o papel `diretoria_press` próprio existe desde o passo 17, e a sua conta pode ter os dois) |
 
-   Escreva cada e-mail e senha num papelzinho, para entregar na hora.
+   Escreva cada e-mail e senha num papelzinho, com o endereço do app (<https://diplomacy.rafesilvadesouza.workers.dev>), para entregar na hora.
 
-3. **Telão.** Um notebook ligado ao projetor, com a conta da mesa aberta em `/telao/TREINO` em tela cheia. Teste o projetor antes: a tela tem que caber em 1920 × 1080 sem rolar.
+3. **Telão.** Um notebook ligado ao projetor, com a conta da mesa aberta em <https://diplomacy.rafesilvadesouza.workers.dev/telao/TREINO> em tela cheia. Teste o projetor antes: a tela tem que caber em 1920 × 1080 sem rolar.
 
 4. **Plano B em papel** (veja abaixo), impresso e na mesa.
 

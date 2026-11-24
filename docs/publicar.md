@@ -57,7 +57,7 @@ O app é publicado como um **Worker só com arquivos estáticos**. O `wrangler.j
    | `SUPABASE_CHAVE` | a chave pública do passo 1.4 |
    | `LOGIN_GOOGLE` | `0` (vira `1` no passo 3) |
 
-5. Rode o build de novo (aba **Deployments**). O app fica em `https://diplomacy.<sua-conta>.workers.dev`, e cada push na `main` publica de novo.
+5. Rode o build de novo (aba **Deployments**). O app fica em `https://diplomacy.<sua-conta>.workers.dev` (o deste repositório: <https://diplomacy.rafesilvadesouza.workers.dev>), e cada push na `main` publica de novo.
 6. De volta ao Supabase, em **Authentication → URL Configuration**:
    - **Site URL:** o endereço do app;
    - **Redirect URLs:** adicione `<endereço do app>/**` e `http://localhost:5173/**`.

@@ -2,7 +2,9 @@
 
 App web tudo em um para simulações da ONU (MUNs), começando pelo [UFRGSMUN](https://www.ufrgs.br/ufrgsmun/). Funciona no celular e no computador, sem instalar nada.
 
-> **Status:** os 19 passos estão prontos, e o piloto está publicado. Os comitês funcionam em português e em inglês; a secretaria, só em português. A sessão de teste com pessoas segue o roteiro em `docs/piloto.md`.
+**No ar:** [diplomacy.rafesilvadesouza.workers.dev](https://diplomacy.rafesilvadesouza.workers.dev). Não há cadastro livre: as contas são criadas pela secretaria.
+
+> **Status:** os passos 01 a 46 estão prontos (do 45, só a parte A), e o piloto está [publicado](https://diplomacy.rafesilvadesouza.workers.dev). Os comitês funcionam em português e em inglês; a secretaria, só em português. A próxima etapa é a sessão de teste com pessoas, pelo roteiro em [docs/piloto.md](docs/piloto.md); depois vêm o 45 parte B, o 47 e o 48.
 
 ## O problema
 
@@ -39,7 +41,7 @@ As regras de procedimento seguem as Rules of Procedure do UNOCT 2026, que valem 
 | Peça | Piloto (grátis, poucos usuários) | Evento completo |
 |---|---|---|
 | Interface | SvelteKit em modo SPA, responsivo | Igual, mais PWA com cache completo |
-| Hospedagem | Cloudflare Pages (grátis) | Igual |
+| Hospedagem | Cloudflare Workers, só arquivos estáticos (grátis) | Igual |
 | Backend | Supabase grátis, região São Paulo | Supabase Pro no mês do evento |
 | Tempo real | Postgres Changes | Broadcast a partir do banco |
 | Login | Google e e-mail com senha | Mais QR do crachá e link/código por e-mail |
@@ -163,7 +165,7 @@ Para parar o Supabase local: `npx supabase stop`. Depois de criar uma migração
 2. Baixe o artefato `capturas`.
 3. Coloque o conteúdo em `tests/capturas/` e faça o commit.
 
-**Publicar:** o passo a passo do Supabase na nuvem, do Cloudflare Pages e do login com Google está em [docs/publicar.md](docs/publicar.md).
+**Publicar:** o passo a passo do Supabase na nuvem, do Cloudflare e do login com Google está em [docs/publicar.md](docs/publicar.md).
 
 ## Privacidade
 
