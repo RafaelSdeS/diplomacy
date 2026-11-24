@@ -4,7 +4,7 @@ App web tudo em um para simulações da ONU (MUNs), começando pelo [UFRGSMUN](h
 
 **No ar:** [diplomacy.rafesilvadesouza.workers.dev](https://diplomacy.rafesilvadesouza.workers.dev). Não há cadastro livre: as contas são criadas pela secretaria.
 
-> **Status:** os passos 01 a 46 estão prontos (do 45, só a parte A), e o piloto está [publicado](https://diplomacy.rafesilvadesouza.workers.dev). Os comitês funcionam em português e em inglês; a secretaria, só em português. A próxima etapa é a interface: o passo 47 (modais, menus de escolha e confirmação) e a presidência e a Agora sem rolagem (passo 51). A sessão de teste com pessoas, pelo roteiro em [docs/piloto.md](docs/piloto.md), vem depois; em seguida, o 45 parte B e o 48.
+> **Status:** os passos 01 a 46 estão prontos (do 45, só a parte A), e o piloto está [publicado](https://diplomacy.rafesilvadesouza.workers.dev). Os comitês funcionam em português e em inglês; a secretaria, só em português. A etapa atual é a interface: o passo 47 (modais, menus de escolha e confirmação) está em andamento, com os itens 1 a 3 prontos (modal base, saída com confirmação e confirmação nas ações irreversíveis); depois vêm a presidência e a Agora sem rolagem (passo 51). A sessão de teste com pessoas, pelo roteiro em [docs/piloto.md](docs/piloto.md), vem depois; em seguida, o 45 parte B e o 48.
 
 ## O problema
 

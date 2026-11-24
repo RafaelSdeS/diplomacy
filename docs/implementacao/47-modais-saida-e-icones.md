@@ -36,6 +36,10 @@ Em ordem:
 
 **Item 3 feito:** "Encerrar a coletiva" e "Ocultar notícia" passaram a usar `Confirmar` (o de encerrar a coletiva saiu de dentro do formulário de abrir, porque formulário não se aninha). O resto da lista já confirmava: encerrar sessão e votação, retirar adoção e remover acesso; o pedido de exclusão da conta tem confirmação própria na tela. Retirar ponto fica com o desfazer do item 10, porque dá para propor de novo. A troca de cenário entra com o passo 48. Teste de encerrar a coletiva (cancelar e confirmar) em `tests/17-comunicacao.spec.ts`; ocultar notícia, em `tests/11-press.spec.ts`.
 
+**Próximos (itens 4 a 10).** Começar pelo 4, as fichas de votação, ponto, moção e nota: o ganho maior está na presidência e na Agora, porque a página de votações já abre cada votação no lugar.
+
+**Atenção no item 7 (menus).** O visual próprio do `<select>` muda as capturas de referência do CI (`presidencia.png`, `fila.png` e, com um exemplo de menu no `/estilo`, `estilo-*.png`). No mesmo trabalho, gerar as capturas de novo pelo CI, num ramo para a `main` não ficar vermelha: `gh workflow run ci.yml --ref <ramo> -f atualizar_capturas=true`, baixar os artefatos `capturas-N` para `tests/capturas/`, fazer o commit e só então levar à `main`. Só um `<select>` fica fora de `.campo` (o andamento da agenda), então a regra vale para o elemento `select`.
+
 ## Fora desta etapa
 
 Favoritos, tamanho do texto e a revisão de rolagem, densidade e estados, tela por tela (passo 51).
