@@ -40,7 +40,9 @@ Em ordem:
 
 **Item 5 feito:** `src/lib/ui/Previa.svelte`, uma só no layout (carrega na primeira vez, como a ficha da delegação), aberta por `abrirPrevia(tipo, id)` de `ficha.svelte.ts`. Busca o DPO, a carta, o working paper ou projeto (cláusulas formatadas por `formatarDocumento`) ou a matéria pelo id, com o que a RLS deixa ler, e mostra o texto no painel lateral, com o link para a versão completa (impressão do DPO e da carta, página do documento, matéria no veículo). Abre pelo título na central de Documentos ("Do comitê" e cartas), na página de cartas, nos DPOs de outras delegações (o "Imprimir" virou "Ler") e no "Na press" da Agora. Os documentos dos próprios blocos e os "Ler e avaliar" da mesa seguem como links, porque levam a editar ou avaliar. Teste da carta em `tests/47-fichas.spec.ts`.
 
-**Próximos (itens 6 a 10).** Começar pelo 6, os modais de ação curta (entrevista, destinatários de carta, delegações citadas, nova carta e bilhete pela ficha).
+**Item 6 feito:** pedido de entrevista respondido num modal (`ResponderEntrevista.svelte`: horário, aceitar, recusar), nas mensagens e no "Precisa de você" da Agora, que agora lista os pedidos à delegação. Destinatários da carta e delegações citadas na matéria saem pelo `Escolha` (`src/lib/ui/Escolha.svelte`, adiantado do item 7): a tela mostra o resumo e "Escolher", e a lista abre num modal, com filtro a partir de sete opções, bandeira, setas e Enter. A ficha da delegação ganhou "Mandar bilhete" e "Escrever carta", que escrevem no próprio painel, com os mesmos rascunhos das mensagens e das cartas.
+
+**Próximos (itens 7 a 10).** Começar pelo 7: o visual próprio do `<select>` e o `Escolha` de uma opção nas listas de delegações (entrevistas, coletiva, mensagens, crise, caderno, presidência, participantes).
 
 **Atenção no item 7 (menus).** O visual próprio do `<select>` muda as capturas de referência do CI (`presidencia.png`, `fila.png` e, com um exemplo de menu no `/estilo`, `estilo-*.png`). No mesmo trabalho, gerar as capturas de novo pelo CI, num ramo para a `main` não ficar vermelha: `gh workflow run ci.yml --ref <ramo> -f atualizar_capturas=true`, baixar os artefatos `capturas-N` para `tests/capturas/`, fazer o commit e só então levar à `main`. Só um `<select>` fica fora de `.campo` (o andamento da agenda), então a regra vale para o elemento `select`.
 
@@ -54,8 +56,8 @@ Favoritos, tamanho do texto e a revisão de rolagem, densidade e estados, tela p
 - [x] Ponta a ponta: *Sair* abre a confirmação, cancelar mantém a sessão, confirmar apaga os caches e volta ao login; com um item na caixa de saída a modal mostra o aviso e "enviar agora" envia antes de sair.
 - [x] Ponta a ponta: cada ação irreversível da lista do item 3 pede confirmação.
 - [x] Ponta a ponta: clicar numa votação, num ponto e numa nota abre a ficha sem mudar a URL, e a ação da ficha (encerrar votação, retirar ponto) funciona dali.
-- [ ] Ponta a ponta: aceitar uma entrevista, escolher destinatários de carta e citar uma delegação numa matéria sem sair da página.
-- [ ] Ponta a ponta: escolher uma delegação digitando parte do nome no `Escolha`, só com o teclado.
+- [x] Ponta a ponta: aceitar uma entrevista, escolher destinatários de carta e citar uma delegação numa matéria sem sair da página.
+- [x] Ponta a ponta: escolher uma delegação digitando parte do nome no `Escolha`, só com o teclado.
 - [ ] Textos novos em português e inglês (`npm run textos` passa).
 - [ ] axe em cada modal; todo ícone com nome acessível.
 - [ ] Teclado: Tab e Enter percorrem o cabeçalho, as modais e o "Ir para…".
