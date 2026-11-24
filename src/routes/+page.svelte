@@ -18,6 +18,8 @@
 	import FichaVotacao from '#lib/ui/FichaVotacao.svelte';
 	import FichaNota from '#lib/ui/FichaNota.svelte';
 	import QuemPreside from '#lib/ui/QuemPreside.svelte';
+	import Modal from '#lib/ui/Modal.svelte';
+	import Quando from '#lib/ui/Quando.svelte';
 	import ResponderEntrevista from '#lib/ui/ResponderEntrevista.svelte';
 	import { invalidateAll } from '$app/navigation';
 	import { chamarAtencao } from '#lib/aparelho.ts';
@@ -59,6 +61,10 @@
 	// Passo 47: as fichas da votação e da nota, sem sair da Agora.
 	let verVotacao = $state(false);
 	let notaVista = $state<string | null>(null);
+	let modalAgora = $state<Modal>();
+	let modalAvisos = $state<Modal>();
+	let modalCrise = $state<Modal>();
+	let modalPress = $state<Modal>();
 	// Passo 38: a votação que abre depois de a tela estar aberta chama a atenção.
 	let votacaoVista = untrack(() => votacao?.id ?? '');
 	$effect(() => {
@@ -95,7 +101,6 @@
 	);
 	// A mesa: três ações, e o que espera por ela em cada uma.
 	const documentosEnviados = $derived((data.mesa?.dpos ?? 0) + (data.mesa?.documentos ?? 0));
-	const nadaParaMesa = $derived(!sessao?.avisos.length && !paraJulgar && !documentosEnviados);
 </script>
 
 <svelte:head>
@@ -127,38 +132,46 @@
 			{#if !sessao || !estado}
 				<p class="suave">{t('Nenhuma sessão aberta.')}</p>
 			{:else}
-				<p class="suave">{t('Sessão {n}', { n: sessao.numero })} · {FASES[data.aoVivo.fase]} · {FORMAS[estado.forma]}</p>
-				{#if momento === 'pausa'}
-					<p class="telegrama" role="status">
-						{t('Há pontos ou moções?')} <a class="botao botao--secundario botao--pequeno" href={`/comite/${sigla}/sessao`}>{t('Fazer um ponto ou moção')}</a>
+				<!-- Passo 51 (lote 2): no notebook, o que acontece à esquerda e as ações à direita. -->
+				<div class="ao-vivo-grade">
+					<div>
+					<p class="suave">{t('Sessão {n}', { n: sessao.numero })} · {FASES[data.aoVivo.fase]} · {FORMAS[estado.forma]}</p>
+					{#if momento === 'pausa'}
+						<p class="telegrama" role="status">
+							{t('Há pontos ou moções?')} <a class="botao botao--secundario botao--pequeno" href={`/comite/${sigla}/sessao`}>{t('Fazer um ponto ou moção')}</a>
+						</p>
+					{/if}
+					<p>
+						<span class="rotulo">{t('Com a palavra')}</span>
+						{estado.orador ? estado.orador.nome : t('Ninguém com a palavra.')}
 					</p>
-				{/if}
-				<p>
-					<span class="rotulo">{t('Com a palavra')}</span>
-					{estado.orador ? estado.orador.nome : t('Ninguém com a palavra.')}
-				</p>
-				<Cronometro cronometro={estado} avisoSeg={data.aoVivo.regras.aviso_fala_seg} {diferenca} />
-				{#if temDebate(estado)}
-					<p class="rotulo">{FORMAS[estado.forma]} · {t('tempo do debate')}</p>
-					<Cronometro cronometro={relogioDebate(estado)} avisoSeg={60} {diferenca} />
-				{/if}
-				{#if votacao}
-					<p class="destaque" id="a-votacao" tabindex="-1">{t('Votação aberta')}:
-						<button class="abre-ficha" type="button" onclick={() => (verVotacao = true)}>{votacao.objeto}</button></p
-					>
-					<Votar votacaoId={votacao.id} escolhas={posso} {meuVoto} onerro={(m) => (erro = m)} />
-				{/if}
-				{#if data.aoVivo.fase !== 'plenaria' && minhaDelegacao && !restrita}
-					<BotaoPlaca comiteId={data.minha!.comite_id!} {posicao} nome={data.minha?.delegacao_nome ?? ''} onerro={(m) => (erro = m)} />
-				{/if}
-				<p class="acoes"><a class="botao botao--secundario" href={`/comite/${sigla}/sessao`}>{t('Abrir a sessão')}</a></p>
+					<Cronometro cronometro={estado} avisoSeg={data.aoVivo.regras.aviso_fala_seg} {diferenca} />
+					{#if temDebate(estado)}
+						<p class="rotulo">{FORMAS[estado.forma]} · {t('tempo do debate')}</p>
+						<Cronometro cronometro={relogioDebate(estado)} avisoSeg={60} {diferenca} />
+					{/if}
+					{#if votacao}
+						<p class="destaque" id="a-votacao" tabindex="-1">{t('Votação aberta')}:
+							<button class="abre-ficha" type="button" onclick={() => (verVotacao = true)}>{votacao.objeto}</button></p
+						>
+						<Votar votacaoId={votacao.id} escolhas={posso} {meuVoto} onerro={(m) => (erro = m)} />
+					{/if}
+					</div>
+					<div class="ao-vivo-acoes">
+					{#if data.aoVivo.fase !== 'plenaria' && minhaDelegacao && !restrita}
+						<BotaoPlaca compacto comiteId={data.minha!.comite_id!} {posicao} nome={data.minha?.delegacao_nome ?? ''} onerro={(m) => (erro = m)} />
+					{/if}
+					<p class="acoes"><a class="botao botao--secundario" href={`/comite/${sigla}/sessao`}>{t('Abrir a sessão')}</a></p>
+					</div>
+				</div>
 			{/if}
 		</article>
 	{/if}
 
 	<!-- Passo 43: o que espera a delegação, cada item a um clique do lugar exato. -->
-	{#if data.principal === 'delegado'}
-		<article class="cartao cartao--destaque" aria-labelledby="c-caixa">
+	<!-- Passo 51 (lote 2): sem pendências e com a sessão ao vivo à vista, o cartão sai (sem ruído). -->
+	{#if data.principal === 'delegado' && !(nadaParaDelegacao && data.aoVivo)}
+		<article class={['cartao', nadaParaDelegacao ? 'precisa-vazio' : 'cartao--destaque']} aria-labelledby="c-caixa">
 			<h2 id="c-caixa">{t('Precisa de você')}</h2>
 			<ul class="lista">
 				{#if ausente}
@@ -205,21 +218,18 @@
 		<article class="cartao cartao--destaque" aria-labelledby="c-mesa">
 			<h2 id="c-mesa">{t('Mesa')} · {sigla}</h2>
 			<p>{sessao ? t('Sessão {n} aberta', { n: sessao.numero }) : t('Nenhuma sessão aberta.')}</p>
-			<ul class="lista">
-				<li>
-					<a href={`/comite/${sigla}/sessao/chamada`}>{t('Chegadas a confirmar')}</a>
-					<span class="selo">{sessao?.avisos.length ?? 0}</span>
-				</li>
-				<li>
-					<a href={`/comite/${sigla}/sessao/presidencia`}>{t('Pedidos para o bureau')}</a>
-					<span class="selo">{paraJulgar}</span>
-				</li>
-				<li>
-					<a href={`/comite/${sigla}/documentos`}>{t('Documentos enviados à mesa')}</a>
-					<span class="selo">{documentosEnviados}</span>
-				</li>
-				{#if nadaParaMesa}<li class="suave">{t('Nada esperando você agora.')}</li>{/if}
-			</ul>
+			<!-- Passo 51 (lote 2): os três atalhos como botões numa linha, com a contagem dentro. -->
+			<div class="acoes">
+				<a class={['botao botao--pequeno', !sessao?.avisos.length && 'botao--secundario']} href={`/comite/${sigla}/sessao/chamada`}
+					>{t('Chegadas a confirmar')} <span class="selo">{sessao?.avisos.length ?? 0}</span></a
+				>
+				<a class={['botao botao--pequeno', !paraJulgar && 'botao--secundario']} href={`/comite/${sigla}/sessao/presidencia`}
+					>{t('Pedidos para o bureau')} <span class="selo">{paraJulgar}</span></a
+				>
+				<a class={['botao botao--pequeno', !documentosEnviados && 'botao--secundario']} href={`/comite/${sigla}/documentos`}
+					>{t('Documentos enviados à mesa')} <span class="selo">{documentosEnviados}</span></a
+				>
+			</div>
 			<div class="acoes">
 				<a class="botao" href={`/comite/${sigla}/sessao/presidencia`}>{t('Abrir o painel')}</a>
 			</div>
@@ -265,85 +275,137 @@
 		</article>
 	{/if}
 
-	<article class="cartao" aria-labelledby="c-agora">
-		<h2 id="c-agora">{t('Acontecendo agora')}</h2>
-		{#each data.comitesAoVivo as c (c.comite?.sigla)}
-			<p class="topico-atual">
-				<span class="rotulo">{c.comite?.sigla}</span>
-				{c.fase === 'debate' && c.topico_atual ? `${t('Em debate')}: ${c.comite?.topicos[c.topico_atual - 1]}` : FASES[c.fase]}
-			</p>
-		{/each}
-		{#each atuais as item (item.id)}
-			<p class="destaque">{item.titulo} <TipoItem tipo={item.tipo} /></p>
-			<p class="suave">{junto(item.local, `${t('até')} ${formatarHora(item.fim)}`)}</p>
-		{:else}
-			<p class="suave">{t('Nada no cronograma neste momento.')}</p>
-		{/each}
-	</article>
-
-	<article class="cartao" aria-labelledby="c-depois">
-		<h2 id="c-depois">{t('Depois')}</h2>
-		{#if proximo}
-			<p class="destaque">{proximo.titulo} <TipoItem tipo={proximo.tipo} /></p>
-			<p class="suave">{junto(proximo.local, formatarQuando(proximo.inicio, agora))}</p>
-		{:else}
-			<p class="suave">{t('Nada mais no cronograma.')}</p>
-		{/if}
-		<p><a class="botao botao--secundario botao--pequeno" href="/cronograma">{t('Ver o cronograma')}</a></p>
-	</article>
-
-	<article class="cartao" aria-labelledby="c-avisos">
-		<h2 id="c-avisos">{t('Avisos')}</h2>
-		{#if novos.length > 0}
-			<p class="destaque">{novos.length === 1 ? t('1 aviso novo') : t('{n} avisos novos', { n: novos.length })}</p>
-		{/if}
-		{#each data.avisos.slice(0, 3) as aviso (aviso.id)}
-			<p>{aviso.texto}</p>
-		{:else}
-			<p class="suave">{t('Nenhum aviso.')}</p>
-		{/each}
-		<p><a class="botao botao--secundario botao--pequeno" href="/avisos">{t('Ver todos os avisos')}</a></p>
-	</article>
-
-	{#if data.respostasCrise.length}
-		<article class="cartao" aria-labelledby="c-crise">
-			<h2 id="c-crise">{t('Respostas da crise')}</h2>
-			<ul class="lista">
-				{#each data.respostasCrise as nota (nota.id)}
-					<li>
-						<span>
-							<span class="selo {SELO_NOTA[nota.status as StatusNota]}">{STATUS_NOTA[nota.status as StatusNota]}</span>
-							<button class="abre-ficha" type="button" onclick={() => (notaVista = nota.id)}>{nota.titulo}</button>
-							<span class="detalhe">{nota.resposta}</span>
-						</span>
-					</li>
-				{/each}
-			</ul>
-			<p>
-				<a class="botao botao--secundario botao--pequeno" href={`/comite/${data.participacoes.find((p) => p.comite_id === data.respostasCrise[0].comite_id)?.comite_sigla}/crise`}
-					>{t('Ver as notas de crise')}</a
-				>
-			</p>
+	<!-- Passo 51 (lote 2): o bloco do papel fica em cima; o resto do evento vira linhas curtas,
+		 cada uma com o mais recente, e "Ver tudo" abre o resto num modal. -->
+	<section class="cartao cartao--largo no-evento" aria-labelledby="c-no-evento">
+		<h2 id="c-no-evento">{t('No evento')}</h2>
+		<article class="linha-evento" aria-labelledby="c-agora">
+			<h3 id="c-agora">{t('Acontecendo agora')}</h3>
+			<div class="linha-evento-resumo">
+				{#if atuais[0]}
+					<p><strong>{atuais[0].titulo}</strong> <TipoItem tipo={atuais[0].tipo} /></p>
+					<p class="suave">{junto(atuais[0].local, `${t('até')} ${formatarHora(atuais[0].fim)}`)}</p>
+				{:else}
+					<p class="suave">{t('Nada no cronograma neste momento.')}</p>
+				{/if}
+			</div>
+			{#if atuais.length > 1 || data.comitesAoVivo.length}
+				<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => modalAgora?.abrir()}>{t('Ver tudo')}</button>
+			{/if}
 		</article>
-	{/if}
-
-	{#if data.citacoes.length}
-		<article class="cartao" aria-labelledby="c-press">
-			<h2 id="c-press">{t('Na press')}</h2>
-			<ul class="lista">
-				{#each data.citacoes as n (n.id)}
-					<li>
-						<span>
-							<button class="abre-ficha" type="button" onclick={() => abrirPrevia('noticia', n.id)}>{n.titulo}</button>
-							<span class="detalhe">{t('{veiculo} cita a sua delegação', { veiculo: n.veiculo?.nome ?? '' })}</span>
-						</span>
-					</li>
-				{/each}
-			</ul>
+		<article class="linha-evento" aria-labelledby="c-depois">
+			<h3 id="c-depois">{t('Depois')}</h3>
+			<div class="linha-evento-resumo">
+				{#if proximo}
+					<p><strong>{proximo.titulo}</strong> <TipoItem tipo={proximo.tipo} /></p>
+					<p class="suave">{junto(proximo.local, formatarQuando(proximo.inicio, agora))}</p>
+				{:else}
+					<p class="suave">{t('Nada mais no cronograma.')}</p>
+				{/if}
+			</div>
+			<a class="botao botao--secundario botao--pequeno" href="/cronograma">{t('Cronograma')}</a>
 		</article>
-	{/if}
-
+		<article class="linha-evento" aria-labelledby="c-avisos">
+			<h3 id="c-avisos">
+				{t('Avisos')}
+				{#if novos.length > 0}<span class="selo selo--info">{novos.length === 1 ? t('1 aviso novo') : t('{n} avisos novos', { n: novos.length })}</span>{/if}
+			</h3>
+			<div class="linha-evento-resumo">
+				{#if data.avisos[0]}<p class="linha-evento-texto">{data.avisos[0].texto}</p>{:else}<p class="suave">{t('Nenhum aviso.')}</p>{/if}
+			</div>
+			<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => modalAvisos?.abrir()}>{t('Ver tudo')}</button>
+		</article>
+		{#if data.respostasCrise.length}
+			<article class="linha-evento" aria-labelledby="c-crise">
+				<h3 id="c-crise">{t('Respostas da crise')} <span class="selo">{data.respostasCrise.length}</span></h3>
+				<div class="linha-evento-resumo">
+					<p class="linha-evento-texto">
+						<button class="abre-ficha" type="button" onclick={() => (notaVista = data.respostasCrise[0].id)}>{data.respostasCrise[0].titulo}</button>
+						<span class="detalhe">{data.respostasCrise[0].resposta}</span>
+					</p>
+				</div>
+				<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => modalCrise?.abrir()}>{t('Ver tudo')}</button>
+			</article>
+		{/if}
+		{#if data.citacoes.length}
+			<article class="linha-evento" aria-labelledby="c-press">
+				<h3 id="c-press">{t('Na press')} <span class="selo">{data.citacoes.length}</span></h3>
+				<div class="linha-evento-resumo">
+					<p class="linha-evento-texto">
+						<button class="abre-ficha" type="button" onclick={() => abrirPrevia('noticia', data.citacoes[0].id)}>{data.citacoes[0].titulo}</button>
+						<span class="detalhe">{t('{veiculo} cita a sua delegação', { veiculo: data.citacoes[0].veiculo?.nome ?? '' })}</span>
+					</p>
+				</div>
+				<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => modalPress?.abrir()}>{t('Ver tudo')}</button>
+			</article>
+		{/if}
+	</section>
 </div>
+
+<Modal bind:this={modalAgora} nome={t('Acontecendo agora')} classe="modal-acao">
+	<h3>{t('Acontecendo agora')}</h3>
+	{#each data.comitesAoVivo as c (c.comite?.sigla)}
+		<p class="topico-atual">
+			<span class="rotulo">{c.comite?.sigla}</span>
+			{c.fase === 'debate' && c.topico_atual ? `${t('Em debate')}: ${c.comite?.topicos[c.topico_atual - 1]}` : FASES[c.fase]}
+		</p>
+	{/each}
+	{#each atuais as item (item.id)}
+		<p><strong>{item.titulo}</strong> <TipoItem tipo={item.tipo} /></p>
+		<p class="suave">{junto(item.local, `${t('até')} ${formatarHora(item.fim)}`)}</p>
+	{/each}
+	<form method="dialog" class="acoes"><button class="botao botao--secundario">{t('Fechar')}</button></form>
+</Modal>
+<Modal bind:this={modalAvisos} nome={t('Avisos')} classe="modal-acao">
+	<h3>{t('Avisos')}</h3>
+	<ul class="lista">
+		{#each data.avisos.slice(0, 5) as aviso (aviso.id)}
+			<li><span>{aviso.texto} <span class="detalhe"><Quando iso={aviso.criado_em} /></span></span></li>
+		{:else}
+			<li class="suave">{t('Nenhum aviso.')}</li>
+		{/each}
+	</ul>
+	<div class="acoes">
+		<a class="botao botao--secundario" href="/avisos">{t('Ver todos os avisos')}</a>
+		<button class="botao botao--secundario" type="button" onclick={() => modalAvisos?.fechar()}>{t('Fechar')}</button>
+	</div>
+</Modal>
+<Modal bind:this={modalCrise} nome={t('Respostas da crise')} classe="modal-acao">
+	<h3>{t('Respostas da crise')}</h3>
+	<ul class="lista">
+		{#each data.respostasCrise as nota (nota.id)}
+			<li>
+				<span>
+					<span class="selo {SELO_NOTA[nota.status as StatusNota]}">{STATUS_NOTA[nota.status as StatusNota]}</span>
+					<button class="abre-ficha" type="button" onclick={() => (notaVista = nota.id)}>{nota.titulo}</button>
+					<span class="detalhe">{nota.resposta}</span>
+				</span>
+			</li>
+		{/each}
+	</ul>
+	<div class="acoes">
+		{#if data.respostasCrise[0]}
+			<a class="botao botao--secundario" href={`/comite/${data.participacoes.find((p) => p.comite_id === data.respostasCrise[0].comite_id)?.comite_sigla}/crise`}
+				>{t('Ver as notas de crise')}</a
+			>
+		{/if}
+		<button class="botao botao--secundario" type="button" onclick={() => modalCrise?.fechar()}>{t('Fechar')}</button>
+	</div>
+</Modal>
+<Modal bind:this={modalPress} nome={t('Na press')} classe="modal-acao">
+	<h3>{t('Na press')}</h3>
+	<ul class="lista">
+		{#each data.citacoes as n (n.id)}
+			<li>
+				<span>
+					<button class="abre-ficha" type="button" onclick={() => abrirPrevia('noticia', n.id)}>{n.titulo}</button>
+					<span class="detalhe">{t('{veiculo} cita a sua delegação', { veiculo: n.veiculo?.nome ?? '' })}</span>
+				</span>
+			</li>
+		{/each}
+	</ul>
+	<form method="dialog" class="acoes"><button class="botao botao--secundario">{t('Fechar')}</button></form>
+</Modal>
 
 <FichaVotacao
 	votacao={verVotacao ? votacao : null}

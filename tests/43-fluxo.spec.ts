@@ -37,6 +37,18 @@ test('no notebook, o painel da presidência cabe na tela: a página não rola', 
 	await expect(page.getByLabel('Tempo de fala (segundos)')).toBeVisible();
 });
 
+test('a Agora da mesa e a do delegado cabem na tela, sem rolar (passo 51, lote 2)', async ({ browser }, info) => {
+	test.skip(info.project.name !== 'notebook', 'a regra de rolagem é do notebook');
+	for (const conta of [MESA, EUA]) {
+		const contexto = await browser.newContext({ viewport: { width: 1366, height: 768 } });
+		const page = await contexto.newPage();
+		await entrar(page, conta);
+		await expect(page.getByRole('region', { name: 'No evento' })).toBeVisible();
+		expect(await page.evaluate(() => document.documentElement.scrollHeight - innerHeight), conta).toBeLessThanOrEqual(2);
+		await contexto.close();
+	}
+});
+
 test('a faixa mostra a bandeira e o nome da delegação de quem entrou', async ({ page }, info) => {
 	await entrar(page, EUA);
 	const faixa = page.getByRole('banner');

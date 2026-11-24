@@ -1805,6 +1805,81 @@ dialog.modal-dpo {
 	list-style: none;
 }
 
+/* Passo 51 (lote 2): o resto do evento em linhas curtas, na Agora. */
+.no-evento h3 {
+	margin: 0;
+	font-size: 0.95rem;
+}
+
+.linha-evento {
+	display: grid;
+	grid-template-columns: 11rem 1fr auto;
+	align-items: center;
+	gap: 0.25rem 1rem;
+	padding: 0.3rem 0;
+	border-top: var(--linha);
+}
+
+.linha-evento-resumo p {
+	margin: 0;
+}
+
+.linha-evento-texto {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+@media (max-width: 639px) {
+	.linha-evento {
+		grid-template-columns: 1fr auto;
+	}
+
+	.linha-evento-resumo {
+		grid-column: 1 / -1;
+		grid-row: 2;
+	}
+}
+
+/* Passo 51 (lote 2): a sessão ao vivo na Agora em duas colunas no notebook. */
+@media (min-width: 1024px) {
+	.ao-vivo-grade {
+		display: grid;
+		grid-template-columns: 1fr auto;
+		align-items: start;
+		gap: 1rem 2rem;
+	}
+
+	.ao-vivo-acoes {
+		display: grid;
+		justify-items: start;
+		gap: 0.5rem;
+	}
+}
+
+/* Sem pendências, o "Precisa de você" é uma linha só. */
+.precisa-vazio {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0 1rem;
+	padding-block: 0.5rem;
+}
+
+.no-evento > h2 {
+	margin-bottom: 0.25rem;
+}
+
+.precisa-vazio h2,
+.precisa-vazio .lista {
+	margin: 0;
+}
+
+.precisa-vazio .lista li {
+	border: 0;
+	padding: 0;
+}
+
 .escolha-resumo {
 	display: flex;
 	flex-wrap: wrap;

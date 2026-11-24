@@ -115,6 +115,13 @@
 - **Limite conhecido:** com a votação aberta num comitê de 15 delegações, a coluna da votação ainda pode rolar (a grade de votos e a chamada ocupam espaço). O teste cobre o debate; a votação aberta fica para a revisão depois do piloto.
 - **Testes:** `abrirPainel()` em `tests/ajuda.ts`.
 
+**Lote 2 feito (Agora):**
+
+- **O bloco do papel fica em cima.** A sessão ao vivo do delegado tem duas colunas no notebook: o que acontece à esquerda; a placa (sem o nome grande) e "Abrir a sessão" à direita. Os três atalhos da mesa são botões numa linha, com a contagem dentro.
+- **"Precisa de você":** sai quando não há pendência e a sessão ao vivo já está à vista.
+- **"No evento":** "Acontecendo agora", "Depois", "Avisos", "Respostas da crise" e "Na press" viram linhas, cada uma com o mais recente; "Ver tudo" abre o resto num modal.
+- **Teste:** a Agora da mesa e a do delegado (com sessão aberta) não rolam a 1366 × 768 (teste em `43-fluxo`).
+
 ## Fora desta etapa
 
 Itens que dependem de um segundo evento, habilidades especiais para delegações, edição livre simultânea e telas inteiras de personalização.

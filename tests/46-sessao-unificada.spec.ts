@@ -133,6 +133,6 @@ test('a Agora mostra o ponto que espera a mesa, e a mesa tem três atalhos', asy
 	await page.evaluate(() => localStorage.clear());
 	await entrar(page, MESA);
 	const mesa = page.getByRole('article', { name: `Mesa · ${C.sigla}` });
-	await expect(mesa.getByRole('link')).toHaveText(['Chegadas a confirmar', 'Pedidos para o bureau', 'Documentos enviados à mesa', 'Abrir o painel']);
+	await expect(mesa.getByRole('link')).toHaveText([/^Chegadas a confirmar \d+$/, /^Pedidos para o bureau \d+$/, /^Documentos enviados à mesa \d+$/, 'Abrir o painel']);
 	await page.context().close();
 });
