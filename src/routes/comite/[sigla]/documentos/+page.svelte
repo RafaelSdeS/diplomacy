@@ -5,29 +5,68 @@
 	import { formatarHora } from '#lib/cronograma.ts';
 	import { nomeDoDocumento, STATUS_DOCUMENTO } from '#lib/formatacao.ts';
 	import { STATUS_DPO } from '#lib/impressao.ts';
+	import { doTopico } from '#lib/ordem.ts';
+	import Bandeira from '#lib/ui/Bandeira.svelte';
 	import NomeDelegacao from '#lib/ui/NomeDelegacao.svelte';
 	import GradeAtalhos, { type Atalho } from '#lib/ui/GradeAtalhos.svelte';
+	import Modal from '#lib/ui/Modal.svelte';
+	import TrilhaDoTopico from '#lib/ui/TrilhaDoTopico.svelte';
 	import Mail from '@lucide/svelte/icons/mail';
 	import NotebookPen from '@lucide/svelte/icons/notebook-pen';
 	import ScrollText from '@lucide/svelte/icons/scroll-text';
 	import Users from '@lucide/svelte/icons/users';
 	import type { PageProps } from './$types';
 
+	// Passo 56: a aba Documentos pela ordem do tópico, sem rolar. Em cima, só o que espera a
+	// pessoa ("Para você"); depois, cada tópico com a trilha e uma linha por etapa, que abre a
+	// lista num modal; por fim, os DPOs e as cartas, uma linha cada.
 	let { data }: PageProps = $props();
 
 	const sigla = $derived(data.comite.sigla);
 	const agora = Date.now();
+	type Documento = (typeof data.documentos)[number];
 	// A rodada aberta de cada documento (a mais recente que ainda não acabou).
 	const rodadaAte = $derived(
 		new Map(data.rodadas.filter((r) => Date.parse(r.fim) > agora).map((r) => [r.documento_id, r.fim] as const))
 	);
 	const meusDpos = $derived(data.dpos.filter((d) => d.delegacao?.id === data.minha));
 	const dosMeusBlocos = $derived(data.documentos.filter((d) => data.meusBlocos.includes(d.bloco_id)));
-	const doComite = $derived(data.documentos.filter((d) => !data.meusBlocos.includes(d.bloco_id)));
-	const dposParaAvaliar = $derived(data.ehMesa ? data.dpos.filter((d) => d.status === 'enviado') : []);
-	const docsParaAvaliar = $derived(data.ehMesa ? data.documentos.filter((d) => d.status === 'enviado') : []);
-	const dposDoComite = $derived(data.dpos.filter((d) => d.delegacao?.id !== data.minha && (d.status === 'aprovado' || !data.ehMesa)));
-	const situacaoDoDpo = (topico: number) => meusDpos.find((d) => d.topico === topico);
+	const paraAvaliar = $derived(
+		data.ehMesa ? data.dpos.filter((d) => d.status === 'enviado').length + data.documentos.filter((d) => d.status === 'enviado').length : 0
+	);
+	// O que espera a delegação: o DPO por fazer, a rodada aberta e a assinatura que falta.
+	const dposPorFazer = $derived(
+		data.minha
+			? data.comite.topicos
+					.map((_, i) => ({ topico: i + 1, dpo: meusDpos.find((d) => d.topico === i + 1) }))
+					.filter(({ dpo }) => !dpo || dpo.status === 'rascunho' || dpo.status === 'pede_ajustes')
+			: []
+	);
+	const emRodada = $derived(dosMeusBlocos.filter((d) => rodadaAte.has(d.id)));
+	const semMinhaAssinatura = $derived(
+		dosMeusBlocos.filter((d) => d.status === 'rascunho' && !rodadaAte.has(d.id) && !d.assinaturas.some((a) => a.delegacao?.id === data.minha))
+	);
+	const nadaParaVoce = $derived(!paraAvaliar && !dposPorFazer.length && !emRodada.length && !semMinhaAssinatura.length);
+	const dposVisiveis = $derived(data.dpos.filter((d) => d.status !== 'rascunho'));
+
+	// As listas de cada etapa, por tópico, num modal.
+	type Etapa = 'working_paper' | 'projeto' | 'resolucao';
+	const ROTULO = (): Record<Etapa, string> => ({ working_paper: t('Working papers'), projeto: t('Projetos'), resolucao: t('Resoluções') });
+	const daEtapa = (topico: number, etapa: Etapa) =>
+		data.documentos.filter(
+			(d) =>
+				d.topico === topico &&
+				(etapa === 'resolucao' ? d.tipo === 'projeto' && d.status === 'aprovado' : d.tipo === etapa && !(etapa === 'projeto' && d.status === 'aprovado'))
+		);
+	let lista = $state<{ topico: number; etapa: Etapa } | null>(null);
+	let modalLista = $state<Modal>();
+	let modalAvaliar = $state<Modal>();
+	let modalDpos = $state<Modal>();
+	function abrirLista(topico: number, etapa: Etapa) {
+		lista = { topico, etapa };
+		modalLista?.abrir();
+	}
+
 	// Passo 51: as ações da área em cartões, como na aba Comitê.
 	const atalhos = $derived(
 		[
@@ -39,6 +78,23 @@
 	);
 </script>
 
+{#snippet documento(d: Documento)}
+	<li>
+		<span>
+			<button class="abre-ficha" type="button" onclick={() => abrirPrevia('documento', d.id)}>{nomeDoDocumento(d)}</button>
+			<span class="detalhe">
+				{d.bloco?.nome}
+				{#if d.assinaturas.length}
+					· <span class="bandeiras" aria-label={t('Signatários: {nomes}', { nomes: d.assinaturas.map((a) => a.delegacao?.nome).join(', ') })}
+						>{#each d.assinaturas as a (a.delegacao?.id)}<Bandeira codigo={a.delegacao?.bandeira} />{/each}</span
+					>
+				{/if}
+			</span>
+		</span>
+		{#if STATUS_DOCUMENTO[d.status]}<span class="selo {STATUS_DOCUMENTO[d.status].selo}">{STATUS_DOCUMENTO[d.status].rotulo}</span>{/if}
+	</li>
+{/snippet}
+
 <svelte:head>
 	<title>{tituloDaAba(t('Documentos'), sigla)}</title>
 </svelte:head>
@@ -49,102 +105,124 @@
 <GradeAtalhos nome={t('Atalhos de documentos')} {atalhos} />
 
 <div class="cartoes">
-	{#if data.ehMesa}
-		<section class="cartao cartao--destaque cartao--largo" aria-labelledby="t-avaliar">
-			<h2 id="t-avaliar">{t('Para avaliar')}</h2>
-			<ul class="lista">
-				{#each dposParaAvaliar as dpo (dpo.id)}
+	{#if data.ehMesa || data.minha}
+		<section class={['cartao', !nadaParaVoce && 'cartao--destaque']} aria-labelledby="t-para-voce">
+			<h2 id="t-para-voce">{t('Para você')}</h2>
+			<ul class="lista lista--compacta">
+				{#if paraAvaliar}
 					<li>
-						<span>{t('DPO')} · <NomeDelegacao {sigla} delegacao={dpo.delegacao} /> · {t('Tópico')} {dpo.topico}</span>
-						<a class="botao botao--secundario botao--pequeno" href={`/comite/${sigla}/dpo`}>{t('Ler e avaliar')}</a>
+						<span>{paraAvaliar === 1 ? t('1 documento espera a avaliação da mesa') : t('{n} documentos esperam a avaliação da mesa', { n: paraAvaliar })}</span>
+						<button class="botao botao--pequeno" type="button" onclick={() => modalAvaliar?.abrir()}>{t('Ler e avaliar')}</button>
 					</li>
-				{/each}
-				{#each docsParaAvaliar as d (d.id)}
-					<li>
-						<span>{nomeDoDocumento(d)} <span class="detalhe">{d.bloco?.nome}</span></span>
-						<a class="botao botao--secundario botao--pequeno" href={`/documento/${d.id}`}>{t('Ler e avaliar')}</a>
-					</li>
-				{/each}
-				{#if !dposParaAvaliar.length && !docsParaAvaliar.length}
-					<li class="suave">{t('Nada esperando a mesa.')}</li>
 				{/if}
+				{#if dposPorFazer.length}
+					<li>
+						<span>{t('Seu DPO')} <span class="suave">· {t('Tópico')} {dposPorFazer.map((d) => d.topico).join(', ')}</span></span>
+						<a class="botao botao--secundario botao--pequeno" href={`/comite/${sigla}/dpo`}>{t('Abrir')}</a>
+					</li>
+				{/if}
+				{#each emRodada as d (d.id)}
+					<li>
+						<span>{nomeDoDocumento(d)} <span class="detalhe">{t('rodada até {hora}', { hora: formatarHora(rodadaAte.get(d.id)!) })}</span></span>
+						<a class="botao botao--pequeno" href={`/documento/${d.id}`}>{t('Abrir')}</a>
+					</li>
+				{/each}
+				{#if semMinhaAssinatura.length === 1}
+					<li>
+						<span>{nomeDoDocumento(semMinhaAssinatura[0])} <span class="detalhe">{t('falta a assinatura da sua delegação')}</span></span>
+						<a class="botao botao--secundario botao--pequeno" href={`/documento/${semMinhaAssinatura[0].id}`}>{t('Abrir')}</a>
+					</li>
+				{:else if semMinhaAssinatura.length}
+					<!-- Uma linha só, para não rolar: os documentos ficam na aba Blocos. -->
+					<li>
+						<span>{t('{n} documentos sem a sua assinatura', { n: semMinhaAssinatura.length })}</span>
+						<a class="botao botao--secundario botao--pequeno" href={`/comite/${sigla}/blocos`}>{t('Abrir')}</a>
+					</li>
+				{/if}
+				{#if nadaParaVoce}<li class="suave">{t('Nada esperando você agora.')}</li>{/if}
 			</ul>
 		</section>
 	{/if}
 
-	{#if data.minha}
-		<section class="cartao" aria-labelledby="t-meu-dpo">
-			<h2 id="t-meu-dpo">{t('Seu DPO')}</h2>
-			<ul class="lista">
-				{#each data.comite.topicos as titulo, i (titulo)}
-					{@const dpo = situacaoDoDpo(i + 1)}
-					<li>
-						<span>
-							{t('Tópico')} {i + 1}: {titulo}
-							{#if dpo}<span class="selo {STATUS_DPO[dpo.status].selo}">{STATUS_DPO[dpo.status].rotulo}</span>{/if}
-						</span>
-						<a class="botao botao--secundario botao--pequeno" href={`/comite/${sigla}/dpo`}>{dpo ? t('Abrir') : t('Escrever')}</a>
-					</li>
-				{/each}
-			</ul>
-		</section>
-
-		<section class="cartao" aria-labelledby="t-meus-docs">
-			<h2 id="t-meus-docs">{t('Dos seus blocos')}</h2>
-			<ul class="lista">
-				{#each dosMeusBlocos as d (d.id)}
-					<li>
-						<span>
-							<a href={`/documento/${d.id}`}>{nomeDoDocumento(d)}</a>
-							<span class="detalhe">
-								{d.bloco?.nome}
-								{#if rodadaAte.get(d.id)}· {t('rodada até {hora}', { hora: formatarHora(rodadaAte.get(d.id)!) })}{/if}
-							</span>
-						</span>
-						{#if STATUS_DOCUMENTO[d.status]}<span class="selo {STATUS_DOCUMENTO[d.status].selo}">{STATUS_DOCUMENTO[d.status].rotulo}</span>{/if}
-					</li>
+	<section class="cartao no-evento" aria-label={t('DPOs e cartas')}>
+		<article class="linha-evento" aria-labelledby="t-dpos">
+			<h3 id="t-dpos">{t('DPOs')} <span class="selo">{t('{n} de {total}', { n: dposVisiveis.length, total: data.totalDelegacoes })}</span></h3>
+			<div class="linha-evento-resumo"></div>
+			<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => modalDpos?.abrir()}>{t('Ver todos')}</button>
+		</article>
+		<article class="linha-evento" aria-labelledby="t-cartas">
+			<h3 id="t-cartas">{t('Cartas')} <span class="selo">{data.cartas.length}</span></h3>
+			<div class="linha-evento-resumo">
+				{#if data.cartas[0]}
+					<p class="linha-evento-texto">
+						<button class="abre-ficha" type="button" onclick={() => abrirPrevia('carta', data.cartas[0].id)}>{data.cartas[0].titulo}</button>
+						<span class="detalhe">{data.cartas[0].remetente?.nome}</span>
+					</p>
 				{:else}
-					<li class="suave">{data.meusBlocos.length ? t('O seu bloco ainda não tem documentos.') : t('Sua delegação ainda não está num bloco.')}</li>
-				{/each}
-			</ul>
-		</section>
-	{/if}
-
-	<section class="cartao" aria-labelledby="t-cartas">
-		<h2 id="t-cartas">{t('Cartas')}</h2>
-		<ul class="lista">
-			{#each data.cartas as c (c.id)}
-				<li><span><button class="abre-ficha" type="button" onclick={() => abrirPrevia('carta', c.id)}>{c.titulo}</button> <span class="detalhe">{c.remetente?.nome}</span></span></li>
-			{:else}
-				<li class="suave">{t('Nenhuma carta ainda.')}</li>
-			{/each}
-		</ul>
+					<p class="suave">{t('Nenhuma carta ainda.')}</p>
+				{/if}
+			</div>
+			<a class="botao botao--secundario botao--pequeno" href={`/comite/${sigla}/cartas`}>{t('Ver todas')}</a>
+		</article>
 	</section>
 
+	{#each data.comite.topicos as titulo, i (titulo)}
+		{@const topico = i + 1}
+		{@const resumo = doTopico(data.ordem, topico)}
+		<article class="cartao" aria-labelledby={`t-topico-${topico}`}>
+			<h2 id={`t-topico-${topico}`}>{t('Tópico {n}', { n: topico })} <span class="detalhe">{titulo}</span></h2>
+			<!-- Cada etapa da trilha abre a lista dela; a agenda leva à aba Agenda. -->
+			<TrilhaDoTopico {sigla} mesa={data.ehMesa} {...resumo} onetapa={(etapa) => abrirLista(topico, etapa === 'working_papers' ? 'working_paper' : etapa)} />
+		</article>
+	{/each}
 
-	<section class="cartao cartao--largo" aria-labelledby="t-do-comite">
-		<h2 id="t-do-comite">{t('Do comitê')}</h2>
-		<ul class="lista">
-			{#each doComite as d (d.id)}
-				<li>
-					<span><button class="abre-ficha" type="button" onclick={() => abrirPrevia('documento', d.id)}>{nomeDoDocumento(d)}</button> <span class="detalhe">{d.bloco?.nome}</span></span>
-					{#if STATUS_DOCUMENTO[d.status]}<span class="selo {STATUS_DOCUMENTO[d.status].selo}">{STATUS_DOCUMENTO[d.status].rotulo}</span>{/if}
-				</li>
-			{/each}
-			{#each dposDoComite as dpo (dpo.id)}
-				<li>
-					<span>{t('DPO')} · <NomeDelegacao {sigla} delegacao={dpo.delegacao} /> · {t('Tópico')} {dpo.topico}</span>
-					<button
-						class="abre-ficha"
-						type="button"
-						aria-label={`${t('Ler')}: ${t('DPO de {delegacao}', { delegacao: dpo.delegacao?.nome ?? '' })}, ${t('Tópico')} ${dpo.topico}`}
-						onclick={() => abrirPrevia('dpo', dpo.id)}>{t('Ler')}</button
-					>
-				</li>
-			{/each}
-			{#if !doComite.length && !dposDoComite.length}
-				<li class="suave">{t('Nenhum documento aberto ao comitê ainda.')}</li>
-			{/if}
-		</ul>
-	</section>
 </div>
+
+<Modal bind:this={modalLista} nome={lista ? `${ROTULO()[lista.etapa]} · ${t('Tópico {n}', { n: lista.topico })}` : ''} classe="modal-acao">
+	{#if lista}
+		<h3>{ROTULO()[lista.etapa]} · {t('Tópico {n}', { n: lista.topico })}</h3>
+		<ul class="lista">
+			{#each daEtapa(lista.topico, lista.etapa) as d (d.id)}{@render documento(d)}{:else}<li class="suave">{t('Nada nesta etapa ainda.')}</li>{/each}
+		</ul>
+	{/if}
+	<form method="dialog" class="acoes"><button class="botao botao--secundario">{t('Fechar')}</button></form>
+</Modal>
+
+<Modal bind:this={modalAvaliar} nome={t('Para avaliar')} classe="modal-acao">
+	<h3>{t('Para avaliar')}</h3>
+	<ul class="lista">
+		{#each data.dpos.filter((d) => d.status === 'enviado') as dpo (dpo.id)}
+			<li>
+				<span>{t('DPO')} · <NomeDelegacao {sigla} delegacao={dpo.delegacao} /> · {t('Tópico')} {dpo.topico}</span>
+				<a class="botao botao--secundario botao--pequeno" href={`/comite/${sigla}/dpo`}>{t('Ler e avaliar')}</a>
+			</li>
+		{/each}
+		{#each data.documentos.filter((d) => d.status === 'enviado') as d (d.id)}
+			<li>
+				<span>{nomeDoDocumento(d)} <span class="detalhe">{d.bloco?.nome}</span></span>
+				<a class="botao botao--secundario botao--pequeno" href={`/documento/${d.id}`}>{t('Ler e avaliar')}</a>
+			</li>
+		{/each}
+	</ul>
+	<form method="dialog" class="acoes"><button class="botao botao--secundario">{t('Fechar')}</button></form>
+</Modal>
+
+<Modal bind:this={modalDpos} nome={t('DPOs')} classe="modal-acao">
+	<h3>{t('DPOs')}</h3>
+	<ul class="lista">
+		{#each dposVisiveis as dpo (dpo.id)}
+			<li>
+				<span><NomeDelegacao {sigla} delegacao={dpo.delegacao} /> · {t('Tópico')} {dpo.topico} <span class="selo {STATUS_DPO[dpo.status].selo}">{STATUS_DPO[dpo.status].rotulo}</span></span>
+				<button
+					class="botao botao--secundario botao--pequeno"
+					type="button"
+					aria-label={`${t('Ler')}: ${t('DPO de {delegacao}', { delegacao: dpo.delegacao?.nome ?? '' })}, ${t('Tópico')} ${dpo.topico}`}
+					onclick={() => abrirPrevia('dpo', dpo.id)}>{t('Ler')}</button
+				>
+			</li>
+		{:else}
+			<li class="suave">{t('Nenhum DPO enviado ainda.')}</li>
+		{/each}
+	</ul>
+	<form method="dialog" class="acoes"><button class="botao botao--secundario">{t('Fechar')}</button></form>
+</Modal>

@@ -20,6 +20,8 @@ export const TABELAS_SESSAO = [
 	'votacao',
 	'voto',
 	'documento',
+	// Passo 56: a trilha do tópico (agenda adotada).
+	'proposta_agenda',
 	// Passo 40: com a releitura por tabela, o que a tela mostra precisa do próprio aviso.
 	'proximo_orador',
 	'assinatura_mocao',

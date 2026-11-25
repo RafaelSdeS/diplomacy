@@ -38,14 +38,18 @@ export const load: PageLoad = async ({ params, depends }) => {
 		supabase.from('pedido_reabertura').select('clausula_id, delegacao_id'),
 		supabase.rpc('sou_redator', { p_bloco: d.bloco!.id }, { get: true }),
 		supabase.rpc('regras', { p_comite: d.comite_id }, { get: true }),
-		// Para a fusão: os outros documentos do comitê que a pessoa vê, com as cláusulas.
-		supabase
-			.from('documento')
-			.select('id, tipo, numero, titulo, clausulas:clausula!clausula_documento_id_comite_id_fkey(id, tipo, ordem, texto)')
-			.eq('comite_id', d.comite_id)
-			.neq('id', d.id)
-			.in('tipo', ['working_paper'])
-			.order('ordem', { referencedTable: 'clausulas' })
+		// Para a fusão: os working papers que a pessoa vê, com as cláusulas. Passo 56: só os do
+		// mesmo tópico do projeto (de qualquer bloco).
+		(() => {
+			const consulta = supabase
+				.from('documento')
+				.select('id, tipo, numero, titulo, status, bloco(nome), clausulas:clausula!clausula_documento_id_comite_id_fkey(id, tipo, ordem, texto)')
+				.eq('comite_id', d.comite_id)
+				.neq('id', d.id)
+				.in('tipo', ['working_paper'])
+				.order('ordem', { referencedTable: 'clausulas' });
+			return d.topico ? consulta.eq('topico', d.topico) : consulta;
+		})()
 	]);
 	for (const r of [clausulas, propostas, comentarios, rodadas, assinaturas, reaberturas, redator, regras, outros])
 		if (r.error) throw r.error;
@@ -70,6 +74,7 @@ export const load: PageLoad = async ({ params, depends }) => {
 		reaberturas: reaberturas.data!,
 		souRedator: redator.data ?? false,
 		regras: regras.data as Regras,
-		workingPapers: outros.data!
+		// Os aprovados pela mesa primeiro.
+		workingPapers: outros.data!.sort((a, b) => Number(b.status === 'aprovado_mesa') - Number(a.status === 'aprovado_mesa'))
 	};
 };

@@ -51,10 +51,16 @@
 	let topico = $state(1);
 	let subtopico = $state('');
 	let atualizacao = $state('');
-	// Projeto de resolução: se o tópico escolhido não tem agenda adotada, vai para um que tem.
+	// Passo 56: working paper e projeto só em tópico com a agenda adotada; o working paper é
+	// sobre um item da agenda (o primeiro vem escolhido).
+	const precisaAgenda = $derived(tipo === 'projeto' || tipo === 'working_paper');
+	const itens = $derived(data.subtopicos.filter((s) => s.topico === topico));
 	$effect(() => {
-		if (tipo === 'projeto' && !data.topicosAdotados.includes(topico) && data.topicosAdotados.length)
+		if (precisaAgenda && !data.topicosAdotados.includes(topico) && data.topicosAdotados.length)
 			topico = data.topicosAdotados[0];
+	});
+	$effect(() => {
+		if (!itens.some((s) => s.id === subtopico)) subtopico = itens[0]?.id ?? '';
 	});
 
 	async function executar(acao: PromiseLike<{ error: { code?: string; message?: string } | null }>) {
@@ -203,20 +209,21 @@
 				{t('Tópico')}
 				<select bind:value={topico}>
 					{#each data.comite.topicos as tp, i (tp)}
-						{@const semAgenda = tipo === 'projeto' && !data.topicosAdotados.includes(i + 1)}
+						{@const semAgenda = precisaAgenda && !data.topicosAdotados.includes(i + 1)}
 						<option value={i + 1} disabled={semAgenda}>{i + 1}. {tp}{semAgenda ? ` · ${t('agenda ainda não adotada')}` : ''}</option>
 					{/each}
 				</select>
 			</label>
-			{#if tipo === 'projeto' && !data.topicosAdotados.length}
-				<p class="suave" role="note">{t('A agenda vem antes das resoluções: adote a agenda de um tópico para apresentar um projeto.')}</p>
+			{#if precisaAgenda && !data.topicosAdotados.length}
+				<p class="suave" role="note">
+					{t('Primeiro a agenda: quando a mesa adotar a agenda de um tópico, os blocos escrevem working papers sobre os itens dela, e depois o projeto de resolução.')}
+				</p>
 			{/if}
-			{#if tipo === 'working_paper' && data.subtopicos.some((s) => s.topico === topico)}
+			{#if tipo === 'working_paper' && itens.length}
 				<label class="campo">
-					{t('Subtópico da agenda')}
-					<select bind:value={subtopico}>
-						<option value="">{t('Nenhum')}</option>
-						{#each data.subtopicos.filter((s) => s.topico === topico) as s (s.id)}
+					{t('Item da agenda')}
+					<select bind:value={subtopico} required>
+						{#each itens as s (s.id)}
 							<option value={s.id}>{s.texto}</option>
 						{/each}
 					</select>
@@ -233,7 +240,7 @@
 				</label>
 			{/if}
 			<div class="acoes">
-				<button class="botao">{t('Criar e abrir')}</button>
+				<button class="botao" disabled={precisaAgenda && !data.topicosAdotados.length}>{t('Criar e abrir')}</button>
 				<button class="botao botao--secundario" type="button" onclick={() => (novoEm = null)}>{t('Cancelar')}</button>
 			</div>
 		</form>

@@ -278,35 +278,34 @@ test('quem não preside não usa o painel', async ({ page }) => {
 
 test('a agenda informal: propostas em tópicos, lado a lado, e a mesa adota uma', async ({ browser }) => {
 	const delegado = await abrir(browser, C.conta(contaDaDelegacao(outra)), AGENDA);
-	// Um tópico ainda sem agenda adotada (numa nova tentativa, o primeiro já pode estar).
+	// Passo 56: um tópico por vez. Um tópico ainda sem agenda adotada (numa nova tentativa, o
+	// primeiro já pode estar).
 	const livres = [];
 	for (const n of [1, 2]) {
-		const secao = delegado.getByRole('region', { name: `Agenda informal · tópico ${n}` });
-		if (!(await secao.getByText('Adotada').count())) livres.push(n);
+		await delegado.goto(`${AGENDA}?topico=${n}`);
+		await expect(delegado.getByRole('heading', { level: 2 })).not.toHaveCount(0);
+		if (!(await delegado.getByRole('heading', { name: 'Agenda adotada' }).count())) livres.push(n);
 	}
 	test.skip(!livres.length, 'os dois tópicos já têm agenda adotada (banco reaproveitado)');
 	const n = livres[0];
-	const escolher = async (page: Page) => {
-		const campo = page.getByRole('combobox', { name: /^Tópico/ });
-		const rotulo = await campo.locator('option', { hasText: new RegExp(`^${n}\\.`) }).textContent();
-		await campo.selectOption({ label: rotulo!.trim() });
+	// Propor colando uma lista (o editor de itens tem o próprio teste, no passo 56).
+	const propor = async (page: Page, lista: string) => {
+		await page.goto(`${AGENDA}?topico=${n}`);
+		await page.getByRole('button', { name: /^(Propor agenda|Editar a minha proposta)$/ }).click();
+		const editor = page.getByRole('dialog');
+		await editor.getByText('Colar uma lista').click();
+		await editor.locator('.colar-lista textarea').fill(lista);
+		await editor.getByRole('button', { name: 'Montar os itens' }).click();
+		await editor.getByRole('button', { name: 'Salvar proposta' }).click();
+		await expect(page.getByRole('status')).toHaveText('Proposta salva.');
 	};
-
-	await escolher(delegado);
-	await delegado.getByLabel('Agenda em tópicos').fill('A. Causas\n  A.1 Financiamento\nB. Respostas');
-	await delegado.getByRole('button', { name: 'Salvar proposta' }).click();
-	await expect(delegado.getByRole('status')).toHaveText('Proposta salva.');
-
+	await propor(delegado, 'A. Causas\n  A.1 Financiamento\nB. Respostas');
 	const mesa = await abrir(browser, C.conta(CONTAS.mesa), AGENDA);
-	await escolher(mesa);
-	await mesa.getByLabel('Agenda em tópicos').fill('A. Contexto\nB. Cooperação\n  B.1 Inteligência');
-	await mesa.getByRole('button', { name: 'Salvar proposta' }).click();
-	await expect(mesa.getByRole('status')).toHaveText('Proposta salva.');
+	await propor(mesa, 'A. Contexto\nB. Cooperação\n  B.1 Inteligência');
 
 	// No notebook, as propostas do mesmo tópico ficam lado a lado.
-	const secao = mesa.getByRole('region', { name: `Agenda informal · tópico ${n}` });
-	const daDelegacao = secao.getByRole('article', { name: `Proposta de ${outra}` });
-	const daMesa = secao.getByRole('article', { name: 'Proposta de Mesa' });
+	const daDelegacao = mesa.getByRole('article', { name: `Proposta de ${outra}` });
+	const daMesa = mesa.getByRole('article', { name: 'Proposta de Mesa' });
 	const [a, b] = await Promise.all([daDelegacao.boundingBox(), daMesa.boundingBox()]);
 	expect(Math.abs(a!.y - b!.y)).toBeLessThan(5);
 	// A árvore: "A.1 Financiamento" fica dentro de "A. Causas".
@@ -314,10 +313,13 @@ test('a agenda informal: propostas em tópicos, lado a lado, e a mesa adota uma'
 		daDelegacao.getByRole('listitem').filter({ hasText: 'A. Causas' }).getByRole('listitem')
 	).toHaveText(/A\.1 Financiamento/);
 
-	await secao.getByRole('button', { name: `Adotar a proposta de ${outra}` }).click();
-	await expect(daDelegacao).toContainText('Adotada');
-	await daDelegacao.getByRole('button', { name: /^Andamento de A\. Causas: Pendente/ }).click();
-	await expect(daDelegacao.getByRole('button', { name: /^Andamento de A\. Causas: Em debate/ })).toBeVisible();
+	await daDelegacao.getByRole('button', { name: 'Adotar esta' }).click();
+	await mesa.getByRole('dialog').getByRole('button', { name: 'Adotar esta' }).click();
+	const adotada = mesa.getByRole('article', { name: 'Agenda adotada' });
+	await expect(adotada).toContainText('A.1 Financiamento');
+	const andamento = adotada.getByRole('combobox', { name: 'Andamento de A. Causas' });
+	await andamento.selectOption('em_debate');
+	await expect(andamento).toHaveValue('em_debate');
 	await Promise.all([delegado, mesa].map((p) => p.context().close()));
 });
 

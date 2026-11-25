@@ -49,8 +49,11 @@ select pg_temp.entrar(4); select public.entrar_bloco(pg_temp.id('bloco'));
 select pg_temp.entrar(5); select public.entrar_bloco(pg_temp.id('bloco'));
 select results_eq($$select count(*)::int from public.bloco_membro$$, array[5], 'cinco delegações no bloco');
 
--- Working paper: o redator escreve; os outros propõem
+-- Working paper: o redator escreve; os outros propõem (a agenda do tópico já foi adotada:
+-- passo 22 para o projeto, passo 56 para o working paper)
 
+reset role;
+insert into public.proposta_agenda (comite_id, topico, adotada) values ('00000000-0000-0000-0000-0000000000c1', 1, true);
 select pg_temp.entrar(1);
 insert into ids values ('wp', public.criar_documento(pg_temp.id('bloco'), 'working_paper', 'Financiamento', 1));
 select public.adicionar_clausula(pg_temp.id('wp'), 'preambular', 'Recordando a resolução 2178');
@@ -147,10 +150,8 @@ select lives_ok($$select public.criar_documento(pg_temp.id('bloco'), 'working_pa
 select throws_ok($$select public.criar_documento(pg_temp.id('bloco'), 'projeto', 'Projeto da observadora')$$,
 	'P0001', null, 'mas não apresenta projeto');
 
--- Projeto: fusão, 5 signatários e envio (a agenda do tópico já foi adotada, passo 22)
+-- Projeto: fusão, 5 signatários e envio
 
-reset role;
-insert into public.proposta_agenda (comite_id, topico, adotada) values ('00000000-0000-0000-0000-0000000000c1', 1, true);
 select pg_temp.entrar(1);
 insert into ids values ('projeto', public.criar_documento(pg_temp.id('bloco'), 'projeto', 'Projeto de resolução', 1));
 select public.importar_clausulas(pg_temp.id('projeto'),

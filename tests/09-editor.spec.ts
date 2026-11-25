@@ -59,6 +59,9 @@ test('um bloco escreve um working paper, com verbos sugeridos', async ({ page })
 	}
 	await expect(bloco.getByRole('listitem')).toHaveCount(5);
 
+	// Passo 56: o working paper também vem depois da agenda adotada.
+	await adotarAgenda(C.conta(CONTAS.mesa), C.sigla, 1);
+	await page.reload();
 	await bloco.getByRole('button', { name: 'Novo documento' }).click();
 	const novo = page.getByRole('form', { name: 'Novo documento' });
 	await novo.getByLabel('Título').fill(WP);
@@ -158,6 +161,8 @@ test('o projeto junta cláusulas do working paper, recebe 5 assinaturas e vai à
 	projeto = page.url();
 
 	// Fusão: as cláusulas do working paper aprovado, cada uma guardando a origem.
+	// Passo 56: a fusão abre num modal, na barra do documento.
+	await page.getByRole('button', { name: 'Trazer de working papers' }).click();
 	const fusao = page.getByRole('region', { name: 'Trazer cláusulas de working papers' });
 	const wp = fusao.getByRole('group', { name: new RegExp(WP) });
 	for (const caixa of await wp.getByRole('checkbox').all()) await caixa.check();

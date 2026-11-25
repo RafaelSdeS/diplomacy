@@ -31,14 +31,14 @@ create function pg_temp.item(p_texto text) returns uuid language sql as $$
 	select id from public.ponto_pauta where texto = p_texto and comite_id = '00000000-0000-0000-0000-0000000000c1'
 $$;
 
--- Antes da agenda adotada, só working papers
+-- Antes da agenda adotada, nem projeto nem working paper (passo 56)
 
 select pg_temp.entrar('00000000-0000-0000-0000-0000000000a1');
 insert into ids values ('bloco', public.criar_bloco('00000000-0000-0000-0000-0000000000c1', 'Bloco'));
 select throws_ok($$select public.criar_documento(pg_temp.id('bloco'), 'projeto', 'Projeto cedo', 1)$$,
 	'P0001', 'Adote a agenda do tópico antes de apresentar um projeto de resolução.', 'sem agenda adotada, não há projeto');
-select lives_ok($$select public.criar_documento(pg_temp.id('bloco'), 'working_paper', 'Notas', 1)$$,
-	'working paper não depende da agenda');
+select throws_ok($$select public.criar_documento(pg_temp.id('bloco'), 'working_paper', 'Notas', 1)$$,
+	'P0001', 'Adote a agenda do tópico antes de apresentar um working paper.', 'nem working paper (passo 56)');
 
 -- A delegação propõe, a mesa adota
 

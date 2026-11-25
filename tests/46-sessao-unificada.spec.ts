@@ -133,6 +133,7 @@ test('a Agora mostra o ponto que espera a mesa, e a mesa tem três atalhos', asy
 	await page.evaluate(() => localStorage.clear());
 	await entrar(page, MESA);
 	const mesa = page.getByRole('article', { name: `Mesa · ${C.sigla}` });
-	await expect(mesa.getByRole('link')).toHaveText([/^Chegadas a confirmar \d+$/, /^Pedidos para o bureau \d+$/, /^Documentos enviados à mesa \d+$/, 'Abrir o painel']);
+	// Passo 56: os atalhos ficam numa linha (a trilha do tópico também tem links).
+	await expect(mesa.locator('.acoes').getByRole('link')).toHaveText([/^Chegadas a confirmar \d+$/, /^Pedidos para o bureau \d+$/, /^Documentos enviados à mesa \d+$/, 'Abrir o painel']);
 	await page.context().close();
 });

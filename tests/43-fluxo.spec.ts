@@ -105,13 +105,14 @@ test('delegado: Documentos reúne o que se escreve, e o "Voltar" volta para lá'
 	await entrar(page, EUA);
 	await irPeloMenu(page, 'Documentos');
 	await expect(page.getByRole('heading', { level: 1, name: 'Documentos' })).toBeVisible();
-	for (const nome of ['Seu DPO', 'Dos seus blocos', 'Cartas', 'Do comitê'])
-		await expect(page.getByRole('region', { name: nome })).toBeVisible();
+	// Passo 56: o que espera a pessoa, cada tópico pela ordem, e DPOs e cartas numa linha cada.
+	for (const nome of ['Para você', 'DPOs e cartas']) await expect(page.getByRole('region', { name: nome })).toBeVisible();
+	await expect(page.getByRole('article', { name: /^Tópico 1/ }).getByRole('navigation', { name: 'Ordem do tópico 1' })).toBeVisible();
 	// Passo 51: as ações da área em cartões, como na aba Comitê.
 	await expect(page.getByRole('navigation', { name: 'Atalhos de documentos' }).getByRole('link')).toHaveText([/^\s*DPO/, /^\s*Blocos/, /^\s*Cartas/, /^\s*Caderno/]);
 	await semErrosDeAcessibilidade(page);
 
-	await page.getByRole('region', { name: 'Seu DPO' }).getByRole('link').first().click();
+	await page.getByRole('navigation', { name: 'Atalhos de documentos' }).getByRole('link', { name: /^\s*DPO/ }).click();
 	await expect(page.getByRole('heading', { level: 1, name: 'Documento de posição oficial' })).toBeVisible();
 	await page.getByRole('link', { name: '‹ Voltar para Documentos' }).click();
 	await expect(page.getByRole('heading', { level: 1, name: 'Documentos' })).toBeVisible();
@@ -121,8 +122,8 @@ test('mesa: Documentos começa pelo que espera a avaliação', async ({ page }, 
 	test.skip(info.project.name !== 'notebook', 'uma tela basta');
 	await entrar(page, MESA);
 	await irPeloMenu(page, 'Documentos');
-	await expect(page.getByRole('region', { name: 'Para avaliar' })).toBeVisible();
-	await expect(page.getByRole('region', { name: 'Seu DPO' })).toHaveCount(0);
+	await expect(page.getByRole('region', { name: 'Para você' })).toBeVisible();
+	await expect(page.getByRole('region', { name: 'Para você' })).not.toContainText('Seu DPO');
 });
 
 test('no celular, "Mais" guarda o resto do menu, e o "Voltar" volta a ele', async ({ page }, info) => {

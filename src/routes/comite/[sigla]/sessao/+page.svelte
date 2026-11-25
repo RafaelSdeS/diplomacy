@@ -42,6 +42,8 @@
 	import Siren from '@lucide/svelte/icons/siren';
 	import Vote from '@lucide/svelte/icons/vote';
 	import QuemPreside from '#lib/ui/QuemPreside.svelte';
+	import TrilhaDoTopico from '#lib/ui/TrilhaDoTopico.svelte';
+	import { doTopico } from '#lib/ordem.ts';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -221,6 +223,8 @@
 		<p class="topico-atual">
 			<span class="rotulo">{t('Tópico em debate')}</span> <a href={`/comite/${data.comite.sigla}/sessao/agenda`}>{topicoAtual}</a>
 		</p>
+		<!-- Passo 56: em que etapa o tópico está, e o que fazer agora. -->
+		<TrilhaDoTopico compacta sigla={data.comite.sigla} mesa={ehMesa} {...doTopico(data.ordem, data.estado.topico_atual!)} />
 	{/if}
 
 	{#if erro}

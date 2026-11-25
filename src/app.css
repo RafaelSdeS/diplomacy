@@ -1697,6 +1697,16 @@ dialog.modal-acao {
 	width: min(36rem, calc(100vw - 2rem));
 }
 
+/* Passo 56: a largura de cada tipo de modal vale; o max-width de 28rem dos diálogos é só o
+   padrão (antes, ele apertava estes em 28rem). */
+dialog:is(.modal-acao, .modal-dpo, .modal-painel, .modal-largo) {
+	max-width: calc(100vw - 2rem);
+}
+
+dialog.modal-largo {
+	width: min(48rem, calc(100vw - 2rem));
+}
+
 /* Passo 51 (lote 1): os cartões do painel dentro do modal, sem moldura dupla. */
 dialog.modal-painel {
 	width: min(44rem, calc(100vw - 2rem));
@@ -3265,4 +3275,173 @@ dialog.ir-para {
 .lista-minha {
 	background: var(--cor-marinho-suave);
 	font-weight: 600;
+}
+
+/* Passo 56: a ordem do tópico (agenda → working papers → projeto → resolução). */
+.so-leitor {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
+
+.trilha-topico {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.35rem 1rem;
+	margin: 0 0 1rem;
+}
+
+.trilha-topico ol {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.25rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.trilha-etapa :is(a, button) {
+	display: inline-flex;
+	font: inherit;
+	background: none;
+	cursor: pointer;
+	align-items: center;
+	gap: 0.35rem;
+	padding: 0.25rem 0.5rem;
+	border: 1px solid var(--cor-linha);
+	border-radius: var(--raio);
+	color: var(--cor-texto-suave);
+	text-decoration: none;
+}
+
+.trilha-etapa :is(a, button):hover {
+	border-color: var(--cor-marinho);
+}
+
+.trilha-etapa--feita :is(a, button) {
+	color: var(--cor-ok);
+}
+
+.trilha-etapa--atual :is(a, button) {
+	border-color: var(--cor-marinho);
+	background: var(--cor-marinho-suave);
+	color: var(--cor-marinho);
+	font-weight: 600;
+}
+
+.trilha-etapa .detalhe {
+	font-weight: 400;
+	font-size: 0.85rem;
+}
+
+.trilha-agora {
+	margin: 0;
+	font-size: 0.9rem;
+	color: var(--cor-texto-suave);
+}
+
+.trilha-topico--compacta {
+	margin: 0.25rem 0 0.75rem;
+}
+
+.trilha-topico--compacta .trilha-etapa :is(a, button) {
+	padding: 0.25rem 0.45rem;
+}
+
+/* Passo 56: a aba Agenda, um tópico por vez, e o editor de itens. */
+.abas-topicos {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	margin: 0 0 0.5rem;
+}
+
+.cartao-timbre h3,
+.cartao-timbre .acoes {
+	margin: 0;
+}
+
+.cartao > .trilha-topico:last-child {
+	margin-bottom: 0;
+}
+
+.arvore--numerada,
+.arvore--numerada .arvore {
+	padding-left: 0;
+	list-style: none;
+	counter-reset: item;
+}
+
+.arvore--numerada .arvore {
+	padding-left: 1.5rem;
+}
+
+.arvore--numerada li {
+	counter-increment: item;
+}
+
+.arvore--numerada .arvore-item::before {
+	content: counters(item, '.') '.';
+	font-weight: 600;
+	color: var(--cor-marinho);
+}
+
+.outras-propostas {
+	margin: 1rem 0;
+}
+
+.outras-propostas > summary {
+	cursor: pointer;
+	font-weight: 600;
+}
+
+.editor-itens {
+	margin: 0 0 0.5rem;
+	padding: 0;
+	list-style: none;
+}
+
+.editor-item {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.25rem 0.5rem;
+	margin: 0.35rem 0;
+	padding-left: calc(var(--nivel, 0) * 1.75rem);
+}
+
+.editor-item input {
+	flex: 1 1 14rem;
+	min-width: 0;
+}
+
+.editor-item-acoes {
+	display: inline-flex;
+	gap: 0.25rem;
+}
+
+.colar-lista > summary {
+	cursor: pointer;
+}
+
+/* Passo 56: as bandeiras dos signatários, na lista de documentos. */
+.bandeiras {
+	display: inline-flex;
+	flex-wrap: wrap;
+	gap: 0.15rem;
+	vertical-align: middle;
+}
+
+.bandeiras .bandeira {
+	width: 1.1rem;
+	height: auto;
+}
+
+/* Passo 56: listas curtas de pendências, uma linha cada, para a tela não rolar. */
+.lista--compacta li {
+	padding: 0.35rem 0;
 }

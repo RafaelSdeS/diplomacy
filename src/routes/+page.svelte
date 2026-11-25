@@ -18,6 +18,8 @@
 	import FichaVotacao from '#lib/ui/FichaVotacao.svelte';
 	import FichaNota from '#lib/ui/FichaNota.svelte';
 	import QuemPreside from '#lib/ui/QuemPreside.svelte';
+	import TrilhaDoTopico from '#lib/ui/TrilhaDoTopico.svelte';
+	import { doTopico } from '#lib/ordem.ts';
 	import Modal from '#lib/ui/Modal.svelte';
 	import Quando from '#lib/ui/Quando.svelte';
 	import ResponderEntrevista from '#lib/ui/ResponderEntrevista.svelte';
@@ -136,6 +138,7 @@
 				<div class="ao-vivo-grade">
 					<div>
 					<p class="suave">{t('Sessão {n}', { n: sessao.numero })} · {FASES[data.aoVivo.fase]} · {FORMAS[estado.forma]}</p>
+					{#if estado.topico_atual}<TrilhaDoTopico compacta {sigla} {...doTopico(data.aoVivo.ordem, estado.topico_atual)} />{/if}
 					{#if momento === 'pausa'}
 						<p class="telegrama" role="status">
 							{t('Há pontos ou moções?')} <a class="botao botao--secundario botao--pequeno" href={`/comite/${sigla}/sessao`}>{t('Fazer um ponto ou moção')}</a>
@@ -224,6 +227,8 @@
 		<article class="cartao cartao--destaque" aria-labelledby="c-mesa">
 			<h2 id="c-mesa">{t('Mesa')} · {sigla}</h2>
 			<p>{sessao ? t('Sessão {n} aberta', { n: sessao.numero }) : t('Nenhuma sessão aberta.')}</p>
+			<!-- Passo 56: a etapa do tópico em debate e o que a mesa faz agora. -->
+			{#if estado?.topico_atual && data.aoVivo}<TrilhaDoTopico compacta mesa {sigla} {...doTopico(data.aoVivo.ordem, estado.topico_atual)} />{/if}
 			<!-- Passo 51 (lote 2): os três atalhos como botões numa linha, com a contagem dentro. -->
 			<div class="acoes">
 				<a class={['botao botao--pequeno', !sessao?.avisos.length && 'botao--secundario']} href={`/comite/${sigla}/sessao/chamada`}
@@ -235,9 +240,8 @@
 				<a class={['botao botao--pequeno', !documentosEnviados && 'botao--secundario']} href={`/comite/${sigla}/documentos`}
 					>{t('Documentos enviados à mesa')} <span class="selo">{documentosEnviados}</span></a
 				>
-			</div>
-			<div class="acoes">
-				<a class="botao" href={`/comite/${sigla}/sessao/presidencia`}>{t('Abrir o painel')}</a>
+				<!-- Passo 56: na mesma linha, para a trilha do tópico caber sem rolar. -->
+				<a class="botao botao--pequeno" href={`/comite/${sigla}/sessao/presidencia`}>{t('Abrir o painel')}</a>
 			</div>
 		</article>
 	{/if}

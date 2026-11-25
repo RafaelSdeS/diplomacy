@@ -3,6 +3,7 @@
 **Parte de:** pedido de 24/11/2026 ("primeiro se debate a agenda, depois os working papers, que viram as resoluções; essa ordem não está clara"; "a aba Agenda ainda não está intuitiva"; "a aba Documentos pode ter menos rolagem e menos informação desnecessária")
 **Depende de:** 22 (agenda antes das resoluções), 09 (blocos e documentos), 51 lote 0, 54 e 55
 **Esforço:** M
+**Situação:** pronto (25/11/2026).
 **Quando:** depois do 55 e antes do piloto: o roteiro do piloto passa pela agenda, pelo working paper e pelo projeto.
 **Objetivo:** cada tópico mostra em que etapa está, a etapa seguinte e onde fazer cada coisa. A aba Agenda serve para propor e adotar sem aprender uma sintaxe. A aba Documentos segue a mesma ordem, sem rolar.
 
@@ -104,10 +105,19 @@ Votar a agenda no app (a adoção continua um ato da mesa, depois da moção ou 
 
 ## Testes
 
-- [ ] pgTAP: working paper de tópico sem agenda adotada é recusado; projeto em branco é aceito; projeto guarda a origem das cláusulas trazidas.
-- [ ] Unidade: a etapa atual da trilha para cada combinação (sem agenda, agenda adotada, working paper aprovado, projeto enviado, em votação, resolução aprovada).
-- [ ] Unidade: o editor de itens gera a mesma árvore que a sintaxe de espaços (`niveis()`), e "Colar uma lista" monta os itens.
-- [ ] Ponta a ponta: delegação propõe uma agenda só com botões e teclado; a mesa compara lado a lado e adota; a trilha muda de etapa na sessão, sem recarregar.
-- [ ] Ponta a ponta: um projeto em branco traz, pelo modal, as cláusulas de dois working papers do tópico (de blocos diferentes) e mostra "Baseado em"; working papers de outro tópico não aparecem.
-- [ ] Ponta a ponta, a 1366 × 768: Agenda e Documentos não rolam para a mesa e para a delegação, com dados do CSNU-T de exemplo.
-- [ ] axe nas abas e no editor de itens, no tema claro e no escuro.
+- [x] pgTAP: working paper de tópico sem agenda adotada é recusado; projeto em branco é aceito; projeto guarda a origem das cláusulas trazidas.
+- [x] Unidade: a etapa atual da trilha para cada combinação (sem agenda, agenda adotada, working paper aprovado, projeto enviado, em votação, resolução aprovada).
+- [x] Unidade: o editor de itens gera a mesma árvore que a sintaxe de espaços (`niveis()`), e "Colar uma lista" monta os itens.
+- [x] Ponta a ponta: delegação propõe uma agenda só com botões e teclado; a mesa compara lado a lado e adota; a trilha muda de etapa na sessão, sem recarregar.
+- [x] Ponta a ponta: um projeto em branco traz, pelo modal, as cláusulas de dois working papers do tópico (de blocos diferentes) e mostra "Baseado em"; working papers de outro tópico não aparecem.
+- [x] Ponta a ponta, a 1366 × 768: Agenda e Documentos não rolam para a mesa e para a delegação, com dados do CSNU-T de exemplo.
+- [x] axe nas abas e no editor de itens, no tema claro e no escuro.
+
+## Como ficou
+
+- `src/lib/ordem.ts`: a etapa atual (`etapaAtual`), o que fazer por papel e `carregarOrdem` (agenda e documentos do comitê, relidos ao vivo). `TrilhaDoTopico.svelte` mostra as quatro etapas; compacta na Sessão e na Agora (delegação e mesa), completa na Agenda. Na aba Documentos, as etapas depois da agenda abrem a lista num modal (`onetapa`).
+- Migração `20261223090000_ordem_do_topico.sql`: working paper com tópico só com a agenda adotada (mensagem própria, a do projeto continua a mesma); o item da agenda, se vier, tem de ser da agenda adotada do tópico; `proposta_agenda` e `ponto_pauta` passam a avisar o comitê ao vivo (a trilha muda na sessão sem recarregar). O "Novo documento" pede o item da agenda no working paper.
+- Aba Agenda: abas por tópico (`?topico=n`, a trilha leva a elas), agenda adotada em destaque com numeração 1, 1.1, 1.1.1 e "com N working papers" por item; as outras propostas recolhidas; sem adotada, lado a lado, com "Adotar esta" (Confirmar) e "Usar como base". `EditorDeItens.svelte` (funções puras em `src/lib/itens.ts`): botões de nível e ordem, Enter/Tab/Shift+Tab (o Tab só é tomado quando muda algo, para não prender o foco), "Colar uma lista". A mesa edita a adotada no mesmo editor e pode trazer os itens de outra proposta.
+- Aba Documentos: atalhos; "Para você" (uma linha por pendência, curta) ao lado de "DPOs e cartas"; um cartão por tópico com a trilha completa. A 1366 × 768 não rola (teste com mesa e delegação, nos dois temas).
+- Editor: "Trazer de working papers" na barra do documento, num modal, só com os working papers do mesmo tópico, os aprovados primeiro, com "Trazer todas as cláusulas"; o cabeçalho mostra "Baseado em".
+- Correção junto: os modais `.modal-acao`, `.modal-dpo` e `.modal-painel` ficavam presos ao `max-width` de 28rem dos diálogos; agora valem as larguras deles.

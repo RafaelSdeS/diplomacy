@@ -1,3 +1,4 @@
+import { carregarOrdem } from '#lib/ordem.ts';
 import { supabase } from '#lib/supabase.ts';
 import type { PageLoad } from './$types';
 
@@ -9,11 +10,11 @@ export const load: PageLoad = async ({ parent, depends }) => {
 	const minha = participacoes.find((p) => p.comite_id === comite.id && p.papel === 'delegado')?.delegacao_id ?? null;
 	const ehMesa = participacoes.some((p) => p.papel === 'secretaria' || (p.papel === 'mesa' && p.comite_id === comite.id));
 
-	const [dpos, documentos, meusBlocos, rodadas, cartas] = await Promise.all([
+	const [dpos, documentos, meusBlocos, rodadas, cartas, delegacoes, ordem] = await Promise.all([
 		supabase.from('dpo').select('id, topico, status, delegacao(id, nome, bandeira)').eq('comite_id', comite.id).order('topico'),
 		supabase
 			.from('documento')
-			.select('id, tipo, numero, titulo, status, bloco_id, bloco(nome)')
+			.select('id, tipo, numero, titulo, status, topico, bloco_id, bloco(nome), assinaturas:assinatura(delegacao(id, nome, bandeira))')
 			.eq('comite_id', comite.id)
 			.order('criado_em', { ascending: false }),
 		minha ? supabase.from('bloco_membro').select('bloco_id').eq('delegacao_id', minha) : Promise.resolve({ data: [], error: null }),
@@ -25,7 +26,10 @@ export const load: PageLoad = async ({ parent, depends }) => {
 			.select('id, titulo, enviada_em, remetente:delegacao(nome)')
 			.eq('comite_id', comite.id)
 			.order('enviada_em', { ascending: false })
-			.limit(5)
+			.limit(5),
+		supabase.from('delegacao').select('id', { count: 'exact', head: true }).eq('comite_id', comite.id),
+		// Passo 56: a ordem de cada tópico (agenda adotada e documentos).
+		carregarOrdem(comite.id)
 	]);
 	for (const r of [dpos, documentos, meusBlocos, rodadas, cartas]) if (r.error) throw r.error;
 
@@ -36,6 +40,8 @@ export const load: PageLoad = async ({ parent, depends }) => {
 		documentos: documentos.data!,
 		meusBlocos: meusBlocos.data!.map((b) => b.bloco_id),
 		rodadas: rodadas.data!,
-		cartas: cartas.data!
+		cartas: cartas.data!,
+		totalDelegacoes: delegacoes.count ?? 0,
+		ordem
 	};
 };

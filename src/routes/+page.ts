@@ -1,6 +1,7 @@
 import { semRede } from '#lib/cache-dados.ts';
 import { noComite, papelPrincipal } from '#lib/papeis.ts';
 import { carregarIncidentes } from '#lib/crise.ts';
+import { carregarOrdem } from '#lib/ordem.ts';
 import { carregarSessao } from '#lib/sessao.ts';
 import { supabase } from '#lib/supabase.ts';
 import { lerAoVivo } from '#lib/tempo-real.ts';
@@ -72,8 +73,9 @@ export const load: PageLoad = async ({ parent, depends }) => {
 			? Promise.all([
 					carregarSessao(comiteAoVivo),
 					ler('restrita', ['comite'], () => supabase.from('comite').select('tecnologia_restrita').eq('id', comiteAoVivo).single()),
-					carregarIncidentes(comiteAoVivo)
-				]).then(([sessao, comite, incidentes]) => ({ ...sessao, restrita: !!comite.data?.tecnologia_restrita, incidentes }))
+					carregarIncidentes(comiteAoVivo),
+					carregarOrdem(comiteAoVivo)
+				]).then(([sessao, comite, incidentes, ordem]) => ({ ...sessao, restrita: !!comite.data?.tecnologia_restrita, incidentes, ordem }))
 			: null,
 		minhaDelegacao
 			? ler('bilhetes', ['mensagem'], () =>

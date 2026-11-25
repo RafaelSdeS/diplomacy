@@ -13,6 +13,8 @@
 	import { supabase } from '#lib/supabase.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import NomeDelegacao from '#lib/ui/NomeDelegacao.svelte';
+	import FileInput from '@lucide/svelte/icons/file-input';
+	import Modal from '#lib/ui/Modal.svelte';
 	import { sugerirVerbos } from '#lib/verbos.ts';
 	import type { PageProps } from './$types';
 
@@ -183,10 +185,18 @@
 		);
 	}
 
-	async function trazer() {
-		if (await executar(supabase.rpc('importar_clausulas', { p_documento: d.id, p_clausulas: paraTrazer }), t('Cláusulas trazidas.')))
+	async function trazer(clausulas = paraTrazer) {
+		if (await executar(supabase.rpc('importar_clausulas', { p_documento: d.id, p_clausulas: clausulas }), t('Cláusulas trazidas.'))) {
 			paraTrazer = [];
+			modalTrazer?.fechar();
+		}
 	}
+	// Passo 56: "Trazer de working papers" num modal, na barra do documento; o projeto diz de
+	// quais working papers veio (a origem de cada cláusula).
+	let modalTrazer = $state<Modal>();
+	const baseadoEm = $derived(
+		data.workingPapers.filter((wp) => wp.clausulas.some((c) => data.clausulas.some((x) => x.origem_id === c.id))).map((wp) => nomeDoDocumento(wp))
+	);
 </script>
 
 <svelte:head>
@@ -202,7 +212,15 @@
 	<span class="selo {STATUS_DOCUMENTO[d.status].selo}">{STATUS_DOCUMENTO[d.status].rotulo}</span>
 	{#if d.ponto_pauta}<span class="suave">{t('Subtópico')}: {d.ponto_pauta.texto}</span>{/if}
 	{#if d.aprovacao}<span class="suave">{d.aprovacao === 'consenso' ? t('Aprovação por consenso') : t('Aprovação por votação')}</span>{/if}
+	{#if baseadoEm.length}<span class="suave">{t('Baseado em')}: {baseadoEm.join(', ')}</span>{/if}
 </p>
+{#if data.souRedator && editavel && d.tipo !== 'working_paper'}
+	<div class="acoes">
+		<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => modalTrazer?.abrir()}
+			><FileInput aria-hidden="true" size={16} strokeWidth={1.75} /> {t('Trazer de working papers')}</button
+		>
+	</div>
+{/if}
 
 <div class="progresso">
 	<label for="progresso">{t('{n} de {total} acordadas', { n: acordadas, total: data.clausulas.length })}</label>
@@ -539,24 +557,33 @@
 	{/if}
 </section>
 
-{#if data.souRedator && editavel && d.tipo !== 'working_paper' && data.workingPapers.length}
+<Modal bind:this={modalTrazer} rotulo="t-fusao" classe="modal-largo">
 	<section aria-labelledby="t-fusao">
-		<h2 id="t-fusao">{t('Trazer cláusulas de working papers')}</h2>
-		<div class="propostas">
-			{#each data.workingPapers as wp (wp.id)}
-				<fieldset class="cartao opcoes">
-					<legend>{nomeDoDocumento(wp)}</legend>
-					{#each wp.clausulas as c (c.id)}
-						<label class="opcao"><input type="checkbox" value={c.id} bind:group={paraTrazer} /> {c.texto}</label>
-					{/each}
-				</fieldset>
-			{/each}
+		<h3 id="t-fusao">{t('Trazer cláusulas de working papers')}</h3>
+		<p class="suave">{d.topico ? t('Os working papers do tópico {n}, de qualquer bloco; os aprovados pela mesa primeiro.', { n: d.topico }) : t('Os working papers do comitê.')}</p>
+		{#each data.workingPapers as wp (wp.id)}
+			<fieldset class="cartao opcoes">
+				<legend>{nomeDoDocumento(wp)} <span class="detalhe">{wp.bloco?.nome}</span> {#if STATUS_DOCUMENTO[wp.status]}<span class="selo {STATUS_DOCUMENTO[wp.status].selo}">{STATUS_DOCUMENTO[wp.status].rotulo}</span>{/if}</legend>
+				{#each wp.clausulas as c (c.id)}
+					<label class="opcao"><input type="checkbox" value={c.id} bind:group={paraTrazer} /> {c.texto}</label>
+				{/each}
+				{#if wp.clausulas.length}
+					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => trazer(wp.clausulas.map((c) => c.id))}
+						>{t('Trazer todas as cláusulas')}</button
+					>
+				{/if}
+			</fieldset>
+		{:else}
+			<p class="suave">{t('Ainda não há working papers neste tópico.')}</p>
+		{/each}
+		<div class="acoes">
+			<button class="botao" type="button" disabled={!paraTrazer.length} onclick={() => trazer()}>
+				{t('Trazer {n} cláusulas para este documento', { n: paraTrazer.length || '' })}
+			</button>
+			<button class="botao botao--secundario" type="button" onclick={() => modalTrazer?.fechar()}>{t('Fechar')}</button>
 		</div>
-		<button class="botao botao--secundario" type="button" disabled={!paraTrazer.length} onclick={trazer}>
-			{t('Trazer {n} cláusulas para este documento', { n: paraTrazer.length || '' })}
-		</button>
 	</section>
-{/if}
+</Modal>
 
 {#if d.tipo !== 'working_paper' && (d.status === 'aprovado_mesa' || data.emendas.length)}
 	<section class="cartao" aria-labelledby="t-emendas">
