@@ -63,5 +63,6 @@ test('"Sobre o Diplomacy" abre sem login, com os créditos, e leva a "Meus dados
 	await expect(page.getByRole('heading', { level: 1, name: 'Sobre o Diplomacy' })).toBeVisible();
 	await expect(page.getByRole('link', { name: 'Rafael Silva de Souza' })).toHaveAttribute('href', 'https://rafaelsdes.github.io/');
 	await expect(page.getByRole('link', { name: 'Meus dados (LGPD)' })).toHaveAttribute('href', '/perfil/meus-dados');
+	await expect(page.getByRole('link', { name: 'rafesilvadesouza@gmail.com' })).toHaveAttribute('href', 'mailto:rafesilvadesouza@gmail.com');
 	expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 });

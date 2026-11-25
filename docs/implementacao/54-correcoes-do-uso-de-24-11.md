@@ -74,7 +74,7 @@ Hoje "Meus dados (LGPD)" é um botão no Perfil, e o aviso de privacidade aparec
   - os créditos: "Criado e desenvolvido por **Rafael Silva de Souza**", com link para <https://rafaelsdes.github.io/> (decidido em 24/11/2026);
   - a versão (o commit do build);
   - os links para "Meus dados (LGPD)", com baixar, corrigir e pedir exclusão (o que `/perfil/meus-dados` já faz), e para o aviso de privacidade;
-  - o contato do encarregado de dados. **Pendente:** o contato não existe ainda; a página diz que o encarregado é a organização do evento (a controladora). Entra com o texto final do aviso de privacidade.
+  - o contato do encarregado de dados: Rafael Silva de Souza, por e-mail (decidido em 25/11/2026), também no aviso de privacidade.
 - Os textos traduzidos ficam em constantes `.ts` (o `npm run textos` recusa texto solto em `.svelte`).
 
 

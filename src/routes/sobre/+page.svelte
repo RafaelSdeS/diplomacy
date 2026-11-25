@@ -1,7 +1,7 @@
 <script lang="ts">
 	// Passo 54: a página discreta "Sobre": o que é o app, os créditos, a versão e os dados
 	// pessoais (LGPD). Abre sem login, como o aviso de privacidade.
-	import { tituloDaAba, APP, CRIADOR } from '#lib/titulo.svelte.ts';
+	import { tituloDaAba, APP, CRIADOR, ENCARREGADO } from '#lib/titulo.svelte.ts';
 	import { t } from '#lib/i18n.svelte.ts';
 </script>
 
@@ -27,5 +27,5 @@
 		<a class="botao botao--secundario" href="/perfil/meus-dados">{t('Meus dados (LGPD)')}</a>
 		<a class="botao botao--secundario" href="/privacidade">{t('Aviso de privacidade')}</a>
 	</div>
-	<p class="suave">{t('Encarregado de dados: a organização do evento, que é a controladora dos dados.')}</p>
+	<p>{t('Encarregado de dados')}: {ENCARREGADO.nome}, <a href={`mailto:${ENCARREGADO.email}`}>{ENCARREGADO.email}</a></p>
 </section>

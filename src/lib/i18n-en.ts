@@ -1404,7 +1404,7 @@ export const EN: Record<string, string> = {
 	'Versão': 'Version',
 	'Seus dados (LGPD)': 'Your data (LGPD)',
 	'Baixe tudo o que o app guarda sobre você, corrija o seu nome ou peça a exclusão da conta.': 'Download everything the app keeps about you, correct your name or ask for your account to be deleted.',
-	'Encarregado de dados: a organização do evento, que é a controladora dos dados.': 'Data protection officer: the event organization, which controls the data.',
+	'Encarregado de dados': 'Data protection officer',
 };
 
 /** Mensagens do banco com partes variáveis: [padrão em português, tradução]. */

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { tituloDaAba } from '#lib/titulo.svelte.ts';
+	import { ENCARREGADO, tituloDaAba } from '#lib/titulo.svelte.ts';
 </script>
 
 <svelte:head>
@@ -55,5 +55,8 @@
 	<p>
 		Em <a href="/perfil/meus-dados">Perfil → Meus dados</a>, você baixa tudo o que o app guarda sobre você, corrige o seu
 		nome e pede a exclusão da sua conta.
+	</p>
+	<p>
+		Encarregado de dados: {ENCARREGADO.nome}, <a href={`mailto:${ENCARREGADO.email}`}>{ENCARREGADO.email}</a>.
 	</p>
 </section>
