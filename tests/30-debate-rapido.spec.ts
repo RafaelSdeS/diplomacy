@@ -36,7 +36,7 @@ test('a presidência escolhe a lista curta, e a pausa para pontos e moções vem
 	await aoVivo(page);
 
 	// Lista curta: França e Alemanha, nessa ordem.
-	const fila = page.getByRole('region', { name: 'Pedidos de fala' });
+	const fila = page.getByRole('region', { name: 'Placas levantadas' });
 	await fila.getByRole('button', { name: 'Escolher para a lista curta: França' }).click();
 	await fila.getByRole('button', { name: 'Escolher para a lista curta: Alemanha' }).click();
 	await expect(fila.getByRole('button', { name: 'Escolher para a lista curta: França' })).toHaveText('1º');
@@ -70,7 +70,7 @@ test('a presidência escolhe a lista curta, e a pausa para pontos e moções vem
 	await expect(page.getByRole('region', { name: 'Há pontos ou moções?' })).toBeVisible();
 	await expect(telao.locator('.telao-pausa')).toHaveText('Há pontos ou moções?');
 	const pausa = alemanha.getByRole('article', { name: 'Há pontos ou moções?' });
-	await pausa.getByRole('button', { name: 'Fazer um ponto ou moção' }).click();
+	await pausa.getByRole('button', { name: 'Fazer agora' }).click();
 	await expect(alemanha.locator('#tipo-ponto')).toBeFocused();
 
 	// A presidência encerra a pausa e baixa as placas.

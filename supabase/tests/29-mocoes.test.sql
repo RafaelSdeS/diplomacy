@@ -75,8 +75,11 @@ select results_eq($$select status, motivo from public.ponto_mocao where id = pg_
 -- A mesa concedendo direto, ou o bureau presidindo, é um toque só
 
 select public.enviar_ponto('00000000-0000-0000-0000-0000000000c1', 'ponto_ordem');
+-- Passo 59: com a delegação presidindo, a mesa só conduz se assumir (caso excepcional).
+reset role;
+update public.estado_sessao set mesa_assumiu = true where comite_id = '00000000-0000-0000-0000-0000000000c1';
 select pg_temp.entrar(3);
-select lives_ok($$select public.responder_ponto(pg_temp.ponto('ponto_ordem'), 'aceito')$$, 'a mesa concede direto: o julgamento está implícito');
+select lives_ok($$select public.responder_ponto(pg_temp.ponto('ponto_ordem'), 'aceito')$$, 'a mesa que assumiu concede direto: o julgamento está implícito');
 
 reset role;
 update public.estado_sessao set mesa_assumiu = true where comite_id = '00000000-0000-0000-0000-0000000000c1';

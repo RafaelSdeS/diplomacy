@@ -23,7 +23,7 @@ test('no notebook, o painel da presidência cabe na tela: a página não rola', 
 	await page.goto(PAINEL);
 	await aoVivo(page);
 	const altura = page.viewportSize()!.height;
-	for (const nome of ['Com a palavra', 'Pedidos de fala', 'Para decidir']) {
+	for (const nome of ['Com a palavra', 'Placas levantadas', 'Para decidir']) {
 		const caixa = await page.getByRole('region', { name: nome }).boundingBox();
 		expect(caixa!.y, `${nome} começa na primeira tela`).toBeLessThan(altura - 100);
 	}
@@ -86,7 +86,7 @@ test('no painel, o nome da delegação abre a ficha sem sair da tela', async ({ 
 	await entrar(page, MESA);
 	await page.goto(PAINEL);
 	await aoVivo(page);
-	await page.getByRole('region', { name: 'Pedidos de fala' }).getByRole('button', { name: 'EUA', exact: true }).click();
+	await page.getByRole('region', { name: 'Placas levantadas' }).getByRole('button', { name: 'EUA', exact: true }).click();
 	const ficha = page.getByRole('dialog', { name: 'EUA' });
 	await expect(ficha).toBeVisible();
 	await expect(ficha.getByRole('link', { name: 'Abrir a página da delegação' })).toBeVisible();

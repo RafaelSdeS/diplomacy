@@ -3,11 +3,12 @@ import { carregarOrdem } from '#lib/ordem.ts';
 import { carregarSessao } from '#lib/sessao.ts';
 import { supabase } from '#lib/supabase.ts';
 import { lerAoVivo } from '#lib/tempo-real.ts';
+import { redirect } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
 
 export const load: PageLoad = async ({ parent, depends }) => {
 	depends('app:sessao-ao-vivo');
-	const { comite } = await parent();
+	const { comite, participacoes } = await parent();
 	const [dados, incidentes, ordem] = await Promise.all([carregarSessao(comite.id), carregarIncidentes(comite.id), carregarOrdem(comite.id)]);
 	// As votações encerradas desta sessão, com os votos de cada delegação (passo 23).
 	const sessao = dados.estado?.sessao?.id;
@@ -22,5 +23,8 @@ export const load: PageLoad = async ({ parent, depends }) => {
 			)
 		: { data: [], error: null };
 	if (votacoes.error) throw votacoes.error;
+	// Passo 59: para a delegação que preside, a sessão é o painel (ela conduz, vota e fala dali).
+	const ehMesa = participacoes.some((p) => (p.papel === 'mesa' && p.comite_id === comite.id) || p.papel === 'secretaria');
+	if (dados.podePresidir && !ehMesa) redirect(307, `/comite/${comite.sigla}/sessao/presidencia`);
 	return { ...dados, votacoes: votacoes.data, incidentes, ordem };
 };

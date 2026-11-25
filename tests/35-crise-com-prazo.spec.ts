@@ -75,7 +75,7 @@ test('a crise deixa o Brasil sem voz, toma o telão e, no fim, devolve a voz', a
 	await aoVivo(brasil);
 	await expect(brasil.getByRole('alert').filter({ hasText: 'impedida pela crise' })).toContainText('Delegado sequestrado');
 	// Sem voz: o formulário de ponto ou moção some (e a placa, fora da plenária).
-	await expect(brasil.getByRole('region', { name: 'Ponto ou moção' })).toHaveCount(0);
+	await expect(brasil.getByRole('button', { name: 'Fazer um ponto ou moção' })).toHaveCount(0);
 
 	// A equipe encerra a crise: resolvida.
 	const encerrar = page.getByRole('form', { name: `Encerrar: ${TITULO}` });
@@ -84,5 +84,5 @@ test('a crise deixa o Brasil sem voz, toma o telão e, no fim, devolve a voz', a
 	await expect(page.getByRole('status').filter({ hasText: 'Crise encerrada.' })).toBeVisible();
 	await expect(modoCrise).toContainText('Resolvida: O delegado foi libertado.');
 	if (process.env.CAPTURAS) await expect(telao).toHaveScreenshot('telao-desfecho.png', { mask: mascaras, stylePath: OCULTAR_RODIZIO });
-	await expect(brasil.getByRole('region', { name: 'Ponto ou moção' })).toBeVisible();
+	await expect(brasil.getByRole('button', { name: 'Fazer um ponto ou moção' })).toBeVisible();
 });

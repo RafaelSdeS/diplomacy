@@ -27,7 +27,7 @@ test('a 1366 × 768, a placa e as placas levantadas ficam no cartão "A palavra"
 	await aoVivo(page);
 	const palavra = page.getByRole('article', { name: 'A palavra' });
 	await palavra.getByRole('button', { name: 'Levantar placa' }).click();
-	await expect(palavra).toContainText('1ª na fila');
+	await expect(palavra).toContainText('Placa levantada');
 	await palavra.getByRole('button', { name: /^Placas levantadas/ }).click();
 	await expect(page.getByRole('dialog', { name: 'Placas levantadas' })).toContainText('Alemanha');
 	await page.keyboard.press('Escape');

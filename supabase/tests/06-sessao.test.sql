@@ -1,7 +1,7 @@
 -- Passo 06: sessão, chamada, rodízio da presidência, placa, cronômetro, pontos.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(38);
+select plan(39);
 
 -- Cenário: C1 com 15 delegações (d01..d0f); a1 delegado de d01, a2 delegado de
 -- d02, a3 mesa de C1, a4 delegado de d03.
@@ -184,7 +184,7 @@ select throws_ok(
 			'00000000-0000-0000-0000-000000000009')$$,
 	'42501', null, 'só a mesa faz a chamada');
 
--- Sessão 2: preside a primeira do rodízio; passada, a segunda, depois a terceira
+-- Sessão 2: preside a primeira do rodízio
 
 select pg_temp.entrar('00000000-0000-0000-0000-0000000000a3');
 select public.abrir_sessao('00000000-0000-0000-0000-0000000000c1');
@@ -205,11 +205,18 @@ select throws_ok(
 	$$select public.dar_palavra('00000000-0000-0000-0000-0000000000c1', null)$$,
 	'42501', null, 'um delegado de outra delegação não dá a palavra');
 
+-- Passo 59: com uma delegação presidindo, a mesa não conduz (é só bureau). A da vez faltou
+-- à chamada: a mesa passa à próxima presente, e a ausente fica com a vez.
 select pg_temp.entrar('00000000-0000-0000-0000-0000000000a3');
-select public.passar_presidencia('00000000-0000-0000-0000-0000000000c1');
-select is(pg_temp.presidencia(), (select delegacao_id from ordem where ordem = 2), 'passada, vai para a segunda sorteada');
-select public.passar_presidencia('00000000-0000-0000-0000-0000000000c1');
-select is(pg_temp.presidencia(), (select delegacao_id from ordem where ordem = 3), 'passada de novo, vai para a terceira');
+select ok(not public.pode_presidir('00000000-0000-0000-0000-0000000000c1'), 'com uma delegação presidindo, a mesa não conduz');
+reset role;
+insert into public.presenca (sessao_id, comite_id, delegacao_id)
+values (public.sessao_atual('00000000-0000-0000-0000-0000000000c1'), '00000000-0000-0000-0000-0000000000c1', (select delegacao_id from ordem where ordem = 3));
+select pg_temp.entrar('00000000-0000-0000-0000-0000000000a3');
+select public.presidencia_ausente('00000000-0000-0000-0000-0000000000c1');
+select is(pg_temp.presidencia(), (select delegacao_id from ordem where ordem = 3), 'a da vez ausente: assume a próxima presente');
+select is((select vezes from public.rodizio_presidencia r join ordem o on o.delegacao_id = r.delegacao_id where o.ordem = 1), 0,
+	'e a ausente não gasta a vez');
 
 -- Na fase de ação, o bureau preside, e a presidência não é passada.
 reset role;
@@ -217,9 +224,7 @@ update public.estado_sessao set fase = 'acao';
 select pg_temp.entrar('00000000-0000-0000-0000-0000000000a4'); -- d03, a delegação da vez
 select ok(not public.pode_presidir('00000000-0000-0000-0000-0000000000c1'), 'na fase de ação, a delegação da vez não preside');
 select pg_temp.entrar('00000000-0000-0000-0000-0000000000a3');
-select throws_ok(
-	$$select public.passar_presidencia('00000000-0000-0000-0000-0000000000c1')$$,
-	'42501', null, 'na fase de ação, a presidência não é passada');
+select ok(public.pode_presidir('00000000-0000-0000-0000-0000000000c1'), 'na fase de ação, a mesa (bureau) preside');
 reset role;
 
 select * from finish();

@@ -40,7 +40,7 @@ export async function carregarSessao(comiteId: string) {
 		ler('estado', TABELAS_DO_ESTADO, () => supabase
 			.from('estado_sessao')
 			.select(
-				`forma, fase, etapa_plenaria, topico_atual, ordem_topicos, mesa_assumiu, tempo_fala_seg,
+				`forma, fase, etapa_plenaria, topico_atual, ordem_topicos, mesa_assumiu, motivo_mesa, tempo_fala_seg,
 				cronometro_inicio, cronometro_duracao_seg, cronometro_pausado_restante_seg,
 				debate_inicio, debate_duracao_seg, debate_pausado_restante_seg, debate_total_seg, pausa_ate,
 				orador:delegacao(id, nome, bandeira),

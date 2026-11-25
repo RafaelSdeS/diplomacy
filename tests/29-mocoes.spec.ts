@@ -18,7 +18,7 @@ test.beforeEach(({}, info) => {
 
 test.beforeAll(async ({}, info) => {
 	if (info.project.name !== 'notebook') return;
-	const { mesa, comite } = await comiteEmDebate(MESA, C.sigla, ALEMANHA);
+	const { mesa, comite } = await comiteEmDebate(MESA, C.sigla, ALEMANHA, { mesaConduz: false });
 	// Uma delegação na presidência: sorteia o rodízio e reabre a sessão no debate.
 	const presidencia = await mesa.from('estado_sessao').select('sessao(presidencia_delegacao_id)').eq('comite_id', comite).single();
 	if (!presidencia.data?.sessao?.presidencia_delegacao_id) {

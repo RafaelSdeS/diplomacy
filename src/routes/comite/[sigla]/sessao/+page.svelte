@@ -3,6 +3,7 @@
 	import { contador } from '#lib/contador.ts';
 	import { t } from '#lib/i18n.svelte.ts';
 	import { invalidate } from '$app/navigation';
+	import { page } from '$app/state';
 	import {
 		descreverPonto,
 		FORMAS,
@@ -114,6 +115,10 @@
 	let modalPlacas = $state<Modal>();
 	const naListaCurta = $derived((sessao?.proximos ?? []).findIndex((p) => p.delegacao?.id === eu?.delegacao_id));
 	// Passo 51: o ponto ou moção abre no modal, com o foco já no tipo.
+	// Passo 59: a Agora leva direto ao ponto ou moção (?ponto).
+	$effect(() => {
+		if (novoPonto && page.url.searchParams.has('ponto')) untrack(irAoPonto);
+	});
 	function irAoPonto() {
 		novoPonto?.abrir();
 		document.getElementById('tipo-ponto')?.focus();
@@ -180,6 +185,51 @@
 
 <!-- Passo 43: só o que é da sessão, no topo (documentos e mensagens estão no menu). -->
 <nav class="nesta-sessao" aria-label={t('Telas da sessão')}>
+	<!-- Passo 59: ponto ou moção é de alta prioridade: o primeiro botão da sessão. -->
+	{#if eu && data.estado && !restrita && !impedida}
+		<AcaoEmModal
+			bind:this={novoPonto}
+			rotulo={t('Fazer um ponto ou moção')}
+			icone={Hand}
+			titulo={t('Ponto ou moção')}
+			descricao={t('O pedido vai à mesa, que julga se está em ordem.')}
+		>
+			<form class="formulario" onsubmit={enviarPonto} aria-label={t('Ponto ou moção')}>
+				<label class="campo">
+					{t('Tipo')}
+					<select id="tipo-ponto" bind:value={tipoPonto}>
+						{#each tiposEmOrdem as tipo (tipo)}
+							<option value={tipo}>{PONTOS[tipo]}</option>
+						{/each}
+					</select>
+				</label>
+				{#if tipoPonto === 'topico_no_topo'}
+					<label class="campo">
+						{t('Tópico')}
+						<select bind:value={topico}>
+							{#each data.comite.topicos as tp, i (tp)}
+								<option value={i + 1}>{i + 1}. {tp}</option>
+							{/each}
+						</select>
+					</label>
+				{:else if tipoPonto === 'informal_informal'}
+					<label class="campo campo--curto">
+						{t('Minutos (até {n} por sessão)', { n: data.regras.informal_informal_max_min })}
+						<input type="number" min="1" max={data.regras.informal_informal_max_min} required bind:value={minutos} />
+					</label>
+				{/if}
+				<label class="campo">
+					{t('Detalhe (opcional)')}
+					<textarea maxlength="300" bind:value={detalhe} {@attach contador(detalhe)}></textarea>
+				</label>
+				{#if erro}<p class="erro">{erro}</p>{/if}
+				<div class="acoes">
+					<button class="botao">{t('Enviar à mesa')}</button>
+					<button class="botao botao--secundario" type="button" onclick={() => novoPonto?.fechar()}>{t('Cancelar')}</button>
+				</div>
+			</form>
+		</AcaoEmModal>
+	{/if}
 	{#if data.podePresidir}
 		<a class="botao" href={`/comite/${data.comite.sigla}/sessao/presidencia`}>{t('Painel da presidência')}</a>
 	{/if}
@@ -211,6 +261,7 @@
 	<QuemPreside
 		fase={data.fase}
 		mesaAssumiu={data.estado.mesa_assumiu}
+		motivo={data.estado.motivo_mesa}
 		presidencia={sessao.presidencia}
 		minhaDelegacao={eu?.delegacao_id}
 		sigla={data.comite.sigla}
@@ -246,6 +297,7 @@
 	{/if}
 
 	{#if minhaVez}<p class="sua-vez" role="status">{t('A palavra é sua')}</p>{/if}
+	{#if page.url.searchParams.has('fim-da-presidencia')}<p class="telegrama" role="status">{t('A presidência da sua delegação terminou.')}</p>{/if}
 
 	<!-- Passo 43: no notebook, o que a delegação faz à esquerda e o que acontece na sala à
 	     direita; no celular, a ação vem primeiro. Passo 54: sem delegação (mesa, crise, press),
@@ -257,7 +309,7 @@
 			{#if momento === 'pausa' && eu && !restrita && !impedida}
 				<article class="cartao cartao--destaque pausa-pontos" aria-labelledby="c-pausa">
 					<h2 id="c-pausa">{t('Há pontos ou moções?')}</h2>
-					<button class="botao" type="button" onclick={irAoPonto}>{t('Fazer um ponto ou moção')}</button>
+					<button class="botao" type="button" onclick={irAoPonto}>{t('Fazer agora')}</button>
 				</article>
 			{/if}
 			{#if eu && !minhaPresenca && minhaSituacao !== 'suspensa'}
@@ -321,54 +373,10 @@
 				</article>
 			{/if}
 		{#if eu && !restrita && !impedida}
+			<!-- Passo 59: fazer um ponto ou moção fica no topo (barra da sessão); aqui, só os pedidos. -->
+			{#if meusPontos.length}
 			<section class="cartao" aria-labelledby="t-ponto">
-				<h2 id="t-ponto">{t('Ponto ou moção')}</h2>
-				<!-- Passo 51: o cartão mostra os seus pedidos; fazer um abre o modal. -->
-				<div class="acoes">
-					<AcaoEmModal
-						bind:this={novoPonto}
-						rotulo={t('Fazer um ponto ou moção')}
-						icone={Hand}
-						titulo={t('Ponto ou moção')}
-						descricao={t('O pedido vai à mesa, que julga se está em ordem.')}
-					>
-						<form class="formulario" onsubmit={enviarPonto} aria-label={t('Ponto ou moção')}>
-							<label class="campo">
-								{t('Tipo')}
-								<select id="tipo-ponto" bind:value={tipoPonto}>
-									{#each tiposEmOrdem as tipo (tipo)}
-										<option value={tipo}>{PONTOS[tipo]}</option>
-									{/each}
-								</select>
-							</label>
-							{#if tipoPonto === 'topico_no_topo'}
-								<label class="campo">
-									{t('Tópico')}
-									<select bind:value={topico}>
-										{#each data.comite.topicos as tp, i (tp)}
-											<option value={i + 1}>{i + 1}. {tp}</option>
-										{/each}
-									</select>
-								</label>
-							{:else if tipoPonto === 'informal_informal'}
-								<label class="campo campo--curto">
-									{t('Minutos (até {n} por sessão)', { n: data.regras.informal_informal_max_min })}
-									<input type="number" min="1" max={data.regras.informal_informal_max_min} required bind:value={minutos} />
-								</label>
-							{/if}
-							<label class="campo">
-								{t('Detalhe (opcional)')}
-								<textarea maxlength="300" bind:value={detalhe} {@attach contador(detalhe)}></textarea>
-							</label>
-							{#if erro}<p class="erro">{erro}</p>{/if}
-							<div class="acoes">
-								<button class="botao">{t('Enviar à mesa')}</button>
-								<button class="botao botao--secundario" type="button" onclick={() => novoPonto?.fechar()}>{t('Cancelar')}</button>
-							</div>
-						</form>
-					</AcaoEmModal>
-				</div>
-				{#if meusPontos.length}
+				<h2 id="t-ponto">{t('Seus pontos e moções')}</h2>
 					<ul class="lista" aria-label={t('Seus pontos e moções')}>
 						{#each meusPontos as ponto (ponto.id)}
 							<li>
@@ -381,8 +389,8 @@
 							</li>
 						{/each}
 					</ul>
-				{/if}
 			</section>
+			{/if}
 
 			<Modal classe="placa" bind:this={placa} nome="Placa de {eu.delegacao_nome}">
 				<Bandeira codigo={eu.delegacao_bandeira} />
@@ -502,13 +510,14 @@
 
 <Modal bind:this={modalPlacas} nome={t('Placas levantadas')} classe="modal-acao">
 	<h3>{t('Placas levantadas')}</h3>
-	<ol class="lista">
-		{#each fila as pedido (pedido.id)}
-			<li><NomeDelegacao ficha sigla={data.comite.sigla} delegacao={pedido.delegacao} /></li>
+	<!-- Passo 59: as placas não são uma ordem; quem fala é a presidência que escolhe. -->
+	<ul class="lista">
+		{#each [...fila].sort((a, b) => (a.delegacao?.nome ?? '').localeCompare(b.delegacao?.nome ?? '')) as pedido (pedido.id)}
+			<li><NomeDelegacao sigla={data.comite.sigla} delegacao={pedido.delegacao} /></li>
 		{:else}
 			<li class="suave">{t('Nenhuma placa levantada.')}</li>
 		{/each}
-	</ol>
+	</ul>
 	<form method="dialog" class="acoes"><button class="botao botao--secundario">{t('Fechar')}</button></form>
 </Modal>
 

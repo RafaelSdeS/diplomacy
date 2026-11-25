@@ -130,7 +130,7 @@ export async function adotarAgenda(contaMesa: string, sigla: string, topico: num
  * Deixa o comitê com sessão aberta, todas as delegações presentes e na fase de debate
  * (passa pela plenária de abertura pela API, se preciso). Devolve a mesa e o comitê.
  */
-export async function comiteEmDebate(contaMesa: string, sigla: string, contaDelegado: string) {
+export async function comiteEmDebate(contaMesa: string, sigla: string, contaDelegado: string, { mesaConduz = true } = {}) {
 	const ok = <T>(r: { data: T; error: { message: string } | null }) => {
 		if (r.error) throw new Error(r.error.message);
 		return r.data as NonNullable<T>;
@@ -155,5 +155,8 @@ export async function comiteEmDebate(contaMesa: string, sigla: string, contaDele
 		for (const p of presentes) ok(await mesa.rpc('registrar_voto', { p_votacao: votacao, p_delegacao: p.delegacao_id, p_escolha: 'a_favor' }));
 		ok(await mesa.rpc('encerrar_votacao', { p_votacao: votacao }));
 	}
+	// Passo 59: com a delegação da vez no debate, a mesa só conduz se assumir (caso excepcional).
+	// Os testes que exercitam a condução usam a mesa assim; os do bureau pedem mesaConduz: false.
+	ok(await mesa.rpc('assumir_presidencia', { p_comite: comite, p_assumir: mesaConduz }));
 	return { mesa, comite };
 }

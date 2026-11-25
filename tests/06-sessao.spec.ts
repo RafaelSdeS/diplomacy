@@ -176,7 +176,7 @@ test('no debate, preside a delegação sorteada, e um pedido de fala chega ao pa
 	outra = PRESENTES.find((n) => n !== preside)!;
 
 	const painel = await abrir(browser, C.conta(contaDaDelegacao(preside)), PRESIDENCIA);
-	const fila = painel.getByRole('region', { name: 'Pedidos de fala' });
+	const fila = painel.getByRole('region', { name: 'Placas levantadas' });
 	await expect(
 		painel.getByRole('navigation', { name: 'Principal' }).getByRole('link', { name: 'Sessão' })
 	).toHaveAttribute('aria-current', 'true');
@@ -184,15 +184,21 @@ test('no debate, preside a delegação sorteada, e um pedido de fala chega ao pa
 	const delegado = await abrir(browser, C.conta(contaDaDelegacao(outra)), SESSAO);
 	await delegado.getByRole('button', { name: 'Levantar placa' }).click();
 	await expect(fila).toContainText(outra, { timeout: 1_000 });
-	await expect(delegado.getByRole('article', { name: 'A palavra' })).toContainText('1ª na fila');
+	await expect(delegado.getByRole('article', { name: 'A palavra' })).toContainText('Placa levantada');
 	await Promise.all([painel, delegado].map((p) => p.context().close()));
 });
 
 test('Enter dá a palavra ao próximo, e os dois aparelhos mostram o mesmo tempo', async ({ browser }) => {
 	const painel = await abrir(browser, C.conta(contaDaDelegacao(preside)), PRESIDENCIA);
-	await expect(painel.getByRole('region', { name: 'Pedidos de fala' })).toContainText(outra);
+	await expect(painel.getByRole('region', { name: 'Placas levantadas' })).toContainText(outra);
 	const delegado = await abrir(browser, C.conta(contaDaDelegacao(outra)), SESSAO);
 
+	// Passo 59: a placa não é ordem; o Enter dá a palavra ao primeiro dos próximos, que a
+	// presidência escolhe.
+	const placas = painel.getByRole('region', { name: 'Placas levantadas' });
+	await placas.getByRole('button', { name: `Escolher para a lista curta: ${outra}` }).click();
+	await placas.getByRole('button', { name: /^Definir os próximos/ }).click();
+	await expect(painel.getByRole('region', { name: 'Próximos' })).toContainText(outra);
 	await painel.keyboard.press('Enter');
 	await expect(painel.getByRole('region', { name: 'Com a palavra' })).toContainText(outra);
 	await expect(delegado.getByRole('article', { name: 'A palavra' })).toContainText(outra);
@@ -225,7 +231,7 @@ test('Espaço pausa e retoma o cronômetro, mas não dentro de um campo', async 
 	await painel.getByLabel('Tempo de fala (segundos)').press('Space');
 	await expect(palavra.getByRole('status')).toHaveText('Pausado');
 	await delegado.getByRole('button', { name: 'Levantar placa' }).click();
-	await expect(painel.getByRole('region', { name: 'Pedidos de fala' })).toContainText(outra);
+	await expect(painel.getByRole('region', { name: 'Placas levantadas' })).toContainText(outra);
 	await expect(painel.getByLabel('Tempo de fala (segundos)')).toHaveValue('120');
 
 	await painel.keyboard.press('Escape'); // fecha os ajustes (passo 51: um modal)
@@ -317,9 +323,8 @@ test('a agenda informal: propostas em tópicos, lado a lado, e a mesa adota uma'
 	await mesa.getByRole('dialog').getByRole('button', { name: 'Adotar esta' }).click();
 	const adotada = mesa.getByRole('article', { name: 'Agenda adotada' });
 	await expect(adotada).toContainText('A.1 Financiamento');
-	const andamento = adotada.getByRole('combobox', { name: 'Andamento de A. Causas' });
-	await andamento.selectOption('em_debate');
-	await expect(andamento).toHaveValue('em_debate');
+	// O andamento dos itens fica com quem conduz (no debate, a delegação da vez; passo 59), e o
+	// passo 22 o testa com a mesa na plenária.
 	await Promise.all([delegado, mesa].map((p) => p.context().close()));
 });
 
@@ -381,7 +386,7 @@ for (const tema of ['light', 'dark'] as const) {
 		await page.emulateMedia({ colorScheme: tema });
 		await entrar(page, C.conta(contaDaDelegacao(preside)));
 		for (const [rota, titulo] of [
-			[SESSAO, /^Sessão/],
+			[SESSAO, /^Presidência/], // passo 59: para quem preside, a sessão é o painel
 			[PRESIDENCIA, 'Presidência'],
 			[AGENDA, 'Agenda']
 		] as const) {
@@ -402,16 +407,17 @@ for (const tema of ['light', 'dark'] as const) {
 	});
 }
 
-test('a presidência passada vai para a próxima delegação sorteada', async ({ browser }) => {
+// Passo 59: uma presidência por vez. A delegação da vez conduz, vota e fala no painel; a
+// mesa vê só o bureau; não há "Passar a presidência".
+test('uma presidência por vez: a delegação conduz e vota no painel; a mesa vê o bureau', async ({ browser }) => {
 	const painel = await abrir(browser, C.conta(contaDaDelegacao(preside)), PRESIDENCIA);
-	const mesa = await abrir(browser, C.conta(CONTAS.mesa), SESSAO);
-
-	await painel.getByRole('button', { name: 'Passar a presidência' }).click();
-	await painel.getByRole('dialog').getByRole('button', { name: 'Passar a presidência' }).click();
-	await expect(painel.getByText('Você não preside esta sessão.')).toBeVisible();
-	const quem = mesa.locator('.quem-preside strong');
-	await expect(quem).not.toHaveText(preside);
-	await expect(quem).not.toHaveText('Mesa');
-	await expect(quem).not.toBeEmpty();
+	await expect(painel.getByRole('button', { name: 'Passar a presidência' })).toHaveCount(0);
+	await expect(painel.getByRole('region', { name: /^Sua delegação/ })).toBeVisible();
+	const mesa = await abrir(browser, C.conta(CONTAS.mesa), PRESIDENCIA);
+	await expect(mesa.getByRole('region', { name: 'A mesa como bureau' })).toContainText(preside);
+	await expect(mesa.getByRole('button', { name: 'Pausar' })).toHaveCount(0);
+	// A delegação que preside, ao abrir a sessão, vai direto ao painel.
+	await painel.goto(SESSAO);
+	await expect(painel).toHaveURL(PRESIDENCIA);
 	await Promise.all([painel, mesa].map((p) => p.context().close()));
 });

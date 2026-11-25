@@ -35,7 +35,7 @@
 			? listaCurta
 			: lista.length
 				? lista.map((i) => ({ id: i.id, delegacao: i.delegacao }))
-				: (sessao?.pedidos ?? [])
+				: [...(sessao?.pedidos ?? [])].sort((a, b) => (a.delegacao?.nome ?? '').localeCompare(b.delegacao?.nome ?? ''))
 		).slice(0, 4)
 	);
 	let agora = $state(Date.now());
@@ -172,14 +172,14 @@
 			{#if data.votacao && !data.votacao.aberta}
 				<p class="telao-resultado">{data.votacao.objeto}. {textoResultado(data.votacao)}</p>
 			{/if}
-			<p class="rotulo">{listaCurta.length ? t('Próximos') : lista.length ? (emDiscussao ? t('Lista especial') : t('Lista de oradores')) : t('Próximos')}</p>
-			<ol>
+			<p class="rotulo">{listaCurta.length ? t('Próximos') : lista.length ? (emDiscussao ? t('Lista especial') : t('Lista de oradores')) : t('Placas levantadas')}</p>
+			<svelte:element this={listaCurta.length || lista.length ? 'ol' : 'ul'}>
 				{#each proximos as item (item.id)}
 					<li class="com-bandeira"><Bandeira codigo={item.delegacao?.bandeira} /> {item.delegacao?.nome}</li>
 				{:else}
 					<li class="telao-vazio">{t('Nenhuma placa levantada')}</li>
 				{/each}
-			</ol>
+			</svelte:element>
 		</aside>
 	{/if}
 </div>

@@ -25,12 +25,12 @@ test('o delegado vê a sessão ao vivo no Agora e levanta a placa dali; a mesa v
 	await expect(aoVivo).toContainText(/Sessão \d+ · Debate/);
 	await expect(page.locator('[data-ao-vivo="sim"]')).toBeVisible({ timeout: 10_000 });
 	await aoVivo.getByRole('button', { name: 'Levantar placa' }).click();
-	await expect(aoVivo).toContainText('1ª na fila');
+	await expect(aoVivo).toContainText('Placa levantada');
 
 	const mesa = await (await browser.newContext()).newPage();
 	await entrar(mesa, MESA);
 	await mesa.goto(`/comite/${C.sigla}/sessao/presidencia`);
-	await expect(mesa.getByRole('region', { name: 'Pedidos de fala' })).toContainText('Alemanha');
+	await expect(mesa.getByRole('region', { name: 'Placas levantadas' })).toContainText('Alemanha');
 	await aoVivo.getByRole('button', { name: 'Baixar placa' }).click();
 	await expect(aoVivo.getByRole('button', { name: 'Levantar placa' })).toBeVisible();
 });

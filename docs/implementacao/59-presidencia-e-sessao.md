@@ -3,6 +3,7 @@
 **Parte de:** uso de 25/11/2026 ("a lista de placas levantadas não é necessariamente a ordem em que serão faladas, o presidente decide"; "o botão de ponto ou moção deveria estar mais em cima"; "o presidente ainda é uma delegação que vota e fala: fica ruim ter duas abas"; "só pode haver UM presidente por sessão; a presidência só é passada se a sessão acabar ou houver voto de não confiança")
 **Depende de:** 29 (bureau e presidência), 30 (lista curta), 43 e 46 (sessão), 51 lote 1 (painel), 54 (cartão "A palavra")
 **Esforço:** M
+**Situação:** pronto (25/11/2026).
 **Quando:** antes do piloto. O roteiro passa pela presidência de uma delegação, e hoje ela confunde quem já conhece as regras.
 **Objetivo:** a delegação que preside conduz e participa na mesma tela; há um único presidente; as placas são um conjunto, e a ordem de fala é a que a presidência escolhe; ponto ou moção fica à mão.
 
@@ -58,7 +59,16 @@ As regras oficiais (regras-de-procedimento.md) valem, confirmado em 25/11/2026.
 
 ## Testes
 
-- [ ] pgTAP: na plenária e na fase de ação, a mesa preside; no debate com uma delegação da vez, a mesa não dá a palavra nem mexe no cronômetro (só julga e confirma chegadas), até assumir um caso excepcional; a sessão nova pula a delegação da vez ausente sem gastar a vez dela; a não-confiança aprovada passa a presidência, e a anterior perde `pode_presidir`; não há mais `passar_presidencia` livre.
-- [ ] Ponta a ponta: a França preside e vota no painel, sem trocar de tela; a mesa não vê os controles de condução até assumir.
-- [ ] Ponta a ponta: três delegações levantam a placa em ordem; o painel as mostra em ordem alfabética, sem número; o Enter não dá a palavra a ninguém até a presidência montar os próximos; a delegação vê "Você é a 1ª dos próximos" só depois.
-- [ ] Ponta a ponta, a 1366 × 768 e no celular: "Fazer um ponto ou moção" à vista sem rolar na Sessão e na Agora.
+- [x] pgTAP: na plenária e na fase de ação, a mesa preside; no debate com uma delegação da vez, a mesa não dá a palavra nem mexe no cronômetro (só julga e confirma chegadas), até assumir um caso excepcional; a sessão nova pula a delegação da vez ausente sem gastar a vez dela; a não-confiança aprovada passa a presidência, e a anterior perde `pode_presidir`; não há mais `passar_presidencia` livre.
+- [x] Ponta a ponta: a França preside e vota no painel, sem trocar de tela; a mesa não vê os controles de condução até assumir.
+- [x] Ponta a ponta: três delegações levantam a placa em ordem; o painel as mostra em ordem alfabética, sem número; o Enter não dá a palavra a ninguém até a presidência montar os próximos; a delegação vê "Você é a 1ª dos próximos" só depois.
+- [x] Ponta a ponta, a 1366 × 768 e no celular: "Fazer um ponto ou moção" à vista sem rolar na Sessão e na Agora.
+
+## Como ficou
+
+- Migração `20261225090000_presidencia_unica.sql`: `pode_presidir()` só dá a condução à mesa quando o bureau preside (`bureau_preside()`); `passar_presidencia` saiu; `assumir_presidencia(…, p_motivo)` guarda o motivo em `estado_sessao.motivo_mesa`; `tomar_proxima_presidencia` pula as ausentes quando a chamada da sessão aberta já foi feita (fim da plenária, não-confiança); `presidencia_ausente()` (mesa) passa à próxima presente e devolve a vez à ausente. Na abertura da sessão a chamada ainda não existe, então a da vez é a da ordem, e a mesa vê o aviso se ela faltar.
+- Painel: para a mesa sem a condução, o cartão "A mesa como bureau" (quem conduz, o aviso da ausente com "Passar à próxima presente", "Acompanhar a sessão"), mais "Para decidir" sem "Pontos e moções" e a votação sem "Encerrar". "Mais opções" tem "Mesa assume a presidência" (com motivo e confirmação) e "Devolver a presidência a …". A faixa "Preside a sessão" mostra "caso excepcional: motivo".
+- A delegação da vez: a Sessão redireciona ao painel; o painel tem "Sua delegação" (voto na votação aberta e "Dar a palavra a si mesma"); ao perder a presidência, volta à Sessão com o aviso "A presidência da sua delegação terminou.".
+- Placas: "Placas levantadas" em ordem alfabética, sem número, no painel, no cartão "A palavra" e no telão (o telão só numera os próximos e a lista de oradores); o delegado vê "Placa levantada"; o Enter dá a palavra ao primeiro dos próximos (ou da lista de oradores), nunca à placa mais antiga.
+- Ponto ou moção: o primeiro botão da barra da Sessão; o cartão vira "Seus pontos e moções" (só com pedidos); na pausa, "Fazer agora"; na Agora, sempre, ao lado de "Abrir a sessão" (leva à Sessão com o modal aberto, `?ponto`). O rodapé fixo no celular não foi feito: o botão já é o primeiro da tela.
+- Testes: o ajudante `comiteEmDebate` faz a mesa assumir (caso excepcional) para os testes de condução; o do bureau (29) pede `mesaConduz: false`.

@@ -129,7 +129,7 @@
 		<article class="cartao cartao--ao-vivo cartao--largo" aria-labelledby="c-ao-vivo">
 			<h2 id="c-ao-vivo">{t('Sessão ao vivo')} · {sigla}</h2>
 			{#if sessao && estado && !preside}
-				<QuemPreside fase={data.aoVivo.fase} mesaAssumiu={estado.mesa_assumiu} presidencia={sessao.presidencia} {minhaDelegacao} {sigla} />
+				<QuemPreside fase={data.aoVivo.fase} mesaAssumiu={estado.mesa_assumiu} motivo={estado.motivo_mesa} presidencia={sessao.presidencia} {minhaDelegacao} {sigla} />
 			{/if}
 			{#if !sessao || !estado}
 				<p class="suave">{t('Nenhuma sessão aberta.')}</p>
@@ -139,11 +139,7 @@
 					<div>
 					<p class="suave">{t('Sessão {n}', { n: sessao.numero })} · {FASES[data.aoVivo.fase]} · {FORMAS[estado.forma]}</p>
 					{#if estado.topico_atual}<TrilhaDoTopico compacta {sigla} {...doTopico(data.aoVivo.ordem, estado.topico_atual)} />{/if}
-					{#if momento === 'pausa'}
-						<p class="telegrama" role="status">
-							{t('Há pontos ou moções?')} <a class="botao botao--secundario botao--pequeno" href={`/comite/${sigla}/sessao`}>{t('Fazer um ponto ou moção')}</a>
-						</p>
-					{/if}
+					{#if momento === 'pausa'}<p class="telegrama" role="status">{t('Há pontos ou moções?')}</p>{/if}
 					<p>
 						<span class="rotulo">{t('Com a palavra')}</span>
 						{estado.orador ? estado.orador.nome : t('Ninguém com a palavra.')}
@@ -164,7 +160,11 @@
 					{#if data.aoVivo.fase !== 'plenaria' && minhaDelegacao && !restrita}
 						<BotaoPlaca compacto comiteId={data.minha!.comite_id!} {posicao} nome={data.minha?.delegacao_nome ?? ''} onerro={(m) => (erro = m)} />
 					{/if}
-					<p class="acoes"><a class="botao botao--secundario" href={`/comite/${sigla}/sessao`}>{t('Abrir a sessão')}</a></p>
+					<!-- Passo 59: ponto ou moção sempre à mão, não só na pausa. -->
+					<p class="acoes">
+						{#if minhaDelegacao && !restrita}<a class="botao" href={`/comite/${sigla}/sessao?ponto`}>{t('Fazer um ponto ou moção')}</a>{/if}
+						<a class="botao botao--secundario" href={`/comite/${sigla}/sessao`}>{t('Abrir a sessão')}</a>
+					</p>
 					</div>
 				</div>
 			{/if}

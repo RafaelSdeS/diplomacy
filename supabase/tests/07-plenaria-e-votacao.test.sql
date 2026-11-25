@@ -195,7 +195,11 @@ select results_eq($$select aprovada from public.votacao where id = pg_temp.votac
 select results_eq($$select ordem_topicos, topico_atual from public.estado_sessao$$,
 	$$values ('{1,2}'::int[], 1)$$, 'rejeitada a moção do tópico 2, entra o tópico 1');
 
--- No debate: adiamento do debate, por dois terços
+-- No debate: adiamento do debate, por dois terços. Passo 59: a delegação da vez preside; a
+-- mesa conduz aqui como caso excepcional (assumiu).
+
+reset role;
+update public.estado_sessao set mesa_assumiu = true where comite_id = '00000000-0000-0000-0000-0000000000c1';
 
 select pg_temp.entrar('00000000-0000-0000-0000-0000000000a2');
 select public.enviar_ponto('00000000-0000-0000-0000-0000000000c1', 'adiamento_debate');

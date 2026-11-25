@@ -61,7 +61,7 @@ test('com mais de 12 placas, a presidência filtra a fila pelo nome', async ({ p
 	await entrar(page, C.conta(CONTAS.mesa));
 	await page.goto(`/comite/${C.sigla}/sessao/presidencia`);
 	await expect(page.locator('[data-ao-vivo="sim"]')).toBeVisible({ timeout: 10_000 });
-	const fila = page.getByRole('region', { name: 'Pedidos de fala' });
+	const fila = page.getByRole('region', { name: 'Placas levantadas' });
 	await expect(fila.getByRole('listitem')).toHaveCount(levantadas.length);
 
 	// Sem acento e sem maiúsculas, como nas outras listas longas (passo 38).

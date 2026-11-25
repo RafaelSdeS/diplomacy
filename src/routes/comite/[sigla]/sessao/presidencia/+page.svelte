@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { contador } from '#lib/contador.ts';
 	import { t } from '#lib/i18n.svelte.ts';
@@ -14,6 +15,7 @@
 	import Cronometro from '#lib/ui/Cronometro.svelte';
 	import Contagem from '#lib/ui/Contagem.svelte';
 	import Confirmar from '#lib/ui/Confirmar.svelte';
+	import Votar from '#lib/ui/Votar.svelte';
 	import { filtrarDelegacoes, LISTA_LONGA } from '#lib/filtro.ts';
 	import { manterTelaAcesa } from '#lib/aparelho.ts';
 	import AlertaCrise from '#lib/ui/AlertaCrise.svelte';
@@ -51,7 +53,9 @@
 	const ehMesa = $derived(
 		data.participacoes.some((p) => (p.papel === 'mesa' && p.comite_id === data.comite.id) || p.papel === 'secretaria')
 	);
-	const fila = $derived(sessao?.pedidos ?? []);
+	// Passo 59: as placas levantadas não são uma ordem: em ordem alfabética, sem número. A ordem
+	// de fala é a dos próximos, que a presidência monta.
+	const fila = $derived([...(sessao?.pedidos ?? [])].sort((a, b) => (a.delegacao?.nome ?? '').localeCompare(b.delegacao?.nome ?? '')));
 	const pontosAbertos = $derived((sessao?.pontos ?? []).filter((p) => !['aceito', 'recusado', 'retirado'].includes(p.status)));
 	const emDiscussao = $derived(pontosAbertos.find((p) => p.status === 'em_discussao'));
 	// Passo 29: com uma delegação presidindo, o bureau aprova antes e a presidência só vê o aprovado.
@@ -104,6 +108,20 @@
 	// Passo 43: o raro fica recolhido (assumir delegação, ajustes de tempo e forma), e o
 	// estado aberto sobrevive às recargas ao vivo.
 	let representarAberto = $state(false);
+	// Passo 59: acabada a presidência (fim da sessão ou não-confiança), a delegação volta à sessão.
+	let presidia = untrack(() => data.podePresidir);
+	$effect(() => {
+		if (data.podePresidir) presidia = true;
+		else if (presidia && !ehMesa) void goto(`/comite/${data.comite.sigla}/sessao?fim-da-presidencia`);
+	});
+	// Passo 59: o motivo de a mesa assumir (caso excepcional) e a delegação da vez ausente.
+	let motivoMesa = $state('');
+	const daVezAusente = $derived(
+		!!sessao?.presidencia && !!sessao.presenca.length && !sessao.presenca.some((p) => p.delegacao_id === sessao.presidencia?.id)
+	);
+	// Passo 59: a delegação que preside também é delegação: vota e discursa daqui.
+	const minha = $derived(data.participacoes.find((p) => p.comite_id === data.comite.id && p.papel === 'delegado'));
+	const souDaVez = $derived(!!minha?.delegacao_id && sessao?.presidencia?.id === minha.delegacao_id && data.podePresidir);
 	let modalAjustes = $state<Modal>();
 	let modalPontos = $state<Modal>();
 	let modalBureau = $state<Modal>();
@@ -131,6 +149,16 @@
 	const presentesN = $derived(chamada.length - [...ausentes].filter((id) => data.delegacoes.find((d) => d.id === id)?.situacao !== 'suspensa').length);
 	const correndo = $derived(!!data.estado?.cronometro_inicio && !pausado);
 	const votacao = $derived(data.votacao);
+	const meuVoto = $derived(votacao?.votos.find((v) => v.delegacao_id === minha?.delegacao_id)?.escolha);
+	const possoVotar = $derived(
+		votacao?.aberta && minha
+			? escolhasPermitidas(
+					votacao.tipo,
+					data.delegacoes.find((d) => d.id === minha.delegacao_id)?.situacao,
+					sessao?.presenca.find((p) => p.delegacao_id === minha.delegacao_id)?.situacao
+				)
+			: []
+	);
 	// Quem pode votar nesta votação: presentes, menos suspensas (e observadoras, na substantiva).
 	const votantes = $derived(
 		data.delegacoes.filter(
@@ -193,13 +221,13 @@
 		void rpc('mudar_forma', { p_comite: comite, p_forma: forma, p_minutos: minutos ?? undefined });
 	}
 
-	// Atalhos: Espaço pausa ou retoma; Enter dá a palavra ao primeiro da lista curta, ou
-	// ao próximo da lista de oradores, ou ao primeiro da fila de placas; B baixa todas as
+	// Atalhos: Espaço pausa ou retoma; Enter dá a palavra ao primeiro dos próximos (ou ao
+	// próximo da lista de oradores), nunca à placa mais antiga (passo 59); B baixa todas as
 	// placas. Só fora de campos e botões.
 	function atalho(evento: KeyboardEvent) {
 		const alvo = evento.target as HTMLElement;
 		if (alvo.closest('input, textarea, select, button, a, summary, dialog, [contenteditable]')) return;
-		const seguinte = proximos[0]?.delegacao?.id ?? proximo?.delegacao?.id ?? fila[0]?.delegacao?.id;
+		const seguinte = proximos[0]?.delegacao?.id ?? proximo?.delegacao?.id;
 		if (evento.key === ' ') {
 			evento.preventDefault();
 			void pausarOuRetomar();
@@ -225,7 +253,7 @@
 		>{:else if sessao}<span class="painel-quem">{' · '}{t('Mesa')}</span>{/if}
 </h1>
 
-{#if !data.podePresidir}
+{#if !data.podePresidir && !ehMesa}
 	<p class="suave">{t('Você não preside esta sessão. Quando for a vez da sua delegação, o painel aparece aqui.')}</p>
 {:else if !data.estado || !sessao}
 	{#if erro}
@@ -277,14 +305,33 @@
 			{#if ehMesa}
 				<a class="botao botao--secundario botao--pequeno" href={`/comite/${data.comite.sigla}/sessao/chamada`}>{t('Chamada')}</a>
 				<a class="botao botao--secundario botao--pequeno" href={`/comite/${data.comite.sigla}/sessao/agenda`}>{t('Agenda')}</a>
-				{#if data.fase === 'debate'}
-					<button
-						class="botao botao--secundario botao--pequeno"
-						type="button"
-						onclick={() => rpc('assumir_presidencia', { p_comite: comite, p_assumir: !data.estado?.mesa_assumiu })}
-					>
-						{data.estado.mesa_assumiu ? t('Devolver a presidência à delegação') : t('Mesa assume a presidência')}
-					</button>
+				<!-- Passo 59: a mesa assume só em caso excepcional, com motivo; devolver volta à mesma delegação. -->
+				{#if data.fase === 'debate' && sessao.presidencia}
+					<details class="menu-painel">
+						<summary class="botao botao--secundario botao--pequeno">{t('Mais opções')}</summary>
+						<section class="cartao" aria-label={t('Caso excepcional')}>
+							{#if data.estado.mesa_assumiu}
+								<button
+									class="botao botao--secundario botao--pequeno"
+									type="button"
+									onclick={() => rpc('assumir_presidencia', { p_comite: comite, p_assumir: false })}
+									>{t('Devolver a presidência a {delegacao}', { delegacao: sessao.presidencia.nome })}</button
+								>
+							{:else}
+								<label class="campo">
+									{t('Motivo (caso excepcional)')}
+									<input maxlength="200" bind:value={motivoMesa} />
+								</label>
+								<Confirmar
+									classe="botao botao--secundario botao--pequeno"
+									rotulo={t('Mesa assume a presidência')}
+									pergunta={t('A mesa assume a presidência desta sessão?')}
+									explicacao={t('Só em caso excepcional. A delegação da vez fica sem os controles até a mesa devolver.')}
+									acao={() => rpc('assumir_presidencia', { p_comite: comite, p_assumir: true, p_motivo: motivoMesa })}
+								/>
+							{/if}
+						</section>
+					</details>
 				{/if}
 				<details class="menu-painel" bind:open={representarAberto}>
 					<summary class="botao botao--secundario botao--pequeno">{representada ? t('No lugar de {delegacao}', { delegacao: representada.nome }) : t('Assumir uma delegação')}</summary>
@@ -323,7 +370,7 @@
 			<details class="menu-painel">
 				<summary class="botao botao--secundario botao--pequeno">{t('Atalhos')}</summary>
 				<p class="cartao atalhos-ajuda">
-					<kbd>{t('Espaço')}</kbd> {t('pausa ou retoma;')} <kbd>{t('Enter')}</kbd> {t('dá a palavra ao próximo da lista ou da fila;')} <kbd>B</kbd> {t('baixa todas as placas.')}
+					<kbd>{t('Espaço')}</kbd> {t('pausa ou retoma;')} <kbd>{t('Enter')}</kbd> {t('dá a palavra ao primeiro dos próximos;')} <kbd>B</kbd> {t('baixa todas as placas.')}
 				</p>
 			</details>
 			{#if ehMesa}
@@ -343,6 +390,10 @@
 	{/if}
 
 	<div class="painel">
+		{#if !data.podePresidir}
+			<!-- Passo 59: com a delegação da vez conduzindo, a mesa é só bureau. -->
+			<div class="painel-coluna">{@render bureau()}</div>
+		{:else}
 		<div class="painel-coluna">
 			{#if lista.length}
 				<section class="cartao" aria-labelledby="t-lista">
@@ -379,11 +430,11 @@
 			{/if}
 
 			<section class="cartao" aria-labelledby="t-fila">
-				<h2 id="t-fila">{t('Pedidos de fala')}</h2>
+				<h2 id="t-fila">{t('Placas levantadas')}</h2>
 				{#if fila.length > LISTA_LONGA}
 					<label class="campo">{t('Filtrar')} <input type="search" bind:value={buscaFila} /></label>
 				{/if}
-				<ol class="lista">
+				<ul class="lista">
 					{#each filaVisivel as pedido (pedido.id)}
 						{@const ordem = escolhidos.indexOf(pedido.delegacao?.id ?? '')}
 						<li>
@@ -411,7 +462,7 @@
 					{:else}
 						<li class="suave">{fila.length ? t('Nenhuma delegação encontrada.') : t('Nenhuma placa levantada.')}</li>
 					{/each}
-				</ol>
+				</ul>
 				{#if fila.length}
 					<div class="acoes">
 						<button class="botao botao--secundario botao--pequeno" type="button" disabled={!escolhidos.length} onclick={definirProximos}
@@ -588,8 +639,21 @@
 				</Modal>
 			</section>
 		</div>
+		{/if}
 
 		<div class="painel-coluna">
+			{#if souDaVez && minha}
+				<section class="cartao" aria-labelledby="t-sua-delegacao">
+					<h2 id="t-sua-delegacao">{t('Sua delegação')} · {minha.delegacao_nome}</h2>
+					{#if votacao?.aberta}
+						<p class="rotulo">{votacao.objeto}</p>
+						<Votar votacaoId={votacao.id} escolhas={possoVotar} {meuVoto} onerro={(m) => (erro = m)} />
+					{/if}
+					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => darPalavra(minha.delegacao_id!)}
+						>{t('Dar a palavra a si mesma')}</button
+					>
+				</section>
+			{/if}
 			{#if votacao}
 				<section class="cartao cartao--destaque" aria-labelledby="t-votacao">
 					<h2 id="t-votacao">{votacao.aberta ? t('Votação aberta') : t('Última votação')}</h2>
@@ -657,12 +721,14 @@
 								</ul>
 							</details>
 						{/if}
-						<Confirmar
-							rotulo={t('Encerrar a votação')}
-							pergunta={t('Encerrar a votação de {objeto}?', { objeto: votacao.objeto })}
-							explicacao={t('Quem não votou fica sem voto, e o resultado sai na hora.')}
-							acao={() => rpc('encerrar_votacao', { p_votacao: votacao.id })}
-						/>
+						{#if data.podePresidir}
+							<Confirmar
+								rotulo={t('Encerrar a votação')}
+								pergunta={t('Encerrar a votação de {objeto}?', { objeto: votacao.objeto })}
+								explicacao={t('Quem não votou fica sem voto, e o resultado sai na hora.')}
+								acao={() => rpc('encerrar_votacao', { p_votacao: votacao.id })}
+							/>
+						{/if}
 					{:else}
 						<p>{textoResultado(votacao)}</p>
 					{/if}
@@ -674,11 +740,13 @@
 			<section class="cartao para-decidir" aria-labelledby="t-para-decidir">
 				<h2 id="t-para-decidir">{t('Para decidir')}</h2>
 				<ul class="lista">
+					{#if data.podePresidir}
 					<li>
 						<button class="botao botao--secundario botao--pequeno linha-decidir" type="button" onclick={() => modalPontos?.abrir()}
 							><span>{t('Pontos e moções')}</span><span class={['selo', paraConceder.length && 'selo--alerta']}>{paraConceder.length}</span></button
 						>
 					</li>
+					{/if}
 					{#if ehMesa && !presidePeloBureau && paraJulgar.length}
 						<li>
 							<button class="botao botao--secundario botao--pequeno linha-decidir" type="button" onclick={() => modalBureau?.abrir()}
@@ -708,14 +776,6 @@
 						</li>
 					{/if}
 				</ul>
-				{#if data.fase === 'debate'}
-					<Confirmar
-						classe="botao botao--secundario"
-						rotulo={t('Passar a presidência')}
-						pergunta={t('Passar a presidência à próxima delegação?')}
-						acao={() => rpc('passar_presidencia', { p_comite: comite })}
-					/>
-				{/if}
 			</section>
 			<Modal bind:this={modalPontos} nome={t('Pontos e moções')} classe="modal-acao modal-painel">
 				<!-- Agir aqui (aceitar, votar, julgar, confirmar) devolve ao painel. -->
@@ -896,6 +956,25 @@
 		</div>
 	</div>
 {/if}
+
+{#snippet bureau()}
+	<section class="cartao cartao--destaque" aria-labelledby="t-bureau">
+		<h2 id="t-bureau">{t('A mesa como bureau')}</h2>
+		<p>{t('Quem conduz o debate é a delegação da vez: {delegacao}.', { delegacao: sessao?.presidencia?.nome ?? '' })}</p>
+		<p class="suave">{t('A mesa aprova os pontos e moções, confirma as chegadas e avalia os documentos. Num caso excepcional, assume em "Mais opções".')}</p>
+		{#if daVezAusente}
+			<p class="telegrama" role="status">{t('A delegação da vez, {delegacao}, está ausente na chamada.', { delegacao: sessao?.presidencia?.nome ?? '' })}</p>
+			<Confirmar
+				classe="botao"
+				rotulo={t('Passar à próxima presente')}
+				pergunta={t('Passar a presidência à próxima delegação presente?')}
+				explicacao={t('{delegacao} não perde a vez: preside numa próxima sessão.', { delegacao: sessao?.presidencia?.nome ?? '' })}
+				acao={() => rpc('presidencia_ausente', { p_comite: comite })}
+			/>
+		{/if}
+		<p><a class="botao botao--secundario botao--pequeno" href={`/comite/${data.comite.sigla}/sessao`}>{t('Acompanhar a sessão')}</a></p>
+	</section>
+{/snippet}
 
 {#snippet julgarPonto(ponto: (typeof paraJulgar)[number])}
 	{@const nome = descreverPonto(ponto)}

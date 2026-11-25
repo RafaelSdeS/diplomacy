@@ -42,7 +42,7 @@ test('a mesa assume a Itália, levanta a placa por ela e deixa', async ({ page }
 
 	await page.goto(PAINEL);
 	await aoVivo(page);
-	const fila = page.getByRole('region', { name: 'Pedidos de fala' });
+	const fila = page.getByRole('region', { name: 'Placas levantadas' });
 	await expect(fila.getByRole('listitem').filter({ hasText: 'Itália' })).toContainText('pela mesa');
 
 	await page.locator('summary', { hasText: 'No lugar de Itália' }).click();

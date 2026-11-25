@@ -12,8 +12,10 @@
 		presidencia: { id: string; nome: string; bandeira: string | null } | null | undefined;
 		minhaDelegacao?: string | null;
 		sigla: string;
+		/** Passo 59: o motivo, quando a mesa assumiu num caso excepcional. */
+		motivo?: string | null;
 	};
-	let { fase, mesaAssumiu, presidencia, minhaDelegacao = null, sigla }: Props = $props();
+	let { fase, mesaAssumiu, presidencia, minhaDelegacao = null, sigla, motivo = null }: Props = $props();
 	const pelaMesa = $derived(bureauPreside(fase, mesaAssumiu, presidencia?.id));
 	const souEu = $derived(!pelaMesa && !!minhaDelegacao && presidencia?.id === minhaDelegacao);
 </script>
@@ -28,5 +30,6 @@
 		<strong>
 			{#if pelaMesa}{t('Mesa')}{:else}<NomeDelegacao {sigla} delegacao={presidencia} />{/if}
 		</strong>
+		{#if mesaAssumiu && fase === 'debate'}<span class="suave">{t('caso excepcional')}{motivo ? `: ${motivo}` : ''}</span>{/if}
 	{/if}
 </p>
