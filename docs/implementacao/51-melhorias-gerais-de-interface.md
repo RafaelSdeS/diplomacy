@@ -77,7 +77,7 @@
   - separadores por sessão ("Sessão 3 · 14:00").
 
   A caixa de escrever fica fixa embaixo, com "Enviar" (Enter envia, Shift + Enter quebra linha) e o rascunho por conversa, como hoje. Sem emoji nem curtidas: o tom é de chancelaria (papel, marinho e dourado), não de rede social.
-- **Não lidas sem migração:** a hora da última leitura de cada conversa fica guardada no aparelho; a contagem entra no ícone de Mensagens do menu.
+- **Não lidas sem migração:** a hora da última leitura de cada conversa fica guardada no aparelho; a contagem entra no ícone de Mensagens do menu. O aviso e a contagem foram antecipados para o passo 61, antes do piloto (uso de 25/11/2026).
 - **Bloquear e ver a ficha:** o nome no topo da conversa abre a ficha da delegação (passo 55); "Bloquear" vai para "Mais opções" da conversa, e os bloqueios saem do fim da página.
 - **Entrevistas:** continuam como pedidos em cima da lista, só quando há pedido pendente.
 - **Teste:** a 1366 × 768, a lista e a conversa não rolam a página, só a própria coluna; uma mensagem nova chega na conversa aberta sem recarregar e marca a conversa como não lida para quem não está nela.

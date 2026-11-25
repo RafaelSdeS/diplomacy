@@ -19,6 +19,8 @@ Os valores que podem mudar de uma edição ou de um comitê para outro ficam em 
   1. a plenária de abertura (a delegação da vez só assume quando todos os procedimentos da plenária terminam);
   2. a fase de ação (projetos de resolução e emendas);
   3. casos excepcionais.
+- **Delegação da vez ausente** (25/11/2026): assume a próxima sorteada que estiver presente; a ausente não perde a vez.
+- **Uma presidência por vez** (confirmado em 25/11/2026): quem deixa de presidir perde na hora as ações de presidente. A presidência só passa no fim da sessão (a sessão seguinte começa com a próxima da lista) ou com a não-confiança aprovada. A presidência continua sendo uma delegação: vota e discursa.
 - **Moção de não-confiança:** pedido escrito informal ao bureau, com assinaturas de **1/5 das delegações previstas**, e aprovação por **maioria simples**. Se aprovada, assume a próxima delegação da lista de espera.
 
 ## Plenária de abertura
@@ -96,4 +98,4 @@ Podem ser levantados entre discursos ou durante o próprio discurso.
 
 - "Sessão fechada", na não-confiança, quer dizer o quê?
 - Delegações suspensas contam como previstas no quórum? Por enquanto, não contam.
-- Quem sugere a agenda informal: só o bureau, ou as delegações também propõem?
+- ~~Quem sugere a agenda informal?~~ Respondido em 25/11/2026: o bureau chega com a agenda de cada tópico pré-organizada, liberada só no dia do evento; a primeira sessão de cada tópico a debate, e alterá-la funciona como alterar um working paper (ordem de debate, incluir, retirar; passo 60).
