@@ -2010,6 +2010,28 @@ dialog.escolha-modal {
 	margin: 0;
 }
 
+/* Passo 58: as alterações de um documento da mesa. */
+.diferenca {
+	white-space: pre-wrap;
+}
+
+.diferenca ins {
+	background: var(--cor-ok-fundo);
+	text-decoration: underline;
+}
+
+.diferenca del {
+	background: var(--cor-erro-fundo);
+	text-decoration: line-through;
+}
+
+.doc-mesa-situacao {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5rem;
+}
+
 /* Passo 51: a aba do DPO, com a escrita num modal largo e a prévia ao lado. */
 dialog.modal-dpo {
 	width: min(72rem, calc(100vw - 2rem));

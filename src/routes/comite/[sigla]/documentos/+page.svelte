@@ -2,6 +2,10 @@
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { t } from '#lib/i18n.svelte.ts';
 	import { abrirPrevia } from '#lib/ficha.svelte.ts';
+	import { lerLidas, seloDaPublicacao } from '#lib/nao-lidas.ts';
+	import { goto } from '$app/navigation';
+	import { mensagemDeErro } from '#lib/sessao.ts';
+	import { supabase } from '#lib/supabase.ts';
 	import { formatarHora } from '#lib/cronograma.ts';
 	import { nomeDoDocumento, STATUS_DOCUMENTO } from '#lib/formatacao.ts';
 	import { STATUS_DPO } from '#lib/impressao.ts';
@@ -63,6 +67,19 @@
 	let modalAvaliar = $state<Modal>();
 	let modalDpos = $state<Modal>();
 	let modalSeus = $state<Modal>();
+	// Passo 58: os documentos da mesa, com "Novo" e "Alterado" pela publicação lida no aparelho.
+	let modalDaMesa = $state<Modal>();
+	const lidas = $derived(lerLidas(data.comite.id));
+	const SELO = (): Record<string, string> => ({ novo: t('Novo'), alterado: t('Alterado') });
+	const seloDaMesa = (d: (typeof data.daMesa)[number]) => (d.versao ? seloDaPublicacao(lidas, d.id, d.versao) : null);
+	let tituloNovo = $state('');
+	let erroNovo = $state('');
+	async function criarDaMesa(evento: SubmitEvent) {
+		evento.preventDefault();
+		const { data: id, error } = await supabase.rpc('criar_documento_mesa', { p_comite: data.comite.id, p_titulo: tituloNovo.trim() });
+		if (error) erroNovo = mensagemDeErro(error);
+		else await goto(`/comite/${sigla}/documentos/mesa/${id}`);
+	}
 	function abrirLista(topico: number, etapa: Etapa) {
 		lista = { topico, etapa };
 		modalLista?.abrir();
@@ -147,6 +164,23 @@
 	{/if}
 
 	<section class="cartao no-evento" aria-label={t('Seus documentos, DPOs e cartas')}>
+		{#if data.ehMesa || data.daMesa.length}
+			{@const primeiro = data.daMesa[0]}
+			<article class="linha-evento" aria-labelledby="t-da-mesa">
+				<h3 id="t-da-mesa">{t('Da mesa')} <span class="selo">{data.daMesa.length}</span></h3>
+				<div class="linha-evento-resumo">
+					{#if primeiro}
+						<p class="linha-evento-texto">
+							<a href={`/comite/${sigla}/documentos/mesa/${primeiro.id}`}>{primeiro.titulo}</a>
+							{@render seloMesa(primeiro)}
+						</p>
+					{:else}
+						<p class="suave">{t('Nada publicado pela mesa ainda.')}</p>
+					{/if}
+				</div>
+				<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => modalDaMesa?.abrir()}>{t('Ver todos')}</button>
+			</article>
+		{/if}
 		<!-- Passo 61: o que é do bloco não some ao assinar: uma linha fixa, que abre a lista. -->
 		{#if data.minha}
 			<article class="linha-evento" aria-labelledby="t-seus">
@@ -216,6 +250,33 @@
 			</li>
 		{/each}
 	</ul>
+	<form method="dialog" class="acoes"><button class="botao botao--secundario">{t('Fechar')}</button></form>
+</Modal>
+
+{#snippet seloMesa(d: (typeof data.daMesa)[number])}
+	{#if !d.versao}<span class="selo">{t('rascunho')}</span>{:else if seloDaMesa(d)}<span class="selo selo--info">{SELO()[seloDaMesa(d)!]}</span>{/if}
+	{#if d.fixado}<span class="detalhe">{t('fixado')}</span>{/if}
+{/snippet}
+
+<Modal bind:this={modalDaMesa} nome={t('Da mesa')} classe="modal-acao">
+	<h3>{t('Da mesa')}</h3>
+	<ul class="lista">
+		{#each data.daMesa as d (d.id)}
+			<li>
+				<span><a href={`/comite/${sigla}/documentos/mesa/${d.id}`}>{d.titulo}</a> {@render seloMesa(d)}</span>
+				{#if d.publicado_em}<span class="detalhe">{t('Atualizado às {hora}', { hora: formatarHora(d.publicado_em) })}</span>{/if}
+			</li>
+		{:else}
+			<li class="suave">{t('Nada publicado pela mesa ainda.')}</li>
+		{/each}
+	</ul>
+	{#if data.ehMesa}
+		<form class="formulario" aria-label={t('Novo documento da mesa')} onsubmit={criarDaMesa}>
+			<label class="campo">{t('Novo documento da mesa')} <input required maxlength="200" placeholder={t('Título')} bind:value={tituloNovo} /></label>
+			{#if erroNovo}<p class="erro">{erroNovo}</p>{/if}
+			<button class="botao">{t('Criar e escrever')}</button>
+		</form>
+	{/if}
 	<form method="dialog" class="acoes"><button class="botao botao--secundario">{t('Fechar')}</button></form>
 </Modal>
 

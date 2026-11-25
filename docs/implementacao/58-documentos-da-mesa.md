@@ -3,6 +3,7 @@
 **Parte de:** pedido de 24/11/2026 ("o bureau ter alguma maneira de divulgar documentos com o comitê, quase um Google Docs")
 **Depende de:** 44 (cache e Storage), 47 (prévia), 53 (bucket de PDF, se vier antes), 56 (lugar na aba Documentos)
 **Esforço:** M
+**Situação:** pronto em parte (25/11/2026); faltam o telão e o "está editando".
 **Quando:** depois do piloto. O piloto manda o guia fictício antes, por fora. Pode subir na fila se a mesa do piloto pedir.
 **Objetivo:** a mesa publica textos e arquivos para o comitê, atualiza durante o evento, e todo o comitê vê a versão do momento, sabendo o que mudou.
 
@@ -48,9 +49,15 @@ Edição simultânea, comentários das delegações, pastas e documentos para um
 
 ## Testes
 
-- [ ] pgTAP: a mesa cria, edita e publica; a delegação lê só os publicados do próprio comitê; ninguém de outro comitê lê; salvar com a `versao` antiga é recusado.
-- [ ] Unidade: a diferença por palavra entre duas versões; a marcação simples vira HTML seguro (sem script nem atributos).
-- [ ] Ponta a ponta com dois navegadores: a mesa publica e a delegação vê sem recarregar; a mesa altera e a delegação vê "Alterado" e as alterações.
-- [ ] Ponta a ponta: duas pessoas da mesa salvam o mesmo documento; a segunda vê a diferença e escolhe.
+- [x] pgTAP: a mesa cria, edita e publica; a delegação lê só os publicados do próprio comitê; ninguém de outro comitê lê; salvar com a `versao` antiga é recusado.
+- [x] Unidade: a diferença por palavra entre duas versões; a marcação simples vira HTML seguro (sem script nem atributos).
+- [x] Ponta a ponta com dois navegadores: a mesa publica e a delegação vê sem recarregar; a mesa altera e a delegação vê "Alterado" e as alterações.
+- [x] Ponta a ponta: duas pessoas da mesa salvam o mesmo documento; a segunda vê a diferença e escolhe.
 - [ ] Offline: o documento publicado abre sem rede depois de visto uma vez.
 - [ ] axe no editor, na leitura e no telão.
+
+## Como ficou
+
+- Banco (`20261228090000_documentos_da_mesa.sql`): `documento_mesa` guarda a última publicação (o comitê só vê com `versao > 0`); `documento_mesa_rascunho`, o texto em edição, que só a mesa e a secretaria leem; `documento_mesa_versao`, cada publicação. `salvar_documento_mesa` confere a versão (código `DM409` se outra pessoa salvou antes; não `40001`, que o PostgREST repete); `publicar_documento_mesa` copia o rascunho e, com "Avisar o comitê", cria um aviso do comitê (o sino); `ajustar_documento_mesa` fixa e anexa o PDF (bucket `documentos-mesa`, `<comitê>/<documento>.pdf`, até 10 MB).
+- Telas: na aba Documentos, a linha "Da mesa" (o mais recente, fixados primeiro, "Novo" ou "Alterado" pela publicação lida no aparelho) abre a lista, onde a mesa cria. `/comite/<sigla>/documentos/mesa/<id>`: o comitê lê ao vivo, com "Atualizado agora" e "Ver alterações" (diferença por palavra, `src/lib/diferenca.ts`); a mesa escreve com a prévia ao lado (marcação simples em `src/lib/marcacao.ts`: títulos, listas, negrito e links, tudo escapado), salva, publica (a primeira vez com confirmação), fixa, anexa o PDF ou exclui. No conflito, vê a diferença e escolhe "Manter o meu texto" ou "Ficar com o texto salvo".
+- **Ainda não:** "Mostrar no telão", o "Fulano está editando" (a conferência da versão já impede perder texto) e a lista na aba Comitê (fica na aba Documentos).

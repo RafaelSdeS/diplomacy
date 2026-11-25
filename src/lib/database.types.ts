@@ -897,6 +897,72 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"documento_mesa": {
+                  Row: {
+                    "arquivo": string | null,"comite_id": string,"corpo": string,"criado_em": string,"fixado": boolean,"id": string,"publicado_em": string | null,"titulo": string,"versao": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "arquivo"?: string | null,"comite_id": string,"corpo"?: string,"criado_em"?: string,"fixado"?: boolean,"id"?: string,"publicado_em"?: string | null,"titulo": string,"versao"?: number
+                  }
+                  Update: {
+                    "arquivo"?: string | null,"comite_id"?: string,"corpo"?: string,"criado_em"?: string,"fixado"?: boolean,"id"?: string,"publicado_em"?: string | null,"titulo"?: string,"versao"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "documento_mesa_comite_id_fkey"
+      columns: ["comite_id"]
+isOneToOne: false
+      referencedRelation: "comite"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"documento_mesa_rascunho": {
+                  Row: {
+                    "atualizado_em": string,"atualizado_por": string | null,"comite_id": string,"corpo": string,"documento_id": string,"titulo": string,"versao": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "atualizado_em"?: string,"atualizado_por"?: string | null,"comite_id": string,"corpo"?: string,"documento_id": string,"titulo": string,"versao"?: number
+                  }
+                  Update: {
+                    "atualizado_em"?: string,"atualizado_por"?: string | null,"comite_id"?: string,"corpo"?: string,"documento_id"?: string,"titulo"?: string,"versao"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "documento_mesa_rascunho_atualizado_por_fkey"
+      columns: ["atualizado_por"]
+isOneToOne: false
+      referencedRelation: "pessoa"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "documento_mesa_rascunho_documento_id_fkey"
+      columns: ["documento_id"]
+isOneToOne: true
+      referencedRelation: "documento_mesa"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"documento_mesa_versao": {
+                  Row: {
+                    "comite_id": string,"corpo": string,"documento_id": string,"numero": number,"publicado_em": string,"titulo": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "comite_id": string,"corpo": string,"documento_id": string,"numero": number,"publicado_em"?: string,"titulo": string
+                  }
+                  Update: {
+                    "comite_id"?: string,"corpo"?: string,"documento_id"?: string,"numero"?: number,"publicado_em"?: string,"titulo"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "documento_mesa_versao_documento_id_fkey"
+      columns: ["documento_id"]
+isOneToOne: false
+      referencedRelation: "documento_mesa"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"dpo": {
                   Row: {
                     "atualizado_em": string,"comentario_mesa": string | null,"comite_id": string,"delegacao_id": string,"enviado_em": string | null,"id": string,"referencias": (string)[],"status": string,"texto": string,"topico": number
@@ -1991,6 +2057,9 @@ isOneToOne: false
 "agora":
 { Args: Record<PropertyKey, never>; Returns: string
                            },
+"ajustar_documento_mesa":
+{ Args: { "p_arquivo"?: string,"p_documento": string,"p_fixado": boolean }; Returns: undefined
+                           },
 "anotacoes_compartilhadas_comigo":
 { Args: Record<PropertyKey, never>; Returns: string[]
                            },
@@ -2110,6 +2179,9 @@ isOneToOne: false
                            },
 "criar_documento":
 { Args: { "p_atualizacao"?: string,"p_bloco": string,"p_ponto_pauta"?: string,"p_tipo": string,"p_titulo": string,"p_topico"?: number }; Returns: string
+                           },
+"criar_documento_mesa":
+{ Args: { "p_comite": string,"p_titulo": string }; Returns: string
                            },
 "dar_palavra":
 { Args: { "p_comite": string,"p_delegacao": string,"p_seg"?: number }; Returns: undefined
@@ -2498,6 +2570,9 @@ isOneToOne: false
 "publicar_atualizacao":
 { Args: { "p_comites": (string)[],"p_texto": string }; Returns: string
                            },
+"publicar_documento_mesa":
+{ Args: { "p_avisar"?: boolean,"p_documento": string }; Returns: undefined
+                           },
 "publicar_noticia":
 { Args: { "p_citadas"?: (string)[],"p_data_simulacao"?: string,"p_id": string,"p_imagem_descricao"?: string,"p_imagem_path"?: string,"p_linha_fina"?: string,"p_texto": string,"p_tipo": string,"p_titulo": string,"p_veiculo": string }; Returns: string
                            },
@@ -2596,6 +2671,9 @@ isOneToOne: false
                            },
 "salvar_assinatura_push":
 { Args: { "p_auth": string,"p_endpoint": string,"p_p256dh": string }; Returns: undefined
+                           },
+"salvar_documento_mesa":
+{ Args: { "p_corpo": string,"p_documento": string,"p_titulo": string,"p_versao": number }; Returns: number
                            },
 "salvar_dpo":
 { Args: { "p_comite": string,"p_referencias": (string)[],"p_texto": string,"p_topico": number }; Returns: string

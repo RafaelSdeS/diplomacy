@@ -10,7 +10,7 @@ export const load: PageLoad = async ({ parent, depends }) => {
 	const minha = participacoes.find((p) => p.comite_id === comite.id && p.papel === 'delegado')?.delegacao_id ?? null;
 	const ehMesa = participacoes.some((p) => p.papel === 'secretaria' || (p.papel === 'mesa' && p.comite_id === comite.id));
 
-	const [dpos, documentos, meusBlocos, rodadas, cartas, delegacoes, ordem] = await Promise.all([
+	const [dpos, documentos, meusBlocos, rodadas, cartas, delegacoes, ordem, daMesa] = await Promise.all([
 		supabase.from('dpo').select('id, topico, status, delegacao(id, nome, bandeira)').eq('comite_id', comite.id).order('topico'),
 		supabase
 			.from('documento')
@@ -29,9 +29,16 @@ export const load: PageLoad = async ({ parent, depends }) => {
 			.limit(5),
 		supabase.from('delegacao').select('id', { count: 'exact', head: true }).eq('comite_id', comite.id),
 		// Passo 56: a ordem de cada tópico (agenda adotada e documentos).
-		carregarOrdem(comite.id)
+		carregarOrdem(comite.id),
+		// Passo 58: os documentos da mesa (a RLS mostra ao comitê só os publicados), fixados primeiro.
+		supabase
+			.from('documento_mesa')
+			.select('id, titulo, versao, fixado, publicado_em')
+			.eq('comite_id', comite.id)
+			.order('fixado', { ascending: false })
+			.order('publicado_em', { ascending: false, nullsFirst: true })
 	]);
-	for (const r of [dpos, documentos, meusBlocos, rodadas, cartas]) if (r.error) throw r.error;
+	for (const r of [dpos, documentos, meusBlocos, rodadas, cartas, daMesa]) if (r.error) throw r.error;
 
 	return {
 		minha,
@@ -42,6 +49,7 @@ export const load: PageLoad = async ({ parent, depends }) => {
 		rodadas: rodadas.data!,
 		cartas: cartas.data!,
 		totalDelegacoes: delegacoes.count ?? 0,
-		ordem
+		ordem,
+		daMesa: daMesa.data!
 	};
 };

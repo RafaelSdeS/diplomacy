@@ -36,3 +36,12 @@ export function marcarLida(comite: string, ...conversas: string[]) {
 	localStorage.setItem(chave(comite), JSON.stringify(lidas));
 	dispatchEvent(new Event('lidas'));
 }
+
+/** Passo 58: a publicação lida de cada documento da mesa; "novo" se nunca lido, "alterado" se mudou. */
+export function marcarPublicacaoLida(comite: string, documento: string, versao: number) {
+	const lidas = lerLidas(comite);
+	lidas[`dm:${documento}`] = versao;
+	localStorage.setItem(chave(comite), JSON.stringify(lidas));
+}
+export const seloDaPublicacao = (lidas: Record<string, number>, documento: string, versao: number) =>
+	!lidas[`dm:${documento}`] ? 'novo' : lidas[`dm:${documento}`] < versao ? 'alterado' : null;
