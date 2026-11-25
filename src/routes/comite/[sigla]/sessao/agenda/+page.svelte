@@ -20,8 +20,8 @@
 
 	// Passo 60: a agenda parte do documento do bureau. A mesa cadastra a agenda de cada tópico
 	// e a libera no dia; as delegações propõem alterações por item, todas debatem e marcam
-	// apoio, ressalva ou contra, e, havendo consenso, a mesa inclui a alteração. A presidência
-	// da sessão não decide a agenda: participa como delegação.
+	// apoio, ressalva ou contra, e, havendo consenso, a presidência da sessão ou a mesa inclui a
+	// alteração (ajuste de 25/11/2026).
 	let { data }: PageProps = $props();
 
 	type Proposta = (typeof data.propostas)[number];
@@ -287,7 +287,7 @@
 		{#if abertas.length}
 			<section class="cartao cartao--largo" aria-labelledby="t-alteracoes">
 				<h3 id="t-alteracoes">{t('Alterações propostas')} <span class="selo">{abertas.length}</span></h3>
-				<p class="suave">{t('Todas as delegações debatem e marcam a posição; havendo consenso, a mesa inclui a alteração.')}</p>
+				<p class="suave">{t('Todas as delegações debatem e marcam a posição; havendo consenso, a presidência ou a mesa inclui a alteração.')}</p>
 				<ul class="lista">
 					{#each abertas as a (a.id)}
 						<li>
@@ -316,7 +316,7 @@
 										{/each}
 									</span>
 								{/if}
-								{#if ehMesa}
+								{#if ehMesa || data.podePresidir}
 									<button
 										class="botao botao--pequeno"
 										type="button"

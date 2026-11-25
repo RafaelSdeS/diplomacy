@@ -1275,6 +1275,8 @@ export const EN: Record<string, string> = {
 	'Só a delegação que pediu retira o pedido.': 'Only the delegation that made the request can withdraw it.',
 	'O pedido já foi atendido e não pode mais ser retirado.': 'The request has already been handled and can no longer be withdrawn.',
 	// Passo 60
+	'Todas as delegações debatem e marcam a posição; havendo consenso, a presidência ou a mesa inclui a alteração.': 'Every delegation debates and marks its position; when there is consensus, the chair or the dais includes the change.',
+	'Só a presidência da sessão ou a mesa incluem alterações na agenda.': 'Only the session chair or the dais include agenda changes.',
 	'A mesa libera a agenda do bureau no dia do evento. A primeira sessão do tópico a debate.': 'The dais releases the bureau agenda on the day of the event. The first session of the topic debates it.',
 	'A sala adotou a agenda do tópico {n}?': 'Did the room adopt the agenda of topic {n}?',
 	'Agenda do bureau': 'Bureau agenda',
