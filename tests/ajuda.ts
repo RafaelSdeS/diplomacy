@@ -27,6 +27,20 @@ export async function abrirPainel(page: Page, nome: string) {
 	await expect(page.getByRole('dialog', { name: nome })).toBeVisible();
 }
 
+/** Passo 54: o modal fica no centro da janela (a menos de 2 px), no notebook e no celular. */
+export async function noCentro(dialogo: Locator) {
+	const page = dialogo.page();
+	const original = page.viewportSize()!;
+	for (const tamanho of [original, { width: 390, height: 844 }]) {
+		await page.setViewportSize(tamanho);
+		const [largura, altura] = await page.evaluate(() => [document.documentElement.clientWidth, document.documentElement.clientHeight]);
+		const caixa = (await dialogo.boundingBox())!;
+		expect(Math.abs(caixa.x + caixa.width / 2 - largura / 2)).toBeLessThan(2);
+		expect(Math.abs(caixa.y + caixa.height / 2 - altura / 2)).toBeLessThan(2);
+	}
+	await page.setViewportSize(original);
+}
+
 /** Passo 51: abre o modal de uma ação de criar ("Novo bilhete", "Escrever carta"). */
 export const abrirAcao = (escopo: Page | Locator, nome: string) => escopo.getByRole('button', { name: nome, exact: true }).click();
 

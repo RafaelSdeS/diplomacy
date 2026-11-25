@@ -19,7 +19,7 @@
 	let { votacao, sigla, delegacoes, presentes, encerrar, onclose }: Props = $props();
 </script>
 
-<Modal aberto={!!votacao} classe="ficha" rotulo="ficha-votacao" {onclose}>
+<Modal aberto={!!votacao} classe="modal-ficha" rotulo="ficha-votacao" {onclose}>
 	{#if votacao}
 		<p class="rotulo">{t('Votação')}</p>
 		<h3 id="ficha-votacao">{votacao.objeto}</h3>

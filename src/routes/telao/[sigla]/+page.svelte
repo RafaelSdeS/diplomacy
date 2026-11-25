@@ -14,6 +14,7 @@
 	import { APP, marca } from '#lib/titulo.svelte.ts';
 	import { segundosAtePrazo } from '#lib/crise.ts';
 	import { formatarTempo } from '#lib/cronometro.ts';
+	import SairDoTelao from '#lib/ui/SairDoTelao.svelte';
 	import type { PageProps } from './$types';
 
 	// O telão roda no notebook do projetor, logado com a conta da mesa, sem botões:
@@ -73,24 +74,22 @@
 
 	onMount(manterTelaAcesa);
 
-	// Passo 38: o cursor e a dica somem depois de 3 s com o mouse parado.
+	// Passo 38: o cursor some com o mouse parado (SairDoTelao conta o tempo).
 	let mexendo = $state(false);
-	let parar: ReturnType<typeof setTimeout> | undefined;
-	function mexeu() {
-		mexendo = true;
-		clearTimeout(parar);
-		parar = setTimeout(() => (mexendo = false), 3000);
-	}
 </script>
 
-<svelte:window onclick={telaCheia} onkeydown={(e) => e.key.toLowerCase() === 'f' && telaCheia()} onmousemove={mexeu} />
+<!-- Passo 54: o clique num botão (Sair do telão) não põe a tela cheia. -->
+<svelte:window
+	onclick={(e) => !(e.target as Element).closest('button') && telaCheia()}
+	onkeydown={(e) => e.key.toLowerCase() === 'f' && telaCheia()}
+/>
 
 <svelte:head>
 	<title>{tituloDaAba(t('Telão'), data.comite.sigla)}</title>
 </svelte:head>
 
 <div class="telao" class:telao--parado={!mexendo}>
-	{#if mexendo}<p class="telao-dica">{t('F: tela cheia')}</p>{/if}
+	<SairDoTelao destino={`/comite/${data.comite.sigla}/sessao`} bind:mexendo />
 	<header class="telao-topo">
 		<div>
 			<p class="telao-comite">{data.comite.sigla} · {data.comite.nome}</p>

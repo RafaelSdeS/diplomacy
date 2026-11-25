@@ -143,7 +143,7 @@ test('a mesa abre a votação pelo teclado, o celular em 3G lento vota e o telã
 test('a conexão cai no meio da sessão, e a tela do celular se atualiza quando ela volta', async ({ browser }) => {
 	const celular = await abrir(browser, C.conta(contaDoTreino('Chile')), SESSAO, { width: 360, height: 740 });
 	await aoVivo(celular);
-	const palavra = celular.getByRole('article', { name: 'Com a palavra' });
+	const palavra = celular.getByRole('article', { name: 'A palavra' });
 
 	await celular.context().setOffline(true);
 	const mesa = await clienteComo(MESA);

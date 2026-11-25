@@ -1274,6 +1274,21 @@ export const EN: Record<string, string> = {
 	'Escuro': 'Dark',
 	'Só a delegação que pediu retira o pedido.': 'Only the delegation that made the request can withdraw it.',
 	'O pedido já foi atendido e não pode mais ser retirado.': 'The request has already been handled and can no longer be withdrawn.',
+	// Passo 54
+	'Sair do telão': 'Leave the big screen',
+	'A palavra': 'The floor',
+	'A seguir': 'Up next',
+	'Você é a {n}ª': 'You are number {n}',
+	'Placas levantadas': 'Raised placards',
+	'Sobre o Diplomacy': 'About Diplomacy',
+	'O app de uma simulação da ONU: a sessão, os documentos, as mensagens, a crise e a press num lugar só.': 'The app for a UN simulation: the session, documents, messages, crisis and press in one place.',
+	'Cada pessoa vê o que o seu papel pede, no celular ou no notebook.': 'Everyone sees what their role needs, on a phone or a laptop.',
+	'Créditos': 'Credits',
+	'Criado e desenvolvido por': 'Created and developed by',
+	'Versão': 'Version',
+	'Seus dados (LGPD)': 'Your data (LGPD)',
+	'Baixe tudo o que o app guarda sobre você, corrija o seu nome ou peça a exclusão da conta.': 'Download everything the app keeps about you, correct your name or ask for your account to be deleted.',
+	'Encarregado de dados: a organização do evento, que é a controladora dos dados.': 'Data protection officer: the event organization, which controls the data.',
 };
 
 /** Mensagens do banco com partes variáveis: [padrão em português, tradução]. */

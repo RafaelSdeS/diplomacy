@@ -6,6 +6,7 @@
 	import { manterTelaAcesa } from '#lib/aparelho.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import Bandeira from '#lib/ui/Bandeira.svelte';
+	import SairDoTelao from '#lib/ui/SairDoTelao.svelte';
 	import type { PageProps } from './$types';
 
 	// Passo 45, parte B: o telão da coletiva. Em "Chamando", a delegação e o veículo; a
@@ -30,6 +31,7 @@
 <svelte:window onkeydown={telaCheia} />
 
 <div class="telao telao-coletiva">
+	<SairDoTelao destino="/press/coletiva" />
 	<header class="telao-topo">
 		<div>
 			<p class="telao-comite">{t('Coletiva de imprensa')} <AoVivo eventoId={data.evento} tabelas={['coletiva', 'coletiva_pergunta']} dependencia="app:coletiva" /></p>

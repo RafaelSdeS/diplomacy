@@ -8,7 +8,7 @@ import type { LayoutLoad } from './$types';
 export const ssr = false;
 
 // Telas que abrem sem login.
-const PUBLICAS = new Set(['/entrar', '/entrar/cracha', '/estilo', '/privacidade']);
+const PUBLICAS = new Set(['/entrar', '/entrar/cracha', '/estilo', '/privacidade', '/sobre']);
 const ehPublica = (caminho: string) => PUBLICAS.has(caminho) || caminho.startsWith('/verificar/');
 
 export const load: LayoutLoad = async ({ url, depends }) => {

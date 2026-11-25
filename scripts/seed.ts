@@ -290,6 +290,17 @@ for (const [n, base] of Object.entries(ISOLADOS) as [keyof typeof ISOLADOS, stri
 	contasIsoladas.push(...doComite.map((c) => ({ ...c, email: conta(c.email) })));
 }
 
+// Passo 54: a mesa do CE-T-32 também é secretaria (o menu e a Agora somam os papéis).
+verificar(
+	await db
+		.from('convite')
+		.upsert({ email: isolado('32').conta('mesa-ce@exemplo.test'), evento_id: evento.id, papel: 'secretaria', comite_id: null }, {
+			onConflict: 'email,evento_id,papel,comite_id',
+			ignoreDuplicates: true
+		}),
+	'secretaria e mesa'
+);
+
 await criarContas(db, [...contas, ...contasIsoladas]);
 
 // Cronograma de dois dias fictícios do evento (horário de Brasília). As datas ficam

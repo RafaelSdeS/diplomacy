@@ -115,7 +115,7 @@
 	});
 </script>
 
-<Modal bind:this={modal} classe="ficha" rotulo="previa-titulo" onclose={fecharPrevia}>
+<Modal bind:this={modal} classe="modal-ficha" rotulo="previa-titulo" onclose={fecharPrevia}>
 	{#if conteudo}
 		<p class="rotulo">{conteudo.rotulo}</p>
 		<h3 id="previa-titulo">{conteudo.titulo}</h3>

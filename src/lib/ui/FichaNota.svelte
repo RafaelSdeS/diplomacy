@@ -9,7 +9,7 @@
 	let { nota, onclose }: { nota: Nota | null | undefined; onclose: () => void } = $props();
 </script>
 
-<Modal aberto={!!nota} classe="ficha" rotulo="ficha-nota" {onclose}>
+<Modal aberto={!!nota} classe="modal-ficha" rotulo="ficha-nota" {onclose}>
 	{#if nota}
 		<p class="rotulo">{nota.tipo === 'diretiva' ? t('Diretiva') : t('Nota')}</p>
 		<h3 id="ficha-nota">{nota.titulo}</h3>

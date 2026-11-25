@@ -20,7 +20,7 @@
 	const SELO: Record<string, string> = { aceito: 'selo--ok', recusado: 'selo--erro', retirado: '' };
 </script>
 
-<Modal aberto={!!ponto} classe="ficha" rotulo="ficha-ponto" {onclose}>
+<Modal aberto={!!ponto} classe="modal-ficha" rotulo="ficha-ponto" {onclose}>
 	{#if ponto}
 		<p class="rotulo">{ehPonto(ponto.tipo) ? t('Ponto') : t('Moção')}</p>
 		<h3 id="ficha-ponto">{descreverPonto(ponto)}</h3>

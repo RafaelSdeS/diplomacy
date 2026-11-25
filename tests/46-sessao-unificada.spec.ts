@@ -51,7 +51,7 @@ test('a nota rápida não se perde com a troca de orador, a reconexão e a recar
 
 	// Outro orador: o texto fica, e a nota continua sendo sobre o Brasil.
 	await darPalavra('Chile');
-	await expect(page.getByRole('article', { name: 'Com a palavra' })).toContainText('Chile');
+	await expect(page.getByRole('article', { name: 'A palavra' })).toContainText('Chile');
 	await expect(nota.getByLabel('Nota rápida')).toHaveValue(texto);
 	await expect(nota.getByRole('radio', { name: 'Sobre Brasil' })).toBeChecked();
 

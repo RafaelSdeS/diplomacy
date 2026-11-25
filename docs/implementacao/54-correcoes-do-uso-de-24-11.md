@@ -3,6 +3,7 @@
 **Parte de:** pedido de 24/11/2026, depois dos lotes 1 e 2 do passo 51 (uso na conta da secretaria, que também é mesa do CSNU-T)
 **Depende de:** 51 (lotes 0 a 2)
 **Esforço:** P–M
+**Situação:** pronto (25/11/2026).
 **Quando:** antes de tudo o que vem depois: são defeitos à vista, e o piloto (passo 12) passaria por eles.
 **Objetivo:** consertar o que atrapalha hoje: papéis somados, modais fora do centro, telão sem saída, lista de oradores solta. E criar uma página discreta "Sobre", com os créditos e os dados pessoais (LGPD).
 
@@ -18,7 +19,7 @@
 - **Agora:** com mesa e secretaria, o bloco da mesa (sessão ao vivo, atalhos) vem em cima, e o cartão da secretaria vem logo abaixo, compacto (check-in e participantes). `comiteAoVivo` olha a participação de mesa ou delegado, qualquer que seja o principal.
 - **Cabeçalho:** a faixa do país e do papel mostra os dois ("Mesa · CSNU-T · Secretaria").
 
-**Decisão em aberto:** a secretaria sem papel de mesa deve poder assumir a presidência numa emergência (mesa ausente)? **Proposta: não.** A secretaria convida alguém como mesa pela tela Participantes, e isso já resolve.
+**Decidido (25/11/2026, com a proposta):** a secretaria sem papel de mesa **não** assume a presidência. A secretaria convida alguém como mesa pela tela Participantes, e isso já resolve.
 
 ## 2. Modais no canto superior esquerdo
 
@@ -73,15 +74,21 @@ Hoje "Meus dados (LGPD)" é um botão no Perfil, e o aviso de privacidade aparec
   - os créditos: "Criado e desenvolvido por **Rafael Silva de Souza**", com link para <https://rafaelsdes.github.io/> (decidido em 24/11/2026);
   - a versão (o commit do build);
   - os links para "Meus dados (LGPD)", com baixar, corrigir e pedir exclusão (o que `/perfil/meus-dados` já faz), e para o aviso de privacidade;
-  - o contato do encarregado de dados.
+  - o contato do encarregado de dados. **Pendente:** o contato não existe ainda; a página diz que o encarregado é a organização do evento (a controladora). Entra com o texto final do aviso de privacidade.
 - Os textos traduzidos ficam em constantes `.ts` (o `npm run textos` recusa texto solto em `.svelte`).
 
 
 ## Testes
 
-- [ ] Unidade (`menu.test`): secretaria e mesa recebem Painel, Documentos, Mensagens, Comitê e Participantes; só secretaria continua sem o comitê.
-- [ ] Ponta a ponta: uma conta de secretaria e mesa abre o painel da presidência pela barra e vê a sessão ao vivo na Agora.
-- [ ] Ponta a ponta: os cinco modais (ficha da delegação, do ponto, da nota e da votação, e a prévia) abrem no centro, no notebook e no celular.
-- [ ] Ponta a ponta: no telão, "Sair do telão" volta à sessão, e o clique nele não põe a tela cheia.
-- [ ] Ponta a ponta, a 1366 × 768: na sessão, a lista de oradores fica dentro do cartão "A palavra"; como mesa, a página usa uma coluna.
-- [ ] `/sobre` abre sem login, mostra o nome e o link do criador, passa no axe e leva a "Meus dados".
+- [x] Unidade (`menu.test`): secretaria e mesa recebem Painel, Documentos, Mensagens, Comitê e Participantes; só secretaria continua sem o comitê.
+- [x] Ponta a ponta: uma conta de secretaria e mesa abre o painel da presidência pela barra e vê a sessão ao vivo na Agora.
+- [x] Ponta a ponta: os cinco modais (ficha da delegação, do ponto, da nota e da votação, e a prévia) abrem no centro, no notebook e no celular.
+- [x] Ponta a ponta: no telão, "Sair do telão" volta à sessão, e o clique nele não põe a tela cheia.
+- [x] Ponta a ponta, a 1366 × 768: na sessão, a lista de oradores fica dentro do cartão "A palavra"; como mesa, a página usa uma coluna.
+- [x] `/sobre` abre sem login, mostra o nome e o link do criador, passa no axe e leva a "Meus dados".
+
+## Como ficou
+
+- `noComite()` (`src/lib/papeis.ts`) acha a participação no comitê (mesa antes de delegado), qualquer que seja o principal; o menu, a Agora e o cabeçalho usam ela. O teste usa a mesa do CE-T-32, que o seed também faz secretaria.
+- No debate, "A seguir" é a lista curta da presidência (a lista de oradores só existe na plenária e na lista especial).
+- "?" e o clique longo no logo (700 ms) abrem `/sobre`; a versão vem de `CF_PAGES_COMMIT_SHA` ou do `git rev-parse` no build (`vite.config.ts`).

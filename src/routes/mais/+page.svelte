@@ -66,3 +66,6 @@
 		</button>
 	</li>
 </ul>
+
+<!-- Passo 54: o acesso discreto à página "Sobre". -->
+<p class="suave"><a href="/sobre">{t('Sobre o Diplomacy')}</a></p>

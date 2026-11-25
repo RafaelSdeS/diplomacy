@@ -10,7 +10,7 @@ import PenLine from '@lucide/svelte/icons/pen-line';
 import Siren from '@lucide/svelte/icons/siren';
 import Users from '@lucide/svelte/icons/users';
 import { t } from './i18n.svelte.ts';
-import { papelPrincipal } from './papeis.ts';
+import { noComite, papelPrincipal } from './papeis.ts';
 import type { Papel } from './supabase.ts';
 
 export type Tela = { href: string; rotulo: string; descricao: string; icone: typeof House; mais: boolean; abrange?: string };
@@ -26,12 +26,14 @@ export const NA_BARRA = 4;
 export function menu(participacoes: Participacao[]): Tela[] {
 	const principal = papelPrincipal(participacoes);
 	const papeis = new Set(participacoes.map((p) => p.papel));
-	const sigla = participacoes.find((p) => p.comite_sigla)?.comite_sigla;
+	// Passo 54: o comitê aparece sempre que a pessoa tem um comitê, qualquer que seja o principal.
+	const meu = noComite(participacoes);
+	const sigla = meu?.comite_sigla;
 	const siglaCrise = participacoes.find((p) => p.papel === 'crise')?.comite_sigla;
 	const tela = (href: string, rotulo: string, descricao: string, icone: typeof House): Omit<Tela, 'mais'> => ({ href, rotulo, descricao, icone });
 
 	const sessao = sigla
-		? principal === 'mesa'
+		? meu?.papel === 'mesa'
 			? { ...tela(`/comite/${sigla}/sessao/presidencia`, t('Painel'), t('Conduzir a sessão: palavra, pontos e votações'), Gavel), abrange: `/comite/${sigla}/sessao` }
 			: tela(`/comite/${sigla}/sessao`, t('Sessão'), t('A sessão ao vivo: placa, pontos e votos'), Gavel)
 		: null;
@@ -59,7 +61,7 @@ export function menu(participacoes: Participacao[]): Tela[] {
 			: principal === 'crise'
 				? [agora, ...crise, ...(sessao ? [sessao] : []), ...comite.slice(1, 2), comite[0], comite[2], press, ...geral]
 				: principal === 'secretaria'
-					? [agora, ...secretaria, press, ...geral]
+					? [agora, ...(sessao ? [sessao] : []), ...comite, ...secretaria, press, ...geral]
 					: [agora, ...(sessao ? [sessao] : []), ...comite, press, ...geral, ...crise, ...secretaria];
 	const telas = ordem.filter((x) => !!x);
 	// Com até 5 telas, todas cabem na barra e não há "Mais".

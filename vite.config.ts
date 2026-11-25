@@ -1,8 +1,19 @@
 import adapter from '@sveltejs/adapter-static';
 import { sveltekit } from '@sveltejs/kit/vite';
+import { execSync } from 'node:child_process';
 import { defineConfig } from 'vitest/config';
 
+// Passo 54: a versão na página "Sobre" é o commit do build (o Cloudflare Pages dá o dele).
+const versao = (() => {
+	try {
+		return process.env.CF_PAGES_COMMIT_SHA ?? execSync('git rev-parse HEAD').toString();
+	} catch {
+		return 'dev';
+	}
+})();
+
 export default defineConfig({
+	define: { __VERSAO__: JSON.stringify(versao.trim().slice(0, 7)) },
 	// Testes de unidade: só funções puras de src/lib e dos scripts (as telas ficam com o Playwright).
 	test: {
 		include: ['src/**/*.test.ts', 'scripts/**/*.test.ts']

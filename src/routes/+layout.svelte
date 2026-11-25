@@ -26,7 +26,7 @@
 	import { anterior, antesDeNavegar, depoisDeNavegar } from '#lib/voltar.svelte.ts';
 	import { abrirAnotacao, anotacao, ficha, previa } from '#lib/ficha.svelte.ts';
 	import NotebookPen from '@lucide/svelte/icons/notebook-pen';
-	import { papelPrincipal, rotuloPapel } from '#lib/papeis.ts';
+	import { noComite, papelPrincipal, rotuloPapel } from '#lib/papeis.ts';
 	import Modal from '#lib/ui/Modal.svelte';
 	import CaixaDeSaida from '#lib/ui/CaixaDeSaida.svelte';
 	import Trilha from '#lib/ui/Trilha.svelte';
@@ -42,7 +42,9 @@
 	const itens = $derived(menu(data.participacoes));
 	const temMais = $derived(itens.some((i) => i.mais));
 	// Passo 43: quem a pessoa é no evento fica sempre à vista na faixa (país ou papel).
-	const eu = $derived(data.participacoes.find((p) => p.papel === principal) ?? data.participacoes[0]);
+	// Passo 54: o papel no comitê primeiro, e os outros papéis depois ("Mesa · CSNU-T · Secretaria").
+	const eu = $derived(noComite(data.participacoes) ?? data.participacoes.find((p) => p.papel === principal) ?? data.participacoes[0]);
+	const outrosPapeis = $derived([...new Set(data.participacoes.map((p) => p.papel))].filter((p) => p !== eu?.papel).map(rotuloPapel));
 	// As bandeiras (271 arquivos) ficam fora da primeira abertura: o componente vem sob demanda.
 	const bandeira = import('#lib/ui/Bandeira.svelte');
 	const comMenu = $derived(data.participacoes.length > 0);
@@ -84,6 +86,18 @@
 			evento.preventDefault();
 			abrirIrPara();
 		}
+		// Passo 54: "?" abre a página "Sobre", menos quando a pessoa digita.
+		if (evento.key === '?' && !(evento.target as Element).closest('input, textarea, select, [contenteditable]')) void goto('/sobre');
+	}
+	// Passo 54: o clique longo no logo também abre o "Sobre" (e não leva à Agora).
+	let segurando: ReturnType<typeof setTimeout> | undefined;
+	let cliqueLongo = false;
+	function segurarLogo() {
+		cliqueLongo = false;
+		segurando = setTimeout(() => {
+			cliqueLongo = true;
+			void goto('/sobre');
+		}, 700);
 	}
 	// O nome do evento da pessoa, para os títulos e o cabeçalho (passo 27).
 	const nomeDoEvento = $derived(data.participacoes[0]?.evento_nome ?? null);
@@ -156,7 +170,7 @@
 	// na caixa de saída, avisa que eles se perderiam e oferece enviar antes (passo 44).
 	let avisoSaida = $state<Modal>();
 	const quemSai = $derived(
-		[data.nome, eu?.papel === 'delegado' ? eu.delegacao_nome : eu && rotuloPapel(eu.papel), eu?.comite_sigla].filter(Boolean).join(' · ')
+		[data.nome, eu?.papel === 'delegado' ? eu.delegacao_nome : eu && rotuloPapel(eu.papel), eu?.comite_sigla, ...outrosPapeis].filter(Boolean).join(' · ')
 	);
 	let enviandoAntes = $state(false);
 	let semRedeAoSair = $state(false);
@@ -211,7 +225,15 @@
 
 	<div class="app" class:app--sem-menu={!comMenu}>
 		<header class="timbre">
-			<a class="marca" href="/">
+			<a
+				class="marca"
+				href="/"
+				onpointerdown={segurarLogo}
+				onpointerup={() => clearTimeout(segurando)}
+				onpointerleave={() => clearTimeout(segurando)}
+				oncontextmenu={(e) => cliqueLongo && e.preventDefault()}
+				onclick={(e) => cliqueLongo && e.preventDefault()}
+			>
 				<img class="marca-logo" src="/favicon.svg" alt="" width="32" height="32" />
 				<span class="marca-texto">
 					<span class="marca-sigla">{APP}</span>
@@ -269,6 +291,7 @@
 						<span class="identidade" title={data.nome ?? undefined}>
 							<span class="identidade-nome">{rotuloPapel(eu.papel)}</span>
 							{#if eu.comite_sigla}<span class="identidade-comite">{eu.comite_sigla}</span>{/if}
+							{#each outrosPapeis as outro (outro)}<span class="identidade-comite">{outro}</span>{/each}
 						</span>
 					{/if}
 					<!-- Passo 47: no celular, tema, idioma, Perfil e Sair ficam em "Mais" (.so-largo). -->

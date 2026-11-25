@@ -111,7 +111,7 @@
 	});
 </script>
 
-<Modal bind:this={modal} classe="ficha" rotulo="ficha-titulo" onclose={fecharFicha}>
+<Modal bind:this={modal} classe="modal-ficha" rotulo="ficha-titulo" onclose={fecharFicha}>
 	{#if dados?.delegacao && escrever}
 		<h3 id="ficha-titulo">
 			{escrever === 'bilhete' ? t('Bilhete para {delegacao}', { delegacao: dados.delegacao.nome }) : t('Carta para {delegacao}', { delegacao: dados.delegacao.nome })}

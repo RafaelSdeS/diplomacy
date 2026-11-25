@@ -35,12 +35,15 @@ test('o delegado vê a sessão ao vivo no Agora e levanta a placa dali; a mesa v
 	await expect(aoVivo.getByRole('button', { name: 'Levantar placa' })).toBeVisible();
 });
 
-test('a mesa vê os atalhos e os contadores, e o menu leva ao painel', async ({ page }, info) => {
+// Passo 54: esta mesa também é secretaria; o comitê não some por isso.
+test('secretaria e mesa: a Agora mostra a mesa e a secretaria, e o menu leva ao painel', async ({ page }, info) => {
 	test.skip(info.project.name !== 'notebook', 'uma tela basta');
 	await entrar(page, MESA);
 	const mesa = page.getByRole('article', { name: `Mesa · ${C.sigla}` });
 	await expect(mesa).toContainText(/Sessão \d+ aberta/);
 	await expect(mesa.getByRole('link', { name: 'Pedidos para o bureau' })).toBeVisible();
+	await expect(page.getByRole('article', { name: 'Secretaria' }).getByRole('link', { name: 'Check-in' })).toBeVisible();
+	await expect(page.getByRole('banner')).toContainText('Secretaria');
 	await page.getByRole('navigation', { name: 'Principal' }).getByRole('link', { name: 'Painel' }).click();
 	await expect(page).toHaveURL(`/comite/${C.sigla}/sessao/presidencia`);
 });

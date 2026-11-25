@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { contaDoTreino, isolado } from '../scripts/delegacoes.ts';
-import { CONTAS, clienteComo, comiteEmDebate, entrar, desfazerRapido } from './ajuda.ts';
+import { CONTAS, clienteComo, comiteEmDebate, entrar, desfazerRapido, noCentro } from './ajuda.ts';
 
 // Passo 47 (item 4): as fichas da votação, do ponto e da nota abrem por cima da tela, sem
 // mudar a URL, e a ação da ficha (encerrar a votação, retirar o ponto) funciona dali.
@@ -44,6 +44,7 @@ test('a ficha da votação abre sem mudar a URL, e a mesa encerra a votação da
 	await expect(ficha).toContainText('Não votaram');
 	expect(page.url()).toBe(url);
 	await semErrosDeAcessibilidade(page);
+	await noCentro(ficha);
 
 	await ficha.getByRole('button', { name: 'Encerrar a votação' }).click();
 	await page.getByRole('dialog', { name: `Encerrar a votação de ${objeto}?` }).getByRole('button', { name: 'Encerrar a votação' }).click();
@@ -72,6 +73,7 @@ test('a delegação abre a ficha do próprio ponto e o retira dali', async ({ pa
 	await expect(ficha).toContainText('Paraguai');
 	await expect(ficha).toContainText('Aguardando o bureau');
 	expect(page.url()).toBe(url);
+	await noCentro(ficha);
 	await semErrosDeAcessibilidade(page);
 
 	// Passo 47 (item 10): retirar tem volta. "Desfazer" cancela; sem ele, vale depois da espera.
@@ -107,6 +109,7 @@ test('a ficha da nota mostra o texto inteiro, na página da crise', async ({ pag
 	await expect(ficha).toContainText('Nota');
 	expect(page.url()).toBe(url);
 	await semErrosDeAcessibilidade(page);
+	await noCentro(ficha);
 });
 
 test('a prévia da carta abre na central de Documentos e na página de cartas, sem mudar a URL', async ({ page }) => {
@@ -124,6 +127,7 @@ test('a prévia da carta abre na central de Documentos e na página de cartas, s
 		await expect(previa.getByRole('link', { name: 'Imprimir ou salvar como PDF' })).toHaveAttribute('href', /^\/imprimir\/carta\//);
 		expect(page.url()).toContain(rota);
 		await semErrosDeAcessibilidade(page);
+		await noCentro(previa);
 		await page.keyboard.press('Escape');
 		await expect(previa).toBeHidden();
 	}
@@ -160,6 +164,7 @@ test('da ficha da delegação saem um bilhete e uma carta, sem ir a outra tela',
 	await page.getByRole('dialog', { name: 'Ir para…' }).getByRole('searchbox').fill('brasil');
 	await page.getByRole('dialog', { name: 'Ir para…' }).getByRole('button', { name: 'Brasil' }).click();
 	const ficha = page.getByRole('dialog', { name: 'Brasil' });
+	await noCentro(ficha);
 	await ficha.getByRole('button', { name: 'Mandar bilhete' }).click();
 	const escrever = page.getByRole('dialog', { name: 'Bilhete para Brasil' });
 	await escrever.getByLabel('Bilhete').fill(bilhete);

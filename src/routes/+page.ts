@@ -1,5 +1,5 @@
 import { semRede } from '#lib/cache-dados.ts';
-import { papelPrincipal } from '#lib/papeis.ts';
+import { noComite, papelPrincipal } from '#lib/papeis.ts';
 import { carregarIncidentes } from '#lib/crise.ts';
 import { carregarSessao } from '#lib/sessao.ts';
 import { supabase } from '#lib/supabase.ts';
@@ -18,8 +18,11 @@ export const load: PageLoad = async ({ parent, depends }) => {
 	const { usuario, participacoes } = await parent();
 	// Passo 32: o Agora de cada papel. Delegado e mesa veem a sessão ao vivo do comitê.
 	const principal = papelPrincipal(participacoes);
-	const minha = participacoes.find((p) => p.papel === principal && p.comite_id);
-	const comiteAoVivo = principal === 'delegado' || principal === 'mesa' ? (minha?.comite_id ?? null) : null;
+	// Passo 54: o bloco do comitê vem da participação no comitê, qualquer que seja o principal
+	// (quem é secretaria e mesa vê a sessão da mesa).
+	const minha = noComite(participacoes);
+	const papel = minha?.papel ?? null;
+	const comiteAoVivo = papel === 'delegado' || papel === 'mesa' ? (minha?.comite_id ?? null) : null;
 	// Sem a hora na consulta: a mesma URL sempre, para a resposta guardada abrir o Agora sem
 	// rede (passo 15). O que já passou sai aqui.
 	const agoraIso = new Date().toISOString();
@@ -63,7 +66,7 @@ export const load: PageLoad = async ({ parent, depends }) => {
 				.limit(3)
 		)
 	]);
-	const minhaDelegacao = principal === 'delegado' ? (minha?.delegacao_id ?? null) : null;
+	const minhaDelegacao = papel === 'delegado' ? (minha?.delegacao_id ?? null) : null;
 	const [aoVivo, bilhetes, rodadas, mesa, crise, entrevistas, pedidosEntrevista, chamadaColetiva] = await Promise.all([
 		comiteAoVivo
 			? Promise.all([
@@ -86,7 +89,7 @@ export const load: PageLoad = async ({ parent, depends }) => {
 		minhaDelegacao
 			? ler('rodadas', ['rodada'], () => supabase.from('rodada').select('fim, documento!inner(id, titulo)').order('fim', { ascending: false }).limit(10))
 			: { data: [], error: null },
-		principal === 'mesa' && minha?.comite_id
+		papel === 'mesa' && minha?.comite_id
 			? Promise.all([
 					contar(ler('dpos-enviados', ['dpo'], () => supabase.from('dpo').select('id', { count: 'exact', head: true }).eq('comite_id', minha.comite_id!).eq('status', 'enviado'))),
 					contar(
@@ -96,7 +99,7 @@ export const load: PageLoad = async ({ parent, depends }) => {
 					)
 				]).then(([dpos, documentos]) => ({ dpos, documentos }))
 			: null,
-		principal === 'crise' && minha?.comite_id
+		papel === 'crise' && minha?.comite_id
 			? contar(
 					ler('notas-pendentes', ['nota_crise'], () =>
 						supabase.from('nota_crise').select('id', { count: 'exact', head: true }).eq('comite_id', minha.comite_id!).eq('status', 'pendente')
@@ -145,6 +148,8 @@ export const load: PageLoad = async ({ parent, depends }) => {
 		dpos: dpos.data,
 		citacoes: citacoes.data.map((c) => c.noticia),
 		principal,
+		papel,
+		secretaria: participacoes.some((p) => p.papel === 'secretaria'),
 		minha: minha ?? null,
 		aoVivo,
 		bilhetes: bilhetes.data ?? [],

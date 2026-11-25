@@ -107,6 +107,9 @@
 		votacaoVista = id;
 		setTimeout(() => chamarAtencao('c-votacao'));
 	});
+	// Passo 54: a posição da delegação entre quem ainda não falou ("Você é a 3ª").
+	const minhaNaLista = $derived(eu ? lista.filter((i) => !i.falou).findIndex((i) => i.delegacao?.id === eu.delegacao_id) : -1);
+	let modalPlacas = $state<Modal>();
 	const naListaCurta = $derived((sessao?.proximos ?? []).findIndex((p) => p.delegacao?.id === eu?.delegacao_id));
 	// Passo 51: o ponto ou moção abre no modal, com o foco já no tipo.
 	function irAoPonto() {
@@ -194,6 +197,10 @@
 	<a class="botao botao--secundario botao--pequeno" href={`/telao/${data.comite.sigla}`}
 		><Presentation aria-hidden="true" size={16} strokeWidth={1.75} /> {t('Telão')}</a
 	>
+	<!-- Passo 46: anotar sem sair da sessão. Passo 54: na barra, não no meio dos cartões. -->
+	{#if eu && data.estado && !restrita && !representada}
+		<NotaRapida comite={data.comite} estado={data.estado} onresultado={(r) => ({ erro, mensagem } = r)} />
+	{/if}
 </nav>
 
 {#if !data.estado || !sessao}
@@ -237,8 +244,10 @@
 	{#if minhaVez}<p class="sua-vez" role="status">{t('A palavra é sua')}</p>{/if}
 
 	<!-- Passo 43: no notebook, o que a delegação faz à esquerda e o que acontece na sala à
-	     direita; no celular, a ação vem primeiro. -->
-	<div class="sessao-colunas">
+	     direita; no celular, a ação vem primeiro. Passo 54: sem delegação (mesa, crise, press),
+	     uma coluna, com "A palavra" largo no topo. -->
+	<div class={['sessao-colunas', !eu && 'sessao-colunas--uma']}>
+		{#if !eu}<div class="cartoes">{@render aPalavra(data.estado)}</div>{/if}
 		<div class="cartoes sessao-acao">
 			<AlertaCrise incidentes={data.incidentes} {diferenca} />
 			{#if momento === 'pausa' && eu && !restrita && !impedida}
@@ -306,21 +315,6 @@
 						<p class="suave">{t('Sua delegação não vota nesta questão (ausente na chamada, observadora ou suspensa).')}</p>
 					{/if}
 				</article>
-			{/if}
-			{#if eu && !restrita && !impedida && data.fase !== 'plenaria'}
-				<article class="cartao" aria-labelledby="c-placa">
-					<h2 id="c-placa">{t('Sua placa')}</h2>
-					{#if naListaCurta >= 0}
-						<p class="sucesso" role="status">{t('Sua delegação é a {n}ª da lista curta.', { n: naListaCurta + 1 })}</p>
-					{/if}
-					<BotaoPlaca comiteId={data.comite.id} {posicao} nome={eu.delegacao_nome ?? ''} onerro={(m) => (erro = m)} />
-					<p>
-						<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => placa?.abrir()}>
-							{t('Mostrar placa em tela cheia')}
-						</button>
-					</p>
-				</article>
-
 			{/if}
 		{#if eu && !restrita && !impedida}
 			<section class="cartao" aria-labelledby="t-ponto">
@@ -394,45 +388,7 @@
 		{/if}
 		</div>
 		<div class="cartoes sessao-sala">
-			<article class="cartao cartao--ao-vivo" aria-labelledby="c-palavra">
-				<h2 id="c-palavra">{t('Com a palavra')}</h2>
-				{#if data.estado.orador}
-					<p class="destaque com-bandeira">
-						<Bandeira codigo={data.estado.orador.bandeira} />
-						{data.estado.orador.nome}
-					</p>
-				{:else}
-					<p class="suave">{t('Ninguém com a palavra.')}</p>
-				{/if}
-				<Cronometro cronometro={data.estado} avisoSeg={data.regras.aviso_fala_seg} {diferenca} />
-				{#if temDebate(data.estado)}
-					<p class="rotulo">{FORMAS[data.estado.forma]} · {t('tempo do debate')}</p>
-					<Cronometro cronometro={relogioDebate(data.estado)} avisoSeg={60} {diferenca} />
-				{/if}
-			</article>
-
-			<!-- Passo 46: anotar e preparar a próxima fala sem sair da sessão (no celular, uma folha). -->
-			{#if eu && !restrita && !representada}
-				<NotaRapida comite={data.comite} estado={data.estado} onresultado={(r) => ({ erro, mensagem } = r)} />
-			{/if}
-
-			{#if lista.length}
-				<article class="cartao" aria-labelledby="c-lista">
-					<h2 id="c-lista">{emDiscussao ? t('Lista especial') : t('Lista de oradores')}</h2>
-					{#if emDiscussao}
-						<p>{descreverPonto(emDiscussao)}</p>
-					{/if}
-					<ol class="lista">
-						{#each lista as inscricao (inscricao.id)}
-							<li>
-								<NomeDelegacao ficha sigla={data.comite.sigla} delegacao={inscricao.delegacao} />
-								{#if inscricao.lado}<span class="selo">{inscricao.lado === 'a_favor' ? t('A favor') : t('Contra')}</span>{/if}
-								{#if inscricao.falou}<span class="selo selo--ok">{t('Falou')}</span>{/if}
-							</li>
-						{/each}
-					</ol>
-				</article>
-			{/if}
+			{#if eu}{@render aPalavra(data.estado)}{/if}
 
 			{#if emDiscussao && eu && !restrita}
 				<article class="cartao" aria-labelledby="c-inscricao">
@@ -442,18 +398,6 @@
 						<button class="botao" type="button" onclick={() => inscrever('a_favor')}>{t('Falar a favor')}</button>
 						<button class="botao botao--secundario" type="button" onclick={() => inscrever('contra')}>{t('Falar contra')}</button>
 					</div>
-				</article>
-			{/if}
-			{#if eu && !restrita && !impedida && data.fase !== 'plenaria'}
-				<article class="cartao" aria-labelledby="c-fila">
-					<h2 id="c-fila">{t('Pedidos de fala')}</h2>
-					<ol class="lista">
-						{#each fila as pedido (pedido.id)}
-							<li><NomeDelegacao ficha sigla={data.comite.sigla} delegacao={pedido.delegacao} /></li>
-						{:else}
-							<li class="suave">{t('Nenhuma placa levantada.')}</li>
-						{/each}
-					</ol>
 				</article>
 			{/if}
 		{#if data.votacoes.length}
@@ -491,6 +435,81 @@
 		{/if}
 	{/if}
 {/snippet}
+
+<!-- Passo 54: quem fala, quem vem a seguir e as placas levantadas num cartão só, como no painel
+     e no telão; a placa da delegação fica embaixo, onde está o efeito. -->
+{#snippet aPalavra(estado: NonNullable<typeof data.estado>)}
+	<article class="cartao cartao--ao-vivo" aria-labelledby="c-palavra">
+		<h2 id="c-palavra">{t('A palavra')}</h2>
+		{#if estado.orador}
+			<p class="destaque com-bandeira">
+				<Bandeira codigo={estado.orador.bandeira} />
+				{estado.orador.nome}
+			</p>
+		{:else}
+			<p class="suave">{t('Ninguém com a palavra.')}</p>
+		{/if}
+		<Cronometro cronometro={estado} avisoSeg={data.regras.aviso_fala_seg} {diferenca} />
+		{#if temDebate(estado)}
+			<p class="rotulo">{FORMAS[estado.forma]} · {t('tempo do debate')}</p>
+			<Cronometro cronometro={relogioDebate(estado)} avisoSeg={60} {diferenca} />
+		{/if}
+		{#if lista.length}
+			<h3>{emDiscussao ? t('Lista especial') : t('A seguir')}</h3>
+			{#if emDiscussao}<p>{descreverPonto(emDiscussao)}</p>{/if}
+			{#if minhaNaLista >= 0}<p class="sucesso">{t('Você é a {n}ª', { n: minhaNaLista + 1 })}</p>{/if}
+			<ol class="lista" aria-label={emDiscussao ? t('Lista especial') : t('Lista de oradores')}>
+				{#each lista as inscricao (inscricao.id)}
+					<li class={[eu && inscricao.delegacao?.id === eu.delegacao_id && 'lista-minha']}>
+						<NomeDelegacao ficha sigla={data.comite.sigla} delegacao={inscricao.delegacao} />
+						{#if inscricao.lado}<span class="selo">{inscricao.lado === 'a_favor' ? t('A favor') : t('Contra')}</span>{/if}
+						{#if inscricao.falou}<span class="selo selo--ok">{t('Falou')}</span>{/if}
+					</li>
+				{/each}
+			</ol>
+		{:else if sessao?.proximos.length}
+			<!-- No debate, quem vem a seguir é a lista curta da presidência. -->
+			<h3>{t('A seguir')}</h3>
+			{#if naListaCurta >= 0}
+				<p class="sucesso" role="status">{t('Sua delegação é a {n}ª da lista curta.', { n: naListaCurta + 1 })}</p>
+			{/if}
+			<ol class="lista" aria-label={t('Próximos')}>
+				{#each sessao.proximos as p, i (p.delegacao?.id ?? i)}
+					<li class={[eu && p.delegacao?.id === eu.delegacao_id && 'lista-minha']}>
+						<NomeDelegacao ficha sigla={data.comite.sigla} delegacao={p.delegacao} />
+					</li>
+				{/each}
+			</ol>
+		{/if}
+		{#if data.fase !== 'plenaria'}
+			<p>
+				<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => modalPlacas?.abrir()}
+					>{t('Placas levantadas')} <span class="selo">{fila.length}</span></button
+				>
+			</p>
+		{/if}
+		{#if eu && !restrita && !impedida && data.fase !== 'plenaria'}
+			<BotaoPlaca compacto comiteId={data.comite.id} {posicao} nome={eu.delegacao_nome ?? ''} onerro={(m) => (erro = m)} />
+			<p>
+				<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => placa?.abrir()}>
+					{t('Mostrar placa em tela cheia')}
+				</button>
+			</p>
+		{/if}
+	</article>
+{/snippet}
+
+<Modal bind:this={modalPlacas} nome={t('Placas levantadas')} classe="modal-acao">
+	<h3>{t('Placas levantadas')}</h3>
+	<ol class="lista">
+		{#each fila as pedido (pedido.id)}
+			<li><NomeDelegacao ficha sigla={data.comite.sigla} delegacao={pedido.delegacao} /></li>
+		{:else}
+			<li class="suave">{t('Nenhuma placa levantada.')}</li>
+		{/each}
+	</ol>
+	<form method="dialog" class="acoes"><button class="botao botao--secundario">{t('Fechar')}</button></form>
+</Modal>
 
 <FichaVotacao
 	votacao={verVotacao ? data.votacao : null}

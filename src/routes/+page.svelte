@@ -54,7 +54,7 @@
 	const estado = $derived(data.aoVivo?.estado ?? null);
 	const sessao = $derived(estado?.sessao ?? null);
 	const momento = $derived(estado ? momentoDoDebate(estado, agoraMs + diferenca) : null);
-	const minhaDelegacao = $derived(data.principal === 'delegado' ? (data.minha?.delegacao_id ?? null) : null);
+	const minhaDelegacao = $derived(data.papel === 'delegado' ? (data.minha?.delegacao_id ?? null) : null);
 	const preside = $derived(!!minhaDelegacao && sessao?.presidencia?.id === minhaDelegacao && data.aoVivo?.fase === 'debate');
 	const posicao = $derived((sessao?.pedidos ?? []).findIndex((p) => p.delegacao?.id === minhaDelegacao));
 	const votacao = $derived(data.aoVivo?.votacao?.aberta ? data.aoVivo.votacao : null);
@@ -123,7 +123,7 @@
 		</article>
 	{/if}
 
-	{#if data.principal === 'delegado' && data.aoVivo}
+	{#if data.papel === 'delegado' && data.aoVivo}
 		<article class="cartao cartao--ao-vivo cartao--largo" aria-labelledby="c-ao-vivo">
 			<h2 id="c-ao-vivo">{t('Sessão ao vivo')} · {sigla}</h2>
 			{#if sessao && estado && !preside}
@@ -170,7 +170,7 @@
 
 	<!-- Passo 43: o que espera a delegação, cada item a um clique do lugar exato. -->
 	<!-- Passo 51 (lote 2): sem pendências e com a sessão ao vivo à vista, o cartão sai (sem ruído). -->
-	{#if data.principal === 'delegado' && !(nadaParaDelegacao && data.aoVivo)}
+	{#if data.papel === 'delegado' && !(nadaParaDelegacao && data.aoVivo)}
 		<article class={['cartao', nadaParaDelegacao ? 'precisa-vazio' : 'cartao--destaque']} aria-labelledby="c-caixa">
 			<h2 id="c-caixa">{t('Precisa de você')}</h2>
 			<ul class="lista">
@@ -220,7 +220,7 @@
 		</article>
 	{/if}
 
-	{#if data.principal === 'mesa'}
+	{#if data.papel === 'mesa'}
 		<article class="cartao cartao--destaque" aria-labelledby="c-mesa">
 			<h2 id="c-mesa">{t('Mesa')} · {sigla}</h2>
 			<p>{sessao ? t('Sessão {n} aberta', { n: sessao.numero }) : t('Nenhuma sessão aberta.')}</p>
@@ -242,7 +242,7 @@
 		</article>
 	{/if}
 
-	{#if data.principal === 'crise'}
+	{#if data.papel === 'crise'}
 		<article class="cartao cartao--destaque" aria-labelledby="c-crise-equipe">
 			<h2 id="c-crise-equipe">{t('Crise')} · {sigla}</h2>
 			<p class="destaque">{t('{n} notas esperando resposta', { n: data.notasPendentes ?? 0 })}</p>
@@ -270,13 +270,14 @@
 		</article>
 	{/if}
 
-	{#if data.principal === 'secretaria'}
-		<article class="cartao cartao--destaque" aria-labelledby="c-secretaria">
+	<!-- Passo 54: com um comitê (mesa), o bloco dele vem em cima e a secretaria fica compacta. -->
+	{#if data.secretaria}
+		<article class={['cartao', !data.papel && 'cartao--destaque']} aria-labelledby="c-secretaria">
 			<h2 id="c-secretaria">{t('Secretaria')}</h2>
 			<div class="acoes">
-				<a class="botao" href="/secretaria/checkin">{t('Check-in')}</a>
-				<a class="botao botao--secundario" href="/secretaria/participantes">{t('Participantes')}</a>
-				<a class="botao botao--secundario" href="/avisos">{t('Avisos')}</a>
+				<a class={['botao', data.papel && 'botao--pequeno']} href="/secretaria/checkin">{t('Check-in')}</a>
+				<a class={['botao botao--secundario', data.papel && 'botao--pequeno']} href="/secretaria/participantes">{t('Participantes')}</a>
+				{#if !data.papel}<a class="botao botao--secundario" href="/avisos">{t('Avisos')}</a>{/if}
 			</div>
 		</article>
 	{/if}

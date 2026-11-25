@@ -184,7 +184,7 @@ test('no debate, preside a delegação sorteada, e um pedido de fala chega ao pa
 	const delegado = await abrir(browser, C.conta(contaDaDelegacao(outra)), SESSAO);
 	await delegado.getByRole('button', { name: 'Levantar placa' }).click();
 	await expect(fila).toContainText(outra, { timeout: 1_000 });
-	await expect(delegado.getByRole('article', { name: 'Sua placa' })).toContainText('1ª na fila');
+	await expect(delegado.getByRole('article', { name: 'A palavra' })).toContainText('1ª na fila');
 	await Promise.all([painel, delegado].map((p) => p.context().close()));
 });
 
@@ -195,7 +195,7 @@ test('Enter dá a palavra ao próximo, e os dois aparelhos mostram o mesmo tempo
 
 	await painel.keyboard.press('Enter');
 	await expect(painel.getByRole('region', { name: 'Com a palavra' })).toContainText(outra);
-	await expect(delegado.getByRole('article', { name: 'Com a palavra' })).toContainText(outra);
+	await expect(delegado.getByRole('article', { name: 'A palavra' })).toContainText(outra);
 
 	const [aqui, la] = await Promise.all([
 		painel.locator('[data-cronometro]').textContent(),
@@ -213,7 +213,7 @@ test('Espaço pausa e retoma o cronômetro, mas não dentro de um campo', async 
 
 	await painel.keyboard.press('Space');
 	await expect(palavra.getByRole('status')).toHaveText('Pausado');
-	await expect(delegado.getByRole('article', { name: 'Com a palavra' }).getByRole('status')).toHaveText('Pausado');
+	await expect(delegado.getByRole('article', { name: 'A palavra' }).getByRole('status')).toHaveText('Pausado');
 	const pausado = await palavra.locator('[data-cronometro]').textContent();
 	await painel.waitForTimeout(1_500);
 	await expect(palavra.locator('[data-cronometro]')).toHaveText(pausado!);
