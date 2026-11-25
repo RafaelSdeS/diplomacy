@@ -2,7 +2,7 @@
 
 **Atualizado:** 24 de novembro de 2026
 
-Este documento consolida os planos discutidos e define uma ordem para o trabalho futuro. Cada plano virou um passo do [plano de implementação](implementacao/README.md) (passos 44 a 51), com esforço e dependências.
+Este documento consolida os planos discutidos e define uma ordem para o trabalho futuro. Cada plano virou um passo do [plano de implementação](implementacao/README.md) (passos 44 a 51; os passos 52 a 58 vieram de pedidos depois de usar o app), com esforço e dependências.
 
 ## Critério
 
@@ -18,7 +18,7 @@ Recomendação geral: não começar todos os itens ao mesmo tempo. Trabalhar por
 
 ## Ordem recomendada
 
-A sequência de execução tem o **piloto depois da interface**. Os passos 44, 45 parte A, 46 e 47 estão feitos. Em 24/11/2026 a sessão de teste foi adiada: a interface ainda está carregada, com ações simples que levam a outra página, pedem rolagem ou passam por menus genéricos, e testar assim mediria esse excesso, não o app. Primeiro vieram o passo 47 ampliado; depois de usá-lo, em 24/11/2026, a interface ainda pareceu pouco intuitiva (formulários sempre abertos sem dizer para que servem, botões que parecem links, caderno longe), e os testes, lentos. Por isso vêm agora o passo 52 (testes rápidos) e os lotes 0, 1 e 2 do passo 51 (ações em botões e modais, presidência e Agora); depois a sessão de teste do passo 12; só então o resto, já com o que o piloto mostrou. A coletiva segue dividida em duas partes (ver a seção 2): o texto protegido já está feito, o fluxo oral completo vem depois do piloto.
+A sequência de execução tem o **piloto depois da interface**. Os passos 44, 45 parte A, 46 e 47 estão feitos. Em 24/11/2026 a sessão de teste foi adiada: a interface ainda está carregada, com ações simples que levam a outra página, pedem rolagem ou passam por menus genéricos, e testar assim mediria esse excesso, não o app. Primeiro vieram o passo 47 ampliado; depois de usá-lo, em 24/11/2026, a interface ainda pareceu pouco intuitiva (formulários sempre abertos sem dizer para que servem, botões que parecem links, caderno longe), e os testes, lentos. Por isso vêm agora o passo 52 (testes rápidos) e os lotes 0, 1 e 2 do passo 51 (ações em botões e modais, presidência e Agora); depois a sessão de teste do passo 12; só então o resto, já com o que o piloto mostrou. Ainda em 24/11/2026, depois dos lotes 1 e 2, o uso na conta da secretaria (que também é mesa) mostrou defeitos e pedidos novos: a conta não via o comitê, modais fora do centro, telão sem saída, lista de oradores solta, a ordem agenda → working papers → resolução pouco clara, agenda, documentos e bilhetes pouco intuitivos, e a falta de documentos da mesa. Viraram os passos 54 a 58 e o lote 3 do 51; os que o roteiro do piloto usa (54 a 56 e a parte A do 57) vêm antes dele. A coletiva segue dividida em duas partes (ver a seção 2): o texto protegido já está feito, o fluxo oral completo vem depois do piloto.
 
 | Ordem | Passo | Plano | Esforço | Por que nesta posição | Escopo mínimo |
 |---:|---|---|:-:|---|---|
@@ -28,23 +28,28 @@ A sequência de execução tem o **piloto depois da interface**. Os passos 44, 4
 | 4 | [47](implementacao/47-modais-saida-e-icones.md) | Modais, menus de escolha, saída segura e ícones (**pronto**) | G | Ataca o que mais atrapalha hoje: ações que trocam de página, menus genéricos e interface carregada; a demonstração depende dele | Modal base; fichas de votação, ponto, moção e nota; modais de ação curta; menus de escolha; saída com confirmação; `Confirmar` nas ações irreversíveis; ícones do cabeçalho |
 | 5 | [52](implementacao/52-testes-do-dia-a-dia.md) | Testes rápidos no dia a dia (**pronto**) | P–M | Cada lote do 51 roda os testes várias vezes; hoje cada rodada refaz a build e a suíte inteira | Rodar só os testes da tela mexida, sem build à toa; sem espera fixa; capturas de uma tela só; instável vira defeito |
 | 6 | [51](implementacao/51-melhorias-gerais-de-interface.md) **lotes 0, 1 e 2** | Ações em botões e modais; presidência e Agora sem rolagem (**pronto**) | M | É o que ainda torna o app pouco intuitivo, nas telas que o roteiro do piloto mais usa | Formulário aberto vira botão e modal; botão com fundo e ícone; abas no modelo da aba Comitê; Perfil e Sair só ícone; caderno de qualquer lugar; regra de rolagem a 1366 × 768 |
+| 7 | [45](implementacao/45-coletiva-oral.md) **parte B** | Coletiva de imprensa como fluxo oral (**pronto**) | M | Feita antes do piloto, que não a usa | Estados, chamada, cartão da delegação, telão da coletiva, cronômetro e conclusão |
+| 8 | [54](implementacao/54-correcoes-do-uso-de-24-11.md) | Correções do uso de 24/11 | P–M | Defeitos à vista que o piloto encontraria: quem é secretaria e mesa não vê o comitê, modais no canto, telão sem saída, lista de oradores solta | Menu e Agora com todos os papéis; classe `modal-ficha`; "Sair do telão"; cartão "A palavra"; página "Sobre" com créditos e LGPD |
+| 9 | [55](implementacao/55-paises-clicaveis.md) | Todo país abre a sua ficha | P–M | Pequeno, e muda todas as telas; o 56 e o 57 usam as bandeiras clicáveis | `NomeDelegacao` em todo lugar; ficha sempre com as minhas anotações e as compartilhadas comigo; caderno da mesa |
+| 10 | [56](implementacao/56-ordem-do-topico.md) | A ordem do tópico, a aba Agenda e a aba Documentos | M | O roteiro do piloto passa por agenda, working paper e projeto, e hoje a ordem não aparece | Trilha agenda → working papers → projeto → resolução; agenda com editor de itens e propostas lado a lado; Documentos pela ordem, sem rolar |
+| 11 | [57](implementacao/57-escrita-de-documentos.md) **parte A** | Escrever documentos sem atrito | G | Os 20 minutos de working paper e projeto do piloto dependem dele | Documento formatado editado no lugar; inserir no meio e reordenar; assinaturas no topo; posição num toque; comentários com autor, na cláusula |
 | — | [12](implementacao/12-teste-do-piloto.md) | **Sessão de teste do piloto** ([piloto.md](piloto.md)) | — | Valida o app já com a interface limpa, antes de construir mais | Roteiro, questionário e plano B em papel |
-| 7 | [45](implementacao/45-coletiva-oral.md) **parte B** | Coletiva de imprensa como fluxo oral (**pronto**) | M | Corrige uma área hoje sem utilidade real, já com o que o piloto disse sobre a imprensa | Estados, chamada, cartão da delegação, telão da coletiva, cronômetro e conclusão |
-| 8 | [53](implementacao/53-dpo-como-arquivo.md) | DPO como arquivo público | M | O DPO é preparado antes do evento e é público; hoje o app o escreve num editor e esconde por regra | PDF por tópico, aberto ao comitê, sem aprovação; prévia; editor e impressão saem |
-| 9 | [48](implementacao/48-demonstracao-online.md) | Demonstração online com acesso rápido por papel | M | Depende da segurança, da coletiva e dos modais; mostra o app inteiro por papel | Projeto separado, um comitê completo, `/demo` por papel e reinício |
-| 10 | [49](implementacao/49-edicao-por-clausula.md) | Edição colaborativa por cláusula | G | Resolve o problema central de documentos sem discussões infinitas, **se o piloto confirmar** | Proposta estruturada, rodada com prazo, comparação e fusão básica |
-| 11 | [50](implementacao/50-preparacao-da-fala.md) | Preparação de discursos e notas | M | Permite acompanhar outras delegações enquanto prepara a próxima fala, **se o piloto confirmar** | Captura rápida por tipo, painel curto da delegação e rascunho da fala |
-| 12 | [51](implementacao/51-melhorias-gerais-de-interface.md) **demais lotes** | Melhorias gerais | G | Acabamento das demais telas, aos poucos | Documento, mensagens, crise, blocos (com a troca de redator) e secretaria; estados vazios, densidade e preferências |
+| 12 | [58](implementacao/58-documentos-da-mesa.md) | Documentos da mesa para o comitê | M | Pedido novo; o piloto manda o guia por fora, e pode subir se a mesa do piloto pedir | Texto e PDF publicados ao vivo, versão conferida ao salvar, "o que mudou", telão |
+| 13 | [53](implementacao/53-dpo-como-arquivo.md) | DPO como arquivo público | M | O DPO é preparado antes do evento e é público; hoje o app o escreve num editor e esconde por regra | PDF por tópico, aberto ao comitê, sem aprovação; prévia; editor e impressão saem |
+| 14 | [48](implementacao/48-demonstracao-online.md) | Demonstração online com acesso rápido por papel | M | Depende da segurança, da coletiva e dos modais; mostra o app inteiro por papel | Projeto separado, um comitê completo, `/demo` por papel e reinício |
+| 15 | [49](implementacao/49-edicao-por-clausula.md) e [57](implementacao/57-escrita-de-documentos.md) **parte B** | Edição colaborativa por cláusula | G | Resolve o problema central de documentos sem discussões infinitas, **se o piloto confirmar**; a parte A do 57 já o diminui | Proposta estruturada, rodada com prazo, comparação e fusão básica |
+| 16 | [50](implementacao/50-preparacao-da-fala.md) | Preparação de discursos e notas | M | Permite acompanhar outras delegações enquanto prepara a próxima fala, **se o piloto confirmar** | Captura rápida por tipo, painel curto da delegação e rascunho da fala |
+| 17 | [51](implementacao/51-melhorias-gerais-de-interface.md) **demais lotes** | Melhorias gerais | G | Acabamento das demais telas, aos poucos | Primeiro o lote 3 (bilhetes como conversa, em duas colunas); depois crise, blocos (com a troca de redator) e secretaria; estados vazios, densidade e preferências |
 
-Esforço **P**, **M** ou **G** como nos passos 01 a 43. Os itens 10 e 11 só começam depois da validação com o piloto (abaixo).
+Esforço **P**, **M** ou **G** como nos passos 01 a 43. Os itens 15 e 16 só começam depois da validação com o piloto (abaixo).
 
 ## O piloto depois da interface
 
 A sessão do piloto ([piloto.md](piloto.md), passo 12) não está registrada como feita: os critérios de aceite do passo 12 seguem abertos. Ela ficava logo depois do passo 46, mas em 24/11/2026 foi adiada: a interface ainda está carregada, e uma sessão de teste agora mediria o excesso de páginas, rolagem e menus, que já se sabe que precisa mudar.
 
 - **Feito:** 44, 45 parte A, 46 e 47, o que o roteiro exercita (sessão, notas, aparelho compartilhado), o que não pode vazar e a base dos modais.
-- **Antes do piloto:** 52 (testes rápidos) e os lotes 0, 1 e 2 do 51 (ações em botões e modais, presidência e Agora), as telas que o roteiro mais usa.
-- **Depois do piloto:** 45 parte B, 53 (DPO como arquivo) e 48 têm requisitos claros e entram em seguida, ajustados ao que a sessão mostrar. A coletiva completa e a demonstração não fazem parte do roteiro do piloto.
+- **Antes do piloto:** 52 (testes rápidos) e os lotes 0, 1 e 2 do 51 (feitos); depois, 54 (correções do uso de 24/11), 55 (países clicáveis), 56 (ordem do tópico, Agenda e Documentos) e a parte A do 57 (escrita de documentos), as telas que o roteiro mais usa.
+- **Depois do piloto:** 58 (documentos da mesa), 53 (DPO como arquivo) e 48 têm requisitos claros (a 45 parte B já foi feita) e entram em seguida, ajustados ao que a sessão mostrar. A coletiva completa e a demonstração não fazem parte do roteiro do piloto.
 - **Só com dor confirmada:** **os passos 49 e 50 só começam depois que o questionário do piloto responder às perguntas deles** (a rodada de propostas deu conta? o que faltou ao preparar a fala?). Se o piloto não mostrar dor, os dois ficam para depois do evento. O que o passo 46 já entrega (nota e próxima fala visíveis) pode bastar.
 - Os demais lotes do 51 entram aos poucos, o ano todo.
 
@@ -317,15 +322,22 @@ Segurança (44)
        └─ Modais, menus de escolha, saída e ícones (47)
 
 ANTES DO PILOTO
-Testes rápidos no dia a dia (52)
-  └─ Ações em botões e modais (51, lote 0)
-       └─ Presidência e Agora sem rolagem (51, lotes 1 e 2)
+Testes rápidos no dia a dia (52)                      (feito)
+  └─ Ações em botões e modais (51, lote 0)           (feito)
+       └─ Presidência e Agora sem rolagem (51, lotes 1 e 2)   (feito)
+            └─ Correções do uso de 24/11 (54)
+                 └─ Países clicáveis (55)
+                      └─ Ordem do tópico, Agenda e Documentos (56)
+                           └─ Escrita de documentos, parte A (57)
 
 PILOTO (passo 12) ── mostra o que ajustar e o que vale construir
 
 DEPOIS DO PILOTO
 Coletiva parte B: fluxo oral (45)
   └─ depende da parte A e da segurança
+
+Documentos da mesa (58)
+  └─ depende do Storage (44), da prévia (47) e do lugar na aba Documentos (56)
 
 DPO como arquivo público (53)
   └─ depende do DPO (10), do Storage (44) e da prévia (47)
@@ -363,19 +375,26 @@ Do passo 47 (feito): modal base; saída com confirmação e `Confirmar`; fichas 
 4. Perfil e Sair só com ícone; caderno de qualquer lugar;
 5. presidência e Agora sem rolagem.
 
+### Lote B2 — pedidos de 24/11, antes do piloto (passos 54, 55, 56 e 57 parte A)
+
+1. papéis somados no menu e na Agora; modais no centro; sair do telão; lista de oradores junto de quem fala; página "Sobre" (54);
+2. todo país abre a ficha, com as anotações (55);
+3. a trilha do tópico, a aba Agenda sem sintaxe e a aba Documentos pela ordem (56);
+4. o documento editado no lugar, assinaturas no topo, posição num toque e comentários na cláusula (57, parte A).
+
 ### Piloto (passo 12)
 
 Roteiro de [piloto.md](piloto.md), com a troca de conta no mesmo aparelho. A coletiva completa e a demonstração ainda não existem e ficam de fora.
 
-### Lote C — depois do piloto (passos 45 parte B, 53 e 48)
+### Lote C — depois do piloto (passos 58, 53 e 48)
 
-1. coletiva oral completa;
+1. documentos da mesa para o comitê;
 2. DPO como arquivo público;
 3. demonstração: ambiente separado, um comitê completo, contas por papel e roteiro manual.
 
 ### Lote D — produtividade (depois do piloto)
 
-1. editor por cláusula;
+1. editor por cláusula (49 e a parte B do 57);
 2. preparação da fala;
 3. busca e documentação.
 
@@ -410,8 +429,8 @@ O [plano completo](plano-do-app.pdf) (seção 17) prevê validação de dezembro
 
 Proposta de encaixe, a confirmar quando a data sair:
 
-- **antes da sessão do piloto:** lote A (feito) e lote B (passo 52 e lotes 0, 1 e 2 do 51);
-- **depois da sessão do piloto:** lote C (passos 45 parte B, 53 e 48), ajustado ao que a sessão mostrar, e em seguida o lote D (passos 49 e 50), só com o que o questionário confirmar;
+- **antes da sessão do piloto:** lote A e lote B (feitos) e lote B2 (passos 54, 55, 56 e a parte A do 57);
+- **depois da sessão do piloto:** lote C (passos 58, 53 e 48), ajustado ao que a sessão mostrar, e em seguida o lote D (passos 49 e 50), só com o que o questionário confirmar;
 - **lote E (demais lotes do passo 51):** em lotes pequenos, o ano todo, e congelado antes do ensaio de outubro.
 
 Para cada passo o esforço (P, M ou G) está na tabela; a duração em semanas depende de quanto tempo por semana a pessoa do projeto tem, e isso o documento não sabe.

@@ -40,7 +40,7 @@ Roteiro para testar o app com um grupo pequeno (passo 12), no formato do **mock*
 |---|---|---|
 | 10 min | Entrada | Login no celular de cada um; cada delegação vê o próprio comitê na Agora |
 | 10 min | Chamada | A mesa abre a sessão e faz a chamada em **Sessão → Chamada e rodízio**; o quórum aparece |
-| 20 min | Plenária de abertura | Briefing; discursos de abertura pela lista de oradores; moção do tópico no topo votada no celular; a agenda informal com as propostas lado a lado |
+| 20 min | Plenária de abertura | Briefing; discursos de abertura pela lista de oradores; moção do tópico no topo votada no celular; a agenda informal com as propostas lado a lado, e a mesa adota uma (sem agenda adotada, o working paper não abre: passo 56) |
 | 20 min | Debate formal-informal | O rodízio sorteia a delegação que preside; placas levantadas no celular; cronômetro no telão; pontos e moções |
 | 10 min | Crise | A equipe de crise publica uma atualização (plantão no telão); as delegações mandam notas; a crise responde |
 | 20 min | Working paper e projeto | Um bloco escreve um working paper (o redator aceita propostas); a mesa aprova; o projeto junta as cláusulas, ganha 5 assinaturas e vai à mesa |
@@ -90,7 +90,8 @@ Delegado:
 6. Você leu as matérias da press no app?
 7. Durante o debate, você anotou algo no app? O que faltou para preparar a sua fala sem sair da sessão?
 8. Se o seu bloco escreveu um working paper ou projeto: a rodada de propostas deu conta? O que travou (ver o que mudou, comparar versões, prazo, discussão que não acabava)?
-9. (coletiva, só depois do passo 45 parte B) Se a sua delegação foi chamada na coletiva: Ficou claro quando falar, sem ver a pergunta antes?
+9. A ordem do tópico (agenda, working paper, projeto, resolução) ficou clara na tela? Você soube em que etapa o comitê estava?
+10. (coletiva, só depois do passo 45 parte B) Se a sua delegação foi chamada na coletiva: Ficou claro quando falar, sem ver a pergunta antes?
 
 Mesa:
 5. O painel da presidência deu conta do ritmo da sessão? O que faltou?

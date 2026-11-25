@@ -70,7 +70,7 @@ Podem ser levantados entre discursos ou durante o próprio discurso.
 
 ## Documentos
 
-- **Working paper:** documento informal para ajudar o trabalho (notícias, resoluções anteriores, cláusulas de rascunho, mídia...). Sem signatários e sem formato fixo. Precisa da **aprovação prévia do bureau para ser mencionado** no comitê. Observadoras podem apresentar.
+- **Working paper:** documento informal para ajudar o trabalho (notícias, resoluções anteriores, cláusulas de rascunho, mídia...). Sem formato fixo. Tem signatários, sem mínimo, e não é votado (confirmado em 24/11/2026). Só é apresentado depois da agenda do tópico adotada, e o projeto de resolução costuma juntar os working papers do tópico no final. Precisa da **aprovação prévia do bureau para ser mencionado** no comitê. Observadoras podem apresentar.
 - **Projeto de resolução:**
   - precisa da aprovação do bureau e de **no mínimo 5 signatários**;
   - é aprovado por **maioria simples**;

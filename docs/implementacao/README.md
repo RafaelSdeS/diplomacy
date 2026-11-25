@@ -2,7 +2,7 @@
 
 Ordem dos passos para construir o app. Os passos 01 a 12 formam o **piloto**: planos gratuitos, poucos usuários e dados fictícios. Os passos 13 a 19 levam o app à **escala do evento**. Os passos 20 a 38 são as **melhorias depois da revisão** do app, explicadas e priorizadas em [melhorias-pos-revisao.pdf](../melhorias-pos-revisao.pdf). Os passos 39 a 41 deixam o desenvolvimento mais rápido, o app mais leve na internet móvel e fecham as pendências. O passo 42 aplica o estilo "chancelaria", escolhido entre os protótipos de `docs/estilos/`. O passo 43 deixa o app fácil de achar e de voltar. Os passos 44 a 51 vêm dos planos posteriores, em [ordem de prioridade](../ordem-de-prioridade.md): segurança, coletiva oral, sessão unificada, modais e ícones, demonstração online, edição por cláusula, preparação da fala e melhorias gerais. Os passos 49 e 50 só começam depois que o piloto disser que valem a pena.
 
-**Ordem de execução dos passos 44 a 51:** 44, 45 parte A e 46 (feitos); 47 e os lotes 1 e 2 do 51 (presidência e Agora); **sessão de teste do piloto (passo 12)**; 45 parte B e 48; 49 e 50 só com o que o piloto confirmar; os demais lotes do 51 aos poucos, o ano todo. O piloto foi adiado em 24/11/2026 para depois da interface, que ainda está carregada. A tabela abaixo segue a numeração, não essa sequência.
+**Ordem de execução dos passos 44 a 58:** 44, 45 (partes A e B), 46, 47, 52 e os lotes 0 a 2 do 51 (feitos); **54, 55, 56 e a parte A do 57** (correções do uso de 24/11, países clicáveis, ordem do tópico e escrita de documentos); **sessão de teste do piloto (passo 12)**; 58, 53 e 48; 49, 50 e a parte B do 57 só com o que o piloto confirmar; os demais lotes do 51 (o 3, dos bilhetes, primeiro) aos poucos, o ano todo. A tabela abaixo segue a numeração, não essa sequência.
 
 Cada passo só começa quando os passos de que ele depende estão prontos. As regras de procedimento que o app segue estão resumidas em [regras-de-procedimento.md](../regras-de-procedimento.md).
 
@@ -67,6 +67,11 @@ Cada passo só começa quando os passos de que ele depende estão prontos. As re
 | [51](51-melhorias-gerais-de-interface.md) | Melhorias gerais de interface, por tela: ações em botões e modais, presidência e Agora sem rolagem (antes do piloto), troca de redator, estados, densidade e preferências | 47, 52 |
 | [52](52-testes-do-dia-a-dia.md) | Testes rápidos no dia a dia: só os testes da tela mexida, sem build à toa, sem espera fixa, capturas de uma tela | 39 |
 | [53](53-dpo-como-arquivo.md) | DPO como arquivo público: PDF por tópico, aberto ao comitê, sem aprovação | 10, 44, 47 |
+| [54](54-correcoes-do-uso-de-24-11.md) | Correções do uso de 24/11: papéis somados (secretaria e mesa), modais no centro, sair do telão, lista de oradores junto de quem fala, página "Sobre" com créditos e LGPD | 51 |
+| [55](55-paises-clicaveis.md) | Todo país abre a sua ficha, sempre com as minhas anotações sobre ele (da delegação ou da mesa) | 47, 51, 54 |
+| [56](56-ordem-do-topico.md) | A ordem do tópico (agenda, working papers, projeto, resolução) à vista; aba Agenda sem sintaxe; aba Documentos pela ordem, sem rolar | 09, 22, 51, 54, 55 |
+| [57](57-escrita-de-documentos.md) | Escrever documentos sem atrito: o documento formatado editado no lugar, assinaturas no topo, posição num toque e comentários na cláusula | 09, 47, 55, 56 |
+| [58](58-documentos-da-mesa.md) | Documentos da mesa para o comitê: texto e PDF, publicados ao vivo, com o que mudou | 44, 47, 53, 56 |
 
 ## Melhorias depois da revisão
 
@@ -88,7 +93,7 @@ Cada passo só começa quando os passos de que ele depende estão prontos. As re
 
 ## Planos posteriores desta investigação
 
-Viraram os passos 44 a 51. Cada plano detalhado continua sendo a referência do que o passo constrói:
+Viraram os passos 44 a 51 (os passos 52 a 58 vieram de pedidos depois de usar o app). Cada plano detalhado continua sendo a referência do que o passo constrói:
 
 - [Plano de segurança online](../seguranca-online.md) → passo 44.
 - [Plano da coletiva de imprensa](../coletiva-de-imprensa.md) → passo 45.
@@ -233,6 +238,11 @@ Cada passo tem uma seção "Testes" com os testes que provam que ele funciona e 
 | 49 | sim | sim | sim | — |
 | 50 | sim | sim | sim | sim |
 | 51 | — | — | capturas e axe | sim |
+| 54 | — | sim | sim | sim |
+| 55 | sim (parte B) | sim | sim | sim |
+| 56 | sim | sim | sim | sim |
+| 57 | sim | sim | sim | sim |
+| 58 | sim | sim | sim | sim |
 
 ## Aparência
 

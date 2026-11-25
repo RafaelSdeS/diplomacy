@@ -61,7 +61,28 @@
 
 **Lote 2 · Agora** (`/`). Hoje empilha o bloco do papel e até cinco seções gerais (acontecendo agora, depois, avisos, respostas da crise, na press). O bloco do papel fica no topo; cada seção geral vira uma linha com contagem e o item mais recente, que abre o resto.
 
-**Lotes seguintes**, pelas telas maiores: documento, mensagens, crise, blocos e secretaria.
+**Lote 3 · Bilhetes como conversa** (pedido de 24/11/2026: "a aba de bilhetes também pode ser melhorada; tente algo mais próximo de uma rede social, sem perder o tom oficial e sofisticado"). O lote 0b agrupou os bilhetes por delegação, mas cada conversa ainda é um `<details>` numa lista longa, e responder abre um modal. Proposta, no modelo dos aplicativos de conversa:
+
+- **Duas colunas no notebook:** à esquerda, as conversas; à direita, a conversa aberta. No celular, a lista e, ao tocar, a conversa em tela inteira, com "Voltar".
+- **Na lista de conversas, cada linha mostra:**
+  - a bandeira, como avatar;
+  - o nome da delegação em Spectral;
+  - a prévia da última mensagem e a hora;
+  - um ponto dourado quando há mensagem não lida.
+
+  Em cima, a busca e o botão "Novo bilhete". A conversa com a mesa fica fixada no topo ("Mesa diretora", com o ícone do martelo).
+- **Na conversa:**
+  - as mensagens em balões: as minhas à direita, em marinho; as da outra delegação à esquerda, em fundo claro com fio dourado;
+  - a hora em versalete pequeno;
+  - separadores por sessão ("Sessão 3 · 14:00").
+
+  A caixa de escrever fica fixa embaixo, com "Enviar" (Enter envia, Shift + Enter quebra linha) e o rascunho por conversa, como hoje. Sem emoji nem curtidas: o tom é de chancelaria (papel, marinho e dourado), não de rede social.
+- **Não lidas sem migração:** a hora da última leitura de cada conversa fica guardada no aparelho; a contagem entra no ícone de Mensagens do menu.
+- **Bloquear e ver a ficha:** o nome no topo da conversa abre a ficha da delegação (passo 55); "Bloquear" vai para "Mais opções" da conversa, e os bloqueios saem do fim da página.
+- **Entrevistas:** continuam como pedidos em cima da lista, só quando há pedido pendente.
+- **Teste:** a 1366 × 768, a lista e a conversa não rolam a página, só a própria coluna; uma mensagem nova chega na conversa aberta sem recarregar e marca a conversa como não lida para quem não está nela.
+
+**Lotes seguintes**, pelas telas maiores: crise, blocos e secretaria. O documento virou o [passo 57](57-escrita-de-documentos.md), e as abas Agenda e Documentos, o [passo 56](56-ordem-do-topico.md).
 
 **No lote dos blocos: trocar o redator** (prioridade pequena; **a primeira parte está feita**: o redator abre "Redatores · Mudar" no cartão do bloco e marca ou desmarca membros, com bandeiras; quem entra é marcado antes de quem sai, porque o bloco precisa de um redator). Hoje o redator é quem cria o bloco. O banco já permite passar ou dividir a redação (`definir_redator`, passo 09), mas nenhuma tela usa isso. A tela do bloco ganha:
 
