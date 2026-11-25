@@ -2,7 +2,7 @@
 
 Ordem dos passos para construir o app. Os passos 01 a 12 formam o **piloto**: planos gratuitos, poucos usuários e dados fictícios. Os passos 13 a 19 levam o app à **escala do evento**. Os passos 20 a 38 são as **melhorias depois da revisão** do app, explicadas e priorizadas em [melhorias-pos-revisao.pdf](../melhorias-pos-revisao.pdf). Os passos 39 a 41 deixam o desenvolvimento mais rápido, o app mais leve na internet móvel e fecham as pendências. O passo 42 aplica o estilo "chancelaria", escolhido entre os protótipos de `docs/estilos/`. O passo 43 deixa o app fácil de achar e de voltar. Os passos 44 a 51 vêm dos planos posteriores, em [ordem de prioridade](../ordem-de-prioridade.md): segurança, coletiva oral, sessão unificada, modais e ícones, demonstração online, edição por cláusula, preparação da fala e melhorias gerais. Os passos 49 e 50 só começam depois que o piloto disser que valem a pena.
 
-**Ordem de execução dos passos 44 a 58:** 44, 45 (partes A e B), 46, 47, 52, os lotes 0 a 2 do 51, o 54, o 55, o 56, a parte A do 57, o 59, o 61 e o 60 (feitos); **sessão de teste do piloto (passo 12)**; 58, 53 e 48; 49, 50 e a parte B do 57 só com o que o piloto confirmar; os demais lotes do 51 (o 3, dos bilhetes, primeiro) aos poucos, o ano todo. A tabela abaixo segue a numeração, não essa sequência.
+**Ordem de execução dos passos 44 a 58:** 44, 45 (partes A e B), 46, 47, 52, os lotes 0 a 2 do 51, o 54, o 55, o 56, a parte A do 57, o 59, o 61 e o 60, o lote 3 do 51 (bilhetes como conversa) e o 58 sem o telão (feitos); **sessão de teste do piloto (passo 12)**; 53 e 48; 49, 50 e a parte B do 57 só com o que o piloto confirmar; os demais lotes do 51 aos poucos, o ano todo. A tabela abaixo segue a numeração, não essa sequência.
 
 Cada passo só começa quando os passos de que ele depende estão prontos. As regras de procedimento que o app segue estão resumidas em [regras-de-procedimento.md](../regras-de-procedimento.md).
 
@@ -71,7 +71,7 @@ Cada passo só começa quando os passos de que ele depende estão prontos. As re
 | [55](55-paises-clicaveis.md) | Todo país abre a sua ficha, sempre com as minhas anotações sobre ele (da delegação ou da mesa) | 47, 51, 54 |
 | [56](56-ordem-do-topico.md) | A ordem do tópico (agenda, working papers, projeto, resolução) à vista; aba Agenda sem sintaxe; aba Documentos pela ordem, sem rolar | 09, 22, 51, 54, 55 |
 | [57](57-escrita-de-documentos.md) | Escrever documentos sem atrito: o documento formatado editado no lugar, assinaturas no topo, posição num toque e comentários na cláusula | 09, 47, 55, 56 |
-| [58](58-documentos-da-mesa.md) | Documentos da mesa para o comitê: texto e PDF, publicados ao vivo, com o que mudou | 44, 47, 53, 56 |
+| [58](58-documentos-da-mesa.md) | Documentos da mesa para o comitê: texto e PDF, publicados ao vivo, com o que mudou (**pronto**, menos o telão e o "está editando") | 44, 47, 53, 56 |
 | [59](59-presidencia-e-sessao.md) | Uma presidência só, numa tela só: o bureau só na plenária, na fase de ação e em casos excepcionais, presidência muda só no fim da sessão ou na não-confiança, placas sem ordem, ponto ou moção em cima | 29, 30, 43, 46, 51, 54 |
 | [60](60-agenda-do-bureau.md) | A agenda parte do documento do bureau, liberada no dia: uma agenda por tópico, alterada como um working paper e adotada pela sala | 22, 56, 57 |
 | [61](61-saber-onde-estou.md) | Saber onde estou e o que chegou: linha do comitê desde a plenária, "Como funciona", aviso de bilhetes, "Seus documentos" | 51, 55, 56, 59 |
