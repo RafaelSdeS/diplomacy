@@ -47,6 +47,19 @@
 			.map(([id, msgs]) => ({ id, delegacao: data.delegacoes.find((d) => d.id === id), msgs: msgs.sort((a, b) => quando(a) - quando(b)) }))
 			.sort((a, b) => quando(b.msgs[b.msgs.length - 1]) - quando(a.msgs[a.msgs.length - 1]));
 	});
+	// A conversa da mesa com cada delegação (a mensagem é da delegação ou da mesa para ela).
+	const conversasDaMesa = $derived.by(() => {
+		const porDelegacao = new Map<string, (typeof data.mensagens)[number][]>();
+		for (const m of do_tipo('mesa')) {
+			const d = m.de_delegacao_id ?? m.para_delegacao_id;
+			if (d) porDelegacao.set(d, [...(porDelegacao.get(d) ?? []), m]);
+		}
+		const quando = (m: { criado_em: string }) => Date.parse(m.criado_em);
+		return [...porDelegacao]
+			.map(([id, msgs]) => ({ id, delegacao: data.delegacoes.find((d) => d.id === id), msgs: msgs.sort((a, b) => quando(a) - quando(b)) }))
+			.sort((a, b) => quando(b.msgs[b.msgs.length - 1]) - quando(a.msgs[a.msgs.length - 1]));
+	});
+	let respostaDaMesa = $state<AcaoEmModal>();
 	function responder(delegacao: string) {
 		para = delegacao;
 		novoBilhete?.abrir();
@@ -91,7 +104,10 @@
 			texto[campo] = '';
 			// Passo 51: o modal fecha quando a mensagem sai (ou fica guardada para sair depois).
 			if (tipo === 'bilhete') novoBilhete?.fechar();
-			if (tipo === 'mesa') falarComMesa?.fechar();
+			if (tipo === 'mesa') {
+				falarComMesa?.fechar();
+				respostaDaMesa?.fechar();
+			}
 		}
 		await invalidate('app:mensagens');
 	}
@@ -375,30 +391,64 @@
 		</section>
 	{/if}
 
+	<!-- Passo 51: a mesa vê uma conversa por delegação; responder abre o modal já com ela. -->
 	<section aria-labelledby="t-delegacoes">
 		<h2 id="t-delegacoes">{t('Com as delegações')}</h2>
-		<ul class="lista">
-			{#each do_tipo('mesa') as m (m.id)}
-				<li><span><strong>{m.de_delegacao_id ? nome(m.de_delegacao_id) : `${t('Mesa')} → ${nome(m.para_delegacao_id)}`}:</strong> {m.texto}</span></li>
+		<div class="acoes">
+			<AcaoEmModal bind:this={respostaDaMesa} rotulo={t('Escrever a uma delegação')} icone={Send} descricao={t('Só a delegação escolhida lê.')}>
+				<form
+					class="formulario"
+					aria-label={t('Resposta da mesa')}
+					onsubmit={(e) => {
+						e.preventDefault();
+						void enviar('mesa', 'resposta', responderA, t('Resposta enviada.'));
+					}}
+				>
+					<Escolha unica rotulo={t('Para a delegação')} botao={t('Escolher')} opcoes={data.delegacoes} bind:valor={responderA} />
+					<label class="campo">
+						{t('Resposta')}
+						<textarea required rows="3" maxlength="1000" bind:value={texto.resposta} {@attach contador(texto.resposta)}></textarea>
+					</label>
+					{#if erro}<p class="erro">{erro}</p>{/if}
+					<div class="acoes">
+						<button class="botao">{t('Enviar')}</button>
+						<button class="botao botao--secundario" type="button" onclick={() => respostaDaMesa?.fechar()}>{t('Cancelar')}</button>
+					</div>
+				</form>
+			</AcaoEmModal>
+		</div>
+		<ul class="lista conversas">
+			{#each conversasDaMesa as c, i (c.id)}
+				{@const ultima = c.msgs[c.msgs.length - 1]}
+				<li>
+					<details class="conversa" open={i === 0}>
+						<summary>
+							<span class="com-bandeira"><Bandeira codigo={c.delegacao?.bandeira} /> <strong>{c.delegacao?.nome}</strong></span>
+							<span class="conversa-ultima">{ultima.de_delegacao_id ? '' : `${t('Mesa')}: `}{ultima.texto}</span>
+							<span class="detalhe"><Quando iso={ultima.criado_em} /></span>
+						</summary>
+						<ol class="lista conversa-mensagens">
+							{#each c.msgs as m (m.id)}
+								<li class={m.de_delegacao_id ? '' : 'conversa-minha'}>
+									<span><strong>{m.de_delegacao_id ? c.delegacao?.nome : t('Mesa')}:</strong> {m.texto} <span class="detalhe"><Quando iso={m.criado_em} /></span></span>
+								</li>
+							{/each}
+						</ol>
+					</details>
+					<button
+						class="botao botao--secundario botao--pequeno"
+						type="button"
+						aria-label={t('Responder a {delegacao}', { delegacao: c.delegacao?.nome ?? '' })}
+						onclick={() => {
+							responderA = c.id;
+							respostaDaMesa?.abrir();
+						}}>{t('Responder')}</button
+					>
+				</li>
 			{:else}
 				<li class="suave">{t('Nenhuma mensagem das delegações.')}</li>
 			{/each}
 		</ul>
-		<form
-			class="formulario"
-			aria-label={t('Resposta da mesa')}
-			onsubmit={(e) => {
-				e.preventDefault();
-				void enviar('mesa', 'resposta', responderA, t('Resposta enviada.'));
-			}}
-		>
-			<Escolha unica rotulo={t('Para a delegação')} botao={t('Escolher')} opcoes={data.delegacoes} bind:valor={responderA} />
-			<label class="campo">
-				{t('Resposta')}
-				<textarea required rows="2" maxlength="1000" bind:value={texto.resposta} {@attach contador(texto.resposta)}></textarea>
-			</label>
-			<button class="botao botao--secundario">{t('Responder')}</button>
-		</form>
 	</section>
 
 	{#if do_tipo('bilhete').length}

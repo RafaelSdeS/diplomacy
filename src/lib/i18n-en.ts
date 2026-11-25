@@ -842,6 +842,8 @@ export const EN: Record<string, string> = {
 	'Assinaturas': 'Signatures',
 	'Ninguém escolhido': 'No one chosen',
 	'Nenhuma escolhida': 'None chosen',
+	'Só a delegação escolhida lê.': 'Only the chosen delegation reads it.',
+	'Escrever a uma delegação': 'Write to a delegation',
 	'Mudar': 'Change',
 	'Redatores': 'Drafters',
 	'A nota vem depois da resposta.': 'The note comes after the answer.',
