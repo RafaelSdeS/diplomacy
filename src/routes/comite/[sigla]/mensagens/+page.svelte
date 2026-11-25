@@ -14,7 +14,7 @@
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import ResponderEntrevista from '#lib/ui/ResponderEntrevista.svelte';
 	import AcaoEmModal from '#lib/ui/AcaoEmModal.svelte';
-	import Bandeira from '#lib/ui/Bandeira.svelte';
+	import NomeDelegacao from '#lib/ui/NomeDelegacao.svelte';
 	import MessageSquarePlus from '@lucide/svelte/icons/message-square-plus';
 	import Send from '@lucide/svelte/icons/send';
 	import Escolha from '#lib/ui/Escolha.svelte';
@@ -233,9 +233,11 @@
 			{#each conversas as c, i (c.id)}
 				{@const ultima = c.msgs[c.msgs.length - 1]}
 				<li>
+					<!-- Passo 55: a bandeira e o nome abrem a ficha; a linha da conversa a abre. Fora do
+					     summary: um botão dentro dele seria um controle dentro de outro. -->
+					<strong class="conversa-quem">{#if c.delegacao}<NomeDelegacao sigla={data.comite.sigla} delegacao={c.delegacao} />{:else}{t('Mesa')}{/if}</strong>
 					<details class="conversa" open={i === 0}>
 						<summary>
-							<span class="com-bandeira"><Bandeira codigo={c.delegacao?.bandeira} /> <strong>{c.delegacao?.nome ?? t('Mesa')}</strong></span>
 							<span class="conversa-ultima">{ultima.de_delegacao_id === eu.delegacao_id ? `${t('Você')}: ` : ''}{ultima.texto}</span>
 							<span class="detalhe"><Quando iso={ultima.criado_em} /> · {c.msgs.length === 1 ? t('1 bilhete') : t('{n} bilhetes', { n: c.msgs.length })}</span>
 						</summary>
@@ -421,9 +423,9 @@
 			{#each conversasDaMesa as c, i (c.id)}
 				{@const ultima = c.msgs[c.msgs.length - 1]}
 				<li>
+					<strong class="conversa-quem"><NomeDelegacao sigla={data.comite.sigla} delegacao={c.delegacao} /></strong>
 					<details class="conversa" open={i === 0}>
 						<summary>
-							<span class="com-bandeira"><Bandeira codigo={c.delegacao?.bandeira} /> <strong>{c.delegacao?.nome}</strong></span>
 							<span class="conversa-ultima">{ultima.de_delegacao_id ? '' : `${t('Mesa')}: `}{ultima.texto}</span>
 							<span class="detalhe"><Quando iso={ultima.criado_em} /></span>
 						</summary>

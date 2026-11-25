@@ -21,6 +21,7 @@
 	import { TABELAS_CRISE } from '#lib/tempo-real.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import Bandeira from '#lib/ui/Bandeira.svelte';
+	import NomeDelegacao from '#lib/ui/NomeDelegacao.svelte';
 	import AlertaCrise from '#lib/ui/AlertaCrise.svelte';
 	import Escolha from '#lib/ui/Escolha.svelte';
 	import type { PageProps } from './$types';
@@ -231,7 +232,7 @@
 					{/each}
 				</ul>
 			{:else if notaAberta}
-				<p class="com-bandeira destaque"><Bandeira codigo={notaAberta.delegacao?.bandeira} /> {notaAberta.delegacao?.nome}</p>
+				<p class="destaque"><NomeDelegacao sigla={data.comite.sigla} delegacao={notaAberta.delegacao} /></p>
 				<p><strong>{notaAberta.titulo}</strong> · {notaAberta.tipo === 'nota' ? t('Nota') : t('Diretiva')}</p>
 				<p class="texto-nota">{notaAberta.texto}</p>
 				{#if notaAberta.resposta}

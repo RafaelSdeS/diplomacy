@@ -12,7 +12,7 @@
 	import Escolha from '#lib/ui/Escolha.svelte';
 	import AcaoEmModal from '#lib/ui/AcaoEmModal.svelte';
 	import MessageSquarePlus from '@lucide/svelte/icons/message-square-plus';
-	import Bandeira from '#lib/ui/Bandeira.svelte';
+	import NomeDelegacao from '#lib/ui/NomeDelegacao.svelte';
 	import Modal from '#lib/ui/Modal.svelte';
 	import { andamentoDaPauta, SITUACAO_COLETIVA } from '#lib/press.ts';
 	import { formatarTempo } from '#lib/cronometro.ts';
@@ -182,7 +182,7 @@
 					{@const a = andamento.atual}
 					<p>
 						<span class="selo {SITUACAO_COLETIVA[a.status].selo}">{SITUACAO_COLETIVA[a.status].rotulo}</span>
-						<strong class="com-bandeira"><Bandeira codigo={a.delegacao?.bandeira} /> {a.delegacao?.nome}</strong>
+						<strong><NomeDelegacao sigla={a.delegacao?.comite?.sigla ?? ''} delegacao={a.delegacao} /></strong>
 						· {a.veiculo?.nome}
 						{#if a.presente}<span class="selo selo--ok">{t('prontos')}</span>{/if}
 					</p>
@@ -217,7 +217,7 @@
 					</div>
 				{:else if andamento.proxima}
 					{@const prox = andamento.proxima}
-					<p>{t('Próxima')}: <strong class="com-bandeira"><Bandeira codigo={prox.delegacao?.bandeira} /> {prox.delegacao?.nome}</strong> · {prox.veiculo?.nome}</p>
+					<p>{t('Próxima')}: <strong><NomeDelegacao sigla={prox.delegacao?.comite?.sigla ?? ''} delegacao={prox.delegacao} /></strong> · {prox.veiculo?.nome}</p>
 					<button class="botao" type="button" onclick={() => executar(supabase.rpc('chamar_na_coletiva', { p_pergunta: prox.id }), t('Delegação chamada.'))}
 						>{t('Chamar a próxima')}</button
 					>
@@ -233,7 +233,7 @@
 				<li>
 					<span>
 						<span class="selo {SITUACAO_COLETIVA[p.status].selo}">{SITUACAO_COLETIVA[p.status].rotulo}</span>
-						<strong class="com-bandeira"><Bandeira codigo={p.delegacao?.bandeira} /> {p.delegacao?.nome}</strong>
+						<strong><NomeDelegacao sigla={p.delegacao?.comite?.sigla ?? ''} delegacao={p.delegacao} /></strong>
 						<span class="detalhe">{p.veiculo?.nome}</span>
 						{#if p.texto}{p.texto}{:else}<span class="suave">{t('a pergunta só é conhecida quando for feita em voz alta')}</span>{/if}
 						{#if p.status === 'retirada' && p.retirada_motivo}<span class="detalhe">{p.retirada_motivo}</span>{/if}

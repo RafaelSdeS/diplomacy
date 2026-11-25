@@ -9,6 +9,7 @@
 	import { FASES, presidenciaEmVigor } from '#lib/votacao.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import Bandeira from '#lib/ui/Bandeira.svelte';
+	import NomeDelegacao from '#lib/ui/NomeDelegacao.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -73,7 +74,7 @@
 				<ol class="lista" aria-label={t('Ordem sorteada')}>
 					{#each data.rodizio as vez (vez.ordem)}
 						<li>
-							<span class="com-bandeira"><Bandeira codigo={vez.delegacao?.bandeira} /> {vez.delegacao?.nome}</span>
+							<NomeDelegacao sigla={data.comite.sigla} delegacao={vez.delegacao} />
 							{#if vez.vezes}<span class="selo">{vez.vezes === 1 ? t('Presidiu 1 sessão') : t('Presidiu {n} sessões', { n: vez.vezes })}</span>{/if}
 						</li>
 					{/each}

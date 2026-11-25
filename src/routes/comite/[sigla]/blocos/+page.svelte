@@ -8,7 +8,7 @@
 	import { supabase } from '#lib/supabase.ts';
 	import { TABELAS_BLOCOS } from '#lib/tempo-real.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
-	import Bandeira from '#lib/ui/Bandeira.svelte';
+	import NomeDelegacao from '#lib/ui/NomeDelegacao.svelte';
 	import AcaoEmModal from '#lib/ui/AcaoEmModal.svelte';
 	import Escolha from '#lib/ui/Escolha.svelte';
 	import Users from '@lucide/svelte/icons/users';
@@ -133,7 +133,7 @@
 				<ul class="lista">
 					{#each bloco.membros as m (m.delegacao?.id)}
 						<li>
-							<span class="com-bandeira"><Bandeira codigo={m.delegacao?.bandeira} /> {m.delegacao?.nome}</span>
+							<NomeDelegacao sigla={data.comite.sigla} delegacao={m.delegacao} />
 							{#if m.redator}<span class="selo selo--info">{t('Redator')}</span>{/if}
 						</li>
 					{/each}

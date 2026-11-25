@@ -1274,6 +1274,15 @@ export const EN: Record<string, string> = {
 	'Escuro': 'Dark',
 	'Só a delegação que pediu retira o pedido.': 'Only the delegation that made the request can withdraw it.',
 	'O pedido já foi atendido e não pode mais ser retirado.': 'The request has already been handled and can no longer be withdrawn.',
+	// Passo 55
+	'Assinou': "Signed",
+	'Minhas anotações': "My notes",
+	'Anotações da mesa': "The dais's notes",
+	'Compartilhadas comigo': "Shared with me",
+	'Ver todas': "See all",
+	'Só a mesa do comitê lê o que anotar aqui.': "Only the committee dais reads what you note here.",
+	'Só delegados e a mesa do comitê escrevem no caderno.': "Only delegates and the dais of the committee write in the notebook.",
+	'As anotações da mesa não se compartilham.': "The dais's notes are not shared.",
 	// Passo 54
 	'Sair do telão': 'Leave the big screen',
 	'A palavra': 'The floor',

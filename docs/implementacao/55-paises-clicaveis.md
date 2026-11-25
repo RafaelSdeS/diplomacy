@@ -3,6 +3,7 @@
 **Parte de:** pedido de 24/11/2026 ("em todo lugar em que aparecem países quero poder clicar e abrir um modal com suas informações, incluindo minhas anotações sobre eles")
 **Depende de:** 47 (fichas), 51 lote 0b (caderno de qualquer lugar), 54 (fichas no centro)
 **Esforço:** P–M (parte A); M (parte B)
+**Situação:** pronto (25/11/2026), partes A e B.
 **Quando:** logo depois do 54, antes do piloto. É pequeno e muda a sensação de todas as telas.
 **Objetivo:** a bandeira e o nome de uma delegação sempre abrem a mesma ficha, onde quer que apareçam, e a ficha **sempre** mostra o que eu anotei sobre ela: as notas da minha delegação, para o delegado, e as da mesa, para a mesa (exigência do pedido de 24/11/2026).
 
@@ -41,8 +42,16 @@ A parte B vai junto com a parte A: sem ela, a mesa abriria a ficha sem anotaçõ
 
 ## Testes
 
-- [ ] Unidade: nenhuma tela fora de `NomeDelegacao`, do telão e da impressão monta bandeira e nome sem ação.
-- [ ] Ponta a ponta: clicar num membro do bloco, num remetente de bilhete e num signatário abre a ficha certa no centro; fechar devolve o foco a quem abriu.
-- [ ] Ponta a ponta: uma anotação feita pelo "Anotar" aparece na ficha da delegação, sem recarregar, para o delegado e para a mesa; uma nota compartilhada aparece em "Compartilhadas comigo" para quem a recebeu, e não para os outros.
-- [ ] pgTAP (parte B): a mesa lê e escreve as próprias notas; a delegação não as lê; a mesa continua sem ler o caderno das delegações.
-- [ ] axe na ficha com as novas seções; o modal não rola a 1366 × 768 com três notas.
+- [x] Unidade: nenhuma tela fora de `NomeDelegacao`, do telão e da impressão monta bandeira e nome sem ação.
+- [x] Ponta a ponta: clicar num membro do bloco, num remetente de bilhete e num signatário abre a ficha certa no centro; fechar devolve o foco a quem abriu.
+- [x] Ponta a ponta: uma anotação feita pelo "Anotar" aparece na ficha da delegação, sem recarregar, para o delegado e para a mesa; uma nota compartilhada aparece em "Compartilhadas comigo" para quem a recebeu, e não para os outros.
+- [x] pgTAP (parte B): a mesa lê e escreve as próprias notas; a delegação não as lê; a mesa continua sem ler o caderno das delegações.
+- [x] axe na ficha com as novas seções; o modal não rola a 1366 × 768 com três notas.
+
+## Como ficou
+
+- `NomeDelegacao` abre a ficha por padrão; `link={false}` deixa só bandeira e nome. `src/lib/nome-delegacao.test.ts` recusa `com-bandeira` sem ação fora do `NomeDelegacao`, do telão e da impressão; as exceções (dentro de um botão, a credencial do Perfil, `ListaVotos` e `GradeVotos` sem sigla) ficam listadas no teste, com o motivo.
+- Na aba Comitê, o país abre a ficha; a página da delegação fica no botão "Abrir a página da delegação" da ficha.
+- A fila da crise e a chamada continuam com o país dentro do botão da linha (abrir a nota, marcar a presença); a nota aberta mostra o país clicável.
+- Ficha: delegados, DPO, blocos, documentos assinados e a chamada da sessão aberta à esquerda; as anotações à direita (no notebook, `.ficha-corpo` em duas colunas). "Ver todas" e "Anotar" abrem o caderno em modal, filtrado pela delegação. Depois de anotar, `anotacao.salvas` faz a ficha reler as notas.
+- Parte B: `20261222090000_caderno_da_mesa.sql`. Nota da mesa = `delegacao_id` nulo; só a mesa do comitê lê e escreve; não se compartilha. O botão do caderno no cabeçalho aparece também para a mesa.

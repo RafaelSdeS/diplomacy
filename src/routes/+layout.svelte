@@ -262,7 +262,7 @@
 						>
 							<Bell aria-hidden="true" size={16} strokeWidth={1.75} />
 						</a>
-						{#if data.participacoes.some((p) => p.papel === 'delegado')}
+						{#if data.participacoes.some((p) => p.papel === 'delegado' || p.papel === 'mesa')}
 							<button
 								class="botao botao--secundario botao--pequeno botao--icone"
 								type="button"

@@ -482,7 +482,7 @@
 			<section class="cartao cartao--ao-vivo" aria-labelledby="t-palavra">
 				<h2 id="t-palavra">{t('Com a palavra')}</h2>
 				{#if data.estado.orador}
-					<p class="destaque com-bandeira"><Bandeira codigo={data.estado.orador.bandeira} /> {data.estado.orador.nome}</p>
+					<p class="destaque"><NomeDelegacao sigla={data.comite.sigla} delegacao={data.estado.orador} /></p>
 				{:else}
 					<p class="suave">{t('Ninguém com a palavra.')}</p>
 				{/if}
@@ -608,7 +608,7 @@
 								: t('procedimental')}, {REGRAS_VOTACAO[votacao.regra]}
 							{#if votacao.nominal}· <strong>{t('votação nominal')}</strong>, {t('em ordem alfabética')}{/if}
 						</p>
-						<GradeVotos delegacoes={votantes} votos={votacao.votos} />
+						<GradeVotos sigla={data.comite.sigla} delegacoes={votantes} votos={votacao.votos} />
 						{#if ehMesa}
 							<details bind:open={chamadaAberta}>
 								<summary>{votacao.nominal ? t('Chamada nominal') : t('Registrar votos de placa')}</summary>
@@ -778,7 +778,7 @@
 						<ul class="lista">
 							{#each sessao.avisos as aviso (aviso.delegacao?.id)}
 								<li>
-									<span class="com-bandeira"><Bandeira codigo={aviso.delegacao?.bandeira} /> {aviso.delegacao?.nome}</span>
+									<NomeDelegacao sigla={data.comite.sigla} delegacao={aviso.delegacao} />
 									<button
 										class="botao botao--pequeno"
 										type="button"

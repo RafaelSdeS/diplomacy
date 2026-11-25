@@ -442,10 +442,7 @@
 	<article class="cartao cartao--ao-vivo" aria-labelledby="c-palavra">
 		<h2 id="c-palavra">{t('A palavra')}</h2>
 		{#if estado.orador}
-			<p class="destaque com-bandeira">
-				<Bandeira codigo={estado.orador.bandeira} />
-				{estado.orador.nome}
-			</p>
+			<p class="destaque"><NomeDelegacao sigla={data.comite.sigla} delegacao={estado.orador} /></p>
 		{:else}
 			<p class="suave">{t('Ninguém com a palavra.')}</p>
 		{/if}

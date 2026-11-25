@@ -7,7 +7,7 @@
 	import { guardarRascunho, lerRascunho } from '#lib/rascunho.ts';
 	import { supabase } from '#lib/supabase.ts';
 	import { semAcento } from '#lib/filtro.ts';
-	import Bandeira from './Bandeira.svelte';
+	import NomeDelegacao from './NomeDelegacao.svelte';
 	import Escolha from './Escolha.svelte';
 	import Quando from './Quando.svelte';
 	import Modal from './Modal.svelte';
@@ -17,11 +17,14 @@
 	// então a lista mostra o que já foi anotado sobre ela. O texto fica salvo no aparelho.
 	type Participacao = { papel: string; comite_id: string | null; comite_sigla: string | null; delegacao_id: string | null };
 	let { participacoes }: { participacoes: Participacao[] } = $props();
-	const eu = $derived(participacoes.find((p) => p.papel === 'delegado' && p.comite_id));
+	// Passo 55: a mesa também anota (o caderno da mesa, que só ela lê).
+	const eu = $derived(
+		participacoes.find((p) => p.papel === 'delegado' && p.comite_id) ?? participacoes.find((p) => p.papel === 'mesa' && p.comite_id)
+	);
 
 	let modal = $state<Modal>();
 	let delegacoes = $state<{ id: string; nome: string; nome_oficial: string; bandeira: string | null }[]>([]);
-	type Nota = { id: string; tipo: string; titulo: string | null; texto: string; criado_em: string; delegacao_id: string; sobre_delegacao_id: string | null };
+	type Nota = { id: string; tipo: string; titulo: string | null; texto: string; criado_em: string; delegacao_id: string | null; sobre_delegacao_id: string | null };
 	let notas = $state<Nota[]>([]);
 	let busca = $state('');
 	const nomeDe = (id: string | null) => delegacoes.find((d) => d.id === id);
@@ -84,13 +87,14 @@
 			return;
 		}
 		texto = '';
+		anotacao.salvas++;
 		await Promise.all([invalidate('app:caderno'), lerNotas(eu.comite_id)]);
 	}
 </script>
 
 <Modal bind:this={modal} rotulo="anotar-titulo" classe="modal-acao modal-caderno" onclose={() => (anotacao.aberta = false)}>
 	<h3 id="anotar-titulo">{t('Caderno')}</h3>
-	<p class="suave">{t('Só a sua delegação lê o que anotar aqui.')}</p>
+	<p class="suave">{eu?.papel === 'mesa' ? t('Só a mesa do comitê lê o que anotar aqui.') : t('Só a sua delegação lê o que anotar aqui.')}</p>
 	<form class="formulario" onsubmit={salvar}>
 		<Escolha unica rotulo={t('Sobre a delegação (opcional)')} botao={t('Escolher')} opcoes={delegacoes} bind:valor={sobre} />
 		<label class="campo">
@@ -117,7 +121,7 @@
 						<p class="texto-nota">{n.titulo ? `${n.titulo}: ` : ''}{n.texto}</p>
 						<span class="detalhe">
 							<Quando iso={n.criado_em} />
-							{#if sobreQuem}· <span class="com-bandeira"><Bandeira codigo={sobreQuem.bandeira} /> {sobreQuem.nome}</span>{/if}
+							{#if sobreQuem && eu?.comite_sigla}· <NomeDelegacao sigla={eu.comite_sigla} delegacao={sobreQuem} />{/if}
 							{#if n.tipo === 'fala'}· {t('fala')}{/if}
 							{#if n.delegacao_id !== eu?.delegacao_id}· {t('compartilhada com você')}{/if}
 						</span>
@@ -127,7 +131,7 @@
 				<li class="suave">{t('Nada anotado ainda.')}</li>
 			{/each}
 		</ul>
-		{#if eu?.comite_sigla}
+		{#if eu?.comite_sigla && eu.papel === 'delegado'}
 			<p><a class="botao botao--secundario botao--pequeno" href={`/comite/${eu.comite_sigla}/caderno`} onclick={() => modal?.fechar()}>{t('Abrir o caderno completo')}</a></p>
 		{/if}
 	</section>

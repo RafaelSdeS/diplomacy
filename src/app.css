@@ -1674,6 +1674,7 @@ kbd {
    .ficha das regras, cujo margin: 0 anulava o margin: auto que centraliza o <dialog>. */
 dialog.modal-ficha {
 	width: min(40rem, calc(100vw - 2rem));
+	max-width: none; /* Passo 55: o max-width de 28rem dos diálogos apertava a ficha */
 }
 
 /* Passo 51: quem preside a sessão, à vista de todos. */
@@ -2707,6 +2708,56 @@ dialog.modal-lateral {
 	display: block;
 }
 
+/* Passo 55: as minhas anotações na ficha, curtas, com o "Anotar" no topo. */
+.ficha-notas-topo {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem;
+}
+
+.ficha-notas-topo h4,
+.ficha-notas-topo .acoes {
+	margin: 0;
+}
+
+.ficha-notas .lista li {
+	padding: 0.35rem 0;
+}
+
+/* A ficha não rola: cada dado numa linha, cada nota em duas (o resto fica no caderno). */
+.ficha-dados .uma-linha {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.ficha-notas .texto-nota {
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+	line-clamp: 2;
+	overflow: hidden;
+}
+
+@media (min-width: 900px) {
+	dialog.modal-ficha:has(.ficha-notas) {
+		width: min(56rem, calc(100vw - 2rem));
+	}
+
+	.ficha-corpo:has(> .ficha-notas) {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		gap: 0 1.5rem;
+		align-items: start;
+	}
+
+	.ficha-corpo > .ficha-notas {
+		margin-top: 1rem;
+	}
+}
+
 /* Passo 43: "Voltar" para a tela de onde a pessoa veio, ao lado da trilha. */
 .caminho {
 	display: flex;
@@ -3114,9 +3165,15 @@ dialog.modal-lateral {
 }
 
 .grade-delegacoes-nome {
+	padding: 0;
+	border: 0;
+	background: none;
+	font: inherit;
 	font-weight: 600;
 	color: var(--cor-marinho);
+	text-align: left;
 	text-decoration: none;
+	cursor: pointer;
 }
 
 .grade-delegacoes-nome::after {

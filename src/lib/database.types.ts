@@ -25,14 +25,14 @@ export type Database = {
           Tables: {
             "anotacao": {
                   Row: {
-                    "atualizado_em": string,"autor_id": string | null,"comite_id": string,"criado_em": string,"delegacao_id": string,"id": string,"orador_delegacao_id": string | null,"sobre_delegacao_id": string | null,"texto": string,"tipo": string,"titulo": string | null,"topico": number | null
+                    "atualizado_em": string,"autor_id": string | null,"comite_id": string,"criado_em": string,"delegacao_id": string | null,"id": string,"orador_delegacao_id": string | null,"sobre_delegacao_id": string | null,"texto": string,"tipo": string,"titulo": string | null,"topico": number | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "atualizado_em"?: string,"autor_id"?: string | null,"comite_id": string,"criado_em"?: string,"delegacao_id": string,"id": string,"orador_delegacao_id"?: string | null,"sobre_delegacao_id"?: string | null,"texto": string,"tipo": string,"titulo"?: string | null,"topico"?: number | null
+                    "atualizado_em"?: string,"autor_id"?: string | null,"comite_id": string,"criado_em"?: string,"delegacao_id"?: string | null,"id": string,"orador_delegacao_id"?: string | null,"sobre_delegacao_id"?: string | null,"texto": string,"tipo": string,"titulo"?: string | null,"topico"?: number | null
                   }
                   Update: {
-                    "atualizado_em"?: string,"autor_id"?: string | null,"comite_id"?: string,"criado_em"?: string,"delegacao_id"?: string,"id"?: string,"orador_delegacao_id"?: string | null,"sobre_delegacao_id"?: string | null,"texto"?: string,"tipo"?: string,"titulo"?: string | null,"topico"?: number | null
+                    "atualizado_em"?: string,"autor_id"?: string | null,"comite_id"?: string,"criado_em"?: string,"delegacao_id"?: string | null,"id"?: string,"orador_delegacao_id"?: string | null,"sobre_delegacao_id"?: string | null,"texto"?: string,"tipo"?: string,"titulo"?: string | null,"topico"?: number | null
                   }
                   Relationships: [
                     {
@@ -2161,7 +2161,7 @@ isOneToOne: false
 "autor_id": string | null,
 "comite_id": string,
 "criado_em": string,
-"delegacao_id": string,
+"delegacao_id": string | null,
 "id": string,
 "orador_delegacao_id": string | null,
 "sobre_delegacao_id": string | null,

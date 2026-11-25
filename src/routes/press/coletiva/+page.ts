@@ -24,7 +24,7 @@ export const load: PageLoad = async ({ parent, depends }) => {
 			? supabase
 					.from('coletiva_pergunta')
 					.select(
-						'id, status, ordem, chamada_em, resposta_iniciada_em, presente, retirada_motivo, comite_id, veiculo(nome), delegacao(id, nome, bandeira)'
+						'id, status, ordem, chamada_em, resposta_iniciada_em, presente, retirada_motivo, comite_id, veiculo(nome), delegacao(id, nome, bandeira, comite(sigla))'
 					)
 					.eq('coletiva_id', coletiva.data.id)
 					.order('ordem')

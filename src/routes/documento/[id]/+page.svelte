@@ -12,6 +12,7 @@
 	import { mensagemDeErro } from '#lib/sessao.ts';
 	import { supabase } from '#lib/supabase.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
+	import NomeDelegacao from '#lib/ui/NomeDelegacao.svelte';
 	import { sugerirVerbos } from '#lib/verbos.ts';
 	import type { PageProps } from './$types';
 
@@ -481,7 +482,8 @@
 		{minimoAssinaturas
 			? t('Signatários ({n} de no mínimo {min})', { n: data.assinaturas.length, min: minimoAssinaturas })
 			: t('Signatários ({n})', { n: data.assinaturas.length })}:
-		{data.assinaturas.map((a) => a.nome).join(', ') || t('nenhum')}
+		<!-- Passo 55: cada signatário abre a ficha. -->
+		{#each data.assinaturas as a, i (a.id)}{#if i}, {/if}<NomeDelegacao sigla={data.comite.sigla} delegacao={a} />{:else}{t('nenhum')}{/each}
 	</p>
 	{#if souMembro && d.status === 'rascunho'}
 		<button

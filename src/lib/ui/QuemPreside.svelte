@@ -2,7 +2,7 @@
 	import { t } from '#lib/i18n.svelte.ts';
 	import { bureauPreside } from '#lib/sessao.ts';
 	import Gavel from '@lucide/svelte/icons/gavel';
-	import Bandeira from './Bandeira.svelte';
+	import NomeDelegacao from './NomeDelegacao.svelte';
 
 	// Passo 51 (lote 0b): quem preside a sessão, à vista de todos, com a bandeira. Para a
 	// delegação que preside, o aviso é dela e leva ao painel.
@@ -25,8 +25,8 @@
 		<a class="botao botao--pequeno" href={`/comite/${sigla}/sessao/presidencia`}>{t('Abrir o painel')}</a>
 	{:else}
 		<span>{t('Preside a sessão')}:</span>
-		<strong class="com-bandeira">
-			{#if pelaMesa}{t('Mesa')}{:else}<Bandeira codigo={presidencia?.bandeira} /> {presidencia?.nome}{/if}
+		<strong>
+			{#if pelaMesa}{t('Mesa')}{:else}<NomeDelegacao {sigla} delegacao={presidencia} />{/if}
 		</strong>
 	{/if}
 </p>

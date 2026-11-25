@@ -34,7 +34,7 @@ export const load: PageLoad = async ({ params, depends }) => {
 			.eq('documento_id', d.id)
 			.order('criado_em'),
 		supabase.from('rodada').select('numero, inicio, fim').eq('documento_id', d.id).order('numero'),
-		supabase.from('assinatura').select('delegacao(id, nome, nome_oficial)').eq('documento_id', d.id),
+		supabase.from('assinatura').select('delegacao(id, nome, nome_oficial, bandeira)').eq('documento_id', d.id),
 		supabase.from('pedido_reabertura').select('clausula_id, delegacao_id'),
 		supabase.rpc('sou_redator', { p_bloco: d.bloco!.id }, { get: true }),
 		supabase.rpc('regras', { p_comite: d.comite_id }, { get: true }),

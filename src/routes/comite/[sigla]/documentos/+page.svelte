@@ -5,7 +5,7 @@
 	import { formatarHora } from '#lib/cronograma.ts';
 	import { nomeDoDocumento, STATUS_DOCUMENTO } from '#lib/formatacao.ts';
 	import { STATUS_DPO } from '#lib/impressao.ts';
-	import Bandeira from '#lib/ui/Bandeira.svelte';
+	import NomeDelegacao from '#lib/ui/NomeDelegacao.svelte';
 	import GradeAtalhos, { type Atalho } from '#lib/ui/GradeAtalhos.svelte';
 	import Mail from '@lucide/svelte/icons/mail';
 	import NotebookPen from '@lucide/svelte/icons/notebook-pen';
@@ -55,7 +55,7 @@
 			<ul class="lista">
 				{#each dposParaAvaliar as dpo (dpo.id)}
 					<li>
-						<span class="com-bandeira"><Bandeira codigo={dpo.delegacao?.bandeira} /> {t('DPO de {delegacao}', { delegacao: dpo.delegacao?.nome ?? '' })} · {t('Tópico')} {dpo.topico}</span>
+						<span>{t('DPO')} · <NomeDelegacao {sigla} delegacao={dpo.delegacao} /> · {t('Tópico')} {dpo.topico}</span>
 						<a class="botao botao--secundario botao--pequeno" href={`/comite/${sigla}/dpo`}>{t('Ler e avaliar')}</a>
 					</li>
 				{/each}
@@ -133,7 +133,7 @@
 			{/each}
 			{#each dposDoComite as dpo (dpo.id)}
 				<li>
-					<span class="com-bandeira"><Bandeira codigo={dpo.delegacao?.bandeira} /> {t('DPO de {delegacao}', { delegacao: dpo.delegacao?.nome ?? '' })} · {t('Tópico')} {dpo.topico}</span>
+					<span>{t('DPO')} · <NomeDelegacao {sigla} delegacao={dpo.delegacao} /> · {t('Tópico')} {dpo.topico}</span>
 					<button
 						class="abre-ficha"
 						type="button"

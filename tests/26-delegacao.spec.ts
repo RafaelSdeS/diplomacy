@@ -9,10 +9,12 @@ test('do comitê à página dos EUA, com os dois delegados e o bilhete pronto', 
 	test.skip(info.project.name === 'telao', 'tela de celular e notebook');
 	await entrar(page, contaDaDelegacao('Irã'));
 	await page.goto('/comite/CSNU-T');
-	await page.getByRole('link', { name: 'EUA', exact: true }).click();
+	// Passo 55: o país abre a ficha; a página da delegação fica a um clique dela.
+	await page.getByRole('button', { name: 'EUA', exact: true }).click();
+	await page.getByRole('dialog', { name: 'EUA' }).getByRole('link', { name: 'Abrir a página da delegação' }).click();
 	await expect(page).toHaveURL(/\/comite\/CSNU-T\/delegacao\//);
 	await expect(page.getByRole('heading', { level: 1 })).toHaveText('EUA');
-	await expect(page.getByText('United States of America')).toBeVisible();
+	await expect(page.getByText('United States of America').filter({ visible: true })).toBeVisible();
 	const delegados = page.getByRole('region', { name: 'Delegados' });
 	await expect(delegados.getByRole('listitem')).toHaveCount(2);
 	await expect(delegados).toContainText('Delegado 01');

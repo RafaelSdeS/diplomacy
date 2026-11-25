@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { t } from '#lib/i18n.svelte.ts';
-	import { abrirAnotacao, ficha, fecharFicha } from '#lib/ficha.svelte.ts';
+	import { abrirAnotacao, anotacao, ficha, fecharFicha } from '#lib/ficha.svelte.ts';
+	import { nomeDoDocumento } from '#lib/formatacao.ts';
 	import { caixa, mensagemDoEnvio } from '#lib/caixa.ts';
 	import { contador } from '#lib/contador.ts';
 	import { guardarRascunho, lerRascunho } from '#lib/rascunho.ts';
@@ -10,12 +11,13 @@
 	import { ESCOLHAS } from '#lib/votacao.ts';
 	import Bandeira from './Bandeira.svelte';
 	import Modal from './Modal.svelte';
+	import Quando from './Quando.svelte';
 
 	// Passo 43: a ficha da delegação, aberta por cima da tela ao vivo. O resumo da página da
 	// delegação (a RLS decide o que aparece); a página completa fica a um clique.
 	async function carregar(id: string) {
-		const [delegacao, delegados, dpos, votos] = await Promise.all([
-			supabase.from('delegacao').select('id, nome, nome_oficial, bandeira, situacao').eq('id', id).maybeSingle(),
+		const [delegacao, delegados, dpos, votos, blocos, assinados] = await Promise.all([
+			supabase.from('delegacao').select('id, comite_id, nome, nome_oficial, bandeira, situacao').eq('id', id).maybeSingle(),
 			supabase.from('participacao').select('pessoa(nome)').eq('delegacao_id', id).eq('papel', 'delegado'),
 			supabase.from('dpo').select('topico, status').eq('delegacao_id', id).order('topico'),
 			supabase
@@ -24,14 +26,25 @@
 				.eq('delegacao_id', id)
 				.not('votacao.encerrada_em', 'is', null)
 				.order('votacao(encerrada_em)', { ascending: false })
-				.limit(5)
+				.limit(3),
+			// Passo 55: o essencial do comitê, uma linha cada.
+			supabase.from('bloco_membro').select('bloco(nome)').eq('delegacao_id', id),
+			supabase.from('assinatura').select('documento(tipo, numero, titulo)').eq('delegacao_id', id)
 		]);
-		for (const r of [delegacao, delegados, dpos, votos]) if (r.error) throw r.error;
+		for (const r of [delegacao, delegados, dpos, votos, blocos, assinados]) if (r.error) throw r.error;
+		// A chamada de hoje: presente se a delegação está na presença da sessão aberta.
+		const comite = delegacao.data?.comite_id;
+		const estado = comite ? await supabase.from('estado_sessao').select('sessao_id').eq('comite_id', comite).maybeSingle() : null;
+		const sessao = estado?.data?.sessao_id;
+		const presenca = sessao ? await supabase.from('presenca').select('delegacao_id').eq('sessao_id', sessao).eq('delegacao_id', id) : null;
 		return {
 			delegacao: delegacao.data,
 			delegados: delegados.data!.map((p) => p.pessoa?.nome).filter((n) => !!n),
 			dpos: dpos.data!,
-			votos: votos.data!
+			votos: votos.data!,
+			blocos: blocos.data!.map((b) => b.bloco?.nome).filter((n) => !!n),
+			assinados: assinados.data!.map((a) => a.documento).filter((d) => !!d),
+			presente: presenca && !presenca.error ? presenca.data.length > 0 : null
 		};
 	}
 
@@ -41,6 +54,32 @@
 	let { participacoes }: { participacoes: Participacao[] } = $props();
 	const eu = $derived(participacoes.find((p) => p.papel === 'delegado' && p.comite_sigla === ficha.sigla));
 	const podeEscrever = $derived(!!eu?.delegacao_id && eu.delegacao_id !== ficha.id);
+
+	// Passo 55: a ficha sempre mostra o que eu anotei sobre a delegação: as notas da minha
+	// delegação, para o delegado, e as da mesa (delegacao_id nulo), para a mesa. A RLS só
+	// devolve as minhas, as da mesa (para a mesa) e as compartilhadas comigo.
+	const souMesa = $derived(participacoes.some((p) => p.papel === 'mesa' && p.comite_sigla === ficha.sigla));
+	const anota = $derived(podeEscrever || (souMesa && !eu));
+	const dona = $derived(eu?.delegacao_id ?? null);
+	type Nota = { id: string; titulo: string | null; texto: string; criado_em: string; delegacao_id: string | null };
+	let notas = $state<Nota[]>([]);
+	const minhas = $derived(notas.filter((n) => n.delegacao_id === dona));
+	const compartilhadas = $derived(notas.filter((n) => n.delegacao_id !== dona));
+	$effect(() => {
+		void anotacao.salvas; // depois do "Anotar", a nota nova aparece sem recarregar
+		const id = ficha.id;
+		notas = [];
+		if (!id || !anota) return;
+		void supabase
+			.from('anotacao')
+			.select('id, titulo, texto, criado_em, delegacao_id')
+			.eq('sobre_delegacao_id', id)
+			.order('criado_em', { ascending: false })
+			.limit(50)
+			.then(({ data }) => {
+				if (ficha.id === id) notas = data ?? [];
+			});
+	});
 	let escrever = $state<'' | 'bilhete' | 'carta'>('');
 	let titulo = $state('');
 	let texto = $state({ bilhete: '', carta: '' });
@@ -111,6 +150,40 @@
 	});
 </script>
 
+<!-- Passo 55: as minhas anotações sobre a delegação (três à vista) e as compartilhadas comigo. -->
+{#snippet anotacoes()}
+	<section class="ficha-notas" aria-labelledby="ficha-notas-titulo">
+		<div class="ficha-notas-topo">
+			<h4 id="ficha-notas-titulo">{eu ? t('Minhas anotações') : t('Anotações da mesa')} ({minhas.length})</h4>
+			<div class="acoes">
+				{#if minhas.length > 3}
+					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => ficha.id && abrirAnotacao(ficha.id)}
+						>{t('Ver todas')}</button
+					>
+				{/if}
+				<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => ficha.id && abrirAnotacao(ficha.id)}
+					>{t('Anotar')}</button
+				>
+			</div>
+		</div>
+		<ul class="lista">
+			{#each minhas.slice(0, 3) as n (n.id)}
+				<li><span class="texto-nota">{n.titulo ? `${n.titulo}: ` : ''}{n.texto} <span class="detalhe"><Quando iso={n.criado_em} /></span></span></li>
+			{:else}
+				<li class="suave">{t('Nada anotado ainda.')}</li>
+			{/each}
+		</ul>
+		{#if compartilhadas.length}
+			<h4>{t('Compartilhadas comigo')} ({compartilhadas.length})</h4>
+			<ul class="lista">
+				{#each compartilhadas.slice(0, 2) as n (n.id)}
+					<li><span class="texto-nota">{n.titulo ? `${n.titulo}: ` : ''}{n.texto} <span class="detalhe"><Quando iso={n.criado_em} /></span></span></li>
+				{/each}
+			</ul>
+		{/if}
+	</section>
+{/snippet}
+
 <Modal bind:this={modal} classe="modal-ficha" rotulo="ficha-titulo" onclose={fecharFicha}>
 	{#if dados?.delegacao && escrever}
 		<h3 id="ficha-titulo">
@@ -139,6 +212,9 @@
 		<p class="ficha-bandeira"><Bandeira codigo={d.bandeira} /></p>
 		<h3 id="ficha-titulo">{d.nome}</h3>
 		<p class="suave">{d.nome_oficial}{SITUACAO[d.situacao] ? ` · ${t(SITUACAO[d.situacao])}` : ''}</p>
+		<!-- Passo 55: no notebook, os dados à esquerda e as anotações à direita, sem rolar. -->
+		<div class="ficha-corpo">
+		<div>
 		<dl class="ficha-dados">
 			<dt>{dados.delegados.length === 1 ? t('Delegado') : t('Delegados')}</dt>
 			<dd>{dados.delegados.join(', ') || '—'}</dd>
@@ -150,6 +226,16 @@
 					—
 				{/each}
 			</dd>
+			<dt>{t('Blocos')} ({dados.blocos.length})</dt>
+			<dd class="uma-linha" title={dados.blocos.join(', ')}>{dados.blocos.join(', ') || '—'}</dd>
+			<dt>{t('Assinou')} ({dados.assinados.length})</dt>
+			<dd class="uma-linha" title={dados.assinados.map((d) => nomeDoDocumento(d)).join('; ')}>
+				{dados.assinados.map((d) => nomeDoDocumento(d)).join('; ') || '—'}
+			</dd>
+			{#if dados.presente !== null}
+				<dt>{t('Chamada')}</dt>
+				<dd>{dados.presente ? t('Presente') : t('Ausente')}</dd>
+			{/if}
 		</dl>
 		{#if dados.votos.length}
 			<h4>{t('Votos recentes')}</h4>
@@ -159,6 +245,11 @@
 				{/each}
 			</ul>
 		{/if}
+		</div>
+		{#if anota}
+			{@render anotacoes()}
+		{/if}
+		</div>
 	{:else}
 		<h3 id="ficha-titulo">{t('Delegação')}</h3>
 		<p class={erro ? 'erro' : 'suave'}>{erro || t('Carregando…')}</p>
@@ -168,7 +259,6 @@
 		{#if dados?.delegacao && podeEscrever}
 			<button class="botao" type="button" onclick={() => comecar('bilhete')}>{t('Mandar bilhete')}</button>
 			<button class="botao botao--secundario" type="button" onclick={() => comecar('carta')}>{t('Escrever carta')}</button>
-			<button class="botao botao--secundario" type="button" onclick={() => ficha.id && abrirAnotacao(ficha.id)}>{t('Anotar')}</button>
 		{/if}
 		{#if dados?.delegacao}
 			<a class="botao botao--secundario" href={`/comite/${ficha.sigla}/delegacao/${dados.delegacao.id}`} onclick={() => modal?.fechar()}

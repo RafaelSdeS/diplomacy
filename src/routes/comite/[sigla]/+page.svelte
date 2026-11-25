@@ -2,6 +2,7 @@
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { bilingue, t } from '#lib/i18n.svelte.ts';
 	import Bandeira from '#lib/ui/Bandeira.svelte';
+	import { abrirFicha } from '#lib/ficha.svelte.ts';
 	import BookOpen from '@lucide/svelte/icons/book-open';
 	import FileText from '@lucide/svelte/icons/file-text';
 	import Gavel from '@lucide/svelte/icons/gavel';
@@ -86,10 +87,11 @@
 	<h2 id="t-delegacoes">{t('Delegações')} ({data.delegacoes.length})</h2>
 	<ul class="grade-delegacoes">
 		{#each data.delegacoes as d (d.id)}
-			<!-- O cartão todo é clicável (o link cobre o cartão), mas o nome do link é só o país. -->
+			<!-- O cartão todo é clicável (o botão cobre o cartão), mas o nome do botão é só o país.
+			     Passo 55: abre a ficha, como o país em qualquer tela; a página fica a um clique dela. -->
 			<li class:minha={d.id === minha}>
 				<Bandeira codigo={d.bandeira} />
-				<a class="grade-delegacoes-nome" href={`/comite/${data.comite.sigla}/delegacao/${d.id}`}>{d.nome}</a>
+				<button class="grade-delegacoes-nome" type="button" onclick={() => abrirFicha(data.comite.sigla, d.id)}>{d.nome}</button>
 				<span class="detalhe">{d.nome_oficial}{SITUACOES[d.situacao] ? ` · ${SITUACOES[d.situacao]}` : ''}</span>
 			</li>
 		{/each}

@@ -15,7 +15,6 @@
 	import { mensagemDeErro } from '#lib/sessao.ts';
 	import { supabase } from '#lib/supabase.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
-	import Bandeira from '#lib/ui/Bandeira.svelte';
 	import NomeDelegacao from '#lib/ui/NomeDelegacao.svelte';
 	import type { PageProps } from './$types';
 
@@ -185,7 +184,7 @@
 		<ul class="cartoes-dpo">
 			{#each outros as d (d.id)}
 				<li class="cartao">
-					<p class="com-bandeira"><Bandeira codigo={d.delegacao?.bandeira} /> <strong>{d.delegacao?.nome}</strong></p>
+					<p><NomeDelegacao sigla={data.comite.sigla} delegacao={d.delegacao} /></p>
 					<p class="detalhe">{t('Tópico')} {d.topico} · <span class="selo {STATUS[d.status].selo}">{STATUS[d.status].rotulo}</span></p>
 					<div class="acoes">
 						<button
