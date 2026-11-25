@@ -9,5 +9,7 @@ export const ENCARREGADO = { nome: CRIADOR.nome, email: 'rafesilvadesouza@gmail.
 export const marca = $state<{ evento: string | null }>({ evento: null });
 
 /** O título da aba: as partes, e no fim o nome do evento (ou do app). */
+// Passo 61: as mensagens não lidas também aparecem no título da aba ("(2) Sessão · …").
+export const mensagensNovas = $state({ n: 0 });
 export const tituloDaAba = (...partes: (string | null | undefined)[]) =>
-	[...partes.filter((p) => p), marca.evento ?? APP].join(' · ');
+	(mensagensNovas.n ? `(${mensagensNovas.n}) ` : '') + [...partes.filter((p) => p), marca.evento ?? APP].join(' · ');

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import { t } from '#lib/i18n.svelte.ts';
 	import '@fontsource/spectral/latin-600.css';
 	import '../app.css';
@@ -21,7 +22,9 @@
 	import { esquecerConta } from '#lib/conta.ts';
 	import { esquecerRascunhos } from '#lib/rascunho.ts';
 	import { desativarPush } from '#lib/push.ts';
-	import { APP, marca } from '#lib/titulo.svelte.ts';
+	import { APP, marca, mensagensNovas } from '#lib/titulo.svelte.ts';
+	import { lerLidas, naoLidas } from '#lib/nao-lidas.ts';
+	import MessageSquare from '@lucide/svelte/icons/message-square';
 	import { trilha } from '#lib/trilha.ts';
 	import { anterior, antesDeNavegar, depoisDeNavegar } from '#lib/voltar.svelte.ts';
 	import { abrirAnotacao, anotacao, ficha, previa } from '#lib/ficha.svelte.ts';
@@ -31,7 +34,7 @@
 	import CaixaDeSaida from '#lib/ui/CaixaDeSaida.svelte';
 	import Trilha from '#lib/ui/Trilha.svelte';
 	import { supabase, type Papel } from '#lib/supabase.ts';
-	import { assinarAvisos, esquecerLeituras, recarregarAoVivo } from '#lib/tempo-real.ts';
+	import { assinar, assinarAvisos, esquecerLeituras, recarregarAoVivo } from '#lib/tempo-real.ts';
 	import type { LayoutProps } from './$types';
 
 	let { data, children }: LayoutProps = $props();
@@ -99,6 +102,72 @@
 			void goto('/sobre');
 		}, 700);
 	}
+	// Passo 61: as mensagens que chegaram (bilhetes e a conversa com a mesa): a contagem no menu
+	// e no título e, com o app aberto fora de Mensagens, um aviso por alguns segundos. O que já
+	// foi lido fica no aparelho (#lib/nao-lidas.ts).
+	const naConversa = $derived.by(() => {
+		const p = noComite(data.participacoes);
+		return p?.comite_id && (p.papel === 'delegado' || p.papel === 'mesa')
+			? { comite: p.comite_id, sigla: p.comite_sigla, minha: p.papel === 'delegado' ? p.delegacao_id : null }
+			: null;
+	});
+	type Chegada = { id: string; tipo: string; criado_em: string; de_delegacao_id: string | null; para_delegacao_id: string | null; de: { nome: string } | null };
+	let chegadas = $state<Chegada[] | null>(null);
+	let lidasVersao = $state(0);
+	$effect(() => {
+		const c = naConversa;
+		chegadas = null;
+		if (!c) return;
+		const ler = async () => {
+			const { data: d } = await supabase
+				.from('mensagem')
+				.select('id, tipo, criado_em, de_delegacao_id, para_delegacao_id, de:delegacao!mensagem_de_delegacao_id_comite_id_fkey(nome)')
+				.eq('comite_id', c.comite)
+				.in('tipo', ['bilhete', 'mesa'])
+				.order('criado_em', { ascending: false })
+				.limit(200);
+			if (d) chegadas = d;
+		};
+		void ler();
+		const cancelar = assinar(c.minha ? [`delegacao:${c.minha}`] : [`mesa:${c.comite}`], ['mensagem'], () => void ler());
+		const aoLer = () => lidasVersao++;
+		addEventListener('lidas', aoLer);
+		return () => {
+			cancelar();
+			removeEventListener('lidas', aoLer);
+		};
+	});
+	const novas = $derived.by(() => {
+		void lidasVersao;
+		const c = naConversa;
+		return c && chegadas ? naoLidas(chegadas, c.minha, lerLidas(c.comite)) : [];
+	});
+	$effect(() => {
+		mensagensNovas.n = novas.length;
+	});
+	let aviso = $state<{ texto: string; href: string } | null>(null);
+	let avisadas: Set<string> | null = null;
+	$effect(() => {
+		const lista = novas;
+		if (!chegadas) return;
+		const nova = avisadas ? lista.find((m) => !avisadas!.has(m.id)) : undefined;
+		avisadas = new Set([...(avisadas ?? []), ...lista.map((m) => m.id)]);
+		if (!nova || !naConversa || untrack(() => page.url.pathname.endsWith('/mensagens'))) return;
+		aviso = {
+			texto:
+				nova.tipo === 'bilhete'
+					? t('Bilhete de {delegacao}', { delegacao: nova.de?.nome ?? '' })
+					: nova.de_delegacao_id
+						? t('Mensagem de {delegacao}', { delegacao: nova.de?.nome ?? '' })
+						: t('Mensagem da mesa'),
+			href: `/comite/${naConversa.sigla}/mensagens`
+		};
+		const fim = setTimeout(() => (aviso = null), 8000);
+		return () => clearTimeout(fim);
+	});
+	const ehMensagens = (href: string) => href.endsWith('/mensagens');
+	const mensagensEmMais = $derived(itens.some((i) => i.mais && ehMensagens(i.href)));
+
 	// O nome do evento da pessoa, para os títulos e o cabeçalho (passo 27).
 	const nomeDoEvento = $derived(data.participacoes[0]?.evento_nome ?? null);
 	$effect.pre(() => {
@@ -213,6 +282,10 @@
 		return () => subscription.unsubscribe();
 	});
 </script>
+
+{#snippet contagemNovas()}
+	<span class="contagem-menu">{mensagensNovas.n}<span class="so-leitor"> {mensagensNovas.n === 1 ? t('não lida') : t('não lidas')}</span></span>
+{/snippet}
 
 <svelte:window onkeydown={atalhoIrPara} />
 
@@ -366,6 +439,7 @@
 							<a href={item.href} aria-current={atual(item.href)}>
 								<item.icone aria-hidden="true" size={20} strokeWidth={1.5} />
 								<span>{item.rotulo}</span>
+								{#if ehMensagens(item.href) && mensagensNovas.n}{@render contagemNovas()}{/if}
 							</a>
 						</li>
 					{/each}
@@ -374,6 +448,7 @@
 							<a href="/mais" aria-current={maisMarcado}>
 								<Ellipsis aria-hidden="true" size={20} strokeWidth={1.5} />
 								<span>{t('Mais')}</span>
+								{#if mensagensEmMais && mensagensNovas.n}{@render contagemNovas()}{/if}
 							</a>
 						</li>
 					{/if}
@@ -400,6 +475,13 @@
 			{@render children()}
 		</main>
 	</div>
+	{#if aviso}
+		<div class="aviso-chegou" role="status">
+			<MessageSquare aria-hidden="true" size={18} strokeWidth={1.75} />
+			<span>{aviso.texto}</span>
+			<a class="botao botao--pequeno" href={aviso.href} onclick={() => (aviso = null)}>{t('Abrir')}</a>
+		</div>
+	{/if}
 	{#if fichaDelegacao}{#await fichaDelegacao then { default: Ficha }}<Ficha participacoes={data.participacoes} />{/await}{/if}
 	{#if previaDocumento}{#await previaDocumento then { default: Previa }}<Previa />{/await}{/if}
 	{#if anotar}{#await anotar then { default: Anotar }}<Anotar participacoes={data.participacoes} />{/await}{/if}

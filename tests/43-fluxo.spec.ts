@@ -106,7 +106,7 @@ test('delegado: Documentos reúne o que se escreve, e o "Voltar" volta para lá'
 	await irPeloMenu(page, 'Documentos');
 	await expect(page.getByRole('heading', { level: 1, name: 'Documentos' })).toBeVisible();
 	// Passo 56: o que espera a pessoa, cada tópico pela ordem, e DPOs e cartas numa linha cada.
-	for (const nome of ['Para você', 'DPOs e cartas']) await expect(page.getByRole('region', { name: nome })).toBeVisible();
+	for (const nome of ['Para você', 'Seus documentos, DPOs e cartas']) await expect(page.getByRole('region', { name: nome })).toBeVisible();
 	await expect(page.getByRole('article', { name: /^Tópico 1/ }).getByRole('navigation', { name: 'Ordem do tópico 1' })).toBeVisible();
 	// Passo 51: as ações da área em cartões, como na aba Comitê.
 	await expect(page.getByRole('navigation', { name: 'Atalhos de documentos' }).getByRole('link')).toHaveText([/^\s*DPO/, /^\s*Blocos/, /^\s*Cartas/, /^\s*Caderno/]);

@@ -62,6 +62,7 @@
 	let modalLista = $state<Modal>();
 	let modalAvaliar = $state<Modal>();
 	let modalDpos = $state<Modal>();
+	let modalSeus = $state<Modal>();
 	function abrirLista(topico: number, etapa: Etapa) {
 		lista = { topico, etapa };
 		modalLista?.abrir();
@@ -92,6 +93,7 @@
 			</span>
 		</span>
 		{#if STATUS_DOCUMENTO[d.status]}<span class="selo {STATUS_DOCUMENTO[d.status].selo}">{STATUS_DOCUMENTO[d.status].rotulo}</span>{/if}
+		{#if data.minha && d.assinaturas.some((a) => a.delegacao?.id === data.minha)}<span class="selo selo--ok">{t('assinado por você')}</span>{/if}
 	</li>
 {/snippet}
 
@@ -144,7 +146,17 @@
 		</section>
 	{/if}
 
-	<section class="cartao no-evento" aria-label={t('DPOs e cartas')}>
+	<section class="cartao no-evento" aria-label={t('Seus documentos, DPOs e cartas')}>
+		<!-- Passo 61: o que é do bloco não some ao assinar: uma linha fixa, que abre a lista. -->
+		{#if data.minha}
+			<article class="linha-evento" aria-labelledby="t-seus">
+				<h3 id="t-seus">{t('Seus documentos')} <span class="selo">{dosMeusBlocos.length}</span></h3>
+				<div class="linha-evento-resumo">
+					<p class="suave">{data.meusBlocos.length ? t('dos seus blocos') : t('Sua delegação ainda não está num bloco.')}</p>
+				</div>
+				<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => modalSeus?.abrir()}>{t('Ver todos')}</button>
+			</article>
+		{/if}
 		<article class="linha-evento" aria-labelledby="t-dpos">
 			<h3 id="t-dpos">{t('DPOs')} <span class="selo">{t('{n} de {total}', { n: dposVisiveis.length, total: data.totalDelegacoes })}</span></h3>
 			<div class="linha-evento-resumo"></div>
@@ -202,6 +214,18 @@
 				<span>{nomeDoDocumento(d)} <span class="detalhe">{d.bloco?.nome}</span></span>
 				<a class="botao botao--secundario botao--pequeno" href={`/documento/${d.id}`}>{t('Ler e avaliar')}</a>
 			</li>
+		{/each}
+	</ul>
+	<form method="dialog" class="acoes"><button class="botao botao--secundario">{t('Fechar')}</button></form>
+</Modal>
+
+<Modal bind:this={modalSeus} nome={t('Seus documentos')} classe="modal-acao">
+	<h3>{t('Seus documentos')}</h3>
+	<ul class="lista">
+		{#each dosMeusBlocos as d (d.id)}
+			{@render documento(d)}
+		{:else}
+			<li class="suave">{t('O seu bloco ainda não tem documentos.')}</li>
 		{/each}
 	</ul>
 	<form method="dialog" class="acoes"><button class="botao botao--secundario">{t('Fechar')}</button></form>

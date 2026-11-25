@@ -17,6 +17,7 @@
 	import Users from '@lucide/svelte/icons/users';
 	import Vote from '@lucide/svelte/icons/vote';
 	import GradeAtalhos, { type Atalho } from '#lib/ui/GradeAtalhos.svelte';
+	import CircleHelp from '@lucide/svelte/icons/circle-help';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -34,6 +35,8 @@
 			ehMesa
 				? { href: `/comite/${sigla}/sessao/presidencia`, rotulo: t('Painel'), descricao: t('Conduzir a sessão: palavra, pontos e votações'), icone: Gavel }
 				: { href: `/comite/${sigla}/sessao`, rotulo: t('Sessão'), descricao: t('A sessão ao vivo: placa, pontos e votos'), icone: Gavel },
+			// Passo 61: o caminho do comitê explicado, para quem chega.
+			{ href: `/comite/${sigla}/como-funciona`, rotulo: t('Como funciona'), descricao: t('A ordem do comitê e o que cada um faz'), icone: CircleHelp },
 			{ href: `/comite/${sigla}/sessao/agenda`, rotulo: t('Agenda'), descricao: t('A agenda de cada tópico'), icone: ListOrdered },
 			{ href: `/comite/${sigla}/documentos`, rotulo: t('Documentos'), descricao: t('DPO, projetos, cartas e caderno'), icone: FileText },
 			{ href: `/comite/${sigla}/blocos`, rotulo: t('Blocos'), descricao: t('Formar blocos e escrever documentos'), icone: Users },

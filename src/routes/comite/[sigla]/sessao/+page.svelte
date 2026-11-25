@@ -43,8 +43,7 @@
 	import Siren from '@lucide/svelte/icons/siren';
 	import Vote from '@lucide/svelte/icons/vote';
 	import QuemPreside from '#lib/ui/QuemPreside.svelte';
-	import TrilhaDoTopico from '#lib/ui/TrilhaDoTopico.svelte';
-	import { doTopico } from '#lib/ordem.ts';
+	import LinhaDoComite from '#lib/ui/LinhaDoComite.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -270,13 +269,14 @@
 		{FASES[data.fase]}{data.fase === 'plenaria' ? ` · ${ETAPAS[data.estado.etapa_plenaria].rotulo}` : ''} ·
 		{FORMAS[data.estado.forma]}
 	</p>
-	{#if topicoAtual}
-		<p class="topico-atual">
-			<span class="rotulo">{t('Tópico em debate')}</span> <a href={`/comite/${data.comite.sigla}/sessao/agenda`}>{topicoAtual}</a>
-		</p>
-		<!-- Passo 56: em que etapa o tópico está, e o que fazer agora. -->
-		<TrilhaDoTopico compacta sigla={data.comite.sigla} mesa={ehMesa} {...doTopico(data.ordem, data.estado.topico_atual!)} />
-	{/if}
+	<!-- Passo 61: o caminho inteiro do comitê, da plenária ao tópico, com o "Agora" e o "Depois". -->
+	<LinhaDoComite
+		sigla={data.comite.sigla}
+		estado={{ fase: data.fase, etapa_plenaria: data.estado.etapa_plenaria, topico_atual: data.estado.topico_atual }}
+		papel={ehMesa ? 'mesa' : eu ? 'delegacao' : 'outro'}
+		ordem={data.ordem}
+		topicos={data.comite.topicos}
+	/>
 
 	{#if erro}
 		<p class="erro" role="alert">{erro}</p>

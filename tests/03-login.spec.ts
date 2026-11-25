@@ -76,7 +76,9 @@ for (const [papel, itens] of Object.entries(MENUS)) {
 		await entrar(page, CONTAS[papel as keyof typeof MENUS]);
 		const links = page.getByRole('navigation', { name: 'Principal' }).getByRole('link');
 		const celular = info.project.name === 'celular' && itens.length > 5;
-		await expect(links).toHaveText(celular ? [...itens.slice(0, 4), 'Mais'] : [...itens]);
+		// Passo 61: "Mensagens" (ou "Mais") pode trazer a contagem de não lidas depois do nome.
+		const nomes = celular ? [...itens.slice(0, 4), 'Mais'] : [...itens];
+		await expect(links).toHaveText(nomes.map((n) => new RegExp(`^\\s*${n}\\s*(\\d+\\s*não lidas?)?\\s*$`)));
 	});
 }
 

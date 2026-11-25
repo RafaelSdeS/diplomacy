@@ -3,6 +3,7 @@
 **Parte de:** uso de 25/11/2026 ("eu que sei como funcionam as coisas não consegui entender de primeira qual a ordem das coisas"; "as mensagens recebidas devem ter algum tipo de notificação visual"; "ao assinar o working paper, ele some da aba Documentos?"; "muito do que percebo é que não é intuitivo o suficiente")
 **Depende de:** 51 lote 3 (bilhetes como conversa), 55, 56, 59
 **Esforço:** M
+**Situação:** pronto (25/11/2026).
 **Quando:** antes do piloto, junto com o 59.
 **Objetivo:** em qualquer tela, a pessoa sabe em que momento o comitê está, o que vem depois e o que espera por ela; o que chega (bilhete, documento) se anuncia; o que é dela não some.
 
@@ -42,7 +43,14 @@
 
 ## Testes
 
-- [ ] Ponta a ponta: na plenária, a Sessão do delegado e da mesa mostra a linha do comitê com o momento certo e o "Agora/Depois" de cada papel; aprovada a moção do tópico, a linha passa à agenda, sem recarregar.
-- [ ] Ponta a ponta com dois navegadores: o Brasil manda um bilhete; a França, na Sessão, vê o aviso e a contagem no menu; ao abrir a conversa, a contagem zera.
-- [ ] Ponta a ponta: a delegação assina um working paper do bloco; ele sai de "Para você" e continua em "Seus documentos".
-- [ ] axe na linha do comitê, no aviso e na página "Como funciona", nos dois temas.
+- [x] Ponta a ponta: na plenária, a Sessão do delegado e da mesa mostra a linha do comitê com o momento certo e o "Agora/Depois" de cada papel; aprovada a moção do tópico, a linha passa à agenda, sem recarregar.
+- [x] Ponta a ponta com dois navegadores: o Brasil manda um bilhete; a França, na Sessão, vê o aviso e a contagem no menu; ao abrir a conversa, a contagem zera.
+- [x] Ponta a ponta: a delegação assina um working paper do bloco; ele sai de "Para você" e continua em "Seus documentos".
+- [x] axe na linha do comitê, no aviso e na página "Como funciona", nos dois temas.
+
+## Como ficou
+
+- `src/lib/momento.ts` (`momentoDoComite`) diz o passo (plenária, tópico, fase de ação) e as frases "Agora" e "Depois" por papel (mesa, presidência, delegação); `LinhaDoComite.svelte` mostra a plenária com as três etapas ou a trilha do tópico, mais as duas frases e o link "Como funciona o comitê". Completa no topo da Sessão (no lugar de "Tópico em debate"); compacta na Agora, no cartão da sessão ao vivo (delegação) e no da mesa.
+- `/comite/<sigla>/como-funciona`: a ordem do comitê e o que cada papel faz, numa tela; atalho na aba Comitê.
+- Bilhetes: `src/lib/nao-lidas.ts` conta, por conversa, o que chegou depois da última leitura guardada no aparelho (`lidas:<comitê>`). O layout ouve os canais da delegação (ou da mesa) e mostra a contagem em "Mensagens" (e em "Mais", no celular, quando Mensagens está lá), no título da aba ("(2) …") e um aviso no canto por 8 s ("Bilhete de Brasil · Abrir"), fora da aba Mensagens. Abrir a aba Mensagens marca as conversas como lidas (mais simples que por conversa: elas ficam todas à vista ali). O aviso não espera a votação aberta terminar.
+- Documentos: "Seus documentos" é uma linha fixa (com "Ver todos" num modal, e "assinado por você" em cada documento), na mesma faixa de DPOs e cartas, para a página não crescer. A prévia não ganhou a linha "Sua delegação assinou".

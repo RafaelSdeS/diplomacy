@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { conversa, marcarLida } from '#lib/nao-lidas.ts';
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import Quando from '#lib/ui/Quando.svelte';
 	import { contador } from '#lib/contador.ts';
@@ -33,6 +34,11 @@
 		...(ehCrise ? [`crise:${data.comite.id}`] : [])
 	]);
 	const nome = (id: string | null) => data.delegacoes.find((d) => d.id === id)?.nome ?? t('Mesa');
+	// Passo 61: com a aba aberta, as conversas estão à vista: o que chegou conta como lido.
+	$effect(() => {
+		const conversas = data.mensagens.map((m) => conversa(m, eu?.delegacao_id ?? null)).filter((c) => c !== null);
+		untrack(() => marcarLida(data.comite.id, ...new Set(conversas)));
+	});
 	const do_tipo = (tipo: string) => data.mensagens.filter((m) => m.tipo === tipo);
 	// Passo 51 (lote 0b): os bilhetes agrupados pela outra delegação, a conversa mais recente primeiro.
 	const conversas = $derived.by(() => {

@@ -3641,3 +3641,106 @@ dialog.ir-para {
 .inserir--fim {
 	margin-top: 1rem;
 }
+
+/* Passo 61: o momento do comitê, da plenária ao tópico, com o "Agora" e o "Depois". */
+.linha-comite {
+	margin: 0.5rem 0 1rem;
+	padding: 0.6rem 0.85rem;
+	border-left: 3px solid var(--cor-marinho);
+	background: var(--cor-marinho-suave);
+}
+
+.linha-comite p {
+	margin: 0.2rem 0;
+}
+
+.linha-comite-passos,
+.trilha-topico-plenaria {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.25rem 1.25rem;
+	margin: 0 0 0.35rem;
+	padding: 0;
+	list-style: none;
+	color: var(--cor-texto-suave);
+	font-size: 0.9rem;
+}
+
+.linha-comite-passos li + li::before,
+.trilha-topico-plenaria li + li::before {
+	content: '→ ' / '';
+}
+
+.linha-comite-passos .atual,
+.trilha-topico-plenaria .atual {
+	color: var(--cor-marinho);
+	font-weight: 600;
+}
+
+.linha-comite-passos .feito::after,
+.trilha-topico-plenaria .feito::after {
+	content: ' ✓' / '';
+	color: var(--cor-ok);
+}
+
+.linha-comite .trilha-topico {
+	margin: 0 0 0.35rem;
+}
+
+.linha-comite-ajuda {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+	margin-left: 0.5rem;
+	font-size: 0.9rem;
+}
+
+.linha-comite--compacta {
+	margin: 0.25rem 0 0.5rem;
+	padding: 0.35rem 0.6rem;
+	font-size: 0.92rem;
+}
+
+/* O que chegou: a contagem no menu e o aviso no canto. */
+.contagem-menu {
+	display: inline-grid;
+	place-items: center;
+	min-width: 1.25rem;
+	height: 1.25rem;
+	margin-left: auto;
+	padding: 0 0.3rem;
+	border-radius: 999px;
+	background: #c9191e; /* o mesmo vermelho nos dois temas, com o branco legível */
+	color: #ffffff;
+	font-size: 0.75rem;
+	font-weight: 700;
+}
+
+.aviso-chegou {
+	position: fixed;
+	right: 1rem;
+	bottom: 5rem;
+	z-index: 50;
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+	padding: 0.6rem 0.85rem;
+	border: var(--linha);
+	border-left: 3px solid var(--cor-fio-dourado);
+	background: var(--cor-fundo);
+	box-shadow: 0 4px 16px rgb(0 0 0 / 0.18);
+}
+
+@media (min-width: 1024px) {
+	.aviso-chegou {
+		bottom: 1.5rem;
+	}
+}
+
+.como-funciona > li {
+	margin-bottom: 1.25rem;
+}
+
+.como-funciona ol li {
+	margin: 0.35rem 0;
+}

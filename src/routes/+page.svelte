@@ -18,8 +18,7 @@
 	import FichaVotacao from '#lib/ui/FichaVotacao.svelte';
 	import FichaNota from '#lib/ui/FichaNota.svelte';
 	import QuemPreside from '#lib/ui/QuemPreside.svelte';
-	import TrilhaDoTopico from '#lib/ui/TrilhaDoTopico.svelte';
-	import { doTopico } from '#lib/ordem.ts';
+	import LinhaDoComite from '#lib/ui/LinhaDoComite.svelte';
 	import Modal from '#lib/ui/Modal.svelte';
 	import Quando from '#lib/ui/Quando.svelte';
 	import ResponderEntrevista from '#lib/ui/ResponderEntrevista.svelte';
@@ -138,7 +137,7 @@
 				<div class="ao-vivo-grade">
 					<div>
 					<p class="suave">{t('Sessão {n}', { n: sessao.numero })} · {FASES[data.aoVivo.fase]} · {FORMAS[estado.forma]}</p>
-					{#if estado.topico_atual}<TrilhaDoTopico compacta {sigla} {...doTopico(data.aoVivo.ordem, estado.topico_atual)} />{/if}
+					<LinhaDoComite compacta {sigla} estado={{ fase: data.aoVivo.fase, etapa_plenaria: estado.etapa_plenaria, topico_atual: estado.topico_atual }} papel="delegacao" ordem={data.aoVivo.ordem} />
 					{#if momento === 'pausa'}<p class="telegrama" role="status">{t('Há pontos ou moções?')}</p>{/if}
 					<p>
 						<span class="rotulo">{t('Com a palavra')}</span>
@@ -227,8 +226,8 @@
 		<article class="cartao cartao--destaque" aria-labelledby="c-mesa">
 			<h2 id="c-mesa">{t('Mesa')} · {sigla}</h2>
 			<p>{sessao ? t('Sessão {n} aberta', { n: sessao.numero }) : t('Nenhuma sessão aberta.')}</p>
-			<!-- Passo 56: a etapa do tópico em debate e o que a mesa faz agora. -->
-			{#if estado?.topico_atual && data.aoVivo}<TrilhaDoTopico compacta mesa {sigla} {...doTopico(data.aoVivo.ordem, estado.topico_atual)} />{/if}
+			<!-- Passo 61: o momento do comitê e o que a mesa faz agora. -->
+			{#if estado && data.aoVivo}<LinhaDoComite compacta {sigla} estado={{ fase: data.aoVivo.fase, etapa_plenaria: estado.etapa_plenaria, topico_atual: estado.topico_atual }} papel="mesa" ordem={data.aoVivo.ordem} />{/if}
 			<!-- Passo 51 (lote 2): os três atalhos como botões numa linha, com a contagem dentro. -->
 			<div class="acoes">
 				<a class={['botao botao--pequeno', !sessao?.avisos.length && 'botao--secundario']} href={`/comite/${sigla}/sessao/chamada`}
