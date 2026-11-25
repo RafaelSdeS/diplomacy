@@ -17,7 +17,8 @@ test('sem login, o título é do app; com login, do evento da pessoa', async ({ 
 
 	await entrar(page, CONTAS.delegado);
 	await page.goto('/comite/CSNU-T/sessao');
-	await expect(page).toHaveTitle(/^Sessão · CSNU-T · UFRGSMUN Teste$/);
+	// Passo 61: com bilhete não lido, o título começa com a contagem: "(1) Sessão · …".
+	await expect(page).toHaveTitle(/^(\(\d+\) )?Sessão · CSNU-T · UFRGSMUN Teste$/);
 	const cabecalho = page.getByRole('banner');
 	await expect(cabecalho.getByRole('link', { name: /Diplomacy/ })).toContainText('UFRGSMUN Teste');
 });

@@ -10,6 +10,10 @@ const C = isolado('29');
 // motivo e o telão. Comitê CE-T, com uma delegação na presidência.
 const MESA = C.conta('mesa-ce@exemplo.test');
 const ALEMANHA = C.conta('ce-alemanha@exemplo.test');
+// Passo 59: quem preside vai direto ao painel, sem o botão de ponto; a delegação do teste é
+// uma que não preside (a Alemanha ou, se ela foi sorteada, a França).
+let DELEGADA = ALEMANHA;
+let PAIS = 'Alemanha';
 
 test.describe.configure({ mode: 'serial' });
 test.beforeEach(({}, info) => {
@@ -26,13 +30,19 @@ test.beforeAll(async ({}, info) => {
 		expect((await mesa.rpc('abrir_sessao', { p_comite: comite })).error).toBeNull();
 		expect((await mesa.rpc('marcar_todas_presentes', { p_comite: comite })).error).toBeNull();
 	}
+	const quem = await mesa
+		.from('estado_sessao')
+		.select('sessao(presidencia:delegacao!sessao_presidencia_delegacao_id_comite_id_fkey(nome))')
+		.eq('comite_id', comite)
+		.single();
+	if (quem.data?.sessao?.presidencia?.nome === 'Alemanha') [DELEGADA, PAIS] = [C.conta('ce-franca@exemplo.test'), 'França'];
 });
 
 const aoVivo = (page: Page) => expect(page.locator('[data-ao-vivo="sim"]')).toBeVisible({ timeout: 10_000 });
 
 test('o bureau recusa um pedido com motivo, e o delegado vê a etapa e o motivo', async ({ page, browser }) => {
 	const delegada = await (await browser.newContext()).newPage();
-	await entrar(delegada, ALEMANHA);
+	await entrar(delegada, DELEGADA);
 	await delegada.goto(`/comite/${C.sigla}/sessao`);
 	await aoVivo(delegada);
 	await abrirAcao(delegada, 'Fazer um ponto ou moção');
@@ -47,7 +57,7 @@ test('o bureau recusa um pedido com motivo, e o delegado vê a etapa e o motivo'
 	const telao = await (await browser.newContext({ viewport: { width: 1920, height: 1080 } })).newPage();
 	await entrar(telao, MESA);
 	await telao.goto(`/telao/${C.sigla}`);
-	await expect(telao.locator('.telao-analise')).toContainText('Alemanha');
+	await expect(telao.locator('.telao-analise')).toContainText(PAIS);
 
 	await entrar(page, MESA);
 	await page.goto(`/comite/${C.sigla}/sessao/presidencia`);
@@ -56,13 +66,13 @@ test('o bureau recusa um pedido com motivo, e o delegado vê a etapa e o motivo'
 	const julgar = page.getByRole('region', { name: 'Bureau · pedidos para aprovar' });
 	const nome = 'Moção de informal-informal: 10 minutos';
 	await julgar.getByRole('textbox', { name: `Motivo da recusa: ${nome}` }).last().fill('Fora de hora');
-	await julgar.getByRole('button', { name: `Fora de ordem: ${nome}, Alemanha` }).last().click();
+	await julgar.getByRole('button', { name: `Fora de ordem: ${nome}, ${PAIS}` }).last().click();
 	await expect(meus.getByRole('listitem').last()).toContainText('Recusado: Fora de hora');
 });
 
 test('a delegação retira o próprio pedido enquanto ele espera (passo 38)', async ({ page }) => {
 	await desfazerRapido(page);
-	await entrar(page, ALEMANHA);
+	await entrar(page, DELEGADA);
 	await page.goto(`/comite/${C.sigla}/sessao`);
 	await aoVivo(page);
 	await abrirAcao(page, 'Fazer um ponto ou moção');

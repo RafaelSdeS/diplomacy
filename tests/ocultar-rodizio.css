@@ -8,11 +8,17 @@
 .painel-quem,
 [aria-labelledby='t-palavra'] .com-bandeira,
 [aria-labelledby='t-fila'] li .com-bandeira,
+#t-sua-delegacao,
 .barra-painel > p.suave {
 	visibility: hidden;
 }
 
 /* A identidade na faixa tem a largura do nome sorteado e empurraria a busca e a conta. */
 .timbre .identidade {
+	display: none;
+}
+
+/* O resultado da última votação some do telão depois de um tempo: fora da captura. */
+.telao-resultado {
 	display: none;
 }
