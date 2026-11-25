@@ -10,12 +10,28 @@
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import Bandeira from '#lib/ui/Bandeira.svelte';
 	import AcaoEmModal from '#lib/ui/AcaoEmModal.svelte';
+	import Escolha from '#lib/ui/Escolha.svelte';
 	import Users from '@lucide/svelte/icons/users';
 	import Modal from '#lib/ui/Modal.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 	let novoBloco = $state<AcaoEmModal>();
+	// Passo 51: trocar o redator. Quem entra vem antes de quem sai (o bloco precisa de um redator).
+	type Bloco = (typeof data.blocos)[number];
+	const redatoresDe = (b: Bloco) => b.membros.filter((m) => m.redator && m.delegacao).map((m) => m.delegacao!.id);
+	const souRedator = (b: Bloco) => !!eu?.delegacao_id && redatoresDe(b).includes(eu.delegacao_id);
+	let redatores = $state<Record<string, string[]>>({});
+	async function salvarRedatores(b: Bloco) {
+		const novos = redatores[b.id];
+		if (!novos) return;
+		const antes = redatoresDe(b);
+		for (const id of novos.filter((x) => !antes.includes(x)))
+			if (!(await executar(supabase.rpc('definir_redator', { p_bloco: b.id, p_delegacao: id, p_redator: true })))) break;
+		for (const id of antes.filter((x) => !novos.includes(x)))
+			if (!(await executar(supabase.rpc('definir_redator', { p_bloco: b.id, p_delegacao: id, p_redator: false })))) break;
+		delete redatores[b.id];
+	}
 
 	const eu = $derived(data.participacoes.find((p) => p.comite_id === data.comite.id && p.papel === 'delegado'));
 	const souDo = (bloco: (typeof data.blocos)[number]) => bloco.membros.some((m) => m.delegacao?.id === eu?.delegacao_id);
@@ -122,6 +138,16 @@
 						</li>
 					{/each}
 				</ul>
+				<!-- Passo 51: o redator passa ou divide a redação (definir_redator, passo 09). -->
+				{#if souRedator(bloco)}
+					<Escolha
+						rotulo={t('Redatores')}
+						botao={t('Mudar')}
+						opcoes={bloco.membros.flatMap((m) => (m.delegacao ? [{ id: m.delegacao.id, nome: m.delegacao.nome, bandeira: m.delegacao.bandeira }] : []))}
+						bind:escolhidos={() => redatores[bloco.id] ?? redatoresDe(bloco), (v) => (redatores[bloco.id] = v)}
+						onpronto={() => salvarRedatores(bloco)}
+					/>
+				{/if}
 				{#each data.documentos.filter((d) => d.bloco_id === bloco.id) as d (d.id)}
 					<p>
 						<a href={`/documento/${d.id}`}>{nomeDoDocumento(d)}</a>

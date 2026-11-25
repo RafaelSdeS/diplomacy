@@ -179,3 +179,22 @@ test('da ficha da delegação saem um bilhete e uma carta, sem ir a outra tela',
 	expect((await brasil.from('mensagem').select('id').eq('texto', bilhete)).data).toHaveLength(1);
 	expect((await brasil.from('carta').select('id').eq('titulo', titulo)).data).toHaveLength(1);
 });
+
+test('o redator divide a redação do bloco com outra delegação (passo 51)', async ({ page }) => {
+	const paraguai = await clienteComo(PARAGUAI);
+	const chile = await clienteComo(C.conta(contaDoTreino('Chile')));
+	const nome = `Bloco do rio ${Date.now()}`;
+	const bloco = (await paraguai.rpc('criar_bloco', { p_comite: comite, p_nome: nome })).data!;
+	expect((await chile.rpc('entrar_bloco', { p_bloco: bloco })).error).toBeNull();
+
+	await entrar(page, PARAGUAI);
+	await page.goto(`/comite/${C.sigla}/blocos`);
+	const cartao = page.getByRole('article', { name: `Bloco ${nome}` });
+	await cartao.getByRole('button', { name: 'Mudar: Redatores' }).click();
+	const lista = page.getByRole('dialog', { name: 'Redatores' });
+	await lista.getByRole('checkbox', { name: /^Chile/ }).check();
+	await lista.getByRole('button', { name: 'Pronto' }).click();
+	await expect(cartao.getByRole('listitem').filter({ hasText: 'Chile' })).toContainText('Redator');
+	const chileRedator = await chile.from('bloco_membro').select('redator, delegacao!inner(nome)').eq('bloco_id', bloco).eq('delegacao.nome', 'Chile').single();
+	expect(chileRedator.data?.redator).toBe(true);
+});

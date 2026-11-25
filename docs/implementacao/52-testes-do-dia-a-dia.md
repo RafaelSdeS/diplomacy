@@ -48,6 +48,8 @@ Medido no passo 47 (24/11/2026):
 | Suíte inteira com build | de 1,7 a 2,3 min | 76 s |
 | Capturas de um arquivo | cerca de 2 min (banco, seed, build e todas) | 4 s |
 
+**Depois (24/11/2026, à noite):** com 10 processos locais, a carga da máquina passou de 30 e testes sem relação estouravam o tempo. O computador usa 6 processos (`workers: ci ? 2 : 6`): a suíte inteira leva cerca de 2,5 min com a máquina ocupada, sem falhas por tempo.
+
 ## Fora desta etapa
 
 Tirar testes ou cobrir menos. Paralelizar mais no CI, que já leva cerca de 4 min.

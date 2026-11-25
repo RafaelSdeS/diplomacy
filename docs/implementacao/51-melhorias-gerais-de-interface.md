@@ -63,7 +63,7 @@
 
 **Lotes seguintes**, pelas telas maiores: documento, mensagens, crise, blocos e secretaria.
 
-**No lote dos blocos: trocar o redator** (prioridade pequena). Hoje o redator é quem cria o bloco. O banco já permite passar ou dividir a redação (`definir_redator`, passo 09), mas nenhuma tela usa isso. A tela do bloco ganha:
+**No lote dos blocos: trocar o redator** (prioridade pequena; **a primeira parte está feita**: o redator abre "Redatores · Mudar" no cartão do bloco e marca ou desmarca membros, com bandeiras; quem entra é marcado antes de quem sai, porque o bloco precisa de um redator). Hoje o redator é quem cria o bloco. O banco já permite passar ou dividir a redação (`definir_redator`, passo 09), mas nenhuma tela usa isso. A tela do bloco ganha:
 
 - **o redator passa ou divide:** "Redatores" lista os membros, e o redator atual marca outros, ou passa a redação, com `Confirmar`;
 - **troca por consenso:** um membro propõe outro redator e a troca vale quando a maioria do bloco aceita. Esta parte só entra se o piloto mostrar blocos travados por um redator ausente.
