@@ -42,7 +42,7 @@ A sequência de execução tem o **piloto depois da interface**. Os passos 44, 4
 | 17 | [48](implementacao/48-demonstracao-online.md) | Demonstração online com acesso rápido por papel | M | Depende da segurança, da coletiva e dos modais; mostra o app inteiro por papel | Projeto separado, um comitê completo, `/demo` por papel e reinício |
 | 18 | [49](implementacao/49-edicao-por-clausula.md) e [57](implementacao/57-escrita-de-documentos.md) **parte B** | Edição colaborativa por cláusula | G | Resolve o problema central de documentos sem discussões infinitas, **se o piloto confirmar**; a parte A do 57 já o diminui | Proposta estruturada, rodada com prazo, comparação e fusão básica |
 | 19 | [50](implementacao/50-preparacao-da-fala.md) | Preparação de discursos e notas | M | Permite acompanhar outras delegações enquanto prepara a próxima fala, **se o piloto confirmar** | Captura rápida por tipo, painel curto da delegação e rascunho da fala |
-| 20 | [51](implementacao/51-melhorias-gerais-de-interface.md) **demais lotes** | Melhorias gerais | G | Acabamento das demais telas, aos poucos | Primeiro o lote 3 (bilhetes como conversa, em duas colunas); depois crise, blocos (com a troca de redator) e secretaria; estados vazios, densidade e preferências |
+| 20 | [51](implementacao/51-melhorias-gerais-de-interface.md) **demais lotes** | Melhorias gerais | G | Acabamento das demais telas, aos poucos | O lote 3 (bilhetes como conversa, em duas colunas) está pronto (25/11/2026); depois crise, blocos (com a troca de redator) e secretaria; estados vazios, densidade e preferências |
 
 Esforço **P**, **M** ou **G** como nos passos 01 a 43. Os itens 15 e 16 só começam depois da validação com o piloto (abaixo).
 

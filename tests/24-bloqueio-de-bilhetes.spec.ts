@@ -26,7 +26,9 @@ test('os EUA bloqueiam o Irã, que fica sabendo e não consegue escrever; o desb
 	await entrar(page, EUA);
 	await page.goto(MENSAGENS);
 	await expect(page.locator('[data-ao-vivo="sim"]')).toBeVisible({ timeout: 10_000 });
-	const bloqueios = page.getByRole('region', { name: 'Bloqueios' });
+	// Passo 51 (lote 3): os bloqueios num modal, ao lado da regra; a conversa fica com a tela.
+	await abrirAcao(page, 'Bloqueios');
+	const bloqueios = page.getByRole('dialog', { name: 'Bloqueios' });
 	await escolher(bloqueios, 'Delegação', 'Irã');
 	await bloqueios.getByRole('button', { name: 'Bloquear bilhetes desta delegação' }).click();
 	await expect(page.getByRole('status').filter({ hasText: 'Bilhetes de Irã bloqueados.' })).toBeVisible();
@@ -36,7 +38,9 @@ test('os EUA bloqueiam o Irã, que fica sabendo e não consegue escrever; o desb
 	await entrar(ira, IRA);
 	await ira.goto(MENSAGENS);
 	await expect(ira.locator('[data-ao-vivo="sim"]')).toBeVisible({ timeout: 10_000 });
+	await abrirAcao(ira, 'Bloqueios');
 	await expect(ira.getByRole('list', { name: 'Não aceitam bilhetes da sua delegação' })).toContainText('EUA');
+	await ira.keyboard.press('Escape');
 	await abrirAcao(ira, 'Novo bilhete');
 	const novo = ira.getByRole('form', { name: 'Novo bilhete' });
 	const eua = ira.getByRole('dialog', { name: 'Para' }).getByRole('radio', { name: /^EUA/ });

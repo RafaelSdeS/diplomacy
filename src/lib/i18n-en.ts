@@ -1528,6 +1528,22 @@ export const EN: Record<string, string> = {
 	'Seus dados (LGPD)': 'Your data (LGPD)',
 	'Baixe tudo o que o app guarda sobre você, corrija o seu nome ou peça a exclusão da conta.': 'Download everything the app keeps about you, correct your name or ask for your account to be deleted.',
 	'Encarregado de dados': 'Data protection officer',
+	// Passo 51 (lote 3)
+	'Antes das sessões': 'Before the sessions',
+	'Buscar': 'Search',
+	'Buscar nas conversas': 'Search the conversations',
+	'Conversa': 'Conversation',
+	'Conversas': 'Conversations',
+	'Dúvidas e pedidos privados à mesa: só a mesa lê.': 'Private questions and requests to the dais: only the dais reads them.',
+	'Escolha uma conversa.': 'Choose a conversation.',
+	'Escreva; Enter envia, Shift+Enter quebra a linha': 'Write; Enter sends, Shift+Enter breaks the line',
+	'Escrever para {quem}': 'Write to {quem}',
+	'Esta delegação não aceita bilhetes da sua.': 'This delegation does not accept notes from yours.',
+	'Mensagens com {quem}': 'Messages with {quem}',
+	'Mesa diretora': 'Dais',
+	'Moderação dos bilhetes': 'Note moderation',
+	'Nenhuma conversa encontrada.': 'No conversation found.',
+	'Nenhuma mensagem ainda.': 'No messages yet.',
 };
 
 /** Mensagens do banco com partes variáveis: [padrão em português, tradução]. */

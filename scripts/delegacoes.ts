@@ -76,6 +76,7 @@ export const ISOLADOS = {
 	'44': 'TREINO',
 	'46': 'TREINO',
 	'47': 'TREINO',
+	'51': 'TREINO',
 	'54': 'CE-T',
 	'55': 'TREINO',
 	'56': 'CE-T',

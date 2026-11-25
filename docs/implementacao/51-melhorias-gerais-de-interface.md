@@ -143,6 +143,14 @@
 - **"No evento":** "Acontecendo agora", "Depois", "Avisos", "Respostas da crise" e "Na press" viram linhas, cada uma com o mais recente; "Ver tudo" abre o resto num modal.
 - **Teste:** a Agora da mesa e a do delegado (com sessão aberta) não rolam a 1366 × 768 (teste em `43-fluxo`).
 
+**Lote 3 feito (25/11/2026, mensagens como conversa):**
+
+- **Duas colunas no notebook, uma de cada vez no celular** ("Voltar"). A lista tem a busca, "Novo bilhete" (a mesa: "Escrever a uma delegação") e, por conversa, a bandeira, o nome, a prévia ("Você: …"), a hora e o ponto dourado da não lida. A "Mesa diretora" fica fixada no topo; para a mesa e a crise, o canal interno.
+- **A conversa:** balões (os meus à direita, em marinho; os outros à esquerda, com fio dourado), cada um com quem escreveu ("Chile · nome", "Você") e a hora; separadores por sessão ("Sessão 3 · 14:00", "Antes das sessões"). A caixa de escrever fica embaixo (Enter envia, Shift + Enter quebra a linha), com o rascunho por conversa. Aberta, a conversa conta como lida.
+- **Ficha, bloquear, denunciar:** o nome no topo abre a ficha; "Bloquear" fica em "Mais opções"; "Denunciar" em cada balão da outra delegação. Os demais bloqueios (e, para a mesa, a moderação: regra, bloqueios e bilhetes do comitê) saíram do fim da página e abrem num modal ao lado da regra.
+- **Teste** (`51-conversas`): a 1366 × 768, quem rola é a coluna, não a página; Enter envia; a resposta chega na conversa aberta sem recarregar; no celular, lista e conversa uma de cada vez, e a não lida tem o ponto.
+- **Limite:** a altura da conversa conta com o cabeçalho, o título e a regra; com um pedido de entrevista pendente, a página rola um pouco.
+
 ## Fora desta etapa
 
 Itens que dependem de um segundo evento, habilidades especiais para delegações, edição livre simultânea e telas inteiras de personalização.

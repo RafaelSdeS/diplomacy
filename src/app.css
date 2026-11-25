@@ -1751,38 +1751,263 @@ dialog.escolha-modal {
 	width: min(36rem, calc(100vw - 2rem));
 }
 
-/* Passo 51: os bilhetes como conversas, uma por delegação. */
-.conversas > li {
-	align-items: flex-start;
+/* Passo 51 (lote 3): as mensagens como num aplicativo de conversa. No notebook, a lista à
+   esquerda e a conversa à direita, cada uma rolando por si; no celular, uma de cada vez. */
+.chat {
+	display: grid;
+	/* ponytail: a altura do que vem em cima (cabeçalho, título e regra) é fixa aqui; com um
+	   pedido de entrevista pendente, a página rola um pouco. */
+	height: calc(100dvh - 19.5rem);
+	min-height: 22rem;
+	border: var(--linha);
+	border-radius: var(--raio);
+	background: var(--cor-superficie);
+	overflow: hidden;
 }
 
-.conversa {
+.chat-lista,
+.chat-conversa {
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+}
+
+.chat--aberta .chat-lista,
+.chat:not(.chat--aberta) .chat-conversa {
+	display: none;
+}
+
+@media (min-width: 1024px) {
+	.chat {
+		grid-template-columns: minmax(16rem, 22rem) 1fr;
+	}
+
+	.chat--aberta .chat-lista,
+	.chat:not(.chat--aberta) .chat-conversa {
+		display: flex;
+	}
+
+	.chat-lista {
+		border-right: var(--linha);
+	}
+
+	.chat-voltar {
+		display: none;
+	}
+}
+
+.chat-topo,
+.chat-cabecalho {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.5rem 0.75rem;
+	border-bottom: var(--linha);
+}
+
+.chat-topo input {
+	flex: 1 1 8rem;
+	min-width: 0;
+}
+
+.chat-cabecalho .mais-opcoes {
+	margin-left: auto;
+}
+
+.chat-itens {
+	flex: 1;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	overflow-y: auto;
+}
+
+.chat-item {
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+	width: 100%;
+	padding: 0.6rem 0.75rem;
+	border: 0;
+	border-bottom: var(--linha);
+	background: none;
+	color: inherit;
+	font: inherit;
+	text-align: left;
+	cursor: pointer;
+}
+
+.chat-item:hover,
+.chat-item--aberto {
+	background: var(--cor-marinho-suave);
+}
+
+.chat-avatar {
+	display: grid;
+	flex: none;
+	place-items: center;
+	width: 2.25rem;
+	height: 2.25rem;
+	border-radius: 50%;
+	background: var(--cor-fundo);
+	overflow: hidden;
+}
+
+.chat-item-texto {
+	display: grid;
 	flex: 1;
 	min-width: 0;
 }
 
-.conversa > summary {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: baseline;
-	gap: 0.25rem 0.75rem;
-	cursor: pointer;
+.chat-item-nome {
+	font-family: var(--fonte-titulo);
+	font-weight: 600;
 }
 
-.conversa-ultima {
-	flex: 1 1 12rem;
-	min-width: 0;
+.chat-item-previa {
 	overflow: hidden;
+	color: var(--cor-texto-suave);
+	font-size: 0.875rem;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
 
-.conversa-mensagens {
-	margin-top: 0.5rem;
+.chat-item-hora {
+	display: grid;
+	justify-items: end;
+	gap: 0.25rem;
+	color: var(--cor-texto-suave);
+	font-size: 0.75rem;
 }
 
-.conversa-minha {
-	background: var(--cor-marinho-suave);
+.chat-ponto {
+	width: 0.6rem;
+	height: 0.6rem;
+	border-radius: 50%;
+	background: var(--cor-dourado);
+}
+
+.chat-mensagens {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	gap: 0.4rem;
+	margin: 0;
+	padding: 0.75rem;
+	list-style: none;
+	overflow-y: auto;
+}
+
+.chat-separador {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	margin: 0.75rem 0 0.25rem;
+	color: var(--cor-texto-suave);
+	font-size: 0.75rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+
+.chat-separador::before,
+.chat-separador::after {
+	content: '';
+	flex: 1;
+	border-top: var(--linha);
+}
+
+.balao {
+	max-width: min(36rem, 85%);
+	padding: 0.4rem 0.7rem;
+	border-radius: 0.75rem;
+	border: var(--linha);
+}
+
+.balao--outro {
+	align-self: flex-start;
+	border-bottom-left-radius: 0.2rem;
+	border-left: 3px solid var(--cor-fio-dourado);
+	background: var(--cor-fundo);
+}
+
+.balao--meu {
+	align-self: flex-end;
+	border-bottom-right-radius: 0.2rem;
+	background: var(--cor-marinho);
+	color: var(--cor-sobre-marinho);
+}
+
+.balao-autor {
+	display: block;
+	font-size: 0.75rem;
+	font-weight: 700;
+}
+
+.balao--outro .balao-autor {
+	color: var(--cor-marinho);
+}
+
+.balao-texto {
+	margin: 0.1rem 0;
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+}
+
+.balao-hora {
+	font-size: 0.75rem;
+	font-variant: small-caps;
+	opacity: 0.85;
+}
+
+.balao--outro .balao-hora {
+	color: var(--cor-texto-suave);
+	opacity: 1;
+}
+
+.balao .denunciar {
+	display: inline-block;
+	margin-left: 0.5rem;
+	font-size: 0.75rem;
+}
+
+.chat-escrever {
+	display: flex;
+	align-items: flex-end;
+	gap: 0.5rem;
+	padding: 0.5rem 0.75rem;
+	border-top: var(--linha);
+}
+
+.chat-escrever textarea {
+	flex: 1;
+	min-height: 2.75rem;
+	max-height: 8rem;
+	resize: vertical;
+}
+
+.chat-aviso,
+.chat-vazio {
+	padding: 1rem;
+}
+
+.chat-vazio {
+	margin: auto;
+}
+
+.mensagens-topo {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5rem 1rem;
+	margin-bottom: 0.75rem;
+}
+
+.mensagens-topo .telegrama {
+	flex: 1 1 20rem;
+	max-width: none;
+	margin: 0;
 }
 
 /* Passo 51: a aba do DPO, com a escrita num modal largo e a prévia ao lado. */

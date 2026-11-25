@@ -68,7 +68,9 @@ test('membro do bloco, remetente do bilhete e signatário abrem a ficha certa', 
 	await abreAFicha(page, cartao.getByRole('button', { name: 'Chile' }), 'Chile');
 
 	await page.goto(`/comite/${C.sigla}/mensagens`);
-	await abreAFicha(page, page.locator('.conversas').getByRole('button', { name: 'Paraguai' }).first(), 'Paraguai');
+	// Passo 51 (lote 3): a conversa abre pela lista; o nome no topo dela abre a ficha.
+	await page.getByRole('region', { name: 'Conversas' }).getByRole('button', { name: /Paraguai/ }).click();
+	await abreAFicha(page, page.locator('.chat-cabecalho').getByRole('button', { name: 'Paraguai' }), 'Paraguai');
 
 	// O rascunho só o bloco vê: o Paraguai abre o documento.
 	await page.context().clearCookies();
