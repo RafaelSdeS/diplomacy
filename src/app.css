@@ -3744,3 +3744,12 @@ dialog.ir-para {
 .como-funciona ol li {
 	margin: 0.35rem 0;
 }
+
+/* Passo 60: a agenda do bureau cabe na tela: itens próximos, ação de cada item só com ícone. */
+.arvore--numerada li {
+	margin: 0.1rem 0;
+}
+
+.arvore--numerada .botao--icone {
+	padding: 0.15rem 0.3rem;
+}

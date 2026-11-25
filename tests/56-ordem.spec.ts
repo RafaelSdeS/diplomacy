@@ -25,70 +25,86 @@ test.beforeAll(async ({}, info) => {
 	// Banco reaproveitado: o tópico 1 começa sem agenda adotada.
 	const adotada = (await debate.mesa.from('proposta_agenda').select('id').eq('comite_id', comite).eq('topico', 1).eq('adotada', true)).data ?? [];
 	for (const p of adotada) await debate.mesa.rpc('retirar_adocao', { p_proposta: p.id });
+	// Passo 60: a agenda do bureau do tópico 1 volta aos três itens (sem o que outras rodadas incluíram).
+	await debate.mesa.rpc('salvar_proposta_agenda', {
+		p_comite: comite,
+		p_topico: 1,
+		p_itens: [
+			{ texto: 'A. Causas', nivel: 0 },
+			{ texto: 'A.1 Atores', nivel: 1 },
+			{ texto: 'B. Respostas', nivel: 0 }
+		]
+	});
 });
 
 const etapaAtual = (page: Page) => page.getByRole('navigation', { name: 'Ordem do tópico 1' }).locator('[aria-current="step"]');
 const semRolar = (page: Page) => page.evaluate(() => document.documentElement.scrollHeight <= innerHeight + 1);
 
-test('a delegação propõe só com botões e teclado; a mesa compara e adota; a trilha muda na sessão', async ({ page, browser }) => {
+test('a mesa cadastra a agenda do bureau pelo teclado e a libera; a delegação propõe; a mesa inclui e registra; a trilha muda na sessão', async ({ page, browser }) => {
 	await entrar(page, ALEMANHA);
 	await page.goto(`/comite/${C.sigla}/sessao`);
 	await expect(page.locator('[data-ao-vivo="sim"]')).toBeVisible({ timeout: 10_000 });
 	await expect(etapaAtual(page)).toContainText('Agenda');
-	await expect(page.getByRole('navigation', { name: 'Ordem do tópico 1' })).toContainText('Proponha ou apoie uma agenda.');
 
-	// Outra aba da mesma pessoa: a agenda, com o editor de itens.
-	const agenda = await page.context().newPage();
-	await agenda.goto(`${AGENDA}?topico=1`);
-	await agenda.getByRole('button', { name: /^(Propor agenda|Editar a minha proposta)$/ }).click();
-	const editor = agenda.getByRole('dialog', { name: 'Proposta de Alemanha' });
-	// Banco reaproveitado: a proposta de antes volta no editor; fica um item só.
-	while ((await editor.getByLabel(/^Item \d+,/).count()) > 1) await editor.getByRole('button', { name: 'Tirar: item 1' }).click();
-	const primeiro = editor.getByLabel(/^Item 1,/);
-	await primeiro.fill('A. Causas');
-	await primeiro.press('Enter');
-	await expect(editor.getByLabel(/^Item 2,/)).toBeFocused();
-	await agenda.keyboard.type('A.1 Atores');
-	await agenda.keyboard.press('Tab');
-	await expect(editor.getByLabel('Item 2, nível 2')).toBeFocused();
-	await agenda.keyboard.press('Enter');
-	await agenda.keyboard.type('B. Respostas');
-	await agenda.keyboard.press('Shift+Tab');
-	await expect(editor.getByLabel('Item 3, nível 1')).toHaveValue('B. Respostas');
-	// Os botões: sobe o B para o lugar do A.1 e volta.
-	await editor.getByRole('button', { name: 'Para cima: item 3' }).click();
-	await expect(editor.getByLabel(/^Item 2,/)).toHaveValue('B. Respostas');
-	await editor.getByRole('button', { name: 'Para baixo: item 2' }).click();
-	await expect(editor.getByLabel('Item 2, nível 2')).toHaveValue('A.1 Atores');
-	expect((await new AxeBuilder({ page: agenda }).include('dialog[open]').analyze()).violations).toEqual([]);
-	await editor.getByRole('button', { name: 'Salvar proposta' }).click();
-	await expect(agenda.getByRole('status')).toHaveText('Proposta salva.');
-	const proposta = agenda.getByRole('article', { name: 'Proposta de Alemanha' });
-	await expect(proposta.getByRole('listitem').filter({ hasText: 'A. Causas' }).getByRole('listitem')).toHaveText(/A\.1 Atores/);
-
-	// A mesa sugere outra; as duas ficam lado a lado, e a mesa adota a da Alemanha.
-	const mesaApi = await clienteComo(MESA);
-	await mesaApi.rpc('salvar_proposta_agenda', { p_comite: comite, p_topico: 1, p_itens: [{ texto: 'A. Contexto', nivel: 0 }] });
+	// A mesa: o editor de itens só com botões e teclado.
 	const mesa = await (await browser.newContext({ viewport: { width: 1366, height: 768 } })).newPage();
 	await entrar(mesa, MESA);
 	await mesa.goto(`${AGENDA}?topico=1`);
-	const daAlemanha = mesa.getByRole('article', { name: 'Proposta de Alemanha' });
-	const daMesa = mesa.getByRole('article', { name: 'Proposta de Mesa' });
-	const [a, b] = await Promise.all([daAlemanha.boundingBox(), daMesa.boundingBox()]);
-	expect(Math.abs(a!.y - b!.y)).toBeLessThan(5);
-	await daAlemanha.getByRole('button', { name: 'Adotar esta' }).click();
-	await mesa.getByRole('dialog').getByRole('button', { name: 'Adotar esta' }).click();
-	await expect(mesa.getByRole('article', { name: 'Agenda adotada' })).toContainText('A.1 Atores');
+	const cadastrar = mesa.getByRole('button', { name: 'Cadastrar a agenda do bureau' });
+	const editar = mesa.getByRole('button', { name: 'Editar', exact: true });
+	await expect(cadastrar.or(editar).or(mesa.getByRole('button', { name: 'Registrar a adoção' }))).toBeVisible();
+	if (await cadastrar.isVisible()) await cadastrar.click();
+	else if (await editar.isVisible()) await editar.click();
+	const editor = mesa.getByRole('dialog', { name: 'Agenda do bureau' });
+	if (await editor.isVisible()) {
+		while ((await editor.getByLabel(/^Item \d+,/).count()) > 1) await editor.getByRole('button', { name: 'Tirar: item 1' }).click();
+		const primeiro = editor.getByLabel(/^Item 1,/);
+		await primeiro.fill('A. Causas');
+		await primeiro.press('Enter');
+		await expect(editor.getByLabel(/^Item 2,/)).toBeFocused();
+		await mesa.keyboard.type('A.1 Atores');
+		await mesa.keyboard.press('Tab');
+		await expect(editor.getByLabel('Item 2, nível 2')).toBeFocused();
+		await mesa.keyboard.press('Enter');
+		await mesa.keyboard.type('B. Respostas');
+		await mesa.keyboard.press('Shift+Tab');
+		await expect(editor.getByLabel('Item 3, nível 1')).toHaveValue('B. Respostas');
+		await editor.getByRole('button', { name: 'Para cima: item 3' }).click();
+		await expect(editor.getByLabel(/^Item 2,/)).toHaveValue('B. Respostas');
+		await editor.getByRole('button', { name: 'Para baixo: item 2' }).click();
+		await expect(editor.getByLabel('Item 2, nível 2')).toHaveValue('A.1 Atores');
+		expect((await new AxeBuilder({ page: mesa }).include('dialog[open]').analyze()).violations).toEqual([]);
+		await editor.getByRole('button', { name: 'Salvar a agenda do bureau' }).click();
+		await expect(mesa.getByRole('status')).toHaveText('Agenda do bureau salva.');
+	}
+	const liberar = mesa.getByRole('button', { name: 'Liberar a agenda' });
+	if (await liberar.isVisible()) {
+		await liberar.click();
+		await mesa.getByRole('dialog').getByRole('button', { name: 'Liberar a agenda' }).click();
+	}
+	await expect(mesa.getByRole('article', { name: /^Agenda/ }).getByRole('listitem').filter({ hasText: 'A. Causas' }).getByRole('listitem')).toHaveText(/A\.1 Atores/);
+
+	// A Alemanha propõe incluir um item; a mesa inclui e registra a adoção.
+	const item = `C. Financiamento ${marca}`;
+	const agenda = await page.context().newPage();
+	await agenda.goto(`${AGENDA}?topico=1`);
+	await agenda.getByRole('button', { name: 'Propor um item no fim' }).click();
+	await agenda.getByRole('dialog').getByLabel('Item novo').fill(item);
+	await agenda.getByRole('dialog').getByRole('button', { name: 'Propor', exact: true }).click();
+	await expect(agenda.getByRole('status')).toHaveText('Alteração proposta. As delegações debatem e marcam a posição.');
+	const linha = mesa.getByRole('region', { name: /^Alterações propostas/ }).getByRole('listitem').filter({ hasText: item });
+	await linha.getByRole('button', { name: 'Incluir' }).click({ timeout: 10_000 });
+	await expect(mesa.getByRole('article', { name: /^Agenda/ })).toContainText(item);
+	await mesa.getByRole('button', { name: 'Registrar a adoção' }).click();
+	await mesa.getByRole('dialog').getByRole('button', { name: 'Registrar a adoção' }).click();
 	await expect(etapaAtual(mesa)).toContainText(/Working papers|Projeto/);
 	await mesa.reload(); // a tela em repouso, sem a mensagem de "Agenda adotada."
 	await expect(etapaAtual(mesa)).toBeVisible();
 	expect(await semRolar(mesa)).toBe(true);
 	await mesa.context().close();
 
-	// Na sessão, sem recarregar, a trilha sai da agenda (banco reaproveitado: um projeto de
-	// outra rodada já põe o tópico no projeto).
+	// Na sessão, sem recarregar, a trilha sai da agenda.
 	await expect(etapaAtual(page)).toContainText(/Working papers|Projeto/, { timeout: 10_000 });
-	await expect(page.getByRole('navigation', { name: 'Ordem do tópico 1' })).not.toContainText('Proponha ou apoie uma agenda.');
 });
 
 test('o projeto em branco traz pelo modal as cláusulas de working papers do tópico, de dois blocos', async ({ page }) => {

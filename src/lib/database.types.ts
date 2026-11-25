@@ -23,7 +23,51 @@ export type Database = {
           }
         },"public": {
           Tables: {
-            "anotacao": {
+            "alteracao_agenda": {
+                  Row: {
+                    "acao": string,"autor_id": string | null,"comite_id": string,"criado_em": string,"delegacao_id": string | null,"dentro": boolean,"depois_de": string | null,"id": string,"motivo": string | null,"ponto_id": string | null,"proposta_id": string,"status": string,"texto": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "acao": string,"autor_id"?: string | null,"comite_id": string,"criado_em"?: string,"delegacao_id"?: string | null,"dentro"?: boolean,"depois_de"?: string | null,"id"?: string,"motivo"?: string | null,"ponto_id"?: string | null,"proposta_id": string,"status"?: string,"texto"?: string | null
+                  }
+                  Update: {
+                    "acao"?: string,"autor_id"?: string | null,"comite_id"?: string,"criado_em"?: string,"delegacao_id"?: string | null,"dentro"?: boolean,"depois_de"?: string | null,"id"?: string,"motivo"?: string | null,"ponto_id"?: string | null,"proposta_id"?: string,"status"?: string,"texto"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "alteracao_agenda_autor_id_fkey"
+      columns: ["autor_id"]
+isOneToOne: false
+      referencedRelation: "pessoa"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "alteracao_agenda_delegacao_id_comite_id_fkey"
+      columns: ["delegacao_id","comite_id"]
+isOneToOne: false
+      referencedRelation: "delegacao"
+      referencedColumns: ["id","comite_id"]
+    },{
+      foreignKeyName: "alteracao_agenda_depois_de_fkey"
+      columns: ["depois_de"]
+isOneToOne: false
+      referencedRelation: "ponto_pauta"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "alteracao_agenda_ponto_id_fkey"
+      columns: ["ponto_id"]
+isOneToOne: false
+      referencedRelation: "ponto_pauta"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "alteracao_agenda_proposta_id_comite_id_fkey"
+      columns: ["proposta_id","comite_id"]
+isOneToOne: false
+      referencedRelation: "proposta_agenda"
+      referencedColumns: ["id","comite_id"]
+    }
+                  ]
+                },"anotacao": {
                   Row: {
                     "atualizado_em": string,"autor_id": string | null,"comite_id": string,"criado_em": string,"delegacao_id": string | null,"id": string,"orador_delegacao_id": string | null,"sobre_delegacao_id": string | null,"texto": string,"tipo": string,"titulo": string | null,"topico": number | null
                   }
@@ -1469,6 +1513,26 @@ isOneToOne: false
       referencedColumns: ["id","comite_id"]
     }
                   ]
+                },"posicao_alteracao": {
+                  Row: {
+                    "alteracao_id": string,"comite_id": string,"delegacao_id": string | null,"posicao": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "alteracao_id": string,"comite_id": string,"delegacao_id"?: string | null,"posicao": string
+                  }
+                  Update: {
+                    "alteracao_id"?: string,"comite_id"?: string,"delegacao_id"?: string | null,"posicao"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "posicao_alteracao_alteracao_id_comite_id_fkey"
+      columns: ["alteracao_id","comite_id"]
+isOneToOne: false
+      referencedRelation: "alteracao_agenda"
+      referencedColumns: ["id","comite_id"]
+    }
+                  ]
                 },"posicao_clausula": {
                   Row: {
                     "atualizado_em": string,"autor_id": string | null,"clausula_id": string,"comite_id": string,"delegacao_id": string | null,"documento_id": string,"posicao": string
@@ -1529,14 +1593,14 @@ isOneToOne: false
                   ]
                 },"proposta_agenda": {
                   Row: {
-                    "adotada": boolean,"comite_id": string,"criado_em": string,"delegacao_id": string | null,"id": string,"topico": number
+                    "adotada": boolean,"comite_id": string,"criado_em": string,"delegacao_id": string | null,"id": string,"liberada": boolean,"topico": number
                   }
                   ComputedFields: never
                   Insert: {
-                    "adotada"?: boolean,"comite_id": string,"criado_em"?: string,"delegacao_id"?: string | null,"id"?: string,"topico": number
+                    "adotada"?: boolean,"comite_id": string,"criado_em"?: string,"delegacao_id"?: string | null,"id"?: string,"liberada"?: boolean,"topico": number
                   }
                   Update: {
-                    "adotada"?: boolean,"comite_id"?: string,"criado_em"?: string,"delegacao_id"?: string | null,"id"?: string,"topico"?: number
+                    "adotada"?: boolean,"comite_id"?: string,"criado_em"?: string,"delegacao_id"?: string | null,"id"?: string,"liberada"?: boolean,"topico"?: number
                   }
                   Relationships: [
                     {
@@ -2279,6 +2343,9 @@ isOneToOne: false
 "levantar_placa":
 { Args: { "p_comite": string }; Returns: undefined
                            },
+"liberar_agenda":
+{ Args: { "p_proposta": string }; Returns: undefined
+                           },
 "maioria_simples":
 { Args: { "p_base": number }; Returns: number
                            },
@@ -2299,6 +2366,9 @@ isOneToOne: false
                            },
 "marcar_posicao":
 { Args: { "p_clausula": string,"p_posicao": string }; Returns: undefined
+                           },
+"marcar_posicao_alteracao":
+{ Args: { "p_alteracao": string,"p_posicao": string }; Returns: undefined
                            },
 "marcar_todas_presentes":
 { Args: { "p_comite": string }; Returns: undefined
@@ -2419,6 +2489,9 @@ isOneToOne: false
 "propor_alteracao":
 { Args: { "p_clausula": string,"p_id"?: string,"p_texto": string }; Returns: undefined
                            },
+"propor_alteracao_agenda":
+{ Args: { "p_acao": string,"p_dentro"?: boolean,"p_depois"?: string,"p_motivo"?: string,"p_ponto"?: string,"p_proposta": string,"p_texto"?: string }; Returns: string
+                           },
 "propor_emenda":
 { Args: { "p_acao": string,"p_clausula": string,"p_documento": string,"p_texto": string }; Returns: string
                            },
@@ -2473,6 +2546,9 @@ isOneToOne: false
                            },
 "resolver_comentario":
 { Args: { "p_comentario": string,"p_resolvido": boolean }; Returns: undefined
+                           },
+"responder_alteracao_agenda":
+{ Args: { "p_aceitar": boolean,"p_alteracao": string }; Returns: undefined
                            },
 "responder_entrevista":
 { Args: { "p_aceitar": boolean,"p_entrevista": string,"p_horario"?: string }; Returns: undefined
@@ -2547,6 +2623,9 @@ isOneToOne: false
                            },
 "sou_redator":
 { Args: { "p_bloco": string }; Returns: boolean
+                           },
+"subarvore_pauta":
+{ Args: { "p_ponto": string }; Returns: string[]
                            },
 "tecnologia_restrita_agora":
 { Args: { "p_comite": string }; Returns: boolean

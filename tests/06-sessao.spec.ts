@@ -282,51 +282,7 @@ test('quem não preside não usa o painel', async ({ page }) => {
 	await expect(page.getByRole('link', { name: 'Painel da presidência' })).toHaveCount(0);
 });
 
-test('a agenda informal: propostas em tópicos, lado a lado, e a mesa adota uma', async ({ browser }) => {
-	const delegado = await abrir(browser, C.conta(contaDaDelegacao(outra)), AGENDA);
-	// Passo 56: um tópico por vez. Um tópico ainda sem agenda adotada (numa nova tentativa, o
-	// primeiro já pode estar).
-	const livres = [];
-	for (const n of [1, 2]) {
-		await delegado.goto(`${AGENDA}?topico=${n}`);
-		await expect(delegado.getByRole('heading', { level: 2 })).not.toHaveCount(0);
-		if (!(await delegado.getByRole('heading', { name: 'Agenda adotada' }).count())) livres.push(n);
-	}
-	test.skip(!livres.length, 'os dois tópicos já têm agenda adotada (banco reaproveitado)');
-	const n = livres[0];
-	// Propor colando uma lista (o editor de itens tem o próprio teste, no passo 56).
-	const propor = async (page: Page, lista: string) => {
-		await page.goto(`${AGENDA}?topico=${n}`);
-		await page.getByRole('button', { name: /^(Propor agenda|Editar a minha proposta)$/ }).click();
-		const editor = page.getByRole('dialog');
-		await editor.getByText('Colar uma lista').click();
-		await editor.locator('.colar-lista textarea').fill(lista);
-		await editor.getByRole('button', { name: 'Montar os itens' }).click();
-		await editor.getByRole('button', { name: 'Salvar proposta' }).click();
-		await expect(page.getByRole('status')).toHaveText('Proposta salva.');
-	};
-	await propor(delegado, 'A. Causas\n  A.1 Financiamento\nB. Respostas');
-	const mesa = await abrir(browser, C.conta(CONTAS.mesa), AGENDA);
-	await propor(mesa, 'A. Contexto\nB. Cooperação\n  B.1 Inteligência');
-
-	// No notebook, as propostas do mesmo tópico ficam lado a lado.
-	const daDelegacao = mesa.getByRole('article', { name: `Proposta de ${outra}` });
-	const daMesa = mesa.getByRole('article', { name: 'Proposta de Mesa' });
-	const [a, b] = await Promise.all([daDelegacao.boundingBox(), daMesa.boundingBox()]);
-	expect(Math.abs(a!.y - b!.y)).toBeLessThan(5);
-	// A árvore: "A.1 Financiamento" fica dentro de "A. Causas".
-	await expect(
-		daDelegacao.getByRole('listitem').filter({ hasText: 'A. Causas' }).getByRole('listitem')
-	).toHaveText(/A\.1 Financiamento/);
-
-	await daDelegacao.getByRole('button', { name: 'Adotar esta' }).click();
-	await mesa.getByRole('dialog').getByRole('button', { name: 'Adotar esta' }).click();
-	const adotada = mesa.getByRole('article', { name: 'Agenda adotada' });
-	await expect(adotada).toContainText('A.1 Financiamento');
-	// O andamento dos itens fica com quem conduz (no debate, a delegação da vez; passo 59), e o
-	// passo 22 o testa com a mesa na plenária.
-	await Promise.all([delegado, mesa].map((p) => p.context().close()));
-});
+// Passo 60: a agenda do bureau (cadastro, alterações e adoção) está nos testes 22 e 56.
 
 test.describe('telão em 1920 × 1080', () => {
 	test.use({ viewport: { width: 1920, height: 1080 } });

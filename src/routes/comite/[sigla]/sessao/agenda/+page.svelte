@@ -15,32 +15,41 @@
 	import NomeDelegacao from '#lib/ui/NomeDelegacao.svelte';
 	import TrilhaDoTopico from '#lib/ui/TrilhaDoTopico.svelte';
 	import ListPlus from '@lucide/svelte/icons/list-plus';
+	import PencilLine from '@lucide/svelte/icons/pencil-line';
 	import type { PageProps } from './$types';
 
-	// Passo 56: a aba Agenda, um tópico por vez. Com a agenda adotada, ela vem em destaque e as
-	// outras propostas ficam recolhidas; sem ela, as propostas ficam lado a lado para a mesa
-	// comparar e adotar. Propor e editar usam o editor de itens, num modal, sem sintaxe.
+	// Passo 60: a agenda parte do documento do bureau. A mesa cadastra a agenda de cada tópico
+	// e a libera no dia; as delegações propõem alterações por item, todas debatem e marcam
+	// apoio, ressalva ou contra, e, havendo consenso, a mesa inclui a alteração. A presidência
+	// da sessão não decide a agenda: participa como delegação.
 	let { data }: PageProps = $props();
 
 	type Proposta = (typeof data.propostas)[number];
 	type Ponto = Proposta['pontos'][number];
+	type Alteracao = (typeof data.alteracoes)[number];
 	const ANDAMENTO = bilingue({ pendente: 'Pendente', em_debate: 'Em debate', debatido: 'Debatido' } as const);
+	const POSICOES = { apoio: t('Apoio'), ressalva: t('Ressalva'), contra: t('Contra') } as const;
+	type Posicao = keyof typeof POSICOES;
+	const SELO_POSICAO: Record<Posicao, string> = { apoio: 'selo--ok', ressalva: 'selo--alerta', contra: 'selo--erro' };
 
 	const eu = $derived(data.participacoes.find((p) => p.comite_id === data.comite.id && p.papel === 'delegado'));
 	const ehMesa = $derived(
 		data.participacoes.some((p) => (p.papel === 'mesa' && p.comite_id === data.comite.id) || p.papel === 'secretaria')
 	);
-	const podePropor = $derived(!!eu || ehMesa);
+	const podeAlterar = $derived(!!eu || ehMesa);
+	const minhaVoz = $derived(eu?.delegacao_id ?? null);
 
 	// O tópico da aba: o da URL (a trilha leva a ele), o em debate ou o primeiro.
 	const topico = $derived(Number(page.url.searchParams.get('topico')) || data.topicoAtual || data.topicos[0]?.numero || 1);
 	const titulo = $derived(data.topicos.find((tp) => tp.numero === topico)?.titulo ?? '');
-	const propostas = $derived(data.propostas.filter((p) => p.topico === topico));
-	const adotada = $derived(propostas.find((p) => p.adotada));
-	const outras = $derived(propostas.filter((p) => !p.adotada));
-	const minha = $derived(propostas.find((p) => (eu ? p.delegacao?.id === eu.delegacao_id : !p.delegacao)));
-	const autor = (p: Proposta) => p.delegacao?.nome ?? t('Mesa');
-	const wpsDoItem = (ponto: string) => data.ordem.documentos.filter((d) => d.tipo === 'working_paper' && d.ponto_pauta_id === ponto).length;
+	const base = $derived(data.propostas.find((p) => p.topico === topico && !p.delegacao));
+	const adotada = $derived(data.propostas.find((p) => p.topico === topico && p.adotada));
+	const agenda = $derived(adotada ?? (base && (base.liberada || ehMesa) ? base : undefined));
+	const aberta = $derived(!!agenda && (agenda.liberada || agenda.adotada));
+	const alteracoes = $derived(data.alteracoes.filter((a) => a.proposta_id === agenda?.id));
+	const abertas = $derived(alteracoes.filter((a) => a.status === 'aberta'));
+	const respondidas = $derived(alteracoes.filter((a) => a.status !== 'aberta'));
+	const textoDe = (id: string | null) => agenda?.pontos.find((p) => p.id === id)?.texto ?? '';
 
 	let erro = $state('');
 	let mensagem = $state('');
@@ -63,35 +72,89 @@
 		});
 	}
 
-	// O editor: propor (ou editar a própria proposta) e, para a mesa, editar a adotada.
+	// A mesa cadastra (e, antes de liberar, corrige) a agenda do bureau no editor de itens.
 	let editor = $state<Modal>();
-	let modo = $state<'propor' | 'editar'>('propor');
 	let itens = $state<ItemEsboco[]>([{ texto: '', nivel: 0 }]);
-	function abrirEditor(novoModo: 'propor' | 'editar', base?: Proposta) {
-		modo = novoModo;
-		const de = base ?? (novoModo === 'editar' ? adotada : minha);
-		itens = de?.pontos.length ? niveis(de.pontos) : [{ texto: '', nivel: 0 }];
+	function abrirEditor() {
+		itens = base?.pontos.length ? niveis(base.pontos) : [{ texto: '', nivel: 0 }];
 		erro = mensagem = '';
 		editor?.abrir();
 	}
-	async function salvar(evento: SubmitEvent) {
+	async function salvarBase(evento: SubmitEvent) {
 		evento.preventDefault();
-		const p_itens = preenchidos(itens);
-		const ok =
-			modo === 'editar'
-				? await executar(supabase.rpc('editar_agenda_adotada', { p_proposta: adotada!.id, p_itens }), t('Agenda adotada atualizada.'))
-				: await executar(supabase.rpc('salvar_proposta_agenda', { p_comite: data.comite.id, p_topico: topico, p_itens }), t('Proposta salva.'));
+		const ok = await executar(
+			supabase.rpc('salvar_proposta_agenda', { p_comite: data.comite.id, p_topico: topico, p_itens: preenchidos(itens) }),
+			t('Agenda do bureau salva.')
+		);
 		if (ok) editor?.fechar();
 	}
+
+	// Propor uma alteração num item (ou um item novo no fim).
+	let modalAlteracao = $state<Modal>();
+	let alvo = $state<Ponto | null>(null);
+	let acao = $state<'alterar' | 'incluir' | 'retirar' | 'mover'>('alterar');
+	let texto = $state('');
+	let depois = $state('');
+	let dentro = $state(false);
+	let motivo = $state('');
+	function proporEm(ponto: Ponto | null) {
+		alvo = ponto;
+		acao = ponto ? 'alterar' : 'incluir';
+		texto = ponto?.texto ?? '';
+		depois = '';
+		dentro = false;
+		motivo = '';
+		erro = '';
+		modalAlteracao?.abrir();
+	}
+	async function proporAlteracao(evento: SubmitEvent) {
+		evento.preventDefault();
+		if (!agenda) return;
+		const ok = await executar(
+			supabase.rpc('propor_alteracao_agenda', {
+				p_proposta: agenda.id,
+				p_acao: acao,
+				p_ponto: acao === 'incluir' ? undefined : (alvo?.id ?? undefined),
+				p_texto: acao === 'alterar' || acao === 'incluir' ? texto : undefined,
+				p_depois: acao === 'incluir' ? (alvo?.id ?? undefined) : acao === 'mover' ? depois || undefined : undefined,
+				p_dentro: acao === 'incluir' && !!alvo && dentro,
+				p_motivo: motivo || undefined
+			}),
+			t('Alteração proposta. As delegações debatem e marcam a posição.')
+		);
+		if (ok) modalAlteracao?.fechar();
+	}
+
+	const descrever = (a: Alteracao) =>
+		a.acao === 'alterar'
+			? t('Mudar "{item}" para "{texto}"', { item: textoDe(a.ponto_id), texto: a.texto ?? '' })
+			: a.acao === 'retirar'
+				? t('Retirar "{item}"', { item: textoDe(a.ponto_id) })
+				: a.acao === 'mover'
+					? a.depois_de
+						? t('Mover "{item}" para depois de "{outro}"', { item: textoDe(a.ponto_id), outro: textoDe(a.depois_de) })
+						: t('Mover "{item}" para o começo', { item: textoDe(a.ponto_id) })
+					: a.depois_de
+						? a.dentro
+							? t('Incluir "{texto}" dentro de "{outro}"', { texto: a.texto ?? '', outro: textoDe(a.depois_de) })
+							: t('Incluir "{texto}" depois de "{outro}"', { texto: a.texto ?? '', outro: textoDe(a.depois_de) })
+						: t('Incluir "{texto}" no fim', { texto: a.texto ?? '' });
+	const posicoesDe = (a: Alteracao, p: Posicao) => a.posicoes.filter((x) => x.posicao === p);
+	const minhaPosicao = (a: Alteracao) => (podeAlterar ? a.posicoes.find((x) => x.delegacao_id === minhaVoz)?.posicao : undefined);
+	// "Um certo consenso": ninguém contra e o apoio de pelo menos metade das delegações. É um
+	// sinal para a sala e para a mesa; quem inclui é a mesa.
+	const consenso = (a: Alteracao) => !posicoesDe(a, 'contra').length && posicoesDe(a, 'apoio').length >= Math.ceil(data.totalDelegacoes / 2);
+	const marcar = (a: Alteracao, p: Posicao) =>
+		executar(supabase.rpc('marcar_posicao_alteracao', { p_alteracao: a.id, p_posicao: (minhaPosicao(a) === p ? null : p) as string }));
 </script>
 
-{#snippet arvore(pontos: Ponto[], pai: string | null, daAdotada: boolean)}
-	<ol class={['arvore', daAdotada && 'arvore--numerada']}>
+{#snippet arvore(pontos: Ponto[], pai: string | null)}
+	<ol class="arvore arvore--numerada">
 		{#each pontos.filter((p) => p.pai_id === pai) as ponto (ponto.id)}
 			<li>
 				<span class="arvore-item">
 					{ponto.texto}
-					{#if daAdotada}
+					{#if agenda?.adotada}
 						{#if data.podePresidir}
 							<select
 								class="andamento"
@@ -108,48 +171,33 @@
 								>{ANDAMENTO[ponto.status as keyof typeof ANDAMENTO]}</span
 							>
 						{/if}
-						{#if wpsDoItem(ponto.id)}
-							<span class="detalhe"
-								>{wpsDoItem(ponto.id) === 1 ? t('com 1 working paper') : t('com {n} working papers', { n: wpsDoItem(ponto.id) })}</span
-							>
-						{/if}
+					{/if}
+					{#if podeAlterar && aberta}
+						<button
+							class="botao botao--secundario botao--pequeno botao--icone"
+							type="button"
+							aria-label={t('Propor uma alteração em "{item}"', { item: ponto.texto })}
+							title={t('Propor alteração')}
+							onclick={() => proporEm(ponto)}><PencilLine aria-hidden="true" size={14} strokeWidth={1.75} /></button
+						>
 					{/if}
 				</span>
 				{#if pontos.some((p) => p.pai_id === ponto.id)}
-					{@render arvore(pontos, ponto.id, daAdotada)}
+					{@render arvore(pontos, ponto.id)}
 				{/if}
 			</li>
 		{/each}
 	</ol>
 {/snippet}
 
-{#snippet cartao(p: Proposta)}
-	<article class="cartao" aria-label={t('Proposta de {delegacao}', { delegacao: autor(p) })}>
-		<div class="cartao-timbre">
-			{#if p.delegacao}<NomeDelegacao sigla={data.comite.sigla} delegacao={p.delegacao} />{:else}<span>{t('Mesa')}</span>{/if}
-		</div>
-		{@render arvore(p.pontos, null, false)}
-		<div class="acoes">
-			{#if ehMesa && !adotada}
-				<Confirmar
-					classe="botao botao--pequeno"
-					rotulo={t('Adotar esta')}
-					pergunta={t('Adotar a proposta de {delegacao} como a agenda do tópico {n}?', { delegacao: autor(p), n: topico })}
-					acao={() => executar(supabase.rpc('adotar_proposta', { p_proposta: p.id }), t('Agenda adotada.'))}
-				/>
-			{/if}
-			{#if podePropor && p !== minha}
-				<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => abrirEditor('propor', p)}>{t('Usar como base')}</button>
-			{/if}
-		</div>
-	</article>
-{/snippet}
-
 <svelte:head>
 	<title>{tituloDaAba(t('Agenda'), data.comite.sigla)}</title>
 </svelte:head>
 
-<p class="rotulo">{t('Comitê')} · {data.comite.sigla} <AoVivo comiteId={data.comite.id} tabelas={['proposta_agenda', 'ponto_pauta', 'documento']} dependencia="app:agenda" /></p>
+<p class="rotulo">
+	{t('Comitê')} · {data.comite.sigla}
+	<AoVivo comiteId={data.comite.id} tabelas={['proposta_agenda', 'ponto_pauta', 'alteracao_agenda', 'posicao_alteracao', 'documento']} dependencia="app:agenda" />
+</p>
 <h1>{t('Agenda')}</h1>
 
 <nav class="abas-topicos" aria-label={t('Tópicos')}>
@@ -170,73 +218,179 @@
 	{#if erro}<p class="erro" role="alert">{erro}</p>{/if}
 	{#if mensagem}<p class="sucesso" role="status">{mensagem}</p>{/if}
 
-	{#if adotada}
-		<article class="cartao cartao--largo cartao--destaque" aria-labelledby="t-adotada">
+	{#if !agenda}
+		{#if ehMesa}
+			<article class="cartao cartao--destaque">
+				<p>{t('Cadastre a agenda que o bureau preparou para este tópico. Ela fica oculta das delegações até você liberá-la, no dia do evento.')}</p>
+				<button class="botao" type="button" onclick={abrirEditor}
+					><ListPlus aria-hidden="true" size={18} strokeWidth={1.75} /> {t('Cadastrar a agenda do bureau')}</button
+				>
+			</article>
+		{:else}
+			<p class="suave">{t('A mesa libera a agenda do bureau no dia do evento. A primeira sessão do tópico a debate.')}</p>
+		{/if}
+	{:else}
+		<article class={['cartao cartao--largo', !agenda.adotada && 'cartao--destaque']} aria-labelledby="t-agenda">
 			<div class="cartao-timbre">
-				<h3 id="t-adotada">{t('Agenda adotada')}</h3>
-				{#if adotada.delegacao}<NomeDelegacao sigla={data.comite.sigla} delegacao={adotada.delegacao} />{:else}<span>{t('Mesa')}</span>{/if}
+				<h3 id="t-agenda">{agenda.adotada ? t('Agenda adotada') : t('Agenda do bureau')}</h3>
+				{#if agenda.delegacao}<NomeDelegacao sigla={data.comite.sigla} delegacao={agenda.delegacao} />{/if}
+				{#if !aberta}<span class="selo selo--alerta">{t('oculta das delegações')}</span>{/if}
+				{#if podeAlterar && aberta}
+					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => proporEm(null)}
+						><ListPlus aria-hidden="true" size={16} strokeWidth={1.75} /> {t('Propor um item no fim')}</button
+					>
+				{/if}
 				{#if ehMesa}
 					<div class="acoes">
-						<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => abrirEditor('editar')}>{t('Editar agenda adotada')}</button>
-						<Confirmar
+						{#if !aberta}
+							<button class="botao botao--secundario botao--pequeno" type="button" onclick={abrirEditor}>{t('Editar')}</button>
+							<Confirmar
+								classe="botao botao--pequeno"
+								rotulo={t('Liberar a agenda')}
+								pergunta={t('Liberar a agenda do tópico {n} para as delegações?', { n: topico })}
+								acao={() => executar(supabase.rpc('liberar_agenda', { p_proposta: agenda.id }), t('Agenda liberada.'))}
+							/>
+						{:else if !agenda.adotada}
+							<Confirmar
+								classe="botao botao--pequeno"
+								rotulo={t('Registrar a adoção')}
+								pergunta={t('A sala adotou a agenda do tópico {n}?', { n: topico })}
+								acao={() => executar(supabase.rpc('adotar_proposta', { p_proposta: agenda.id }), t('Agenda adotada.'))}
+							/>
+						{:else}
+							<Confirmar
 								classe="botao botao--secundario botao--pequeno"
 								rotulo={t('Retirar adoção')}
 								pergunta={t('Retirar a adoção da agenda do tópico {n}?', { n: topico })}
-								acao={() => executar(supabase.rpc('retirar_adocao', { p_proposta: adotada!.id }), t('Adoção retirada.'))}
-						/>
+								acao={() => executar(supabase.rpc('retirar_adocao', { p_proposta: agenda.id }), t('Adoção retirada.'))}
+							/>
+						{/if}
 					</div>
 				{/if}
 			</div>
-			{@render arvore(adotada.pontos, null, true)}
+			{@render arvore(agenda.pontos, null)}
+			{#if respondidas.length}
+				<details>
+					<summary>{t('Respondidas ({n})', { n: respondidas.length })}</summary>
+					<ul class="lista lista--compacta">
+						{#each respondidas as a (a.id)}
+							<li>
+								<span>{descrever(a)}</span>
+								<span class="selo {a.status === 'aceita' ? 'selo--ok' : 'selo--erro'}">{a.status === 'aceita' ? t('incluída') : t('recusada')}</span>
+							</li>
+						{/each}
+					</ul>
+				</details>
+			{/if}
 		</article>
-		{#if outras.length}
-			<details class="outras-propostas">
-				<summary>{t('Outras propostas ({n})', { n: outras.length })}</summary>
-				<div class="propostas">
-					{#each outras as p (p.id)}{@render cartao(p)}{/each}
-				</div>
-			</details>
-		{/if}
-	{:else if propostas.length}
-		<div class="propostas propostas--lado">
-			{#each propostas as p (p.id)}{@render cartao(p)}{/each}
-		</div>
-	{:else}
-		<p class="suave">{t('Ainda não há propostas para este tópico.')}</p>
-	{/if}
 
-	{#if podePropor && !adotada}
-		<div class="acoes">
-			<button class="botao" type="button" onclick={() => abrirEditor('propor')}
-				><ListPlus aria-hidden="true" size={18} strokeWidth={1.75} /> {minha ? t('Editar a minha proposta') : t('Propor agenda')}</button
-			>
-		</div>
+		{#if abertas.length}
+			<section class="cartao cartao--largo" aria-labelledby="t-alteracoes">
+				<h3 id="t-alteracoes">{t('Alterações propostas')} <span class="selo">{abertas.length}</span></h3>
+				<p class="suave">{t('Todas as delegações debatem e marcam a posição; havendo consenso, a mesa inclui a alteração.')}</p>
+				<ul class="lista">
+					{#each abertas as a (a.id)}
+						<li>
+							<span>
+								<strong>{descrever(a)}</strong>
+								<span class="detalhe">
+									{#if a.delegacao}<NomeDelegacao sigla={data.comite.sigla} delegacao={a.delegacao} />{:else}{t('Mesa')}{/if}
+									{#if a.motivo}· {a.motivo}{/if}
+								</span>
+								{#each Object.entries(POSICOES) as [p, nome] (p)}
+									{@const quem = posicoesDe(a, p as Posicao)}
+									{#if quem.length}<span class="selo {SELO_POSICAO[p as Posicao]}">{nome} {quem.length}</span>{/if}
+								{/each}
+								{#if consenso(a)}<span class="selo selo--ok">{t('consenso')}</span>{/if}
+							</span>
+							<span class="acoes">
+								{#if podeAlterar}
+									<span class="acoes" role="group" aria-label={t('Sua posição sobre: {alteracao}', { alteracao: descrever(a) })}>
+										{#each Object.entries(POSICOES) as [p, nome] (p)}
+											<button
+												class={['botao botao--pequeno', minhaPosicao(a) !== p && 'botao--secundario']}
+												type="button"
+												aria-pressed={minhaPosicao(a) === p}
+												onclick={() => marcar(a, p as Posicao)}>{nome}</button
+											>
+										{/each}
+									</span>
+								{/if}
+								{#if ehMesa}
+									<button
+										class="botao botao--pequeno"
+										type="button"
+										onclick={() => executar(supabase.rpc('responder_alteracao_agenda', { p_alteracao: a.id, p_aceitar: true }), t('Alteração incluída.'))}
+										>{t('Incluir')}</button
+									>
+									<button
+										class="botao botao--secundario botao--pequeno"
+										type="button"
+										onclick={() => executar(supabase.rpc('responder_alteracao_agenda', { p_alteracao: a.id, p_aceitar: false }), t('Alteração recusada.'))}
+										>{t('Recusar')}</button
+									>
+								{/if}
+							</span>
+						</li>
+					{:else}
+						<li class="suave">{t('Nenhuma alteração esperando.')}</li>
+					{/each}
+				</ul>
+			</section>
+		{/if}
 	{/if}
 </section>
 
 <Modal bind:this={editor} rotulo="editor-agenda-titulo" classe="modal-largo">
-	<form class="formulario formulario--largo" onsubmit={salvar}>
-		<h3 id="editor-agenda-titulo">
-			{modo === 'editar'
-				? t('Editar agenda adotada')
-				: eu
-					? t('Proposta de {delegacao}', { delegacao: eu.delegacao_nome ?? '' })
-					: t('Sugestão da mesa')}
-		</h3>
+	<form class="formulario formulario--largo" onsubmit={salvarBase}>
+		<h3 id="editor-agenda-titulo">{t('Agenda do bureau')}</h3>
 		<p class="suave">{t('Tópico {n}', { n: topico })}: {titulo}</p>
 		<EditorDeItens bind:itens />
-		{#if modo === 'editar'}
-			<p class="suave">{t('Itens de mesmo texto mantêm o andamento.')}</p>
-			{#each outras as p (p.id)}
-				<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => (itens = [...itens, ...niveis(p.pontos)])}
-					>{t('Trazer os itens de {delegacao}', { delegacao: autor(p) })}</button
-				>
-			{/each}
-		{/if}
 		{#if erro}<p class="erro" role="alert">{erro}</p>{/if}
 		<div class="acoes">
-			<button class="botao" disabled={!preenchidos(itens).length}>{modo === 'editar' ? t('Salvar agenda adotada') : t('Salvar proposta')}</button>
+			<button class="botao" disabled={!preenchidos(itens).length}>{t('Salvar a agenda do bureau')}</button>
 			<button class="botao botao--secundario" type="button" onclick={() => editor?.fechar()}>{t('Cancelar')}</button>
+		</div>
+	</form>
+</Modal>
+
+<Modal bind:this={modalAlteracao} rotulo="alteracao-titulo" classe="modal-acao">
+	<form class="formulario" onsubmit={proporAlteracao}>
+		<h3 id="alteracao-titulo">{alvo ? t('Alteração em "{item}"', { item: alvo.texto }) : t('Propor um item no fim')}</h3>
+		{#if alvo}
+			<fieldset class="opcoes">
+				<legend>{t('O que mudar')}</legend>
+				<label class="opcao"><input type="radio" value="alterar" bind:group={acao} /> {t('Mudar o texto')}</label>
+				<label class="opcao"><input type="radio" value="incluir" bind:group={acao} /> {t('Incluir um item depois deste')}</label>
+				<label class="opcao"><input type="radio" value="mover" bind:group={acao} /> {t('Mudar de lugar (a ordem de debate)')}</label>
+				<label class="opcao"><input type="radio" value="retirar" bind:group={acao} /> {t('Retirar da agenda')}</label>
+			</fieldset>
+		{/if}
+		{#if acao === 'alterar' || acao === 'incluir'}
+			<label class="campo">
+				{acao === 'alterar' ? t('Texto novo') : t('Item novo')}
+				<input required maxlength="300" bind:value={texto} />
+			</label>
+			{#if acao === 'incluir' && alvo}
+				<label class="opcao"><input type="checkbox" bind:checked={dentro} /> {t('Como subitem de "{item}"', { item: alvo.texto })}</label>
+			{/if}
+		{:else if acao === 'mover' && agenda}
+			<label class="campo">
+				{t('Para depois de')}
+				<select bind:value={depois}>
+					<option value="">{t('Para o começo')}</option>
+					{#each agenda.pontos.filter((p) => p.id !== alvo?.id) as p (p.id)}<option value={p.id}>{p.texto}</option>{/each}
+				</select>
+			</label>
+		{/if}
+		<label class="campo">
+			{t('Por quê (opcional)')}
+			<input maxlength="280" bind:value={motivo} />
+		</label>
+		{#if erro}<p class="erro" role="alert">{erro}</p>{/if}
+		<div class="acoes">
+			<button class="botao">{t('Propor')}</button>
+			<button class="botao botao--secundario" type="button" onclick={() => modalAlteracao?.fechar()}>{t('Cancelar')}</button>
 		</div>
 	</form>
 </Modal>
