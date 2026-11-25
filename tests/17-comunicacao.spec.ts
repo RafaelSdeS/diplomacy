@@ -67,7 +67,8 @@ test('um pedido de entrevista aceito aparece para os dois lados', async ({ brows
 	await modal.getByLabel('Horário').fill('2027-10-20T15:30');
 	await modal.getByRole('button', { name: 'Aceitar' }).click();
 	await expect(modal).toBeHidden();
-	await expect(eua.getByRole('article', { name: 'Precisa de você' })).not.toContainText(tema);
+	// Respondido, o pedido sai do "Precisa de você" (que some se nada mais espera, passo 51).
+	await expect(eua.getByRole('button', { name: new RegExp(`^Responder: .*${tema}`) })).toHaveCount(0);
 	await eua.goto('/comite/CSNU-T/mensagens');
 	const item = eua.getByRole('region', { name: 'Pedidos de entrevista' }).getByRole('listitem').filter({ hasText: tema });
 	await expect(item).toContainText('Aceita para');
@@ -102,37 +103,8 @@ test('a edição do dia reúne as matérias publicadas no dia', async ({ page })
 	await semErrosDeAcessibilidade(page);
 });
 
-test('a Diretoria da Press abre a coletiva, e a press põe perguntas na pauta', async ({ browser }) => {
-	const diretoria = await abrir(browser, 'diretoria-press@exemplo.test', '/press/coletiva');
-	await diretoria.getByRole('button', { name: 'Abrir uma coletiva' }).click();
-	await expect(diretoria.getByRole('status')).toHaveText('Coletiva aberta.');
-
-	const press = await abrir(browser, CONTAS.press, '/press/coletiva');
-	const pergunta = `Qual a resposta ao bloqueio? ${Date.now()}`;
-	await abrirAcao(press, 'Nova pergunta');
-	const nova = press.getByRole('form', { name: 'Nova pergunta' });
-	await escolher(nova, 'Delegação', 'Brasil');
-	await nova.getByLabel('Pergunta').fill(pergunta);
-	await nova.getByRole('button', { name: 'Pôr na pauta' }).click();
-	await expect(press.getByRole('status')).toHaveText('Pergunta na pauta.');
-	await expect(diretoria.getByText(pergunta)).toBeVisible({ timeout: 10_000 });
-
-	// Passo 45: a delegação chamada vê a pauta, mas não a pergunta, antes de ouvi-la.
-	const brasil = await abrir(browser, contaDaDelegacao('Brasil'), '/press/coletiva', { width: 360, height: 740 });
-	await expect(brasil.getByText('a pergunta só é conhecida quando for feita em voz alta').first()).toBeVisible();
-	await expect(brasil.getByText(pergunta)).toHaveCount(0);
-
-	// Passo 47: encerrar a coletiva pede confirmação; cancelar não encerra.
-	await diretoria.getByRole('button', { name: 'Encerrar a coletiva' }).click();
-	const confirmacao = diretoria.getByRole('dialog', { name: 'Encerrar a coletiva?' });
-	await confirmacao.getByRole('button', { name: 'Cancelar' }).click();
-	await expect(confirmacao).toBeHidden();
-	await diretoria.getByRole('button', { name: 'Encerrar a coletiva' }).click();
-	await confirmacao.getByRole('button', { name: 'Encerrar a coletiva' }).click();
-	await expect(diretoria.getByRole('status')).toHaveText('Coletiva encerrada.');
-	await expect(diretoria.getByRole('button', { name: 'Encerrar a coletiva' })).toHaveCount(0);
-	await Promise.all([diretoria, press, brasil].map((p) => p.context().close()));
-});
+// A coletiva (passos 17 e 45) está toda em tests/45-coletiva-oral.spec.ts, num arquivo serial:
+// abrir uma coletiva fecha a outra do evento, então dois arquivos em paralelo se atrapalhariam.
 
 for (const tema of ['light', 'dark'] as const) {
 	test(`as telas de comunicação não têm erros de acessibilidade (tema ${tema})`, async ({ page }) => {

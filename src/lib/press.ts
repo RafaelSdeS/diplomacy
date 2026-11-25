@@ -1,5 +1,5 @@
 import { linksAssinados } from './imagem.ts';
-import { bilingue } from './i18n.svelte.ts';
+import { bilingue, t } from './i18n.svelte.ts';
 
 export const TIPOS_NOTICIA: Record<string, string> = bilingue({
 	nota_urgente: 'Nota urgente',
@@ -8,6 +8,24 @@ export const TIPOS_NOTICIA: Record<string, string> = bilingue({
 	opiniao: 'Opinião',
 	charge: 'Charge'
 });
+
+// Passo 45, parte B: os estados da pergunta na coletiva oral.
+export const SITUACAO_COLETIVA: Record<string, { rotulo: string; selo: string }> = {
+	na_pauta: { get rotulo() { return t('Na pauta'); }, selo: '' },
+	chamando: { get rotulo() { return t('Chamando'); }, selo: 'selo--alerta' },
+	respondendo: { get rotulo() { return t('Respondendo'); }, selo: 'selo--info' },
+	concluida: { get rotulo() { return t('Concluída'); }, selo: 'selo--ok' },
+	retirada: { get rotulo() { return t('Retirada'); }, selo: 'selo--erro' }
+};
+
+/** A pergunta em andamento (chamando ou respondendo) e a próxima da pauta, pela ordem. */
+export function andamentoDaPauta<T extends { status: string; ordem: number }>(perguntas: T[]) {
+	const pela = [...perguntas].sort((a, b) => a.ordem - b.ordem);
+	return {
+		atual: pela.find((p) => p.status === 'chamando' || p.status === 'respondendo') ?? null,
+		proxima: pela.find((p) => p.status === 'na_pauta') ?? null
+	};
+}
 
 /** As imagens ficam num bucket privado: cada notícia ganha um link assinado (1 h). */
 export async function comImagens<T extends { imagem_path: string | null }>(noticias: T[]) {

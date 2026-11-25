@@ -97,7 +97,7 @@
 		!!sessao && !!minhaDelegacao && !sessao.presenca.some((p) => p.delegacao_id === minhaDelegacao)
 	);
 	const nadaParaDelegacao = $derived(
-		!data.rodadas.length && !data.pedidosEntrevista.length && !dposPendentes.length && !data.bilhetes.length && !meusPontos && !ausente
+		!data.rodadas.length && !data.pedidosEntrevista.length && !data.chamadaColetiva && !dposPendentes.length && !data.bilhetes.length && !meusPontos && !ausente
 	);
 	// A mesa: três ações, e o que espera por ela em cada uma.
 	const documentosEnviados = $derived((data.mesa?.dpos ?? 0) + (data.mesa?.documentos ?? 0));
@@ -184,6 +184,12 @@
 					<li>
 						<a href={`/comite/${sigla}/sessao`}>{t('Seu ponto ou moção espera a mesa')}</a>
 						<span class="selo selo--info">{meusPontos}</span>
+					</li>
+				{/if}
+				{#if data.chamadaColetiva}
+					<li>
+						<a class="botao botao--pequeno" href="/press/coletiva">{t('Sua delegação foi chamada na coletiva')}</a>
+						<span class="detalhe">{data.chamadaColetiva.veiculo?.nome}</span>
 					</li>
 				{/if}
 				{#each data.pedidosEntrevista as e (e.id)}

@@ -1880,6 +1880,24 @@ dialog.modal-dpo {
 	padding: 0;
 }
 
+/* Passo 45, parte B: o telão da coletiva (a pergunta grande, legível de longe). */
+.telao-coletiva-pergunta {
+	max-width: 60ch;
+	font-size: clamp(1.5rem, 2.6vw, 2.6rem);
+	line-height: 1.3;
+}
+
+.telao-coletiva-tempo {
+	font-family: var(--fonte-mono);
+	font-size: clamp(2rem, 4vw, 4rem);
+	font-variant-numeric: tabular-nums;
+}
+
+.telao-coletiva-aviso {
+	font-size: clamp(1.25rem, 2vw, 2rem);
+	color: var(--cor-texto-suave);
+}
+
 .escolha-resumo {
 	display: flex;
 	flex-wrap: wrap;

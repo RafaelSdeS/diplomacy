@@ -529,16 +529,36 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
-                },"coletiva_pergunta": {
+                },"coletiva_nota": {
                   Row: {
-                    "autor_id": string | null,"coletiva_id": string,"comite_id": string,"criada_em": string,"delegacao_id": string,"id": string,"veiculo_id": string
+                    "atualizada_em": string,"pergunta_id": string,"texto": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "autor_id"?: string | null,"coletiva_id": string,"comite_id": string,"criada_em"?: string,"delegacao_id": string,"id"?: string,"veiculo_id": string
+                    "atualizada_em"?: string,"pergunta_id": string,"texto": string
                   }
                   Update: {
-                    "autor_id"?: string | null,"coletiva_id"?: string,"comite_id"?: string,"criada_em"?: string,"delegacao_id"?: string,"id"?: string,"veiculo_id"?: string
+                    "atualizada_em"?: string,"pergunta_id"?: string,"texto"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "coletiva_nota_pergunta_id_fkey"
+      columns: ["pergunta_id"]
+isOneToOne: true
+      referencedRelation: "coletiva_pergunta"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"coletiva_pergunta": {
+                  Row: {
+                    "autor_id": string | null,"chamada_em": string | null,"coletiva_id": string,"comite_id": string,"criada_em": string,"delegacao_id": string,"id": string,"ordem": number,"presente": boolean,"resposta_concluida_em": string | null,"resposta_iniciada_em": string | null,"retirada_motivo": string | null,"status": string,"veiculo_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "autor_id"?: string | null,"chamada_em"?: string | null,"coletiva_id": string,"comite_id": string,"criada_em"?: string,"delegacao_id": string,"id"?: string,"ordem": number,"presente"?: boolean,"resposta_concluida_em"?: string | null,"resposta_iniciada_em"?: string | null,"retirada_motivo"?: string | null,"status"?: string,"veiculo_id": string
+                  }
+                  Update: {
+                    "autor_id"?: string | null,"chamada_em"?: string | null,"coletiva_id"?: string,"comite_id"?: string,"criada_em"?: string,"delegacao_id"?: string,"id"?: string,"ordem"?: number,"presente"?: boolean,"resposta_concluida_em"?: string | null,"resposta_iniciada_em"?: string | null,"retirada_motivo"?: string | null,"status"?: string,"veiculo_id"?: string
                   }
                   Relationships: [
                     {
@@ -1860,6 +1880,9 @@ isOneToOne: false
 "abrir_votacao_projeto":
 { Args: { "p_documento": string }; Returns: string
                            },
+"adiar_pergunta_coletiva":
+{ Args: { "p_pergunta": string }; Returns: undefined
+                           },
 "adicionar_clausula":
 { Args: { "p_documento": string,"p_pai"?: string,"p_texto": string,"p_tipo": string }; Returns: string
                            },
@@ -1959,6 +1982,9 @@ isOneToOne: false
 "cabecalhos_do_pedido":
 { Args: Record<PropertyKey, never>; Returns: undefined
                            },
+"chamar_na_coletiva":
+{ Args: { "p_pergunta": string }; Returns: undefined
+                           },
 "checkin_por_cracha":
 { Args: { "p_codigo": string,"p_evento": string }; Returns: string
                            },
@@ -1973,6 +1999,12 @@ isOneToOne: false
                            },
 "compartilhar_anotacao":
 { Args: { "p_delegacoes": (string)[],"p_id": string }; Returns: undefined
+                           },
+"concluir_resposta_coletiva":
+{ Args: { "p_pergunta": string }; Returns: undefined
+                           },
+"confirmar_chamada_coletiva":
+{ Args: { "p_pergunta": string }; Returns: undefined
                            },
 "copiar_evento":
 { Args: { "p_ano": number,"p_nome": string,"p_origem": string }; Returns: string
@@ -2197,6 +2229,9 @@ isOneToOne: false
 "iniciar_cronometro":
 { Args: { "p_comite": string,"p_seg": number }; Returns: undefined
                            },
+"iniciar_resposta_coletiva":
+{ Args: { "p_pergunta": string }; Returns: undefined
+                           },
 "iniciar_votacao_projeto":
 { Args: { "p_documento": string }; Returns: undefined
                            },
@@ -2287,6 +2322,29 @@ isOneToOne: false
 "pedir_reabertura":
 { Args: { "p_clausula": string }; Returns: undefined
                            },
+"pergunta_da_diretoria":
+{ Args: { "p_pergunta": string }; Returns: {
+              "autor_id": string | null,
+"chamada_em": string | null,
+"coletiva_id": string,
+"comite_id": string,
+"criada_em": string,
+"delegacao_id": string,
+"id": string,
+"ordem": number,
+"presente": boolean,
+"resposta_concluida_em": string | null,
+"resposta_iniciada_em": string | null,
+"retirada_motivo": string | null,
+"status": string,
+"veiculo_id": string
+            }
+                          SetofOptions: {
+        from: "*"
+        to: "coletiva_pergunta"
+        isOneToOne: true
+        isSetofReturn: false
+      } },
 "perguntar_na_coletiva":
 { Args: { "p_coletiva": string,"p_delegacao": string,"p_pergunta": string }; Returns: undefined
                            },
@@ -2404,6 +2462,9 @@ isOneToOne: false
 "retirar_adocao":
 { Args: { "p_proposta": string }; Returns: undefined
                            },
+"retirar_pergunta_da_coletiva":
+{ Args: { "p_motivo"?: string,"p_pergunta": string }; Returns: undefined
+                           },
 "retirar_ponto":
 { Args: { "p_ponto": string }; Returns: undefined
                            },
@@ -2424,6 +2485,9 @@ isOneToOne: false
                            },
 "salvar_dpo":
 { Args: { "p_comite": string,"p_referencias": (string)[],"p_texto": string,"p_topico": number }; Returns: string
+                           },
+"salvar_nota_coletiva":
+{ Args: { "p_pergunta": string,"p_texto": string }; Returns: undefined
                            },
 "salvar_proposta_agenda":
 { Args: { "p_comite": string,"p_itens": Json,"p_topico": number }; Returns: string
