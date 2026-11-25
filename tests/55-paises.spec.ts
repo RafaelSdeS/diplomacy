@@ -75,7 +75,7 @@ test('membro do bloco, remetente do bilhete e signatário abrem a ficha certa', 
 	await page.evaluate(() => localStorage.clear());
 	await entrar(page, conta('Paraguai'));
 	await page.goto(`/documento/${documento}`);
-	await abreAFicha(page, page.getByRole('region', { name: 'Rodadas, assinaturas e envio' }).getByRole('button', { name: 'Chile' }), 'Chile');
+	await abreAFicha(page, page.getByRole('region', { name: 'Assinaturas' }).getByRole('button', { name: 'Chile' }), 'Chile');
 });
 
 test('a anotação feita pelo "Anotar" aparece na ficha, e a compartilhada só para quem recebeu', async ({ page, browser }) => {

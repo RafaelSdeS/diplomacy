@@ -3445,3 +3445,199 @@ dialog.ir-para {
 .lista--compacta li {
 	padding: 0.35rem 0;
 }
+
+/* Passo 57: o documento vivo. O texto fica como no fim (a mesma formatação da impressão), e
+   cada cláusula é um bloco que abre no lugar. No tema da tela, não na folha branca. */
+.folha.documento-vivo {
+	max-width: 52rem;
+	border-color: var(--cor-linha);
+	background: var(--cor-fundo);
+	color: var(--cor-texto);
+}
+
+.documento-vivo h2 {
+	color: var(--cor-marinho);
+}
+
+.documento-vivo .rotulo {
+	color: var(--cor-texto-suave);
+}
+
+/* As assinaturas, fixas no topo ao rolar. */
+.faixa-assinaturas {
+	position: sticky;
+	top: 0;
+	z-index: 3;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5rem 1.25rem;
+	margin: 0 0 1rem;
+	padding: 0.6rem 0.85rem;
+	border: var(--linha);
+	border-left: 3px solid var(--cor-fio-dourado);
+	background: var(--cor-fundo);
+}
+
+.faixa-quem,
+.faixa-contagem {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.25rem 0.75rem;
+}
+
+.faixa-contagem progress {
+	width: 6rem;
+}
+
+.faixa-assinaturas > .acoes {
+	margin: 0 0 0 auto;
+}
+
+.mais-opcoes {
+	position: relative;
+}
+
+.mais-opcoes > summary {
+	list-style: none;
+}
+
+.mais-opcoes > summary::-webkit-details-marker {
+	display: none;
+}
+
+.mais-opcoes-corpo {
+	position: absolute;
+	top: calc(100% + 0.25rem);
+	right: 0;
+	z-index: 4;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	min-width: 15rem;
+	padding: 0.75rem;
+	border: var(--linha);
+	background: var(--cor-fundo);
+	box-shadow: 0 4px 16px rgb(0 0 0 / 0.15);
+}
+
+.bloco-clausula {
+	margin: 0.15rem -0.6rem;
+	padding: 0.35rem 0.6rem;
+	border-left: 3px solid transparent;
+}
+
+.bloco-clausula.aberto {
+	border-left-color: var(--cor-marinho);
+	background: var(--cor-marinho-suave);
+}
+
+.bloco-clausula.em-foco {
+	border-left-color: var(--cor-fio-dourado);
+}
+
+.bloco-clausula--nova {
+	border-left-color: var(--cor-ok);
+	background: var(--cor-superficie);
+	font-family: var(--fonte-ui);
+}
+
+.bloco-texto {
+	display: flex;
+	gap: 0.5rem;
+	width: 100%;
+	padding: 0;
+	border: 0;
+	background: none;
+	color: inherit;
+	font: inherit;
+	line-height: inherit;
+	text-align: left;
+	cursor: pointer;
+}
+
+.bloco-texto:hover > span:last-child {
+	text-decoration: underline dotted;
+}
+
+.bloco-clausula--preambular .bloco-texto {
+	font-style: italic;
+}
+
+.bloco-clausula--preambular .verbo {
+	font-weight: 600;
+}
+
+.bloco-clausula--operativa .verbo,
+.bloco-clausula--subitem .verbo {
+	text-decoration: underline;
+}
+
+.bloco-clausula--subitem {
+	padding-left: 2.6rem;
+}
+
+.bloco-marca {
+	min-width: 1.5rem;
+}
+
+.bloco-sinais {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.25rem;
+	margin: 0.15rem 0 0 2rem;
+	font-family: var(--fonte-ui);
+}
+
+.bloco-sinais:empty {
+	display: none;
+}
+
+.bloco-painel {
+	margin: 0.5rem 0 0.25rem;
+	padding-top: 0.5rem;
+	border-top: var(--linha);
+	font-family: var(--fonte-ui);
+	font-size: 0.95rem;
+}
+
+.comentar-linha {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5rem;
+	margin: 0.5rem 0;
+}
+
+.comentar-linha input {
+	flex: 1 1 14rem;
+	min-width: 0;
+}
+
+/* Inserir entre as cláusulas: aparece com o mouse ou o foco; no celular, sempre. */
+.inserir {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35rem;
+	margin: 0 0 0.15rem;
+	opacity: 0;
+	font-family: var(--fonte-ui);
+}
+
+.inserir:hover,
+.inserir:focus-within,
+.bloco-clausula:hover + .inserir,
+.inserir--fim {
+	opacity: 1;
+}
+
+@media (hover: none) {
+	.inserir {
+		opacity: 1;
+	}
+}
+
+.inserir--fim {
+	margin-top: 1rem;
+}

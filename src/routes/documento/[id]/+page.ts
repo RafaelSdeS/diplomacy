@@ -21,7 +21,7 @@ export const load: PageLoad = async ({ params, depends }) => {
 	if (!documento.data) error(404, 'Documento não encontrado.');
 	const d = documento.data;
 
-	const [clausulas, propostas, comentarios, rodadas, assinaturas, reaberturas, redator, regras, outros] = await Promise.all([
+	const [clausulas, propostas, comentarios, rodadas, assinaturas, reaberturas, redator, regras, outros, posicoes] = await Promise.all([
 		supabase.from('clausula').select('id, tipo, pai_id, ordem, texto, status, versao, origem_id').eq('documento_id', d.id).order('ordem'),
 		supabase
 			.from('proposta_alteracao')
@@ -30,7 +30,7 @@ export const load: PageLoad = async ({ params, depends }) => {
 			.order('criado_em'),
 		supabase
 			.from('comentario')
-			.select('id, clausula_id, texto, estacionado, delegacao_id')
+			.select('id, clausula_id, texto, estacionado, resolvido, delegacao_id, criado_em')
 			.eq('documento_id', d.id)
 			.order('criado_em'),
 		supabase.from('rodada').select('numero, inicio, fim').eq('documento_id', d.id).order('numero'),
@@ -49,9 +49,11 @@ export const load: PageLoad = async ({ params, depends }) => {
 				.in('tipo', ['working_paper'])
 				.order('ordem', { referencedTable: 'clausulas' });
 			return d.topico ? consulta.eq('topico', d.topico) : consulta;
-		})()
+		})(),
+		// Passo 57: a posição de cada delegação do bloco (e da mesa) em cada cláusula.
+		supabase.from('posicao_clausula').select('clausula_id, delegacao_id, posicao').eq('documento_id', d.id)
 	]);
-	for (const r of [clausulas, propostas, comentarios, rodadas, assinaturas, reaberturas, redator, regras, outros])
+	for (const r of [clausulas, propostas, comentarios, rodadas, assinaturas, reaberturas, redator, regras, outros, posicoes])
 		if (r.error) throw r.error;
 
 	// Emendas: só para o projeto aprovado pela mesa (e o histórico das votadas).
@@ -64,6 +66,7 @@ export const load: PageLoad = async ({ params, depends }) => {
 
 	return {
 		emendas: emendas.data,
+		posicoes: posicoes.data!,
 		documento: d,
 		comite: d.bloco!.comite!,
 		clausulas: clausulas.data!,

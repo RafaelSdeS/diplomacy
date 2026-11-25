@@ -14,7 +14,7 @@ export const load: PageLoad = async ({ parent, depends }) => {
 			.order('criado_em'),
 		supabase
 			.from('documento')
-			.select('id, tipo, numero, titulo, status, bloco_id')
+			.select('id, tipo, numero, titulo, status, bloco_id, assinaturas:assinatura(count)')
 			.eq('comite_id', comite.id)
 			.order('criado_em', { ascending: false }),
 		supabase

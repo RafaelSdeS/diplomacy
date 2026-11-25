@@ -69,18 +69,25 @@ test('um bloco escreve um working paper, com verbos sugeridos', async ({ page })
 	await expect(page).toHaveURL(/\/documento\//);
 	workingPaper = page.url();
 
-	const clausula = page.getByRole('form', { name: 'Nova cláusula' });
-	await clausula.getByLabel('Tipo da cláusula').selectOption('preambular');
-	await clausula.getByLabel('Texto da cláusula').fill('Rec');
-	await clausula.getByRole('group', { name: 'Verbos sugeridos' }).getByRole('button', { name: 'Recordando' }).click();
-	await expect(clausula.getByLabel('Texto da cláusula')).toHaveValue('Recordando ');
-	await clausula.getByLabel('Texto da cláusula').pressSequentially('a resolução 2178');
-	await clausula.getByRole('button', { name: 'Acrescentar cláusula' }).click();
+	// Passo 57: escreve no lugar. "+ Preambular" abre a cláusula já em edição; Enter salva e
+	// abre a próxima do mesmo tipo; Esc fecha.
+	const doc = page.getByRole('article', { name: 'Documento formatado' });
+	const noFim = page.getByRole('group', { name: 'Acrescentar no fim' });
+	const nova = page.getByLabel(/^Nova cláusula/);
+	await noFim.getByRole('button', { name: 'Preambular', exact: true }).click();
+	await nova.fill('Rec');
+	await page.getByRole('group', { name: 'Verbos sugeridos' }).getByRole('button', { name: 'Recordando' }).click();
+	await expect(nova).toHaveValue('Recordando ');
+	await nova.pressSequentially('a resolução 2178');
+	await nova.press('Enter');
+	await expect(doc).toContainText('Recordando a resolução 2178');
+	await nova.press('Escape');
 	for (const texto of ['Pede cooperação', 'Decide criar um fundo']) {
-		await clausula.getByLabel('Tipo da cláusula').selectOption('operativa');
-		await clausula.getByLabel('Texto da cláusula').fill(texto);
-		await clausula.getByRole('button', { name: 'Acrescentar cláusula' }).click();
-		await expect(page.getByRole('region', { name: 'Cláusulas' })).toContainText(texto);
+		await noFim.getByRole('button', { name: 'Operativa', exact: true }).click();
+		await nova.fill(texto);
+		await nova.press('Enter');
+		await expect(doc).toContainText(texto);
+		await nova.press('Escape');
 	}
 	await expect(page.getByText('0 de 3 acordadas')).toBeVisible();
 });
@@ -106,7 +113,7 @@ test('uma proposta feita no celular e aceita pelo redator aparece para todo o bl
 	await expect(eua.getByRole('status')).toHaveText('Proposta aceita.');
 
 	// No celular da Rússia, o texto novo aparece sem recarregar.
-	await expect(russia.getByRole('region', { name: 'Cláusulas' })).toContainText('Pede cooperação internacional ampla', {
+	await expect(russia.getByRole('article', { name: 'Documento formatado' })).toContainText('Pede cooperação internacional ampla', {
 		timeout: 10_000
 	});
 	await Promise.all([russia, eua].map((p) => p.context().close()));
@@ -122,7 +129,7 @@ test('a barra de progresso e a cláusula em foco atualizam para todos', async ({
 	await eua.getByRole('button', { name: 'Pôr em foco' }).click();
 
 	await expect(russia.getByText('1 de 3 acordadas')).toBeVisible({ timeout: 10_000 });
-	await expect(russia.getByRole('button', { name: /Operativa 2 Decide/ })).toContainText('Em foco');
+	await expect(russia.locator('.bloco-clausula', { has: russia.getByRole('button', { name: /Operativa 2 Decide/ }) })).toContainText('Em foco');
 
 	// Acordada, a cláusula trava: para reabrir, três delegações pedem.
 	await russia.getByRole('button', { name: /Preambular Recordando/ }).click();
@@ -133,6 +140,7 @@ test('a barra de progresso e a cláusula em foco atualizam para todos', async ({
 test('o working paper vai à mesa e, aprovado, aparece ao comitê', async ({ browser }) => {
 	const eua = await abrir(browser, C.conta(CONTAS.delegado), workingPaper);
 	await eua.getByRole('button', { name: 'Enviar à mesa' }).click();
+	await eua.getByRole('dialog', { name: 'Enviar à mesa?' }).getByRole('button', { name: 'Enviar à mesa' }).click();
 	await expect(eua.getByRole('status')).toHaveText('Documento enviado à mesa.');
 	await expect(eua.getByText('Working paper', { exact: false }).first()).toBeVisible();
 
@@ -173,23 +181,26 @@ test('o projeto junta cláusulas do working paper, recebe 5 assinaturas e vai à
 
 	// Sem 5 signatários, não vai.
 	await page.getByRole('button', { name: 'Assinar' }).click();
-	await page.getByRole('button', { name: 'Enviar à mesa' }).click();
-	await expect(page.getByRole('alert')).toHaveText('O projeto precisa de pelo menos 5 signatários.');
+	// Passo 57: sem 5 signatários, o envio fica desabilitado e a faixa diz quanto falta.
+	const faixa = page.getByRole('region', { name: 'Assinaturas' });
+	await expect(faixa.getByRole('button', { name: 'Enviar à mesa' })).toBeDisabled();
+	await expect(faixa).toContainText('Faltam 4 assinaturas para enviar à mesa');
 
 	const id = projeto.split('/').pop()!;
 	for (const nome of MEMBROS) {
 		const cliente = await clienteComo(C.conta(contaDaDelegacao(nome)));
 		expect((await cliente.rpc('assinar', { p_documento: id, p_assinar: true })).error).toBeNull();
 	}
-	await expect(page.getByText('Signatários (5 de no mínimo 5)')).toBeVisible({ timeout: 10_000 });
-	await page.getByLabel('Aprovação').selectOption('consenso');
-	await page.getByRole('button', { name: 'Enviar à mesa' }).click();
+	await expect(faixa).toContainText('5 de 5 assinaturas', { timeout: 10_000 });
+	await faixa.getByRole('button', { name: 'Enviar à mesa' }).click();
+	const envio = page.getByRole('dialog', { name: 'Enviar à mesa?' });
+	await envio.getByRole('radio', { name: 'Por consenso' }).check();
+	await envio.getByRole('button', { name: 'Enviar à mesa' }).click();
 	await expect(page.getByRole('status')).toHaveText('Documento enviado à mesa.');
 	// O projeto ganha número no envio (o primeiro do comitê é o 1).
 	await expect(page.getByRole('heading', { level: 1 })).toHaveText(/^Projeto de resolução \d+: Projeto sobre financiamento$/);
 
 	// O documento formatado: linha do comitê e signatários com o nome oficial.
-	await page.getByText('Ver como documento').click();
 	const folha = page.getByRole('article', { name: 'Documento formatado' });
 	await expect(folha).toContainText('O Conselho de Segurança:');
 	await expect(folha).toContainText('1. Pede cooperação internacional ampla;');
@@ -220,7 +231,7 @@ for (const tema of ['light', 'dark'] as const) {
 		for (const rota of [BLOCOS, workingPaper, projeto]) {
 			await page.goto(rota);
 			await expect(page.locator('[data-ao-vivo="sim"]')).toBeVisible({ timeout: 10_000 });
-			const primeira = page.getByRole('region', { name: 'Cláusulas' }).getByRole('button').first();
+			const primeira = page.getByRole('article', { name: 'Documento formatado' }).locator('.bloco-texto').first();
 			if (await primeira.count()) await primeira.click();
 			await semErrosDeAcessibilidade(page);
 		}

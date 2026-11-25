@@ -82,16 +82,17 @@ test('o editor sugere verbos em inglês, e o projeto impresso sai em inglês', a
 	await entrar(page, FRANCA);
 	await page.goto(`/documento/${projeto}`);
 	await expect(page.getByRole('heading', { level: 1 })).toHaveText('Draft resolution: Countering the financing of terrorism');
-	const clausula = page.getByRole('form', { name: 'New clause' });
-	await clausula.getByLabel('Clause type').selectOption('preambular');
-	await clausula.getByLabel('Clause text').fill('Rec');
-	await clausula.getByRole('group', { name: 'Suggested verbs' }).getByRole('button', { name: 'Recalling' }).click();
-	await expect(clausula.getByLabel('Clause text')).toHaveValue('Recalling ');
-	await clausula.getByLabel('Clause text').pressSequentially('resolution 2462 (2019)');
-	await clausula.getByRole('button', { name: 'Add clause' }).click();
+	// Passo 57: a cláusula nova abre no lugar, já em edição.
+	await page.getByRole('group', { name: 'Add at the end' }).getByRole('button', { name: 'Preambular', exact: true }).click();
+	const nova = page.getByLabel(/^New clause/);
+	await nova.fill('Rec');
+	await page.getByRole('group', { name: 'Suggested verbs' }).getByRole('button', { name: 'Recalling' }).click();
+	await expect(nova).toHaveValue('Recalling ');
+	await nova.pressSequentially('resolution 2462 (2019)');
+	await nova.press('Enter');
 	await expect(page.getByRole('button', { name: 'Preambular Recalling resolution 2462 (2019)' })).toBeVisible();
 
-	await page.getByText('See as a document').click();
+	await page.getByText('More options').click();
 	await page.getByRole('link', { name: 'Print or save as PDF' }).click();
 	const folha = page.getByRole('article', { name: 'Document for printing' });
 	await expect(folha).toHaveAttribute('lang', 'en');

@@ -142,7 +142,8 @@ test('o projeto impresso tem a linha do comitê e os signatários', async ({ pag
 
 	await entrar(page, C.conta(CONTAS.delegado));
 	await page.goto(`/documento/${projeto}`);
-	await page.getByText('Ver como documento').click();
+	// Passo 57: a impressão fica em "Mais opções", na faixa das assinaturas.
+	await page.getByText('Mais opções').click();
 	await page.getByRole('link', { name: 'Imprimir ou salvar como PDF' }).click();
 	const folha = page.getByRole('article', { name: 'Documento para impressão' });
 	await expect(folha.getByRole('heading', { level: 1 })).toHaveText('Projeto de resolução: Segurança marítima');

@@ -3,6 +3,7 @@
 **Parte de:** pedido de 24/11/2026 ("a escrita de documentos mais fácil e intuitiva, como nos projetos de resolução, que não está bom agora"; "as assinaturas em algum lugar bem visível"; "melhore os comentários das cláusulas: bem dinâmico, para não atrapalhar o debate e o fluxo")
 **Depende de:** 09 (editor), 47 (modais), 55 (signatários com bandeira), 56 (projeto a partir de working papers)
 **Esforço:** G (em duas partes)
+**Situação:** parte A pronta (25/11/2026); a parte B espera o piloto (passo 49).
 **Quando:** a parte A antes do piloto, porque o roteiro tem 20 minutos de working paper e projeto. A parte B entra junto com o passo 49, se o piloto pedir.
 **Objetivo:** o documento se lê como o documento final e se escreve no lugar. As assinaturas ficam no topo. Opinar numa cláusula custa um toque.
 
@@ -87,9 +88,18 @@ Edição livre simultânea (decidido em 20/11/2026: não fazer), menção de del
 
 ## Testes
 
-- [ ] pgTAP: só membros do bloco e a mesa marcam posição; uma posição por delegação e cláusula; só o redator resolve; a mudança de ordem não põe operativa antes de preambular.
-- [ ] Unidade: a formatação do documento na tela é igual à da impressão; a regra de ordem de `mover_clausula`.
-- [ ] Ponta a ponta com dois navegadores: o redator insere uma operativa no meio e edita no lugar; o outro membro vê sem recarregar, marca "Ressalva" e comenta; o redator resolve.
-- [ ] Ponta a ponta: a faixa de assinaturas mostra "Faltam N"; assinar atualiza a contagem para todos; "Enviar à mesa" só fica disponível com o mínimo.
-- [ ] Ponta a ponta, a 1366 × 768: as assinaturas e o "Assinar" ficam à vista sem rolar; no celular, também, na primeira tela.
-- [ ] Teclado: Enter, Esc e Alt + setas no editor; axe no documento e no painel de comentários.
+- [x] pgTAP: só membros do bloco e a mesa marcam posição; uma posição por delegação e cláusula; só o redator resolve; a mudança de ordem não põe operativa antes de preambular.
+- [x] Unidade: a formatação do documento na tela é igual à da impressão; a regra de ordem de `mover_clausula`.
+- [x] Ponta a ponta com dois navegadores: o redator insere uma operativa no meio e edita no lugar; o outro membro vê sem recarregar, marca "Ressalva" e comenta; o redator resolve.
+- [x] Ponta a ponta: a faixa de assinaturas mostra "Faltam N"; assinar atualiza a contagem para todos; "Enviar à mesa" só fica disponível com o mínimo.
+- [x] Ponta a ponta, a 1366 × 768: as assinaturas e o "Assinar" ficam à vista sem rolar; no celular, também, na primeira tela.
+- [x] Teclado: Enter, Esc e Alt + setas no editor; axe no documento e no painel de comentários.
+
+## Como ficou (parte A)
+
+- Migração `20261224090000_escrita_de_documentos.sql`: `posicao_clausula` (uma por delegação e cláusula; a mesa com `delegacao_id` nulo), `marcar_posicao` (de novo, desmarca), `comentario.resolvido` e `resolver_comentario` (só o redator), `comentar` aceita a mesa e limita os novos a 280 caracteres, `adicionar_clausula(…, p_depois)` insere no meio, `mover_clausula` só troca com a vizinha do mesmo tipo e pai. `voz_no_documento()` decide quem fala: a delegação do bloco ou a mesa que vê o documento (a mesa só vê depois do envio, então comenta a partir dele).
+- `/documento/<id>`: o documento formatado (`formatarDocumento`, a mesma função da impressão) é a coluna principal; cada cláusula é um bloco com o verbo destacado (`separarVerbo` em `verbos.ts`), os sinais (estado, em foco, posições com os nomes no `title`, comentários, "novo") e, aberta, o painel no lugar. O redator clica e edita ali (Enter salva, Esc cancela, Shift+Enter quebra a linha, Alt + ↑/↓ muda a ordem); "+ Preambular/Operativa/Subitem" aparece entre os blocos com o mouse ou o foco (no celular, sempre) e no fim.
+- A faixa "Assinaturas" fica fixa no topo: bandeiras clicáveis, "N de M assinaturas" com barra, "Faltam N", "Assinar", "Enviar à mesa" (desabilitado até o mínimo; o modal pergunta e, no projeto, escolhe consenso ou votação), "Aprovar"/"Devolver" para a mesa e "Mais opções" (abrir rodada, imprimir). A rodada vira um selo no cabeçalho.
+- Novidades: por cláusula, a hora em que a pessoa a abriu fica no aparelho (`vistos:<documento>`); o redator vê uma linha "N comentários novos em M cláusulas", com "Marcar como vistos".
+- Blocos mostra a contagem de assinaturas na linha de cada documento.
+- Não feito (ficou simples): o painel ao lado no notebook (o painel abre logo abaixo da cláusula, em toda tela) e o aviso único por rodada (é a linha de novidades, sem ligar à rodada).

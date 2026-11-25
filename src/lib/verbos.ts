@@ -38,3 +38,16 @@ export function sugerirVerbos(inicio: string, tipo: string, idioma: string, limi
 	const lista = VERBOS[idioma === 'en' ? 'en' : 'pt'][tipo === 'preambular' ? 'preambular' : 'operativa'];
 	return lista.filter((v) => semAcento(v).startsWith(busca) && semAcento(v) !== busca).slice(0, limite);
 }
+
+/**
+ * Passo 57: o verbo do começo da cláusula, para destacar no documento (itálico realçado na
+ * preambular, sublinhado na operativa). O mais longo da lista que abre o texto ("Tendo em
+ * mente"); sem nenhum, a primeira palavra.
+ */
+export function separarVerbo(texto: string, tipo: string, idioma: string): [string, string] {
+	const lista = tipo === 'preambular' || tipo === 'operativa' || tipo === 'subitem' ? VERBOS[idioma === 'en' ? 'en' : 'pt'][tipo === 'preambular' ? 'preambular' : 'operativa'] : [];
+	const inicio = semAcento(texto);
+	const verbo = [...lista].sort((a, b) => b.length - a.length).find((v) => inicio.startsWith(semAcento(v)) && /^(\s|,|$)/.test(texto.slice(v.length)));
+	const n = verbo ? verbo.length : Math.max(0, texto.search(/\s|$/));
+	return [texto.slice(0, n), texto.slice(n)];
+}

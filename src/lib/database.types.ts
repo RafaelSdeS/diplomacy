@@ -609,14 +609,14 @@ isOneToOne: true
                   ]
                 },"comentario": {
                   Row: {
-                    "autor_id": string | null,"clausula_id": string,"comite_id": string,"criado_em": string,"delegacao_id": string | null,"documento_id": string,"estacionado": boolean,"id": string,"texto": string
+                    "autor_id": string | null,"clausula_id": string,"comite_id": string,"criado_em": string,"delegacao_id": string | null,"documento_id": string,"estacionado": boolean,"id": string,"resolvido": boolean,"texto": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "autor_id"?: string | null,"clausula_id": string,"comite_id": string,"criado_em"?: string,"delegacao_id"?: string | null,"documento_id": string,"estacionado"?: boolean,"id"?: string,"texto": string
+                    "autor_id"?: string | null,"clausula_id": string,"comite_id": string,"criado_em"?: string,"delegacao_id"?: string | null,"documento_id": string,"estacionado"?: boolean,"id"?: string,"resolvido"?: boolean,"texto": string
                   }
                   Update: {
-                    "autor_id"?: string | null,"clausula_id"?: string,"comite_id"?: string,"criado_em"?: string,"delegacao_id"?: string | null,"documento_id"?: string,"estacionado"?: boolean,"id"?: string,"texto"?: string
+                    "autor_id"?: string | null,"clausula_id"?: string,"comite_id"?: string,"criado_em"?: string,"delegacao_id"?: string | null,"documento_id"?: string,"estacionado"?: boolean,"id"?: string,"resolvido"?: boolean,"texto"?: string
                   }
                   Relationships: [
                     {
@@ -1469,6 +1469,38 @@ isOneToOne: false
       referencedColumns: ["id","comite_id"]
     }
                   ]
+                },"posicao_clausula": {
+                  Row: {
+                    "atualizado_em": string,"autor_id": string | null,"clausula_id": string,"comite_id": string,"delegacao_id": string | null,"documento_id": string,"posicao": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "atualizado_em"?: string,"autor_id"?: string | null,"clausula_id": string,"comite_id": string,"delegacao_id"?: string | null,"documento_id": string,"posicao": string
+                  }
+                  Update: {
+                    "atualizado_em"?: string,"autor_id"?: string | null,"clausula_id"?: string,"comite_id"?: string,"delegacao_id"?: string | null,"documento_id"?: string,"posicao"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "posicao_clausula_autor_id_fkey"
+      columns: ["autor_id"]
+isOneToOne: false
+      referencedRelation: "pessoa"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "posicao_clausula_clausula_id_fkey"
+      columns: ["clausula_id"]
+isOneToOne: false
+      referencedRelation: "clausula"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "posicao_clausula_documento_id_comite_id_fkey"
+      columns: ["documento_id","comite_id"]
+isOneToOne: false
+      referencedRelation: "documento"
+      referencedColumns: ["id","comite_id"]
+    }
+                  ]
                 },"presenca": {
                   Row: {
                     "comite_id": string,"delegacao_id": string,"marcada_em": string,"sessao_id": string,"situacao": Database["public"]['Enums']["situacao_presenca"]
@@ -1884,7 +1916,7 @@ isOneToOne: false
 { Args: { "p_pergunta": string }; Returns: undefined
                            },
 "adicionar_clausula":
-{ Args: { "p_documento": string,"p_pai"?: string,"p_texto": string,"p_tipo": string }; Returns: string
+{ Args: { "p_depois"?: string,"p_documento": string,"p_pai"?: string,"p_texto": string,"p_tipo": string }; Returns: string
                            },
 "adotar_proposta":
 { Args: { "p_proposta": string }; Returns: undefined
@@ -2265,6 +2297,9 @@ isOneToOne: false
 "marcar_ponto_pauta":
 { Args: { "p_ponto": string,"p_status": string }; Returns: undefined
                            },
+"marcar_posicao":
+{ Args: { "p_clausula": string,"p_posicao": string }; Returns: undefined
+                           },
 "marcar_todas_presentes":
 { Args: { "p_comite": string }; Returns: undefined
                            },
@@ -2436,6 +2471,9 @@ isOneToOne: false
 "representar":
 { Args: { "p_comite": string,"p_delegacao": string }; Returns: undefined
                            },
+"resolver_comentario":
+{ Args: { "p_comentario": string,"p_resolvido": boolean }; Returns: undefined
+                           },
 "responder_entrevista":
 { Args: { "p_aceitar": boolean,"p_entrevista": string,"p_horario"?: string }; Returns: undefined
                            },
@@ -2542,6 +2580,9 @@ isOneToOne: false
                            },
 "votar":
 { Args: { "p_escolha": Database["public"]['Enums']["escolha_voto"],"p_votacao": string }; Returns: undefined
+                           },
+"voz_no_documento":
+{ Args: { "p_documento": string }; Returns: string
                            }
           }
           Enums: {

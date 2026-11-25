@@ -158,6 +158,8 @@
 					<p>
 						<a href={`/documento/${d.id}`}>{nomeDoDocumento(d)}</a>
 						<span class="selo {STATUS_DOCUMENTO[d.status].selo}">{STATUS_DOCUMENTO[d.status].rotulo}</span>
+						<!-- Passo 57: a contagem das assinaturas, como na faixa do documento. -->
+						<span class="detalhe">{(d.assinaturas[0]?.count ?? 0) === 1 ? t('1 assinatura') : t('{n} assinaturas', { n: d.assinaturas[0]?.count ?? 0 })}</span>
 					</p>
 				{/each}
 				{#if eu}
