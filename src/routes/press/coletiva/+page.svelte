@@ -18,6 +18,7 @@
 	import { formatarTempo } from '#lib/cronometro.ts';
 	import { guardarRascunho } from '#lib/rascunho.ts';
 	import { goto } from '$app/navigation';
+	import { dica } from '#lib/dica.ts';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -101,7 +102,7 @@
 			{t('Título da coletiva')}
 			<input required maxlength="200" bind:value={titulo} {@attach contador(titulo)} />
 		</label>
-		<button class="botao">{t('Abrir uma coletiva')}</button>
+		<button class="botao" {@attach dica(t('Começa uma coletiva com este título; a press já pode mandar perguntas.'))}>{t('Abrir uma coletiva')}</button>
 	</form>
 	{#if data.coletiva?.aberta}
 		<Confirmar
@@ -143,7 +144,7 @@
 						</label>
 						{#if erro}<p class="erro">{erro}</p>{/if}
 						<div class="acoes">
-							<button class="botao">{t('Pôr na pauta')}</button>
+							<button class="botao" {@attach dica(t('Põe a pergunta na fila da coletiva; a delegação só a ouve na hora.'))}>{t('Pôr na pauta')}</button>
 							<button class="botao botao--secundario" type="button" onclick={() => novaPergunta?.fechar()}>{t('Cancelar')}</button>
 						</div>
 					</form>
@@ -165,6 +166,7 @@
 							type="button"
 							onclick={() =>
 								executar(supabase.rpc('confirmar_chamada_coletiva', { p_pergunta: minhaChamada!.id }), t('A Diretoria sabe que vocês estão prontos.'))}
+							{@attach dica(t('Avisa a Diretoria que a delegação está pronta para responder.'))}
 							>{t('Estamos prontos')}</button
 						>
 					{/if}
@@ -191,12 +193,14 @@
 					<div class="acoes">
 						{#if a.status === 'chamando'}
 							<button class="botao" type="button" onclick={() => executar(supabase.rpc('iniciar_resposta_coletiva', { p_pergunta: a.id }), t('Resposta em andamento.'))}
+								{@attach dica(t('Mostra a pergunta à delegação e começa a contar o tempo da resposta.'))}
 								>{t('Iniciar resposta')}</button
 							>
 							<button
 								class="botao botao--secundario"
 								type="button"
 								onclick={() => executar(supabase.rpc('adiar_pergunta_coletiva', { p_pergunta: a.id }), t('A pergunta foi para o fim da pauta.'))}
+								{@attach dica(t('Manda esta pergunta para o fim da fila e segue com a próxima.'))}
 								>{t('Para o fim da pauta')}</button
 							>
 						{:else}
@@ -219,12 +223,13 @@
 					{@const prox = andamento.proxima}
 					<p>{t('Próxima')}: <strong><NomeDelegacao sigla={prox.delegacao?.comite?.sigla ?? ''} delegacao={prox.delegacao} /></strong> · {prox.veiculo?.nome}</p>
 					<button class="botao" type="button" onclick={() => executar(supabase.rpc('chamar_na_coletiva', { p_pergunta: prox.id }), t('Delegação chamada.'))}
+						{@attach dica(t('Avisa a próxima delegação da pauta que chegou a vez dela.'))}
 						>{t('Chamar a próxima')}</button
 					>
 				{:else}
 					<p class="suave">{t('Nenhuma pergunta esperando na pauta.')}</p>
 				{/if}
-				<p><a class="botao botao--secundario botao--pequeno" href="/telao/coletiva">{t('Abrir o telão da coletiva')}</a></p>
+				<p><a class="botao botao--secundario botao--pequeno" href="/telao/coletiva" {@attach dica(t('Abre a tela da coletiva para projetar na sala.'))}>{t('Abrir o telão da coletiva')}</a></p>
 			</article>
 		{/if}
 
@@ -241,6 +246,7 @@
 					</span>
 					{#if p.status === 'concluida' && data.comitesPress.includes(p.comite_id)}
 						<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => abrirNota(p.id, p.nota)}
+							{@attach dica(t('Guarda o que a delegação disse, para usar na matéria.'))}
 							>{p.nota ? t('Editar a nota') : t('Anotar a fala')}</button
 						>
 					{/if}
@@ -250,7 +256,8 @@
 			{/each}
 		</ol>
 		{#if data.perguntas.some((p) => p.status === 'concluida' && data.comitesPress.includes(p.comite_id))}
-			<p><button class="botao botao--secundario" type="button" onclick={escreverMateria}>{t('Escrever a matéria da coletiva')}</button></p>
+			<p><button class="botao botao--secundario" type="button" onclick={escreverMateria} {@attach dica(t('Abre o editor de matéria já com as falas e as notas do seu veículo.'))}>
+{t('Escrever a matéria da coletiva')}</button></p>
 		{/if}
 		<Modal bind:this={modalNota} rotulo="t-nota-fala" classe="modal-acao">
 			<h3 id="t-nota-fala">{t('Nota da fala')}</h3>

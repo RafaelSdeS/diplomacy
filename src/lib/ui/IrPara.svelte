@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { t } from '#lib/i18n.svelte.ts';
+	import { dica } from '#lib/dica.ts';
 	import { abrirFicha, abrirPrevia } from '#lib/ficha.svelte.ts';
 	import { semAcento } from '#lib/filtro.ts';
 	import { nomeDoDocumento } from '#lib/formatacao.ts';
@@ -144,6 +145,7 @@
 						title={!favorita && cheio ? t('Até {n} favoritas: tire uma antes', { n: MAX_FAVORITOS }) : undefined}
 						disabled={!favorita && cheio}
 						onclick={() => alternarFavorito(tela.href)}
+						{@attach dica(favorita ? t('Tira esta tela dos favoritos.') : t('Põe esta tela nos favoritos, para achar mais rápido.'))}
 						><Star aria-hidden="true" size={16} strokeWidth={1.75} fill={favorita ? 'currentColor' : 'none'} /></button
 					>
 				</li>
@@ -156,6 +158,7 @@
 			{#each achadas.delegacoes as d (d.id)}
 				<li>
 					<button class="com-bandeira nome-delegacao nome-delegacao--ficha" type="button" onclick={() => abrirDelegacao(d.id)}
+						{@attach dica(t('Abre a ficha da delegação por cima da tela, com as suas anotações.'))}
 						><Bandeira codigo={d.bandeira} /> {d.nome}</button
 					>
 				</li>
@@ -194,6 +197,8 @@
 					<button
 						class="abre-ficha"
 						type="button"
+						{@attach dica(t('Mostra a matéria numa prévia, sem sair da página.'))}
+
 						onclick={() => {
 							fechar();
 							abrirPrevia('noticia', m.id);

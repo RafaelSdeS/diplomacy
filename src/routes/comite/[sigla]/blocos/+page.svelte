@@ -10,6 +10,7 @@
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import NomeDelegacao from '#lib/ui/NomeDelegacao.svelte';
 	import AcaoEmModal from '#lib/ui/AcaoEmModal.svelte';
+	import { dica } from '#lib/dica.ts';
 	import Escolha from '#lib/ui/Escolha.svelte';
 	import Users from '@lucide/svelte/icons/users';
 	import Modal from '#lib/ui/Modal.svelte';
@@ -158,6 +159,7 @@
 						<button
 							class="botao botao--secundario botao--pequeno"
 							type="button"
+							{@attach dica(t('Escolher outra delegação do bloco para redigir no lugar da sua.'))}
 							onclick={() => {
 								erro = '';
 								para = '';
@@ -178,10 +180,17 @@
 					<div class="acoes">
 						{#if membro}
 							<!-- Passo 63: a conversa do bloco, só dos membros, na tela de mensagens. -->
-							<a class="botao botao--pequeno" href={`/comite/${data.comite.sigla}/mensagens?conversa=bl:${bloco.id}`}>{t('Conversa do bloco')}</a>
+							<a
+								class="botao botao--pequeno"
+								href={`/comite/${data.comite.sigla}/mensagens?conversa=bl:${bloco.id}`}
+								{@attach dica(t('Mensagens só entre as delegações deste bloco.'))}>{t('Conversa do bloco')}</a
+							>
 							{#if data.atualizacoes.length && !observadora}
-								<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => (novoEm = bloco.id)}
-									>{t('Nova resolução de crise')}</button
+								<button
+									class="botao botao--secundario botao--pequeno"
+									type="button"
+									{@attach dica(t('Escrever com o bloco uma resposta à atualização de crise.'))}
+									onclick={() => (novoEm = bloco.id)}>{t('Nova resolução de crise')}</button
 								>
 							{/if}
 							<!-- Passo 62: o bloco nunca fica sem redator (o banco passa a redação a quem está há mais tempo). -->
@@ -189,9 +198,11 @@
 							<button
 								class="botao botao--secundario botao--pequeno"
 								type="button"
-								title={unicoRedator
-									? t('Sua delegação deixa o bloco. A redação passa à delegação que está no bloco há mais tempo.')
-									: t('Sua delegação deixa o bloco e os documentos dele.')}
+								{@attach dica(
+									unicoRedator
+										? t('Sua delegação deixa o bloco. A redação passa à delegação que está no bloco há mais tempo.')
+										: t('Sua delegação deixa o bloco e os documentos dele.')
+								)}
 								onclick={() => executar(supabase.rpc('sair_bloco', { p_bloco: bloco.id }))}>{t('Sair do bloco')}</button
 							>
 						{:else}
@@ -199,7 +210,11 @@
 								class="botao botao--pequeno"
 								type="button"
 								aria-label={`Entrar no bloco ${bloco.nome}`}
-								title={meuBloco ? t('Sua delegação sai do bloco {nome}: cada delegação fica num bloco por vez.', { nome: meuBloco.nome }) : undefined}
+								{@attach dica(
+									meuBloco
+										? t('Sua delegação sai do bloco {nome}: cada delegação fica num bloco por vez.', { nome: meuBloco.nome })
+										: t('Sua delegação passa a fazer parte deste bloco e dos documentos dele.')
+								)}
 								onclick={() => executar(supabase.rpc('entrar_bloco', { p_bloco: bloco.id }))}>{t('Entrar no bloco')}</button
 							>
 						{/if}

@@ -8,6 +8,7 @@
 	import TipoItem from '#lib/ui/TipoItem.svelte';
 	import { supabase } from '#lib/supabase.ts';
 	import AcaoEmModal from '#lib/ui/AcaoEmModal.svelte';
+	import { dica } from '#lib/dica.ts';
 	import CalendarPlus from '@lucide/svelte/icons/calendar-plus';
 	import type { PageProps } from './$types';
 
@@ -102,6 +103,7 @@
 							class="botao botao--secundario botao--pequeno"
 							type="button"
 							aria-label={`Remover ${item.titulo}`}
+							{@attach dica(t('Tira este horário do cronograma, para todos, na hora.'))}
 							onclick={() => remover(item.id)}>{t('Remover')}</button
 						>
 					{/if}

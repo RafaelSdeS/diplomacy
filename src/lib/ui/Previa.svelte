@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { t } from '#lib/i18n.svelte.ts';
+	import { dica } from '#lib/dica.ts';
 	import { fecharPrevia, previa, type TipoPrevia } from '#lib/ficha.svelte.ts';
 	import { formatarDocumento, nomeDoDocumento, STATUS_DOCUMENTO } from '#lib/formatacao.ts';
 	import { STATUS_DPO } from '#lib/impressao.ts';
@@ -146,9 +147,10 @@
 	{/if}
 	<div class="acoes">
 		{#if conteudo?.href && conteudo.externo}
-			<a class="botao" href={conteudo.href} target="_blank" rel="noopener">{conteudo.link}</a>
+			<a class="botao" href={conteudo.href} target="_blank" rel="noopener" {@attach dica(t('Abre o arquivo numa aba nova.'))}>{conteudo.link}</a>
 		{:else if conteudo?.href}
-			<a class="botao botao--secundario" href={conteudo.href} onclick={() => modal?.fechar()}>{conteudo.link}</a>
+			<a class="botao botao--secundario" href={conteudo.href} onclick={() => modal?.fechar()} {@attach dica(t('Fecha a prévia e abre a página completa.'))}>{conteudo.link}
+</a>
 		{/if}
 		<form method="dialog"><button class="botao">{t('Fechar')}</button></form>
 	</div>

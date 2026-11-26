@@ -6,6 +6,7 @@
 	import { page } from '$app/state';
 	import { mensagemDeErro } from '#lib/sessao.ts';
 	import { supabase } from '#lib/supabase.ts';
+	import { dica } from '#lib/dica.ts';
 	import { doTopico } from '#lib/ordem.ts';
 	import { preenchidos } from '#lib/itens.ts';
 	import type { ItemEsboco } from '#lib/votacao.ts';
@@ -177,7 +178,7 @@
 							class="botao botao--secundario botao--pequeno botao--icone"
 							type="button"
 							aria-label={t('Propor uma alteração em "{item}"', { item: ponto.texto })}
-							title={t('Propor alteração')}
+							{@attach dica(t('Mudar o texto, incluir um item depois, mudar de lugar ou retirar.'))}
 							onclick={() => proporEm(ponto)}><PencilLine aria-hidden="true" size={14} strokeWidth={1.75} /></button
 						>
 					{/if}
@@ -206,6 +207,7 @@
 			class={['botao botao--pequeno', tp.numero !== topico && 'botao--secundario']}
 			href={`?topico=${tp.numero}`}
 			aria-current={tp.numero === topico ? 'page' : undefined}
+			{@attach dica(t('A agenda e as alterações propostas deste tópico.'))}
 			>{t('Tópico {n}', { n: tp.numero })}{#if tp.numero === data.topicoAtual}{` · ${t('em debate')}`}{/if}</a
 		>
 	{/each}
@@ -222,7 +224,11 @@
 		{#if ehMesa}
 			<article class="cartao cartao--destaque">
 				<p>{t('Cadastre a agenda que o bureau preparou para este tópico. Ela fica oculta das delegações até você liberá-la, no dia do evento.')}</p>
-				<button class="botao" type="button" onclick={abrirEditor}
+				<button
+					class="botao"
+					type="button"
+					onclick={abrirEditor}
+					{@attach dica(t('Abre o editor para escrever os itens da agenda deste tópico.'))}
 					><ListPlus aria-hidden="true" size={18} strokeWidth={1.75} /> {t('Cadastrar a agenda do bureau')}</button
 				>
 			</article>
@@ -236,17 +242,22 @@
 				{#if agenda.delegacao}<NomeDelegacao sigla={data.comite.sigla} delegacao={agenda.delegacao} />{/if}
 				{#if !aberta}<span class="selo selo--alerta">{t('oculta das delegações')}</span>{/if}
 				{#if podeAlterar && aberta}
-					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => proporEm(null)}
+					<button
+						class="botao botao--secundario botao--pequeno"
+						type="button"
+						onclick={() => proporEm(null)}
+						{@attach dica(t('Sugere um item novo no fim da agenda, para a sala debater.'))}
 						><ListPlus aria-hidden="true" size={16} strokeWidth={1.75} /> {t('Propor um item no fim')}</button
 					>
 				{/if}
 				{#if ehMesa}
 					<div class="acoes">
 						{#if !aberta}
-							<button class="botao botao--secundario botao--pequeno" type="button" onclick={abrirEditor}>{t('Editar')}</button>
+							<button class="botao botao--secundario botao--pequeno" type="button" onclick={abrirEditor} {@attach dica(t('Corrigir os itens antes de liberar a agenda.'))}>{t('Editar')}</button>
 							<Confirmar
 								classe="botao botao--pequeno"
 								rotulo={t('Liberar a agenda')}
+								dica={t('As delegações passam a ver a agenda e a propor alterações.')}
 								pergunta={t('Liberar a agenda do tópico {n} para as delegações?', { n: topico })}
 								acao={() => executar(supabase.rpc('liberar_agenda', { p_proposta: agenda.id }), t('Agenda liberada.'))}
 							/>
@@ -254,6 +265,7 @@
 							<Confirmar
 								classe="botao botao--pequeno"
 								rotulo={t('Registrar a adoção')}
+								dica={t('Registra que a sala adotou a agenda; a presidência marca o andamento dos itens.')}
 								pergunta={t('A sala adotou a agenda do tópico {n}?', { n: topico })}
 								acao={() => executar(supabase.rpc('adotar_proposta', { p_proposta: agenda.id }), t('Agenda adotada.'))}
 							/>
@@ -261,6 +273,7 @@
 							<Confirmar
 								classe="botao botao--secundario botao--pequeno"
 								rotulo={t('Retirar adoção')}
+								dica={t('Desfaz o registro: a agenda deixa de constar como adotada.')}
 								pergunta={t('Retirar a adoção da agenda do tópico {n}?', { n: topico })}
 								acao={() => executar(supabase.rpc('retirar_adocao', { p_proposta: agenda.id }), t('Adoção retirada.'))}
 							/>
@@ -311,6 +324,7 @@
 												class={['botao botao--pequeno', minhaPosicao(a) !== p && 'botao--secundario']}
 												type="button"
 												aria-pressed={minhaPosicao(a) === p}
+												{@attach dica(t('Marca sua posição nesta alteração; tocar de novo desmarca.'))}
 												onclick={() => marcar(a, p as Posicao)}>{nome}</button
 											>
 										{/each}
@@ -321,12 +335,14 @@
 										class="botao botao--pequeno"
 										type="button"
 										onclick={() => executar(supabase.rpc('responder_alteracao_agenda', { p_alteracao: a.id, p_aceitar: true }), t('Alteração incluída.'))}
+										{@attach dica(t('Aplica esta alteração à agenda.'))}
 										>{t('Incluir')}</button
 									>
 									<button
 										class="botao botao--secundario botao--pequeno"
 										type="button"
 										onclick={() => executar(supabase.rpc('responder_alteracao_agenda', { p_alteracao: a.id, p_aceitar: false }), t('Alteração recusada.'))}
+										{@attach dica(t('A alteração não entra na agenda e fica entre as respondidas.'))}
 										>{t('Recusar')}</button
 									>
 								{/if}
@@ -389,7 +405,7 @@
 		</label>
 		{#if erro}<p class="erro" role="alert">{erro}</p>{/if}
 		<div class="acoes">
-			<button class="botao">{t('Propor')}</button>
+			<button class="botao" {@attach dica(t('A alteração vai à sala, que debate e marca a posição.'))}>{t('Propor')}</button>
 			<button class="botao botao--secundario" type="button" onclick={() => modalAlteracao?.fechar()}>{t('Cancelar')}</button>
 		</div>
 	</form>

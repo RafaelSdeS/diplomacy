@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { APP, marca, tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { t } from '#lib/i18n.svelte.ts';
+	import { dica } from '#lib/dica.ts';
 	import { goto } from '$app/navigation';
 	import { LOGIN_GOOGLE } from '$app/env/public';
 	import { entrarComCodigo } from '#lib/credenciais.ts';
@@ -89,11 +90,11 @@
 		{#if erro}
 			<p class="erro" role="alert">{erro}</p>
 		{/if}
-		<button class="botao" disabled={enviando}>{t('Entrar')}</button>
+		<button class="botao" disabled={enviando} {@attach dica(t('Entra com o e-mail e a senha que a secretaria cadastrou.'))}>{t('Entrar')}</button>
 	</form>
 
 	{#if LOGIN_GOOGLE}
-		<button class="botao botao--secundario" type="button" onclick={entrarComGoogle}>{t('Entrar com Google')}</button>
+		<button class="botao botao--secundario" type="button" onclick={entrarComGoogle} {@attach dica(t('Entra com a sua conta Google, se for o e-mail cadastrado no evento.'))}>{t('Entrar com Google')}</button>
 	{/if}
 
 	<p class="suave"><a href="/privacidade">{t('Aviso de privacidade')}</a></p>
@@ -118,7 +119,7 @@
 			{#if erroCodigo}
 				<p class="erro" role="alert">{erroCodigo}</p>
 			{/if}
-			<button class="botao botao--secundario" disabled={enviando}>{t('Entrar com o código')}</button>
+			<button class="botao botao--secundario" disabled={enviando} {@attach dica(t('Entra com o código que a secretaria deu a você.'))}>{t('Entrar com o código')}</button>
 		</form>
 	</section>
 
@@ -130,7 +131,9 @@
 					{t('E-mail da sua conta')}
 					<input type="email" autocomplete="email" required bind:value={emailOtp} />
 				</label>
-				<button class="botao botao--secundario" disabled={enviando}>{t('Receber link e código')}</button>
+				<button class="botao botao--secundario" disabled={enviando} {@attach dica(t('Manda um link e um código para o seu e-mail, sem precisar de senha.'))}
+					>{t('Receber link e código')}</button
+				>
 			</form>
 		{:else}
 			<p role="status">{t('Se houver uma conta com esse e-mail, enviamos um link e um código. Abra o link ou digite o código.')}</p>
@@ -148,7 +151,9 @@
 				{#if erroEmail}
 					<p class="erro" role="alert">{erroEmail}</p>
 				{/if}
-				<button class="botao botao--secundario" disabled={enviando}>{t('Entrar com o código do e-mail')}</button>
+				<button class="botao botao--secundario" disabled={enviando} {@attach dica(t('Entra com o código que chegou no seu e-mail.'))}
+					>{t('Entrar com o código do e-mail')}</button
+				>
 			</form>
 		{/if}
 	</section>

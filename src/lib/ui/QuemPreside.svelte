@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { t } from '#lib/i18n.svelte.ts';
+	import { dica } from '#lib/dica.ts';
 	import { bureauPreside } from '#lib/sessao.ts';
 	import Gavel from '@lucide/svelte/icons/gavel';
 	import NomeDelegacao from './NomeDelegacao.svelte';
@@ -24,7 +25,8 @@
 	<Gavel aria-hidden="true" size={18} strokeWidth={1.75} />
 	{#if souEu}
 		<strong>{t('Sua delegação preside a sessão')}</strong>
-		<a class="botao botao--pequeno" href={`/comite/${sigla}/sessao/presidencia`}>{t('Abrir o painel')}</a>
+		<a class="botao botao--pequeno" href={`/comite/${sigla}/sessao/presidencia`} {@attach dica(t('Dar a palavra, decidir pontos e moções e conduzir as votações.'))}>
+{t('Abrir o painel')}</a>
 	{:else}
 		<span>{t('Preside a sessão')}:</span>
 		<strong>

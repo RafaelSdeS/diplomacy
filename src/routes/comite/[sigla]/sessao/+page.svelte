@@ -246,7 +246,7 @@
 			><ClipboardCheck aria-hidden="true" size={16} strokeWidth={1.75} /> {t('Chamada e rodízio')}</a
 		>{/if}
 	<details class="mais-opcoes">
-		<summary class="botao botao--secundario botao--pequeno">{t('Mais opções')}</summary>
+		<summary class="botao botao--secundario botao--pequeno" {@attach dica(t('Outras telas da sessão, como a agenda, as votações e o telão.'))}>{t('Mais opções')}</summary>
 		<div class="mais-opcoes-corpo">
 			<a class="botao botao--secundario botao--pequeno" href={`/comite/${data.comite.sigla}/sessao/agenda`} {@attach dica(t('Os itens do tópico e as alterações propostas.'))}
 				><ListOrdered aria-hidden="true" size={16} strokeWidth={1.75} /> {t('Agenda')}</a
@@ -326,7 +326,7 @@
 			{#if momento === 'pausa' && eu && !restrita && !impedida}
 				<article class="cartao cartao--destaque pausa-pontos" aria-labelledby="c-pausa">
 					<h2 id="c-pausa">{t('Há pontos ou moções?')}</h2>
-					<button class="botao" type="button" onclick={irAoPonto}>{t('Fazer agora')}</button>
+					<button class="botao" type="button" onclick={irAoPonto} {@attach dica(t('Abre o pedido de ponto ou moção enquanto a pausa dura.'))}>{t('Fazer agora')}</button>
 				</article>
 			{/if}
 			{#if eu && !minhaPresenca && minhaSituacao !== 'suspensa'}
@@ -341,6 +341,7 @@
 							class="botao"
 							type="button"
 							onclick={() => executar(supabase.rpc('avisar_chegada', { p_comite: data.comite.id }), t('A mesa foi avisada.'))}
+							{@attach dica(t('A mesa confirma a presença, e sua delegação passa a votar.'))}
 							>{t('Cheguei')}</button
 						>
 					{/if}
@@ -364,7 +365,11 @@
 						/>
 					</p>
 					{#if eu && !restrita && !assinou}
-						<button class="botao" type="button" onclick={() => executar(supabase.rpc('assinar_mocao', { p_ponto: p.id }))}
+						<button
+							class="botao"
+							type="button"
+							onclick={() => executar(supabase.rpc('assinar_mocao', { p_ponto: p.id }))}
+							{@attach dica(t('Sua assinatura ajuda o pedido de não-confiança a ir a voto.'))}
 							>{t('Assinar o pedido')}</button
 						>
 					{:else if assinou}
@@ -375,7 +380,7 @@
 			{#if data.votacao}
 				<article class="cartao cartao--destaque" aria-labelledby="c-votacao">
 					<h2 id="c-votacao" tabindex="-1">{data.votacao.aberta ? t('Votação aberta') : t('Última votação')}</h2>
-					<p class="destaque"><button class="abre-ficha" type="button" onclick={() => (verVotacao = true)}>{data.votacao.objeto}</button></p>
+					<p class="destaque"><button class="abre-ficha" type="button" onclick={() => (verVotacao = true)} {@attach dica(t('Ver os detalhes e os votos desta votação.'))}>{data.votacao.objeto}</button></p>
 					{#if data.votacao.aberta && data.votacao.nominal}<p><strong>{t('Votação nominal:')}</strong> {t('a mesa chama as delegações em ordem alfabética.')}</p>{/if}
 					{#if !data.votacao.aberta}
 						<p>{textoResultado(data.votacao)}</p>
@@ -397,7 +402,7 @@
 					<ul class="lista" aria-label={t('Seus pontos e moções')}>
 						{#each meusPontos as ponto (ponto.id)}
 							<li>
-								<button class="abre-ficha" type="button" onclick={() => (pontoVisto = ponto.id)}>{descreverPonto(ponto)}</button>
+								<button class="abre-ficha" type="button" onclick={() => (pontoVisto = ponto.id)} {@attach dica(t('Ver os detalhes deste pedido.'))}>{descreverPonto(ponto)}</button>
 								<span
 									class="selo {ponto.status === 'aceito' ? 'selo--ok' : ponto.status === 'recusado' ? 'selo--erro' : 'selo--info'}"
 									>{situacaoDoPonto(ponto)}</span
@@ -424,8 +429,8 @@
 					<h2 id="c-inscricao">{t('Lista especial aberta')}</h2>
 					<p>{descreverPonto(emDiscussao)}. {t('Até 2 discursos a favor e 2 contra.')}</p>
 					<div class="acoes">
-						<button class="botao" type="button" onclick={() => inscrever('a_favor')}>{t('Falar a favor')}</button>
-						<button class="botao botao--secundario" type="button" onclick={() => inscrever('contra')}>{t('Falar contra')}</button>
+						<button class="botao" type="button" onclick={() => inscrever('a_favor')} {@attach dica(t('Inscreve sua delegação para discursar a favor desta moção.'))}>{t('Falar a favor')}</button>
+						<button class="botao botao--secundario" type="button" onclick={() => inscrever('contra')} {@attach dica(t('Inscreve sua delegação para discursar contra esta moção.'))}>{t('Falar contra')}</button>
 					</div>
 				</article>
 			{/if}
@@ -453,12 +458,13 @@
 	{#if ponto.status === 'aberto' && ponto.delegacao?.id === eu?.delegacao_id}
 		{#if adiadas[ponto.id]}
 			<span class="suave">{t('Retirando…')}</span>
-			<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => desfazer(ponto.id)}>{t('Desfazer')}</button>
+			<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => desfazer(ponto.id)} {@attach dica(t('Cancela a retirada: o pedido continua com a mesa.'))}>{t('Desfazer')}</button>
 		{:else}
 			<button
 				class="botao botao--secundario botao--pequeno"
 				type="button"
 				onclick={() => adiar(ponto.id, () => executar(supabase.rpc('retirar_ponto', { p_ponto: ponto.id }), t('Pedido retirado.')))}
+				{@attach dica(t('Tira o pedido da mesa; dá para desfazer logo em seguida.'))}
 				>{t('Retirar')}</button
 			>
 		{/if}
@@ -509,7 +515,11 @@
 		{/if}
 		{#if data.fase !== 'plenaria'}
 			<p>
-				<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => modalPlacas?.abrir()}
+				<button
+					class="botao botao--secundario botao--pequeno"
+					type="button"
+					onclick={() => modalPlacas?.abrir()}
+					{@attach dica(t('Ver quais delegações estão com a placa levantada.'))}
 					>{t('Placas levantadas')} <span class="selo">{fila.length}</span></button
 				>
 			</p>
@@ -517,7 +527,12 @@
 		{#if eu && !restrita && !impedida && data.fase !== 'plenaria'}
 			<BotaoPlaca compacto comiteId={data.comite.id} {posicao} nome={eu.delegacao_nome ?? ''} onerro={(m) => (erro = m)} />
 			<p>
-				<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => placa?.abrir()}>
+				<button
+					class="botao botao--secundario botao--pequeno"
+					type="button"
+					onclick={() => placa?.abrir()}
+					{@attach dica(t('Para erguer o celular ou o notebook como placa na sala.'))}
+				>
 					{t('Mostrar placa em tela cheia')}
 				</button>
 			</p>

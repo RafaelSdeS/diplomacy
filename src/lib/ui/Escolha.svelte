@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { t } from '#lib/i18n.svelte.ts';
+	import { dica } from '#lib/dica.ts';
 	import { semAcento } from '#lib/filtro.ts';
 	import Bandeira from './Bandeira.svelte';
 	import Modal from './Modal.svelte';
@@ -85,12 +86,14 @@
 		<span class="rotulo">{rotulo}</span>
 		<span class={resumo ? '' : 'suave'}>{resumo || vazio || (unica ? t('Nenhuma escolhida') : t('Ninguém escolhido'))}</span>
 		<button class="botao botao--secundario botao--pequeno" type="button" aria-label={`${botao}: ${rotulo}`} onclick={() => modal?.abrir()}
+			{@attach dica(unica ? t('Abre a lista, com filtro, para escolher uma.') : t('Abre a lista, com filtro, para marcar quantas quiser.'))}
 			>{botao}</button
 		>
 	</div>
 	<Modal bind:this={modal} nome={rotulo} classe="escolha-modal" onclose={onpronto}>
 		{@render escolha()}
-		<div class="acoes"><button class="botao" type="button" onclick={() => modal?.fechar()}>{t('Pronto')}</button></div>
+		<div class="acoes"><button class="botao" type="button" onclick={() => modal?.fechar()} {@attach dica(t('Fecha a lista com o que foi escolhido.'))}>{t('Pronto')}
+</button></div>
 	</Modal>
 {:else}
 	{@render escolha()}

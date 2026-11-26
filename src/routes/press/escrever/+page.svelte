@@ -2,6 +2,7 @@
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { contador } from '#lib/contador.ts';
 	import { t } from '#lib/i18n.svelte.ts';
+	import { dica } from '#lib/dica.ts';
 	import { guardarRascunho, lerRascunho } from '#lib/rascunho.ts';
 	import { goto } from '$app/navigation';
 	import { caixa, mensagemDoEnvio } from '#lib/caixa.ts';
@@ -157,7 +158,8 @@
 		{#if aviso}
 			<p class="sucesso" role="status">{aviso}</p>
 		{/if}
-		<button class="botao" disabled={enviando}>{enviando ? t('Publicando…') : t('Publicar')}</button>
+		<button class="botao" disabled={enviando} {@attach dica(t('Publica a matéria no seu veículo; sem internet, ela sai depois sozinha.'))}>
+{enviando ? t('Publicando…') : t('Publicar')}</button>
 	</form>
 
 	<section class="cartao materia previa" aria-labelledby="t-previa">

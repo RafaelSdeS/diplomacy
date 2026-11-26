@@ -9,6 +9,8 @@
 	import { mensagemDeErro } from '#lib/sessao.ts';
 	import { supabase, todasAsLinhas } from '#lib/supabase.ts';
 	import type { PageProps } from './$types';
+	import { t } from '#lib/i18n.svelte.ts';
+	import { dica } from '#lib/dica.ts';
 
 	let { data }: PageProps = $props();
 	let erro = $state('');
@@ -112,6 +114,7 @@
 					<span>{p.nome} <span class="detalhe">pedido em {new Date(p.criado_em).toLocaleDateString('pt-BR')}</span></span>
 					{#if p.pessoa_id}
 						<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => apagarPessoa(p.pessoa_id!, p.nome)}
+							{@attach dica(t('Apaga a conta e os dados pessoais de quem pediu a exclusão.'))}
 							>Apagar a conta de {p.nome}</button
 						>
 					{/if}
@@ -126,8 +129,8 @@
 		<h2 id="t-arquivo">Arquivo da edição</h2>
 		<p>Os documentos públicos para a organização: agenda aprovada, resoluções, atualizações de crise e notícias, com as regras de cada comitê.</p>
 		<p class="acoes">
-			<a class="botao" href="/imprimir/arquivo">Imprimir o arquivo (PDF)</a>
-			<button class="botao botao--secundario" type="button" onclick={baixarArquivo}>Baixar os dados públicos (JSON)</button>
+			<a class="botao" href="/imprimir/arquivo" {@attach dica(t('Abre o arquivo da edição para imprimir ou salvar em PDF.'))}>Imprimir o arquivo (PDF)</a>
+			<button class="botao botao--secundario" type="button" onclick={baixarArquivo} {@attach dica(t('Salva os documentos públicos da edição num arquivo JSON.'))}>Baixar os dados públicos (JSON)</button>
 		</p>
 	</section>
 
@@ -141,7 +144,7 @@
 			{/each}
 		</ul>
 		{#if data.pesquisa.length}
-			<button class="botao botao--secundario" type="button" onclick={() => baixar('pesquisa.json', data.pesquisa)}>Baixar as respostas</button>
+			<button class="botao botao--secundario" type="button" onclick={() => baixar('pesquisa.json', data.pesquisa)} {@attach dica(t('Salva as respostas da pesquisa num arquivo JSON.'))}>Baixar as respostas</button>
 		{/if}
 	</section>
 
@@ -165,7 +168,8 @@
 						<input type="number" required min="2020" max="2100" bind:value={novoAno} />
 					</label>
 					{#if erro}<p class="erro" role="alert">{erro}</p>{/if}
-					<button class="botao">Copiar comitês, regras e delegações</button>
+					<button class="botao" {@attach dica(t('Cria o evento novo com o nome e o ano escritos acima.'))}>Copiar comitês, regras e delegações</button>
+
 				</form>
 			</AcaoEmModal>
 			<AcaoEmModal

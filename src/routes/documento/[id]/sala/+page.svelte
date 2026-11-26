@@ -25,6 +25,11 @@
 	type Posicao = 'apoio' | 'ressalva' | 'contra';
 	type Acao = 'alterar' | 'incluir' | 'retirar' | 'mover';
 	const POSICOES: Record<Posicao, string> = { apoio: t('Apoio'), ressalva: t('Ressalva'), contra: t('Contra') };
+	const DICA_POSICAO: Record<Posicao, string> = {
+		apoio: t('Sua delegação concorda com esta proposta.'),
+		ressalva: t('Sua delegação aceita, mas com reservas.'),
+		contra: t('Sua delegação não aceita esta proposta.')
+	};
 	const SELO_POSICAO: Record<Posicao, string> = { apoio: 'selo--ok', ressalva: 'selo--alerta', contra: 'selo--erro' };
 	const TIPO: Record<string, string> = { preambular: t('Preambular'), operativa: t('Operativa'), subitem: t('Subitem'), texto: t('Texto livre') };
 
@@ -63,9 +68,9 @@
 	const daClausula = (id: string) => visiveis.filter((p) => (p.acao === 'incluir' ? p.depois_de : p.clausula_id) === id);
 	const novasNoFim = $derived(visiveis.filter((p) => p.acao === 'incluir' && !p.depois_de));
 	const FILTROS = $derived([
-		{ valor: 'todas', nome: t('Todas'), n: abertas.length },
-		{ valor: 'consenso', nome: t('Com consenso'), n: abertas.filter(consenso).length },
-		{ valor: 'debate', nome: t('Em debate'), n: abertas.filter((p) => !consenso(p)).length }
+		{ valor: 'todas', nome: t('Todas'), n: abertas.length, dica: t('Cada proposta ainda em aberto, com ou sem consenso.') },
+		{ valor: 'consenso', nome: t('Com consenso'), n: abertas.filter(consenso).length, dica: t('Sem delegação contra e com o apoio de pelo menos metade da sala.') },
+		{ valor: 'debate', nome: t('Em debate'), n: abertas.filter((p) => !consenso(p)).length, dica: t('As propostas que ainda não chegaram ao consenso.') }
 	] as const);
 
 	const descrever = (p: Proposta) =>
@@ -203,6 +208,7 @@
 							class={['botao botao--pequeno', minha(p) !== x && 'botao--secundario']}
 							type="button"
 							aria-pressed={minha(p) === x}
+							{@attach dica(DICA_POSICAO[x as Posicao])}
 							onclick={() => marcar(p, x as Posicao)}>{nome}</button
 						>
 					{/each}
@@ -211,7 +217,7 @@
 			{#if decido}
 				<span class="acoes" role="group" aria-label={t('Decidir: {proposta}', { proposta: descrever(p) })}>
 					{#if consenso(p)}
-						<button class="botao botao--pequeno" type="button" onclick={() => decidir(p, true)}>{t('Aceitar')}</button>
+						<button class="botao botao--pequeno" type="button" onclick={() => decidir(p, true)} {@attach dica(t('A mudança proposta passa a valer no texto.'))}>{t('Aceitar')}</button>
 					{:else}
 						<Confirmar
 							classe="botao botao--pequeno"
@@ -221,7 +227,12 @@
 							acao={() => decidir(p, true)}
 						/>
 					{/if}
-					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => decidir(p, false)}>{t('Rejeitar')}</button>
+					<button
+						class="botao botao--secundario botao--pequeno"
+						type="button"
+						{@attach dica(t('A proposta sai do debate, e o texto fica como está.'))}
+						onclick={() => decidir(p, false)}>{t('Rejeitar')}</button
+					>
 				</span>
 			{/if}
 		</span>
@@ -285,6 +296,7 @@
 	<nav class="abas-topicos" aria-label={t('Documentos do tópico')}>
 		{#each data.irmaos as x (x.id)}
 			<a class={['botao botao--pequeno', x.id !== d.id && 'botao--secundario']} href={`/documento/${x.id}/sala`} aria-current={x.id === d.id ? 'page' : undefined}
+				{@attach dica(x.tipo === 'projeto' ? t('O projeto de resolução do tópico, feito dos working papers.') : t('Um working paper do tópico, de um item da agenda.'))}
 				>{x.tipo === 'projeto' ? t('Projeto') : x.titulo}</a
 			>
 		{/each}
@@ -292,13 +304,13 @@
 {/if}
 
 <p class="suave">{situacao}</p>
-{#if ehWp && !aberto && projeto}<p><a class="botao botao--pequeno" href={`/documento/${projeto.id}/sala`}>{t('Abrir o projeto do tópico')}</a></p>{/if}
+{#if ehWp && !aberto && projeto}<p><a class="botao botao--pequeno" href={`/documento/${projeto.id}/sala`} {@attach dica(t('Este working paper já virou projeto: o debate segue lá.'))}>{t('Abrir o projeto do tópico')}</a></p>{/if}
 {#if erro}<p class="erro" role="alert">{erro}</p>{/if}
 {#if mensagem}<p class="sucesso" role="status">{mensagem}</p>{/if}
 
 <div class="acoes">
 	{#if possoPropor}
-		<button class="botao" type="button" onclick={() => proporEm(null)}><ListPlus aria-hidden="true" size={18} strokeWidth={1.75} /> {t('Propor uma cláusula nova')}</button>
+		<button class="botao" type="button" onclick={() => proporEm(null)} {@attach dica(t('Sugerir um texto novo, que a sala debate antes de entrar.'))}><ListPlus aria-hidden="true" size={18} strokeWidth={1.75} /> {t('Propor uma cláusula nova')}</button>
 	{/if}
 	{#if ehMesa && aberto}
 		<Confirmar
@@ -331,6 +343,7 @@
 	<div class="acoes" role="group" aria-label={t('Mostrar as propostas')}>
 		{#each FILTROS as f (f.valor)}
 			<button class={['botao botao--pequeno', filtro !== f.valor && 'botao--secundario']} type="button" aria-pressed={filtro === f.valor} onclick={() => (filtro = f.valor)}
+				{@attach dica(f.dica)}
 				>{f.nome} <span class="selo">{f.n}</span></button
 			>
 		{/each}
@@ -375,6 +388,7 @@
 		<button
 			class={['botao botao--pequeno', assinei && 'botao--secundario']}
 			type="button"
+			{@attach dica(assinei ? t('Sua delegação deixa de apoiar o documento.') : t('Sua delegação mostra acordo com o texto e apoia o documento.'))}
 			onclick={() =>
 				executar(supabase.rpc('assinar', { p_documento: d.id, p_assinar: !assinei }), assinei ? t('Assinatura retirada.') : t('Documento assinado.'))}
 			>{assinei ? t('Retirar a assinatura') : t('Assinar')}</button
@@ -382,7 +396,7 @@
 	{/if}
 </section>
 
-<p><a class="botao botao--secundario botao--pequeno" href={`/imprimir/documento/${d.id}`}>{t('Imprimir ou salvar como PDF')}</a></p>
+<p><a class="botao botao--secundario botao--pequeno" href={`/imprimir/documento/${d.id}`} {@attach dica(t('O documento formatado, pronto para imprimir ou guardar.'))}>{t('Imprimir ou salvar como PDF')}</a></p>
 
 {#if decididas.length}
 	<details class="cartao">

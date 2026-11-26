@@ -7,6 +7,8 @@
 	import Escolha from '#lib/ui/Escolha.svelte';
 	import AcaoEmModal from '#lib/ui/AcaoEmModal.svelte';
 	import UserPlus from '@lucide/svelte/icons/user-plus';
+	import { t } from '#lib/i18n.svelte.ts';
+	import { dica } from '#lib/dica.ts';
 	import type { PageProps, Snapshot } from './$types';
 
 	let { data }: PageProps = $props();
@@ -144,11 +146,11 @@
 		</form>
 	</AcaoEmModal>
 	<nav class="acoes" aria-label="Ferramentas da secretaria">
-		<a class="botao botao--secundario" href="/secretaria/importar">Importar inscrições</a>
-		<a class="botao botao--secundario" href="/imprimir/crachas">Crachás</a>
-		<a class="botao botao--secundario" href="/secretaria/checkin">Check-in</a>
-		<a class="botao botao--secundario" href="/secretaria/certificados">Certificados</a>
-		<a class="botao botao--secundario" href="/secretaria/dados">Dados e arquivo</a>
+		<a class="botao botao--secundario" href="/secretaria/importar" {@attach dica(t('Cria os convites a partir da planilha CSV das inscrições.'))}>Importar inscrições</a>
+		<a class="botao botao--secundario" href="/imprimir/crachas" {@attach dica(t('Abre os crachás de todos os participantes para imprimir.'))}>Crachás</a>
+		<a class="botao botao--secundario" href="/secretaria/checkin" {@attach dica(t('Marca quem chegou, pela lista ou pelo QR do crachá.'))}>Check-in</a>
+		<a class="botao botao--secundario" href="/secretaria/certificados" {@attach dica(t('Emite e imprime os certificados de quem fez check-in.'))}>Certificados</a>
+		<a class="botao botao--secundario" href="/secretaria/dados" {@attach dica(t('Baixa o arquivo do evento e apaga os dados pessoais no fim.'))}>Dados e arquivo</a>
 	</nav>
 </div>
 
@@ -176,7 +178,7 @@
 		</select>
 	</label>
 	{#if filtrando}
-		<button class="botao botao--secundario botao--pequeno" type="button" onclick={limpar}>Limpar</button>
+		<button class="botao botao--secundario botao--pequeno" type="button" onclick={limpar} {@attach dica(t('Tira a busca e os filtros e mostra todos de novo.'))}>Limpar</button>
 	{/if}
 </div>
 {#if erro}
@@ -222,6 +224,7 @@
 						class="botao botao--secundario botao--pequeno"
 						type="button"
 						aria-label={`Remover o convite de ${c.email}`}
+						{@attach dica(t('Apaga o convite; quem já recebeu o papel continua com ele.'))}
 						onclick={() => remover(c.id)}>Remover</button
 					>
 				</li>

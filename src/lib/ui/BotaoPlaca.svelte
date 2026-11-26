@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { t } from '#lib/i18n.svelte.ts';
+	import { dica } from '#lib/dica.ts';
 	import Hand from '@lucide/svelte/icons/hand';
 	import { invalidate } from '$app/navigation';
 	import { mensagemDeErro } from '#lib/sessao.ts';
@@ -21,11 +22,12 @@
 {#if !compacto}<p class="placa-nome" class:placa-nome--levantada={posicao >= 0}>{nome}</p>{/if}
 {#if posicao >= 0}
 	<p class={compacto ? undefined : 'destaque'}><strong>{t('Placa levantada')}</strong></p>
-	<button class="botao botao--grande" type="button" aria-pressed="true" onclick={() => acao('baixar_placa')}>
+	<button class="botao botao--grande" type="button" aria-pressed="true" onclick={() => acao('baixar_placa')} {@attach dica(t('Retira o pedido de palavra da delegação.'))}>
 		<Hand aria-hidden="true" size={20} /> {t('Baixar placa')}
 	</button>
 {:else}
-	<button class="botao botao--grande" type="button" aria-pressed="false" onclick={() => acao('levantar_placa')}>
+	<button class="botao botao--grande" type="button" aria-pressed="false" onclick={() => acao('levantar_placa')} {@attach dica(t('Pede a palavra; a presidência escolhe quem fala entre as placas.'))}>
+
 		<Hand aria-hidden="true" size={20} /> {t('Levantar placa')}
 	</button>
 {/if}

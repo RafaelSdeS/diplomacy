@@ -3,6 +3,7 @@
 	// abertura, o debate de cada tópico e o que cada papel faz. Sem tutorial longo.
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { t } from '#lib/i18n.svelte.ts';
+	import { dica } from '#lib/dica.ts';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -70,4 +71,4 @@
 		</dd>
 	</div>
 </dl>
-<p><a class="botao botao--secundario" href={`/comite/${sigla}/sessao`}>{t('Ir para a sessão')}</a></p>
+<p><a class="botao botao--secundario" href={`/comite/${sigla}/sessao`} {@attach dica(t('A sessão ao vivo do comitê: placa, pontos e votos.'))}>{t('Ir para a sessão')}</a></p>

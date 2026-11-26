@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { t } from '#lib/i18n.svelte.ts';
+	import { dica } from '#lib/dica.ts';
 	import { caixa, mensagemDoEnvio } from '#lib/caixa.ts';
 	import { contador } from '#lib/contador.ts';
 	import { formatarHora } from '#lib/cronograma.ts';
@@ -95,6 +96,7 @@
 
 <div class="acoes nota-rapida">
 	<button class="botao botao--secundario" type="button" onclick={abrir}
+		{@attach dica(t('Abre uma nota rápida ou o rascunho da sua próxima fala, sem sair da sessão.'))}
 		><NotebookPen aria-hidden="true" size={18} strokeWidth={1.75} /> {t('Anotar')}</button
 	>
 	{#if texto.trim()}<span class="selo selo--info">{t('rascunho guardado')}</span>{/if}
@@ -124,7 +126,8 @@
 		</label>
 		{#if tipo !== 'fala'}<p class="detalhe">{descricao}</p>{/if}
 		<div class="acoes">
-			<button class="botao" disabled={enviando}>{t('Guardar no caderno')}</button>
+			<button class="botao" disabled={enviando} {@attach dica(t('Salva no caderno com o tópico, a hora e quem tinha a palavra.'))}>{t('Guardar no caderno')}</button>
+
 			<button class="botao botao--secundario" type="button" onclick={() => modal?.fechar()}>{t('Fechar')}</button>
 		</div>
 	</form>

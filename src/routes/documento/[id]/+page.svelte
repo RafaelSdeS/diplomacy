@@ -14,6 +14,7 @@
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import NomeDelegacao from '#lib/ui/NomeDelegacao.svelte';
 	import Modal from '#lib/ui/Modal.svelte';
+	import { dica } from '#lib/dica.ts';
 	import Quando from '#lib/ui/Quando.svelte';
 	import { separarVerbo, sugerirVerbos } from '#lib/verbos.ts';
 	import MessageSquare from '@lucide/svelte/icons/message-square';
@@ -179,6 +180,11 @@
 
 	// Passo 57: a posição num toque (apoio, ressalva, contra), uma por delegação; a mesa também.
 	const POSICOES = { apoio: t('Apoio'), ressalva: t('Ressalva'), contra: t('Contra') } as const;
+	const DICA_POSICAO: Record<Posicao, string> = {
+		apoio: t('Sua delegação concorda com esta cláusula.'),
+		ressalva: t('Sua delegação aceita, mas com reservas.'),
+		contra: t('Sua delegação não aceita esta cláusula.')
+	};
 	type Posicao = keyof typeof POSICOES;
 	const SELO_POSICAO: Record<Posicao, string> = { apoio: 'selo--ok', ressalva: 'selo--alerta', contra: 'selo--erro' };
 	const membros = $derived(new Map((d.bloco?.membros ?? []).map((m) => [m.delegacao?.id ?? '', m.delegacao])));
@@ -300,29 +306,32 @@
 			<button
 				class={['botao', assinei && 'botao--secundario']}
 				type="button"
+				{@attach dica(assinei ? t('Sua delegação deixa de apoiar o documento.') : t('Sua delegação mostra acordo com o texto e apoia o documento.'))}
 				onclick={() => executar(supabase.rpc('assinar', { p_documento: d.id, p_assinar: !assinei }))}>{assinei ? t('Retirar a assinatura') : t('Assinar')}</button
 			>
 		{/if}
 		{#if data.souRedator && editavel}
-			<button class="botao" type="button" disabled={faltam > 0 || !data.clausulas.length} onclick={() => modalEnvio?.abrir()}>{t('Enviar à mesa')}</button>
+			<button class="botao" type="button" disabled={faltam > 0 || !data.clausulas.length} onclick={() => modalEnvio?.abrir()} {@attach dica(t('A mesa recebe o texto para avaliar, e ele deixa de ser editado.'))}>{t('Enviar à mesa')}</button>
 		{/if}
 		{#if ehMesa && d.status === 'enviado'}
 			<button
 				class="botao"
 				type="button"
+				{@attach dica(t('A mesa aceita o texto enviado pelo bloco.'))}
 				onclick={() => executar(supabase.rpc('aprovar_documento', { p_documento: d.id, p_aprovar: true }), t('Documento aprovado.'))}>{t('Aprovar')}</button
 			>
 			<button
 				class="botao botao--secundario"
 				type="button"
+				{@attach dica(t('O bloco recebe o texto de volta para continuar editando.'))}
 				onclick={() => executar(supabase.rpc('aprovar_documento', { p_documento: d.id, p_aprovar: false }), t('Documento devolvido ao bloco.'))}
 				>{t('Devolver ao bloco')}</button
 			>
 		{/if}
 		<details class="mais-opcoes">
-			<summary class="botao botao--secundario botao--pequeno">{t('Mais opções')}</summary>
+			<summary class="botao botao--secundario botao--pequeno" {@attach dica(t('Outras ações, como a versão para imprimir.'))}>{t('Mais opções')}</summary>
 			<div class="mais-opcoes-corpo">
-				<a class="botao botao--secundario botao--pequeno" href={`/imprimir/documento/${d.id}`}>{t('Imprimir ou salvar como PDF')}</a>
+				<a class="botao botao--secundario botao--pequeno" href={`/imprimir/documento/${d.id}`} {@attach dica(t('O documento formatado, pronto para imprimir ou guardar.'))}>{t('Imprimir ou salvar como PDF')}</a>
 			</div>
 		</details>
 	</div>
@@ -332,6 +341,7 @@
 	<p class="telegrama" role="status">
 		{t('{n} comentários novos em {m} cláusulas', { n: comNovidade.reduce((soma, c) => soma + novos(c.id).length, 0), m: comNovidade.length })}
 		<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => marcarVisto(...comNovidade.map((c) => c.id))}
+			{@attach dica(t('Os comentários novos deixam de aparecer como novos.'))}
 			>{t('Marcar como vistos')}</button
 		>
 	</p>
@@ -359,14 +369,14 @@
 		{#if nova && nova.depois === null}{@render novaClausula()}{/if}
 		<div class="inserir inserir--fim" role="group" aria-label={t('Acrescentar no fim')}>
 			{#if d.tipo === 'working_paper'}
-				<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => inserir(null, 'texto')}
+				<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => inserir(null, 'texto')} {@attach dica(t('Acrescenta um parágrafo de texto livre.'))}
 					><Plus aria-hidden="true" size={14} /> {TIPO_CLAUSULA.texto}</button
 				>
 			{/if}
-			<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => inserir(null, 'preambular')}
+			<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => inserir(null, 'preambular')} {@attach dica(t('Acrescenta uma cláusula que dá o contexto e os motivos.'))}
 				><Plus aria-hidden="true" size={14} /> {TIPO_CLAUSULA.preambular}</button
 			>
-			<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => inserir(null, 'operativa')}
+			<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => inserir(null, 'operativa')} {@attach dica(t('Acrescenta uma cláusula numerada com o que o comitê decide.'))}
 				><Plus aria-hidden="true" size={14} /> {TIPO_CLAUSULA.operativa}</button
 			>
 		</div>
@@ -382,6 +392,7 @@
 				<button
 					class="botao botao--secundario botao--pequeno"
 					type="button"
+					{@attach dica(t('Troca a primeira palavra da cláusula por este verbo.'))}
 					onclick={() => usar(`${verbo} ${texto.trimStart().split(/\s+/).slice(1).join(' ')}`.trimEnd() + ' ')}>{verbo}</button
 				>
 			{/each}
@@ -405,7 +416,7 @@
 		{@render verbos(novoTexto, nova!.tipo, (v) => (novoTexto = v))}
 		<p class="suave">{t('Enter salva e abre a próxima; Esc cancela.')}</p>
 		<div class="acoes">
-			<button class="botao botao--pequeno" type="button" disabled={!novoTexto.trim()} onclick={salvarNova}>{t('Salvar')}</button>
+			<button class="botao botao--pequeno" type="button" disabled={!novoTexto.trim()} onclick={salvarNova} {@attach dica(t('Guarda o texto. No teclado, Enter salva e Esc cancela.'))}>{t('Salvar')}</button>
 			<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => (nova = null)}>{t('Cancelar')}</button>
 		</div>
 	</div>
@@ -434,7 +445,7 @@
 			</label>
 			{@render verbos(edicao, tipo, (v) => (edicao = v))}
 			<div class="acoes">
-				<button class="botao botao--pequeno" type="button" onclick={salvarEdicao}>{t('Salvar')}</button>
+				<button class="botao botao--pequeno" type="button" onclick={salvarEdicao} {@attach dica(t('Guarda o texto. No teclado, Enter salva e Esc cancela.'))}>{t('Salvar')}</button>
 				<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => (editando = null)}>{t('Cancelar')}</button>
 			</div>
 		{:else}
@@ -469,24 +480,25 @@
 		{#if tipo !== 'texto' || d.tipo === 'working_paper'}
 			<div class="inserir" role="group" aria-label={t('Inserir depois de {clausula}', { clausula: rotulo })}>
 				{#if tipo === 'texto'}
-					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => inserir(id, 'texto')}
+					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => inserir(id, 'texto')} {@attach dica(t('Acrescenta um parágrafo de texto livre.'))}
 						><Plus aria-hidden="true" size={14} /> {TIPO_CLAUSULA.texto}</button
 					>
 				{:else if tipo === 'preambular'}
-					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => inserir(id, 'preambular')}
+					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => inserir(id, 'preambular')} {@attach dica(t('Acrescenta uma cláusula que dá o contexto e os motivos.'))}
 						><Plus aria-hidden="true" size={14} /> {TIPO_CLAUSULA.preambular}</button
 					>
-					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => inserir(id, 'operativa')}
+					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => inserir(id, 'operativa')} {@attach dica(t('Acrescenta uma cláusula numerada com o que o comitê decide.'))}
 						><Plus aria-hidden="true" size={14} /> {TIPO_CLAUSULA.operativa}</button
 					>
 				{:else}
 					{@const operativa = tipo === 'operativa' ? id : c.pai_id!}
-					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => inserir(fimDaOperativa(operativa), 'operativa')}
+					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => inserir(fimDaOperativa(operativa), 'operativa')} {@attach dica(t('Acrescenta uma cláusula numerada com o que o comitê decide.'))}
 						><Plus aria-hidden="true" size={14} /> {TIPO_CLAUSULA.operativa}</button
 					>
 					<button
 						class="botao botao--secundario botao--pequeno"
 						type="button"
+						{@attach dica(t('Acrescenta um item com letra dentro desta operativa.'))}
 						onclick={() => inserir(tipo === 'subitem' ? id : fimDaOperativa(operativa), 'subitem', operativa)}
 						><Plus aria-hidden="true" size={14} /> {TIPO_CLAUSULA.subitem}</button
 					>
@@ -505,34 +517,38 @@
 					<button
 						class="botao botao--secundario botao--pequeno"
 						type="button"
+						{@attach dica(t('Mostra a todos que esta cláusula está em debate no bloco.'))}
 						onclick={() => executar(supabase.rpc('marcar_clausula', { p_clausula: c.id, p_status: 'em_discussao' }))}>{t('Pôr em discussão')}</button
 					>
 				{/if}
 				<button
 					class="botao botao--secundario botao--pequeno"
 					type="button"
+					{@attach dica(t('Trava a cláusula: só volta a mudar se as delegações pedirem.'))}
 					onclick={() => executar(supabase.rpc('marcar_clausula', { p_clausula: c.id, p_status: 'acordada' }))}>{t('Marcar como acordada')}</button
 				>
 				<button
 					class="botao botao--secundario botao--pequeno"
 					type="button"
+					{@attach dica(t('A cláusula fica em destaque para quem está no documento.'))}
 					onclick={() => executar(supabase.rpc('focar_clausula', { p_documento: d.id, p_clausula: c.id }))}>{t('Pôr em foco')}</button
 				>
 				<button
 					class="botao botao--secundario botao--pequeno"
 					type="button"
-					title="Alt + ↑"
+					{@attach dica(t('Sobe a cláusula uma posição (Alt + ↑).'))}
 					onclick={() => executar(supabase.rpc('mover_clausula', { p_clausula: c.id, p_para_cima: true }))}>{t('Subir')}</button
 				>
 				<button
 					class="botao botao--secundario botao--pequeno"
 					type="button"
-					title="Alt + ↓"
+					{@attach dica(t('Desce a cláusula uma posição (Alt + ↓).'))}
 					onclick={() => executar(supabase.rpc('mover_clausula', { p_clausula: c.id, p_para_cima: false }))}>{t('Descer')}</button
 				>
 				<button
 					class="botao botao--secundario botao--pequeno"
 					type="button"
+					{@attach dica(t('Tira a cláusula do documento.'))}
 					onclick={async () => {
 						if (await executar(supabase.rpc('remover_clausula', { p_clausula: c.id }))) selecionada = editando = null;
 					}}>{t('Remover')}</button
@@ -549,6 +565,7 @@
 			<button
 				class="botao botao--secundario botao--pequeno"
 				type="button"
+				{@attach dica(t('Sua delegação pede que a cláusula volte ao debate.'))}
 				disabled={pedidos.some((p) => p.delegacao_id === eu?.delegacao_id)}
 				onclick={() => executar(supabase.rpc('pedir_reabertura', { p_clausula: c.id }), t('Pedido de reabertura registrado.'))}
 				>{t('Pedir reabertura')}</button
@@ -562,6 +579,7 @@
 						class={['botao botao--pequeno', minhaPosicao(c.id) !== p && 'botao--secundario']}
 						type="button"
 						aria-pressed={minhaPosicao(c.id) === p}
+						{@attach dica(DICA_POSICAO[p as Posicao])}
 						onclick={() => marcar(c.id, p as Posicao)}>{nome}</button
 					>
 				{/each}
@@ -575,8 +593,8 @@
 					placeholder={porque === c.id ? t('Diga o porquê (opcional)') : t('Comentar esta cláusula')}
 					bind:value={comentario}
 				/>
-				<button class="botao botao--secundario botao--pequeno">{t('Comentar')}</button>
-				{#if porque === c.id}<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => (porque = null)}>{t('Pular')}</button>{/if}
+				<button class="botao botao--secundario botao--pequeno" {@attach dica(t('O comentário fica nesta cláusula para o bloco ler.'))}>{t('Comentar')}</button>
+				{#if porque === c.id}<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => (porque = null)} {@attach dica(t('A posição fica marcada, sem comentário.'))}>{t('Pular')}</button>{/if}
 			</form>
 		{/if}
 		<ul class="lista lista--compacta" aria-label={t('Comentários')}>
@@ -592,12 +610,14 @@
 								class="botao botao--secundario botao--pequeno"
 								type="button"
 								aria-label={t('Resolver o comentário "{texto}"', { texto: k.texto.slice(0, 30) })}
+								{@attach dica(t('O comentário foi atendido e sai da lista.'))}
 								onclick={() => executar(supabase.rpc('resolver_comentario', { p_comentario: k.id, p_resolvido: true }))}>{t('Resolvido')}</button
 							>
 							<button
 								class="botao botao--secundario botao--pequeno"
 								type="button"
 								aria-label={`${t('Estacionar')}: "${k.texto.slice(0, 30)}"`}
+								{@attach dica(t('Guarda o comentário para depois, fora da lista principal.'))}
 								onclick={() => executar(supabase.rpc('estacionar_comentario', { p_comentario: k.id, p_estacionado: true }))}>{t('Estacionar')}</button
 							>
 						</span>
@@ -629,6 +649,7 @@
 								<button
 									class="botao botao--pequeno"
 									type="button"
+									{@attach dica(t('O texto proposto substitui o da cláusula.'))}
 									aria-label={`Aceitar a proposta de ${p.delegacao?.nome}`}
 									onclick={() => executar(supabase.rpc('responder_proposta', { p_proposta: p.id, p_aceitar: true }), t('Proposta aceita.'))}
 									>{t('Aceitar')}</button
@@ -636,6 +657,7 @@
 								<button
 									class="botao botao--secundario botao--pequeno"
 									type="button"
+									{@attach dica(t('A proposta é fechada, e a cláusula fica como está.'))}
 									aria-label={`Recusar a proposta de ${p.delegacao?.nome}`}
 									onclick={() => executar(supabase.rpc('responder_proposta', { p_proposta: p.id, p_aceitar: false }))}>{t('Recusar')}</button
 								>
@@ -652,7 +674,7 @@
 						{t('Sua proposta de texto')}
 						<textarea required maxlength="2000" rows="2" bind:value={proposta} {@attach contador(proposta)}></textarea>
 					</label>
-					<button class="botao botao--secundario botao--pequeno">{t('Propor alteração')}</button>
+					<button class="botao botao--secundario botao--pequeno" {@attach dica(t('O redator do bloco decide se o texto proposto entra.'))}>{t('Propor alteração')}</button>
 				</form>
 			{/if}
 		{/if}

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { t } from '#lib/i18n.svelte.ts';
+	import { dica } from '#lib/dica.ts';
 	import { mensagemDeErro } from '#lib/sessao.ts';
 	import { supabase } from '#lib/supabase.ts';
 
@@ -46,7 +47,7 @@
 <section aria-labelledby="t-baixar">
 	<h2 id="t-baixar">{t('Baixar os meus dados')}</h2>
 	<p>{t('Um arquivo JSON com a sua conta, as suas participações e tudo o que você escreveu no app.')}</p>
-	<button class="botao" type="button" onclick={baixar}>{t('Baixar os meus dados')}</button>
+	<button class="botao" type="button" onclick={baixar} {@attach dica(t('Salva o arquivo neste aparelho; nada muda na sua conta.'))}>{t('Baixar os meus dados')}</button>
 </section>
 
 <section aria-labelledby="t-corrigir">
@@ -61,10 +62,10 @@
 	</p>
 	{#if confirmar}
 		<p class="acoes">
-			<button class="botao" type="button" onclick={pedirExclusao}>{t('Sim, pedir a exclusão')}</button>
+			<button class="botao" type="button" onclick={pedirExclusao} {@attach dica(t('Manda o pedido à secretaria, que apaga a conta e avisa você.'))}>{t('Sim, pedir a exclusão')}</button>
 			<button class="botao botao--secundario" type="button" onclick={() => (confirmar = false)}>{t('Cancelar')}</button>
 		</p>
 	{:else}
-		<button class="botao botao--secundario" type="button" onclick={() => (confirmar = true)}>{t('Pedir a exclusão da minha conta')}</button>
+		<button class="botao botao--secundario" type="button" onclick={() => (confirmar = true)} {@attach dica(t('Antes de enviar, o app pede para você confirmar.'))}>{t('Pedir a exclusão da minha conta')}</button>
 	{/if}
 </section>

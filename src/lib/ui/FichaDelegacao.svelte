@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { t } from '#lib/i18n.svelte.ts';
+	import { dica } from '#lib/dica.ts';
 	import { abrirAnotacao, anotacao, ficha, fecharFicha } from '#lib/ficha.svelte.ts';
 	import { nomeDoDocumento } from '#lib/formatacao.ts';
 	import { caixa, mensagemDoEnvio } from '#lib/caixa.ts';
@@ -158,10 +159,12 @@
 			<div class="acoes">
 				{#if minhas.length > 3}
 					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => ficha.id && abrirAnotacao(ficha.id)}
+						{@attach dica(t('Abre o caderno com todas as anotações sobre esta delegação.'))}
 						>{t('Ver todas')}</button
 					>
 				{/if}
 				<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => ficha.id && abrirAnotacao(ficha.id)}
+					{@attach dica(t('Escreve no caderno uma anotação sobre esta delegação.'))}
 					>{t('Anotar')}</button
 				>
 			</div>
@@ -262,12 +265,14 @@
 	{#if aviso && !escrever}<p class="sucesso" role="status">{aviso}</p>{/if}
 	<div class="acoes" hidden={!!escrever}>
 		{#if dados?.delegacao && podeEscrever}
-			<button class="botao" type="button" onclick={() => comecar('bilhete')}>{t('Mandar bilhete')}</button>
-			<button class="botao botao--secundario" type="button" onclick={() => comecar('carta')}>{t('Escrever carta')}</button>
+			<button class="botao" type="button" onclick={() => comecar('bilhete')} {@attach dica(t('Escreve uma mensagem curta para esta delegação.'))}>{t('Mandar bilhete')}</button>
+			<button class="botao botao--secundario" type="button" onclick={() => comecar('carta')} {@attach dica(t('Escreve uma carta diplomática privada, com título, para esta delegação.'))}>{t('Escrever carta')}</button>
 		{/if}
 		{#if dados?.delegacao}
 			<a class="botao botao--secundario" href={`/comite/${ficha.sigla}/delegacao/${dados.delegacao.id}`} onclick={() => modal?.fechar()}
+				{@attach dica(t('Fecha a ficha e abre a página inteira da delegação.'))}
 				>{t('Abrir a página da delegação')}</a
+
 			>
 		{/if}
 		<form method="dialog"><button class="botao">{t('Fechar')}</button></form>

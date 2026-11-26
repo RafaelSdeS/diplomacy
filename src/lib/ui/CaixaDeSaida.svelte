@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { t } from '#lib/i18n.svelte.ts';
+	import { dica } from '#lib/dica.ts';
 	import { caixa } from '#lib/caixa.ts';
 	import type { Item } from '#lib/caixa-de-saida.ts';
 	import { adiadas, adiar, desfazer } from '#lib/desfazer.svelte.ts';
@@ -31,7 +32,7 @@
 
 <!-- Montado sempre: o modal aberto continua quando o último item sai. -->
 {#if pendentes}
-	<button class="selo selo--info selo--botao" type="button" onclick={abrir}>{t('{n} para enviar', { n: pendentes })}</button>
+	<button class="selo selo--info selo--botao" type="button" onclick={abrir} {@attach dica(t('Mostra o que ficou neste aparelho esperando a internet.'))}>{t('{n} para enviar', { n: pendentes })}</button>
 {/if}
 <Modal bind:this={modal} rotulo="caixa-titulo">
 	<h3 id="caixa-titulo">{t('Não enviados')}</h3>
@@ -41,12 +42,13 @@
 			<li>
 				<span>{item.rotulo} <span class="detalhe"><Quando iso={new Date(item.criadoEm).toISOString()} /></span></span>
 				{#if adiadas[item.id]}
-					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => desfazer(item.id)}>{t('Desfazer')}</button>
+					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => desfazer(item.id)} {@attach dica(t('Cancela a remoção; o item continua na fila.'))}>{t('Desfazer')}</button>
 				{:else}
 					<button
 						class="botao botao--secundario botao--pequeno"
 						type="button"
 						aria-label={`${t('Remover')}: ${item.rotulo}`}
+						{@attach dica(t('Tira o item da fila; ele não será enviado.'))}
 						onclick={() => adiar(item.id, () => caixa.remover(item.id))}>{t('Remover')}</button
 					>
 				{/if}
@@ -56,7 +58,8 @@
 		{/each}
 	</ul>
 	<div class="acoes">
-		<button class="botao" type="button" disabled={enviando || !itens.length} onclick={enviarAgora}>{t('Enviar agora')}</button>
+		<button class="botao" type="button" disabled={enviando || !itens.length} onclick={enviarAgora} {@attach dica(t('Tenta enviar tudo agora, sem esperar.'))}>
+{t('Enviar agora')}</button>
 		<form method="dialog"><button class="botao botao--secundario">{t('Fechar')}</button></form>
 	</div>
 </Modal>

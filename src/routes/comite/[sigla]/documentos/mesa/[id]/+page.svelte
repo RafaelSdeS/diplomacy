@@ -16,6 +16,7 @@
 	import { supabase } from '#lib/supabase.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import Modal from '#lib/ui/Modal.svelte';
+	import { dica } from '#lib/dica.ts';
 	import FileText from '@lucide/svelte/icons/file-text';
 	import Projector from '@lucide/svelte/icons/projector';
 	import type { PageProps } from './$types';
@@ -188,13 +189,21 @@
 			<span>{t('Atualizado às {hora}', { hora: formatarHora(doc.publicado_em!) })}</span>
 			{#if !data.ehMesa && doc.versao > versaoAoAbrir}<span class="selo selo--info" role="status">{t('Atualizado agora')}</span>{/if}
 			{#if data.anterior}
-				<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => alteracoes?.abrir()}>{t('Ver alterações')}</button>
+				<button
+					class="botao botao--secundario botao--pequeno"
+					type="button"
+					{@attach dica(t('O que entrou e o que saiu desde a publicação anterior.'))}
+					onclick={() => alteracoes?.abrir()}>{t('Ver alterações')}</button>
 			{/if}
 		{:else}
 			<span class="selo">{t('Ainda não publicado')}</span>
 		{/if}
 		{#if doc.arquivo}
-			<button class="botao botao--secundario botao--pequeno" type="button" onclick={abrirPdf}><FileText aria-hidden="true" size={16} strokeWidth={1.75} /> {t('Abrir o PDF')}</button>
+			<button
+				class="botao botao--secundario botao--pequeno"
+				type="button"
+				{@attach dica(t('O arquivo abre numa aba nova do navegador.'))}
+				onclick={abrirPdf}><FileText aria-hidden="true" size={16} strokeWidth={1.75} /> {t('Abrir o PDF')}</button>
 		{/if}
 	</p>
 {/snippet}
@@ -212,8 +221,8 @@
 			<p>{t('O seu texto não foi salvo. Veja o que muda do texto salvo para o seu e escolha.')}</p>
 			<p class="folha diferenca">{#each diferencaPorPalavra(conflito.corpo, corpo) as d, i (i)}{#if d.tipo === 'entrou'}<ins>{d.texto}</ins>{:else if d.tipo === 'saiu'}<del>{d.texto}</del>{:else}{d.texto}{/if}{/each}</p>
 			<div class="acoes">
-				<button class="botao" type="button" onclick={manterOMeu}>{t('Manter o meu texto')}</button>
-				<button class="botao botao--secundario" type="button" onclick={ficarComOSalvo}>{t('Ficar com o texto salvo')}</button>
+				<button class="botao" type="button" onclick={manterOMeu} {@attach dica(t('Salva o seu texto por cima do que a outra pessoa salvou.'))}>{t('Manter o meu texto')}</button>
+				<button class="botao botao--secundario" type="button" onclick={ficarComOSalvo} {@attach dica(t('Deixa o seu texto de lado e fica com o que a outra pessoa salvou.'))}>{t('Ficar com o texto salvo')}</button>
 			</div>
 		</section>
 	{/if}
@@ -236,12 +245,17 @@
 			{#if naoPublicado && doc.versao}{t('O comitê ainda lê a publicação anterior.')}{/if}
 		</p>
 		<div class="acoes">
-			<button class="botao botao--secundario" disabled={ocupado || salvo}>{t('Salvar rascunho')}</button>
+			<button class="botao botao--secundario" disabled={ocupado || salvo} {@attach dica(t('Guarda o texto para a mesa, sem publicar para o comitê.'))}>{t('Salvar rascunho')}</button>
 			{#if confirmando}
-				<button class="botao" type="button" disabled={ocupado} onclick={publicar}>{t('Confirmar: publicar para o comitê')}</button>
+				<button class="botao" type="button" disabled={ocupado} onclick={publicar} {@attach dica(t('O comitê passa a ler esta versão, ao vivo.'))}>{t('Confirmar: publicar para o comitê')}</button>
 				<button class="botao botao--secundario" type="button" onclick={() => (confirmando = false)}>{t('Cancelar')}</button>
 			{:else}
-				<button class="botao" type="button" disabled={ocupado || !titulo.trim() || (!naoPublicado && salvo)} onclick={publicar}
+				<button
+					class="botao"
+					type="button"
+					disabled={ocupado || !titulo.trim() || (!naoPublicado && salvo)}
+					{@attach dica(t('Pede confirmação e mostra esta versão a todo o comitê.'))}
+					onclick={publicar}
 					>{doc.versao ? t('Publicar alterações') : t('Publicar')}</button
 				>
 			{/if}
@@ -253,17 +267,29 @@
 		<div class="acoes">
 			<label class="opcao"><input type="checkbox" checked={doc.fixado} onchange={(e) => ajustar(e.currentTarget.checked, doc.arquivo)} /> {t('Fixar no topo')}</label>
 			{#if doc.versao}
-				<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => telao(!doc.no_telao)}
+				<button
+					class="botao botao--secundario botao--pequeno"
+					type="button"
+					{@attach dica(doc.no_telao ? t('A tela do projetor volta a mostrar a sessão.') : t('O documento aparece na tela do projetor da sala.'))}
+					onclick={() => telao(!doc.no_telao)}
 					><Projector aria-hidden="true" size={16} strokeWidth={1.75} /> {doc.no_telao ? t('Voltar o telão à sessão') : t('Mostrar no telão')}</button
 				>
 			{/if}
-			<label class="botao botao--secundario botao--pequeno">
+			<label class="botao botao--secundario botao--pequeno" {@attach dica(t('Um PDF que o comitê pode abrir junto com o texto.'))}>
 				<FileText aria-hidden="true" size={16} strokeWidth={1.75} />
 				{doc.arquivo ? t('Trocar o PDF') : t('Anexar um PDF')}
 				<input class="so-leitor" type="file" accept="application/pdf" disabled={ocupado} onchange={anexar} />
 			</label>
-			{#if doc.arquivo}<button class="botao botao--secundario botao--pequeno" type="button" onclick={tirarPdf}>{t('Tirar o PDF')}</button>{/if}
-			<button class="botao botao--secundario botao--pequeno" type="button" onclick={excluir}>{t('Excluir')}</button>
+			{#if doc.arquivo}<button
+					class="botao botao--secundario botao--pequeno"
+					type="button"
+					{@attach dica(t('Remove o arquivo anexado. O texto fica como está.'))}
+					onclick={tirarPdf}>{t('Tirar o PDF')}</button>{/if}
+			<button
+				class="botao botao--secundario botao--pequeno"
+				type="button"
+				{@attach dica(t('Apaga o documento, e o comitê deixa de vê-lo.'))}
+				onclick={excluir}>{t('Excluir')}</button>
 		</div>
 	</section>
 {:else}

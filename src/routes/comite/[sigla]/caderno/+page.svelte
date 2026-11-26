@@ -14,6 +14,7 @@
 	import NomeDelegacao from '#lib/ui/NomeDelegacao.svelte';
 	import Escolha from '#lib/ui/Escolha.svelte';
 	import AcaoEmModal from '#lib/ui/AcaoEmModal.svelte';
+	import { dica } from '#lib/dica.ts';
 	import Mic from '@lucide/svelte/icons/mic';
 	import NotebookPen from '@lucide/svelte/icons/notebook-pen';
 	import type { PageProps, Snapshot } from './$types';
@@ -27,9 +28,9 @@
 	const nomeDe = (id: string | null) => data.delegacoes.find((d) => d.id === id)?.nome ?? '';
 	const outras = $derived(data.delegacoes.filter((d) => d.id !== eu?.delegacao_id));
 	const ABAS = [
-		{ chave: 'nota', rotulo: t('Notas') },
-		{ chave: 'sobre', rotulo: t('Sobre as delegações') },
-		{ chave: 'fala', rotulo: t('Falas') }
+		{ chave: 'nota', rotulo: t('Notas'), dica: t('Anotações livres da sua delegação.') },
+		{ chave: 'sobre', rotulo: t('Sobre as delegações'), dica: t('O que vocês anotaram sobre cada delegação.') },
+		{ chave: 'fala', rotulo: t('Falas'), dica: t('Discursos escritos antes, com o tempo estimado de fala.') }
 	] as const;
 	let aba = $state<'nota' | 'sobre' | 'fala'>('nota');
 
@@ -106,7 +107,7 @@
 
 	<div class="abas" role="tablist" aria-label={t('Partes do caderno')}>
 		{#each ABAS as a (a.chave)}
-			<button class="aba" type="button" role="tab" aria-selected={aba === a.chave} onclick={() => (aba = a.chave)}>{a.rotulo}</button>
+			<button class="aba" type="button" role="tab" aria-selected={aba === a.chave} onclick={() => (aba = a.chave)} {@attach dica(a.dica)}>{a.rotulo}</button>
 		{/each}
 	</div>
 
@@ -161,7 +162,7 @@
 					</div>
 					<div class="acoes">
 						{#if a.tipo === 'fala'}
-							<button class="botao botao--pequeno" type="button" onclick={() => usarNaFala(a)}>{t('Usar na próxima fala')}</button>
+							<button class="botao botao--pequeno" type="button" onclick={() => usarNaFala(a)} {@attach dica(t('Abre o texto num quadro grande, para ler enquanto fala.'))}>{t('Usar na próxima fala')}</button>
 						{/if}
 						<!-- Passo 51: com bandeiras e modal, como o "Para" do bilhete; salva ao fechar a lista. -->
 						<Escolha
@@ -180,6 +181,7 @@
 						<button
 							class="botao botao--secundario botao--pequeno"
 							type="button"
+							{@attach dica(t('Tira a anotação do caderno de vez.'))}
 							onclick={() => confirm(t('Apagar esta anotação?')) && executar(supabase.rpc('apagar_anotacao', { p_id: a.id }), t('Anotação apagada.'))}
 							>{t('Apagar')}</button
 						>

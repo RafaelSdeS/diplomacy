@@ -14,6 +14,7 @@
 
 	import { aparencia, definirAparencia, definirTema, tema } from '#lib/preferencias.svelte.ts';
 	import AcaoEmModal from '#lib/ui/AcaoEmModal.svelte';
+	import { dica } from '#lib/dica.ts';
 	import UserPen from '@lucide/svelte/icons/user-pen';
 	let { data }: PageProps = $props();
 
@@ -161,8 +162,8 @@
 			<button class="botao">{t('Salvar perfil')}</button>
 		</form>
 	</AcaoEmModal>
-	<a class="botao botao--secundario" href="/perfil/meus-dados">{t('Meus dados (LGPD)')}</a>
-	<a class="botao botao--secundario" href="/pesquisa">{t('Pesquisa de satisfação')}</a>
+	<a class="botao botao--secundario" href="/perfil/meus-dados" {@attach dica(t('Baixe tudo o que o app guarda sobre você ou peça a exclusão da conta.'))}>{t('Meus dados (LGPD)')}</a>
+	<a class="botao botao--secundario" href="/pesquisa" {@attach dica(t('Uma pesquisa anônima e curta sobre como o app ajudou no evento.'))}>{t('Pesquisa de satisfação')}</a>
 </div>
 
 <div class="cartoes">
@@ -176,7 +177,9 @@
 						{[rotuloPapel(p.papel), p.delegacao_nome, p.comite_sigla, p.evento_nome].filter(Boolean).join(' · ')}
 					</span>
 					{#if p.delegacao_id && p.comite_sigla}
-						<a class="botao botao--secundario botao--pequeno" href={`/comite/${p.comite_sigla}/delegacao/${p.delegacao_id}`}>{t('Página da delegação')}</a>
+						<a class="botao botao--secundario botao--pequeno" href={`/comite/${p.comite_sigla}/delegacao/${p.delegacao_id}`}
+							{@attach dica(t('Os delegados e os documentos abertos da sua delegação.'))}>{t('Página da delegação')}</a
+						>
 					{/if}
 				</li>
 			{/each}
@@ -228,7 +231,12 @@
 			{:else if push === 'bloqueado'}
 				<p>{t('As notificações estão bloqueadas nas configurações do navegador para este site.')}</p>
 			{:else}
-				<button class="botao botao--secundario" disabled={mudandoPush} onclick={alternarPush}>
+				<button
+					class="botao botao--secundario"
+					disabled={mudandoPush}
+					onclick={alternarPush}
+					{@attach dica(push === 'ativo' ? t('Para de receber os avisos fora do app neste aparelho.') : t('Recebe os avisos importantes mesmo com o app fechado.'))}
+				>
 					{push === 'ativo' ? t('Desativar notificações neste aparelho') : t('Ativar notificações neste aparelho')}
 				</button>
 			{/if}

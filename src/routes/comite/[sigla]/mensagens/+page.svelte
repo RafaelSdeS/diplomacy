@@ -22,6 +22,7 @@
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import ResponderEntrevista from '#lib/ui/ResponderEntrevista.svelte';
 	import AcaoEmModal from '#lib/ui/AcaoEmModal.svelte';
+	import { dica } from '#lib/dica.ts';
 	import NomeDelegacao from '#lib/ui/NomeDelegacao.svelte';
 	import MessageSquarePlus from '@lucide/svelte/icons/message-square-plus';
 	import Send from '@lucide/svelte/icons/send';
@@ -266,7 +267,7 @@
 	<!-- Bloquear quem escreveu fica no "Mais opções" da conversa; o resto dos bloqueios, e a
 	     moderação da mesa, num modal: a conversa fica com a tela. -->
 	{#if eu}
-		<AcaoEmModal rotulo={bloqueei.size ? `${t('Bloqueios')} (${bloqueei.size})` : t('Bloqueios')} titulo={t('Bloqueios')} icone={Ban} secundario>
+		<AcaoEmModal rotulo={bloqueei.size ? `${t('Bloqueios')} (${bloqueei.size})` : t('Bloqueios')} titulo={t('Bloqueios')} icone={Ban} secundario descricao={t('Escolha de quais delegações a sua não recebe bilhetes.')}>
 			<h4>{t('Sua delegação não recebe bilhetes de')}</h4>
 			<ul class="lista">
 				{#each data.delegacoes.filter((d) => bloqueei.has(d.id)) as d (d.id)}
@@ -276,6 +277,7 @@
 							class="botao botao--secundario botao--pequeno"
 							type="button"
 							aria-label={t('Desbloquear {delegacao}', { delegacao: d.nome })}
+							{@attach dica(t('Esta delegação volta a poder mandar bilhetes à sua.'))}
 							onclick={() => bloquearBilhetes(d.id, false)}>{t('Desbloquear')}</button
 						>
 					</li>
@@ -310,7 +312,12 @@
 			{/if}
 		</AcaoEmModal>
 	{:else if ehMesa}
-		<AcaoEmModal rotulo={t('Moderação dos bilhetes')} icone={ShieldCheck} secundario>
+		<AcaoEmModal
+			rotulo={t('Moderação dos bilhetes')}
+			icone={ShieldCheck}
+			secundario
+			descricao={t('Se a mesa lê os bilhetes, se eles ficam bloqueados e quais ocultar.')}
+		>
 		<section aria-labelledby="t-regra">
 			<h4 id="t-regra">{t('Regra dos bilhetes')}</h4>
 			<form
@@ -322,7 +329,7 @@
 			>
 				<label class="opcao"><input type="checkbox" bind:checked={mesaLe} /> {t('A mesa pode ler os bilhetes')}</label>
 				<label class="opcao"><input type="checkbox" bind:checked={bloqueados} /> {t('Bloquear os bilhetes')}</label>
-				<button class="botao botao--secundario">{t('Salvar a regra')}</button>
+				<button class="botao botao--secundario" {@attach dica(t('Vale na hora para todas as delegações do comitê.'))}>{t('Salvar a regra')}</button>
 			</form>
 		</section>
 		{#if data.bloqueios.length}
@@ -351,6 +358,7 @@
 									class="botao botao--secundario botao--pequeno"
 									type="button"
 									onclick={() => executar(supabase.rpc('ocultar_mensagem', { p_mensagem: m.id, p_motivo: t('Fora do personagem') }), t('Bilhete ocultado.'))}
+									{@attach dica(t('Esconde o bilhete das delegações, por estar fora do personagem.'))}
 									>{t('Ocultar')}</button
 								>
 							{/if}
@@ -476,6 +484,7 @@
 						type="button"
 						aria-current={c.id === aberta ? 'true' : undefined}
 						onclick={() => abrir(c.id)}
+						{@attach dica(t('Abre a conversa e marca as mensagens como lidas.'))}
 					>
 						<span class="chat-avatar" aria-hidden="true"
 							>{#if c.delegacao}<Bandeira codigo={c.delegacao.bandeira} />{:else if c.tipo === 'interno'}<Siren size={18} strokeWidth={1.75} />{:else if c.tipo === 'bloco'}<Users size={18} strokeWidth={1.75} />{:else}<Gavel
@@ -512,9 +521,10 @@
 				{#if c.tipo === 'bilhete' && eu && c.destino}
 					{@const destino = c.destino}
 					<details class="mais-opcoes">
-						<summary class="botao botao--secundario botao--pequeno">{t('Mais opções')}</summary>
+						<summary class="botao botao--secundario botao--pequeno" {@attach dica(t('Mostra a opção de bloquear os bilhetes desta delegação.'))}>{t('Mais opções')}</summary>
 						<div class="mais-opcoes-corpo">
 							<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => bloquearBilhetes(destino, !bloqueei.has(destino))}
+								{@attach dica(bloqueei.has(destino) ? t('Esta delegação volta a poder mandar bilhetes à sua.') : t('Esta delegação deixa de mandar bilhetes à sua. Dá para desfazer.'))}
 								>{bloqueei.has(destino) ? t('Desbloquear {delegacao}', { delegacao: c.titulo }) : t('Bloquear bilhetes desta delegação')}</button
 							>
 						</div>
@@ -541,6 +551,7 @@
 									type="button"
 									onclick={() =>
 										executar(supabase.rpc('denunciar_mensagem', { p_mensagem: m.id, p_motivo: t('Fora do personagem ou ofensivo') }), t('Bilhete denunciado à mesa.'))}
+									{@attach dica(t('Avisa a mesa que esta mensagem está fora do personagem ou é ofensiva.'))}
 									>{t('Denunciar à mesa')}</button
 								>
 							</details>
@@ -565,7 +576,7 @@
 						bind:value={escrita[c.id]}
 						onkeydown={teclaEnviar}
 					></textarea>
-					<button class="botao"><Send aria-hidden="true" size={16} strokeWidth={1.75} /> {t('Enviar')}</button>
+					<button class="botao" {@attach dica(t('Manda a mensagem para {quem}.', { quem: c.titulo }))}><Send aria-hidden="true" size={16} strokeWidth={1.75} /> {t('Enviar')}</button>
 				</form>
 			{:else}
 				<p class="suave chat-aviso">

@@ -4,7 +4,7 @@ App web tudo em um para simulações da ONU (MUNs), começando pelo [UFRGSMUN](h
 
 **No ar:** [diplomacy.rafesilvadesouza.workers.dev](https://diplomacy.rafesilvadesouza.workers.dev). Não há cadastro livre: as contas são criadas pela secretaria.
 
-> **Status:** os passos 01 a 47 estão prontos (do 45, só a parte A), e o piloto está [publicado](https://diplomacy.rafesilvadesouza.workers.dev). Os comitês funcionam em português e em inglês; a secretaria, só em português. A etapa atual é a interface: o passo 47 (modais, fichas, menus de escolha, confirmação e desfazer, cabeçalho com ícones) está pronto; o passo 52 (testes rápidos) e os lotes 0 e 0b do passo 51 (ações em botões e modais, cabeçalho só com ícones, caderno de qualquer lugar, quem preside à vista, mensagens como conversas e a aba do DPO) também, assim como a presidência e a Agora sem rolagem (lotes 1 e 2); o próximo é a sessão de teste do piloto. A sessão de teste com pessoas, pelo roteiro em [docs/piloto.md](docs/piloto.md), vem depois; em seguida, o 45 parte B e o 48.
+> **Status (26/11/2026):** os passos até o 63 estão prontos e no ar, incluindo o working paper de toda a sala e o projeto por tópico. Os comitês funcionam em português e em inglês; a secretaria, só em português. A próxima etapa é a sessão de teste do piloto, pelo roteiro em [docs/piloto.md](docs/piloto.md).
 
 ## O problema
 
@@ -36,18 +36,59 @@ As regras de procedimento seguem as Rules of Procedure do UNOCT 2026, que valem 
 - Acessível (WCAG 2.2 AA) e privado por padrão (LGPD).
 - Aparência leve, profissional, diplomática, limpa e com cara de oficial: base clara, azul-marinho, dourado discreto, serifa nos títulos e selos no estilo carimbo.
 
-## Stack
+## Como é feito
 
-| Peça | Piloto (grátis, poucos usuários) | Evento completo |
-|---|---|---|
-| Interface | SvelteKit em modo SPA, responsivo | Igual, mais PWA com cache completo |
-| Hospedagem | Cloudflare Workers, só arquivos estáticos (grátis) | Igual |
-| Backend | Supabase grátis, região São Paulo | Supabase Pro no mês do evento |
-| Tempo real | Postgres Changes | Broadcast a partir do banco |
-| Login | Google e e-mail com senha | Mais QR do crachá e link/código por e-mail |
-| Idioma | Português | Português e inglês |
+Para quem quiser os detalhes técnicos. Os números são de 26/11/2026.
 
-Detalhes e justificativas na seção 16 do plano.
+### Arquitetura
+
+- **Sem servidor próprio.** A interface é uma SPA em [SvelteKit](https://svelte.dev/docs/kit) (Svelte 5, TypeScript), gerada como arquivos estáticos (`adapter-static`) e servida pelo Cloudflare Workers (`wrangler.jsonc`: só arquivos, qualquer rota devolve o `index.html`).
+- **A lógica fica no banco.** O app fala direto com o [Supabase](https://supabase.com) (Postgres, região São Paulo). Toda escrita passa por funções do banco (RPC, `security definer`), que conferem quem chama: mesa, presidência da sessão, redator do bloco, equipe de crise, press ou secretaria. A leitura é filtrada pela RLS, ligada em todas as tabelas.
+- **Duas Edge Functions** (Deno, em `supabase/functions/`): `entrar-com-cracha` (o login pelo QR do crachá) e `enviar-push` (as notificações Web Push).
+
+### Banco de dados
+
+- **Postgres no Supabase:** cerca de 76 tabelas, 230 funções, 95 políticas de RLS e 84 gatilhos, criados por 51 migrações em `supabase/migrations/` (sempre novas, nunca editadas depois de publicadas).
+- **Principais grupos de tabelas:** evento, comitês, delegações e participações (os papéis); sessão, presença, lista de oradores, pontos e moções, votações e votos; agenda e itens; documentos, cláusulas, propostas, posições, comentários e assinaturas; blocos e mensagens; crise (atualizações, incidentes e notas); press (veículos, notícias, entrevistas e coletiva); DPOs, cartas, caderno, avisos, cronograma, credenciais e registros.
+- **Regras de procedimento por comitê:** os valores que mudam de um comitê para outro (mínimo de assinaturas, maiorias, veto, unanimidade, tecnologia restrita) ficam num JSON com padrões, em `regras_do_guia()`, e são conferidos no banco.
+- **Privacidade:** dados pessoais mínimos, exclusão ao fim do evento (LGPD) e testes que conferem que nada vaza entre contas e comitês.
+
+### Tempo real, dados móveis e sem internet
+
+- **Tempo real:** os gatilhos do banco avisam pelo Realtime Broadcast do Supabase, em canais privados por comitê, documento, delegação, bloco, mesa e crise (`transmitir()` e `pode_ouvir()`). O aviso só diz o que mudou, e a tela relê só essas leituras (`src/lib/tempo-real.ts`), o que economiza dados no celular.
+- **Sem internet:** um service worker (`src/service-worker/`) guarda os arquivos do app e, por conta, as últimas leituras (por até 12 horas). A caixa de saída (IndexedDB) guarda o que foi enviado sem rede e reenvia sozinha, sem duplicar: o id de cada mensagem, nota ou proposta nasce no aparelho.
+- **Leveza:** a primeira abertura baixa no máximo 300 KB comprimidos (`npm run tamanho`); bandeiras e telas vêm só quando aparecem.
+
+### Interface
+
+- Svelte 5 com runes; componentes em `src/lib/ui/`; a lógica pura em `src/lib/*.ts`, com testes de unidade ao lado.
+- Ícones [Lucide](https://lucide.dev), bandeiras [flag-icons](https://flagicons.lipis.dev), fonte Spectral nos títulos, CSS próprio com variáveis de cor e tema escuro (`src/app.css`).
+- Idiomas: português e inglês, com o dicionário em `src/lib/i18n-en.ts`; um teste confere que todo texto da tela e toda mensagem de erro do banco têm tradução.
+- Acessibilidade (WCAG 2.2 AA): o axe roda nos testes de ponta a ponta, nos dois temas; toda ação tem dica ao passar o mouse e no foco do teclado (`src/lib/dica.ts`).
+
+### Testes e CI
+
+- **Banco:** pgTAP, 40 arquivos e cerca de 640 verificações (`supabase/tests/`).
+- **Unidade:** Vitest, 34 arquivos e 140 testes (`src/lib/*.test.ts`).
+- **Ponta a ponta:** Playwright, 54 arquivos e cerca de 290 testes, no celular (360 px), no notebook (1366 × 768) e no telão (1920 × 1080), com capturas de tela comparadas sempre no mesmo contêiner (`npm run capturas`).
+- **CI:** GitHub Actions em três partes (rápido, banco e ponta a ponta), com o Supabase local de verdade.
+
+### Estrutura do repositório
+
+```text
+src/
+  routes/          as telas (Agora, comitê, sessão, documentos, crise, press, secretaria, telão...)
+  lib/             lógica pura (regras, sessão, tempo real, idioma...) e os testes de unidade
+  lib/ui/          componentes (modais, fichas, trilha do tópico, cronômetro, placa...)
+  service-worker/  cache do app e das leituras, para abrir sem internet
+supabase/
+  migrations/      o banco inteiro: tabelas, RLS, funções e gatilhos
+  tests/           testes do banco (pgTAP)
+  functions/       Edge Functions (login pelo crachá, notificações)
+tests/             testes de ponta a ponta (Playwright) e capturas de referência
+scripts/           seed, evento de demonstração, carga, chaves de push e medidas
+docs/              plano do app, passos de implementação, regras, piloto e publicação
+```
 
 ## Plano de implementação
 

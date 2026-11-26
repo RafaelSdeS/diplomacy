@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { t } from '#lib/i18n.svelte.ts';
+	import { dica } from '#lib/dica.ts';
 	import { mensagemDeErro } from '#lib/sessao.ts';
 	import { supabase } from '#lib/supabase.ts';
 	import Modal from './Modal.svelte';
@@ -34,6 +35,7 @@
 </script>
 
 <button class="botao botao--pequeno" type="button" aria-label={`${t('Responder')}: ${veiculo}, ${entrevista.tema}`} onclick={() => modal?.abrir()}
+	{@attach dica(t('Abre o pedido para aceitar com um horário ou recusar.'))}
 	>{t('Responder')}</button
 >
 <Modal bind:this={modal} rotulo={id}>
@@ -45,8 +47,9 @@
 	</label>
 	{#if erro}<p class="erro" role="alert">{erro}</p>{/if}
 	<div class="acoes">
-		<button class="botao" type="button" disabled={!horario} onclick={() => responder(true)}>{t('Aceitar')}</button>
-		<button class="botao botao--secundario" type="button" onclick={() => responder(false)}>{t('Recusar')}</button>
+		<button class="botao" type="button" disabled={!horario} onclick={() => responder(true)} {@attach dica(t('Aceita a entrevista no horário escolhido; o veículo fica sabendo.'))}>{t('Aceitar')}</button>
+		<button class="botao botao--secundario" type="button" onclick={() => responder(false)} {@attach dica(t('Recusa o pedido; o veículo fica sabendo.'))}>
+{t('Recusar')}</button>
 		<button class="botao botao--secundario" type="button" onclick={() => modal?.fechar()}>{t('Cancelar')}</button>
 	</div>
 </Modal>

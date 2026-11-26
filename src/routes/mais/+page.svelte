@@ -2,6 +2,7 @@
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { t } from '#lib/i18n.svelte.ts';
 	import { menu } from '#lib/menu.ts';
+	import { dica } from '#lib/dica.ts';
 	import CircleUser from '@lucide/svelte/icons/circle-user';
 	import Languages from '@lucide/svelte/icons/languages';
 	import LogOut from '@lucide/svelte/icons/log-out';
@@ -61,14 +62,14 @@
 		</a>
 	</li>
 	<li>
-		<button type="button" onclick={alternarTema}>
+		<button type="button" onclick={alternarTema} {@attach dica(t('Troca as cores da tela entre claro e escuro.'))}>
 			{#if escuro}<Sun aria-hidden="true" size={24} strokeWidth={1.5} />{:else}<Moon aria-hidden="true" size={24} strokeWidth={1.5} />{/if}
 			<span class="grade-atalhos-nome">{escuro ? t('Usar o tema claro') : t('Usar o tema escuro')}</span>
 			<span class="grade-atalhos-descricao">{t('Só neste aparelho')}</span>
 		</button>
 	</li>
 	<li>
-		<button type="button" onclick={() => data.usuario && alternarIdioma(data.usuario.id)}>
+		<button type="button" onclick={() => data.usuario && alternarIdioma(data.usuario.id)} {@attach dica(t('Muda o idioma do app entre português e inglês.'))}>
 			<Languages aria-hidden="true" size={24} strokeWidth={1.5} />
 			<span class="grade-atalhos-nome" lang={idioma.atual === 'en' ? 'pt-BR' : 'en'}
 				>{idioma.atual === 'en' ? TROCAR_IDIOMA.pt : TROCAR_IDIOMA.en}</span
@@ -77,7 +78,7 @@
 		</button>
 	</li>
 	<li>
-		<button type="button" onclick={pedirSaida}>
+		<button type="button" onclick={pedirSaida} {@attach dica(t('Sai da sua conta neste aparelho; antes, pede para confirmar.'))}>
 			<LogOut aria-hidden="true" size={24} strokeWidth={1.5} />
 			<span class="grade-atalhos-nome">{t('Sair')}</span>
 			<span class="grade-atalhos-descricao">{t('Remove os dados desta sessão do aparelho')}</span>

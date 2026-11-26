@@ -6,6 +6,8 @@
 	import { mensagemDeErro } from '#lib/sessao.ts';
 	import { supabase } from '#lib/supabase.ts';
 	import type { PageProps, Snapshot } from './$types';
+	import { t } from '#lib/i18n.svelte.ts';
+	import { dica } from '#lib/dica.ts';
 
 	let { data }: PageProps = $props();
 
@@ -98,9 +100,9 @@
 {#if temCamera}
 	<p>
 		{#if lendo}
-			<button class="botao botao--secundario" type="button" onclick={parar}>Parar a câmera</button>
+			<button class="botao botao--secundario" type="button" onclick={parar} {@attach dica(t('Fecha a câmera sem marcar ninguém.'))}>Parar a câmera</button>
 		{:else}
-			<button class="botao" type="button" onclick={lerCracha}>Ler o QR do crachá</button>
+			<button class="botao" type="button" onclick={lerCracha} {@attach dica(t('Abre a câmera e marca a presença de quem mostrar o QR do crachá.'))}>Ler o QR do crachá</button>
 		{/if}
 	</p>
 	{#if lendo}<video class="leitor-qr" bind:this={video} muted playsinline></video>{/if}
@@ -129,12 +131,13 @@
 			<span class="acoes">
 				{#if presente}
 					<span class="selo selo--ok">Presente</span>
-					<button class="botao botao--secundario botao--pequeno" type="button" aria-label={`Desfazer a presença de ${p.nome}`} onclick={() => marcar(p.email, false)}>Desfazer</button>
+					<button class="botao botao--secundario botao--pequeno" type="button" aria-label={`Desfazer a presença de ${p.nome}`} onclick={() => marcar(p.email, false)} {@attach dica(t('Tira a presença de hoje desta pessoa.'))}>Desfazer</button>
 				{:else}
-					<button class="botao botao--pequeno" type="button" aria-label={`Marcar presença de ${p.nome}`} onclick={() => marcar(p.email, true)}>Marcar presença</button>
+					<button class="botao botao--pequeno" type="button" aria-label={`Marcar presença de ${p.nome}`} onclick={() => marcar(p.email, true)} {@attach dica(t('Registra que esta pessoa chegou hoje.'))}>Marcar presença</button>
 				{/if}
-				<button class="botao botao--secundario botao--pequeno" type="button" aria-label={`Gerar código de acesso para ${p.nome}`} onclick={() => gerarCodigo(p.email, p.nome)}>Gerar código</button>
-				<button class="botao botao--secundario botao--pequeno" type="button" aria-label={`Revogar o crachá de ${p.nome}`} onclick={() => revogar(p.email, p.nome)}>Revogar crachá</button>
+				<button class="botao botao--secundario botao--pequeno" type="button" aria-label={`Gerar código de acesso para ${p.nome}`} onclick={() => gerarCodigo(p.email, p.nome)} {@attach dica(t('Cria um código de entrada de 30 minutos para quem perdeu o crachá.'))}>Gerar código</button>
+				<button class="botao botao--secundario botao--pequeno" type="button" aria-label={`Revogar o crachá de ${p.nome}`} onclick={() => revogar(p.email, p.nome)} {@attach dica(t('O crachá e os códigos desta pessoa deixam de entrar no app.'))}>
+Revogar crachá</button>
 			</span>
 		</li>
 	{:else}

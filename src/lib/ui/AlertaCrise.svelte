@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { t } from '#lib/i18n.svelte.ts';
+	import { dica } from '#lib/dica.ts';
 	import { formatarTempo } from '#lib/cronometro.ts';
 	import { segundosAtePrazo, type Incidente } from '#lib/crise.ts';
 	import Modal from '#lib/ui/Modal.svelte';
@@ -36,7 +37,9 @@
 				<h2 id={`crise-${i.id}`}>{i.titulo}</h2>
 				<p class="alerta-crise-prazo" aria-live="off">{prazo(i)}</p>
 				<button class="botao botao--secundario botao--pequeno" type="button" aria-label={t('Ler o briefing: {titulo}', { titulo: i.titulo })} onclick={() => (lendo = i.id)}
+					{@attach dica(t('Abre o briefing inteiro da crise, com quem foi atingido.'))}
 					>{t('Ler o briefing')}</button
+
 				>
 			</div>
 			<!-- Compacta, só a linha de cima: quem foi atingido e o briefing ficam no modal. -->

@@ -5,6 +5,8 @@
 	import { mensagemDeErro } from '#lib/sessao.ts';
 	import { supabase } from '#lib/supabase.ts';
 	import type { PageProps } from './$types';
+	import { t } from '#lib/i18n.svelte.ts';
+	import { dica } from '#lib/dica.ts';
 
 	let { data }: PageProps = $props();
 
@@ -124,7 +126,8 @@
 				{#each resultado.problemas as p (p.linha)}<li>Linha {p.linha}: {p.mensagem}</li>{/each}
 			</ul>
 		{/if}
-		<button class="botao" type="button" disabled={enviando || !resultado.convites.length} onclick={criar}>
+		<button class="botao" type="button" disabled={enviando || !resultado.convites.length} onclick={criar} {@attach dica(t('Cria os convites da prévia; as linhas com problema ficam de fora.'))}>
+
 			Criar {resultado.convites.length} convites
 		</button>
 	</section>

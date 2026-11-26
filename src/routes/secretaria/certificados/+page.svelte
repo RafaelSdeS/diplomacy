@@ -4,6 +4,8 @@
 	import { mensagemDeErro } from '#lib/sessao.ts';
 	import { supabase } from '#lib/supabase.ts';
 	import type { PageProps } from './$types';
+	import { t } from '#lib/i18n.svelte.ts';
+	import { dica } from '#lib/dica.ts';
 
 	let { data }: PageProps = $props();
 	let erro = $state('');
@@ -38,6 +40,7 @@
 {/if}
 
 <p class="acoes">
-	<button class="botao" type="button" onclick={emitir}>Emitir certificados</button>
-	{#if data.certificados}<a class="botao botao--secundario" href="/imprimir/certificados">Imprimir os certificados</a>{/if}
+	<button class="botao" type="button" onclick={emitir} {@attach dica(t('Cria o certificado de quem fez check-in e ainda não tem o seu.'))}>Emitir certificados</button>
+	{#if data.certificados}<a class="botao botao--secundario" href="/imprimir/certificados" {@attach dica(t('Abre os certificados emitidos para imprimir ou salvar em PDF.'))}>
+Imprimir os certificados</a>{/if}
 </p>

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { t } from '#lib/i18n.svelte.ts';
+	import { dica } from '#lib/dica.ts';
 	import { formatarQuando } from '#lib/cronograma.ts';
 	import { TIPOS_NOTICIA } from '#lib/press.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
@@ -21,15 +22,16 @@
 <h1>{t('Capa')}</h1>
 
 <p class="acoes">
-	<a class="botao botao--secundario" href="/press/coletiva">{t('Coletiva de imprensa')}</a>
-	{#if data.minhaPress.length}<a class="botao botao--secundario" href="/press/entrevistas">{t('Entrevistas')}</a>{/if}
+	<a class="botao botao--secundario" href="/press/coletiva" {@attach dica(t('Abre a pauta de perguntas da press às delegações.'))}>{t('Coletiva de imprensa')}</a>
+	{#if data.minhaPress.length}<a class="botao botao--secundario" href="/press/entrevistas" {@attach dica(t('Pede entrevistas às delegações e mostra as respostas.'))}>{t('Entrevistas')}</a>{/if}
 </p>
 
 {#if data.minhaPress.length}
 	<p class="acoes">
-		<a class="botao" href="/press/escrever">{t('Escrever matéria')}</a>
+		<a class="botao" href="/press/escrever" {@attach dica(t('Abre o editor para escrever e publicar uma matéria.'))}>{t('Escrever matéria')}</a>
 		{#each data.minhaPress as sigla (sigla)}
-			<a class="botao botao--secundario" href={`/press/${sigla}`}>{t('Meu veículo')} ({sigla})</a>
+			<a class="botao botao--secundario" href={`/press/${sigla}`} {@attach dica(t('Abre a página do seu veículo, com as matérias publicadas.'))}>
+{t('Meu veículo')} ({sigla})</a>
 		{/each}
 	</p>
 {/if}

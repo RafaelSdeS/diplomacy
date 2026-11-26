@@ -5,6 +5,7 @@
 	// paper ou o projeto da sala, o painel da mesa, a sessão). Completa (Agenda, Documentos): com a
 	// linha do que fazer agora. Compacta (Sessão): sem ela, que a linha do comitê já diz.
 	import { t } from '#lib/i18n.svelte.ts';
+	import { dica } from '#lib/dica.ts';
 	import { ETAPAS, estadoDaEtapa, etapaAtual, oQueFazer, ROTULO_ETAPA, type Doc, type Etapa } from '#lib/ordem.ts';
 	import Check from '@lucide/svelte/icons/check';
 	import FileText from '@lucide/svelte/icons/file-text';
@@ -46,6 +47,21 @@
 		acao: mesa ? `/comite/${sigla}/sessao/presidencia` : `/comite/${sigla}/sessao`,
 		resolucao: `/comite/${sigla}/votacoes`
 	});
+	// A dica de cada etapa diz aonde ela leva; na aba Documentos, o botão abre os documentos dela.
+	const dicaDoLink = $derived<Record<Etapa, string>>({
+		agenda: t('Abre a agenda do tópico, com os itens e as propostas.'),
+		working_papers: daSala('working_paper') ? t('Abre o working paper da sala.') : t('Abre a lista de documentos do comitê.'),
+		projeto: daSala('projeto') ? t('Abre o projeto de resolução da sala.') : t('Abre a lista de documentos do comitê.'),
+		acao: mesa ? t('Abre o painel da presidência.') : t('Abre a sessão do comitê.'),
+		resolucao: t('Abre os resultados das votações do comitê.')
+	});
+	const dicaDoBotao = $derived<Record<Etapa, string>>({
+		agenda: '',
+		working_papers: t('Abre os working papers deste tópico.'),
+		projeto: t('Abre os projetos de resolução deste tópico.'),
+		acao: t('Abre os projetos de resolução deste tópico.'),
+		resolucao: t('Abre as resoluções deste tópico.')
+	});
 </script>
 
 <nav class={['trilha-topico', compacta && 'trilha-topico--compacta']} aria-label={t('Ordem do tópico {n}', { n: topico })}>
@@ -61,9 +77,11 @@
 					{#if !compacta && estado !== 'depois' && contagem[etapa]}<span class="detalhe">{contagem[etapa]}</span>{/if}
 				{/snippet}
 				{#if onetapa && etapa !== 'agenda'}
-					<button type="button" aria-current={estado === 'atual' ? 'step' : undefined} onclick={() => onetapa(etapa)}>{@render conteudo()}</button>
+					<button type="button" aria-current={estado === 'atual' ? 'step' : undefined} onclick={() => onetapa(etapa)} {@attach dica(dicaDoBotao[etapa])}>{@render conteudo()}</button>
 				{:else}
 					<a href={destino[etapa]} aria-current={estado === 'atual' ? 'step' : undefined} title={compacta ? ROTULO_ETAPA()[etapa] : undefined}
+						{@attach dica(dicaDoLink[etapa])}
+
 						>{@render conteudo()}</a
 					>
 				{/if}

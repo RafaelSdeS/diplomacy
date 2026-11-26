@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type House from '@lucide/svelte/icons/house';
+	import { dica } from '#lib/dica.ts';
 	import Modal from './Modal.svelte';
 
 	// Passo 51 (lote 0): criar algo é um botão com ícone e verbo, e o formulário abre num
@@ -26,7 +27,8 @@
 	}
 </script>
 
-<button class={['botao', secundario && 'botao--secundario']} type="button" onclick={abrir}
+<!-- Passo 62 (lote 6): a explicação do modal é também a dica do botão. -->
+<button class={['botao', secundario && 'botao--secundario']} type="button" onclick={abrir} {@attach dica(descricao)}
 	><Icone aria-hidden="true" size={18} strokeWidth={1.75} /> {rotulo}</button
 >
 <Modal bind:this={modal} rotulo={id} classe="modal-acao">

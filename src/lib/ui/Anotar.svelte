@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { invalidate } from '$app/navigation';
 	import { t } from '#lib/i18n.svelte.ts';
+	import { dica } from '#lib/dica.ts';
 	import { anotacao } from '#lib/ficha.svelte.ts';
 	import { caixa, mensagemDoEnvio } from '#lib/caixa.ts';
 	import { contador } from '#lib/contador.ts';
@@ -103,7 +104,7 @@
 		</label>
 		{#if erro}<p class="erro" role="alert">{erro}</p>{/if}
 		<div class="acoes">
-			<button class="botao" disabled={enviando}>{t('Guardar no caderno')}</button>
+			<button class="botao" disabled={enviando} {@attach dica(t('Salva a anotação no caderno, ligada à delegação escolhida.'))}>{t('Guardar no caderno')}</button>
 			<button class="botao botao--secundario" type="button" onclick={() => modal?.fechar()}>{t('Fechar')}</button>
 		</div>
 	</form>
@@ -132,7 +133,8 @@
 			{/each}
 		</ul>
 		{#if eu?.comite_sigla && eu.papel === 'delegado'}
-			<p><a class="botao botao--secundario botao--pequeno" href={`/comite/${eu.comite_sigla}/caderno`} onclick={() => modal?.fechar()}>{t('Abrir o caderno completo')}</a></p>
+			<p><a class="botao botao--secundario botao--pequeno" href={`/comite/${eu.comite_sigla}/caderno`} onclick={() => modal?.fechar()} {@attach dica(t('Abre a página do caderno com todas as anotações da delegação.'))}>{t('Abrir o caderno completo')}
+</a></p>
 		{/if}
 	</section>
 </Modal>

@@ -15,6 +15,7 @@
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import FichaNota from '#lib/ui/FichaNota.svelte';
 	import AcaoEmModal from '#lib/ui/AcaoEmModal.svelte';
+	import { dica } from '#lib/dica.ts';
 	import Siren from '@lucide/svelte/icons/siren';
 	import type { PageProps } from './$types';
 
@@ -145,7 +146,11 @@
 						<span>
 							<span class="selo {SELO_NOTA[status]}">{STATUS_NOTA[status]}</span>
 							{#if nota.posicao}<span class="selo">{t('{n}ª na fila', { n: nota.posicao })}</span>{/if}
-							<strong><button class="abre-ficha" type="button" onclick={() => (notaVista = nota.id)}>{nota.titulo}</button></strong>
+							<strong
+								><button class="abre-ficha" type="button" onclick={() => (notaVista = nota.id)} {@attach dica(t('Mostra a nota e a resposta da equipe de crise.'))}
+									>{nota.titulo}</button
+								></strong
+							>
 							<span class="detalhe"
 								>{nota.tipo === 'nota' ? t('Nota') : t('Diretiva')} · {formatarEspera(minutosDesde(nota.criado_em, agora))}</span
 							>

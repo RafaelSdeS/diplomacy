@@ -2,6 +2,7 @@
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { contador } from '#lib/contador.ts';
 	import { t } from '#lib/i18n.svelte.ts';
+	import { dica } from '#lib/dica.ts';
 	import { rotuloPapel } from '#lib/papeis.ts';
 	import { mensagemDeErro } from '#lib/sessao.ts';
 	import { supabase, type Papel } from '#lib/supabase.ts';
@@ -79,6 +80,6 @@
 		{#if erro}
 			<p class="erro" role="alert">{erro}</p>
 		{/if}
-		<button class="botao">{t('Enviar respostas')}</button>
+		<button class="botao" {@attach dica(t('Manda a pesquisa sem o seu nome. Depois não dá para mudar.'))}>{t('Enviar respostas')}</button>
 	</form>
 {/if}

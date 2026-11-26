@@ -6,6 +6,7 @@
 	import { invalidate } from '$app/navigation';
 	import { mensagemDeErro } from '#lib/sessao.ts';
 	import { supabase } from '#lib/supabase.ts';
+	import { dica } from '#lib/dica.ts';
 	import { FASES, presidenciaEmVigor } from '#lib/votacao.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import Bandeira from '#lib/ui/Bandeira.svelte';
@@ -87,6 +88,7 @@
 				class="botao botao--secundario"
 				type="button"
 				onclick={() => executar(supabase.rpc('sortear_presidencia', { p_comite: data.comite.id }), t('Não foi possível sortear.'))}
+				{@attach dica(t('Sorteia a ordem em que as delegações membros presidem as sessões.'))}
 			>
 				{data.rodizio.length ? t('Sortear de novo') : t('Sortear a ordem')}
 			</button>
@@ -109,6 +111,7 @@
 				class="botao"
 				type="button"
 				onclick={() => executar(supabase.rpc('abrir_sessao', { p_comite: data.comite.id }), t('Não foi possível abrir a sessão.'))}
+				{@attach dica(t('Começa uma nova sessão; em seguida, faça a chamada aqui.'))}
 				>{t('Abrir sessão')}</button
 			>
 		{/if}
@@ -127,6 +130,7 @@
 					type="button"
 					onclick={() =>
 						executar(supabase.rpc('marcar_todas_presentes', { p_comite: data.comite.id }), t('Não foi possível marcar a presença.'))}
+					{@attach dica(t('Para começar rápido; depois, toque nas que faltaram.'))}
 					>{t('Marcar todas como presentes')}</button
 				>
 			</p>
@@ -137,7 +141,13 @@
 				{#each filtrarDelegacoes(previstas, busca) as d (d.id)}
 					{@const presente = presentes.has(d.id)}
 					<li>
-						<button class="chamada-item" type="button" aria-pressed={presente} onclick={() => alternar(d.id)}>
+						<button
+							class="chamada-item"
+							type="button"
+							aria-pressed={presente}
+							onclick={() => alternar(d.id)}
+							{@attach dica(t('Um toque alterna entre presente e ausente.'))}
+						>
 							<span class="com-bandeira"><Bandeira codigo={d.bandeira} /> {d.nome}</span>
 							<span class="selo {presente ? 'selo--ok' : ''}" aria-hidden="true">{presente ? t('Presente') : t('Ausente')}</span>
 						</button>
@@ -149,7 +159,10 @@
 		<section aria-labelledby="t-concluir">
 			<h2 id="t-concluir">{t('Concluir a chamada')}</h2>
 			<p class="suave">{t('Quem chegar depois avisa pelo app, e a mesa confirma no painel. Esta tela continua aberta para correções.')}</p>
-			<a class="botao" href={`/comite/${data.comite.sigla}/sessao/presidencia`}>{t('Concluir chamada')}</a>
+			<a
+				class="botao"
+				href={`/comite/${data.comite.sigla}/sessao/presidencia`}
+				{@attach dica(t('Vai ao painel da presidência, que conduz o resto da sessão.'))}>{t('Concluir chamada')}</a>
 		</section>
 	{/if}
 {/if}

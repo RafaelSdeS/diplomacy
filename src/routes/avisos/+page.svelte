@@ -9,6 +9,7 @@
 	import { pedirNotificacao } from '#lib/push.ts';
 	import { supabase } from '#lib/supabase.ts';
 	import AcaoEmModal from '#lib/ui/AcaoEmModal.svelte';
+	import { dica } from '#lib/dica.ts';
 	import Megaphone from '@lucide/svelte/icons/megaphone';
 	import type { PageProps } from './$types';
 
@@ -111,6 +112,7 @@
 						class="botao botao--secundario botao--pequeno"
 						type="button"
 						aria-label={`Remover o aviso "${aviso.texto.slice(0, 40)}"`}
+						{@attach dica(t('Apaga este aviso para todos, na hora.'))}
 						onclick={() => remover(aviso.id)}>{t('Remover')}</button
 					>
 				{/if}

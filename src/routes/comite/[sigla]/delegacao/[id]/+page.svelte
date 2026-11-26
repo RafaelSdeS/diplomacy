@@ -7,6 +7,7 @@
 	import { supabase } from '#lib/supabase.ts';
 	import Bandeira from '#lib/ui/Bandeira.svelte';
 	import { abrirAnotacao, abrirPrevia } from '#lib/ficha.svelte.ts';
+	import { dica } from '#lib/dica.ts';
 	import NotebookPen from '@lucide/svelte/icons/notebook-pen';
 	import { ESCOLHAS } from '#lib/votacao.ts';
 	import type { PageProps } from './$types';
@@ -63,8 +64,15 @@
 
 {#if outra}
 	<div class="acoes">
-		<a class="botao" href={`/comite/${data.comite.sigla}/mensagens?para=${d.id}`}>{t('Mandar bilhete')}</a>
-		<button class="botao botao--secundario" type="button" onclick={bloquear}>
+		<a class="botao" href={`/comite/${data.comite.sigla}/mensagens?para=${d.id}`} {@attach dica(t('Um recado curto e privado para esta delegação.'))}
+			>{t('Mandar bilhete')}</a
+		>
+		<button
+			class="botao botao--secundario"
+			type="button"
+			onclick={bloquear}
+			{@attach dica(bloqueei ? t('Esta delegação volta a poder mandar bilhetes à sua.') : t('Esta delegação deixa de mandar bilhetes à sua. Dá para desfazer.'))}
+		>
 			{bloqueei ? t('Desbloquear bilhetes') : t('Bloquear bilhetes')}
 		</button>
 	</div>
@@ -82,6 +90,7 @@
 		</ul>
 		<p>
 			<button class="botao botao--secundario" type="button" onclick={() => abrirAnotacao(d.id)}
+				{@attach dica(t('Abre o caderno para anotar sobre esta delegação.'))}
 				><NotebookPen aria-hidden="true" size={18} strokeWidth={1.75} /> {t('Anotar sobre {delegacao}', { delegacao: d.nome })}</button
 			>
 		</p>
@@ -115,13 +124,13 @@
 		{#each data.dpos as dpo (dpo.id)}
 			<li>
 				<span>{t('DPO')} · {t('Tópico')} {dpo.topico} <span class="selo {STATUS_DPO[dpo.status].selo}">{STATUS_DPO[dpo.status].rotulo}</span></span>
-				<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => abrirPrevia('dpo', dpo.id)}>{t('Ler')}</button>
+				<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => abrirPrevia('dpo', dpo.id)} {@attach dica(t('Lê o documento de posição sem sair desta tela.'))}>{t('Ler')}</button>
 			</li>
 		{/each}
 		{#each data.cartas as c (c.id)}
 			<li>
 				<span>{t('Carta')} · {c.titulo} <span class="detalhe">{quando(c.enviada_em)}</span></span>
-				<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => abrirPrevia('carta', c.id)}>{t('Ler')}</button>
+				<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => abrirPrevia('carta', c.id)} {@attach dica(t('Lê a carta sem sair desta tela.'))}>{t('Ler')}</button>
 			</li>
 		{/each}
 		{#if !data.dpos.length && !data.cartas.length}

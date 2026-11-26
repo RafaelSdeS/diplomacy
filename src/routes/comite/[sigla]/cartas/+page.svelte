@@ -13,6 +13,7 @@
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import Escolha from '#lib/ui/Escolha.svelte';
 	import AcaoEmModal from '#lib/ui/AcaoEmModal.svelte';
+	import { dica } from '#lib/dica.ts';
 	import MailPlus from '@lucide/svelte/icons/mail-plus';
 	import type { PageProps } from './$types';
 
@@ -135,11 +136,11 @@
 		{#each data.cartas as c (c.id)}
 			<li>
 				<span>
-					<strong><button class="abre-ficha" type="button" onclick={() => abrirPrevia('carta', c.id)}>{c.titulo}</button></strong>
+					<strong><button class="abre-ficha" type="button" onclick={() => abrirPrevia('carta', c.id)} {@attach dica(t('Uma prévia ao lado, sem sair desta tela.'))}>{c.titulo}</button></strong>
 					{#if c.publica}<span class="selo selo--info">{t('Pública')}</span>{/if}
 					<span class="detalhe">{t('De')} {de(c)} · {t('para')} {para(c)} · {formatarQuando(c.enviada_em, agora)}</span>
 				</span>
-				<a class="botao botao--secundario botao--pequeno" href={`/imprimir/carta/${c.id}`} aria-label={`Abrir e imprimir a carta "${c.titulo}"`}>{t('Abrir')}</a>
+				<a class="botao botao--secundario botao--pequeno" href={`/imprimir/carta/${c.id}`} aria-label={`Abrir e imprimir a carta "${c.titulo}"`} {@attach dica(t('A carta inteira numa página própria, para imprimir ou compartilhar.'))}>{t('Abrir')}</a>
 			</li>
 		{:else}
 			<li class="suave">{t('Nenhuma carta ainda.')}</li>

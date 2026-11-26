@@ -7,6 +7,8 @@
 	import { supabase } from '#lib/supabase.ts';
 	import Bandeira from '#lib/ui/Bandeira.svelte';
 	import BotaoImprimir from '#lib/ui/BotaoImprimir.svelte';
+	import { dica } from '#lib/dica.ts';
+	import { t } from '#lib/i18n.svelte.ts';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -95,7 +97,7 @@
 			{#if erro}
 				<p class="erro" role="alert">{erro}</p>
 			{/if}
-			<button class="botao" type="button" disabled={emitindo} onclick={emitir}>Emitir e montar os crachás</button>
+			<button class="botao" type="button" disabled={emitindo} onclick={emitir} {@attach dica(t('Gera um código novo para cada pessoa e monta os crachás com QR para imprimir.'))}>Emitir e montar os crachás</button>
 			<p><a href="/secretaria/participantes">Voltar</a></p>
 		</div>
 	{/if}

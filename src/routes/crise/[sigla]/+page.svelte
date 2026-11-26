@@ -25,6 +25,7 @@
 	import AlertaCrise from '#lib/ui/AlertaCrise.svelte';
 	import Escolha from '#lib/ui/Escolha.svelte';
 	import AcaoEmModal from '#lib/ui/AcaoEmModal.svelte';
+	import { dica } from '#lib/dica.ts';
 	import Modal from '#lib/ui/Modal.svelte';
 	import Siren from '@lucide/svelte/icons/siren';
 	import Megaphone from '@lucide/svelte/icons/megaphone';
@@ -206,7 +207,14 @@
 		<AcaoEmModal bind:this={modalLancar} rotulo={t('Lançar uma crise')} icone={Siren} descricao={t('O comitê vê o briefing e o prazo na hora, no telão e na sessão.')}>
 			{@render formularioDaCrise()}
 		</AcaoEmModal>
-		<AcaoEmModal bind:this={modalAtualizar} secundario rotulo={t('Nova atualização')} titulo={t('Publicar uma atualização de crise')} icone={Megaphone}>
+		<AcaoEmModal
+			bind:this={modalAtualizar}
+			secundario
+			rotulo={t('Nova atualização')}
+			titulo={t('Publicar uma atualização de crise')}
+			icone={Megaphone}
+			descricao={t('Uma novidade da crise que as delegações leem na página de crise do comitê.')}
+		>
 			{@render formularioDaAtualizacao()}
 		</AcaoEmModal>
 		{#each ativos as i (i.id)}
@@ -217,15 +225,18 @@
 					erroModal = '';
 					encerrando = i.id;
 					modalEncerrar?.abrir();
-				}}><FlagOff aria-hidden="true" size={18} strokeWidth={1.75} /> {t('Encerrar: {crise}', { crise: i.titulo })}</button
+				}}
+				{@attach dica(t('Diga se a crise foi resolvida ou fracassou e o que aconteceu.'))}><FlagOff aria-hidden="true" size={18} strokeWidth={1.75} /> {t('Encerrar: {crise}', { crise: i.titulo })}</button
 			>
 		{/each}
 		{#if data.atualizacoes.length}
 			<button class="botao botao--secundario" type="button" onclick={() => modalAtualizacoes?.abrir()}
+				{@attach dica(t('Mostra as atualizações já publicadas neste comitê.'))}
 				>{t('Atualizações publicadas')} <span class="selo">{data.atualizacoes.length}</span></button
 			>
 		{/if}
 		<a class="botao botao--secundario" href={`/comite/${data.comite.sigla}/mensagens`}
+			{@attach dica(t('A conversa privada da equipe de crise com a mesa do comitê.'))}
 			><MessagesSquare aria-hidden="true" size={18} strokeWidth={1.75} /> {t('Canal interno com a mesa')}</a
 		>
 	</div>
@@ -256,7 +267,9 @@
 				<label class="opcao"><input type="checkbox" bind:checked={soEsperando} /> {t('Só as que esperam')}</label>
 				{#if filtro || soEsperando}
 					<span class="detalhe">{t('{n} de {total}', { n: fila.length, total: data.notas.length })}</span>
-					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => ((filtro = ''), (soEsperando = false))}>{t('Limpar')}</button>
+					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => ((filtro = ''), (soEsperando = false))} {@attach dica(t('Mostra de novo todas as notas da fila.'))}
+						>{t('Limpar')}</button
+					>
 				{/if}
 			</div>
 			<ol class="lista fila-crise">
@@ -269,7 +282,7 @@
 							bind:group={selecionadas}
 							aria-label={`Selecionar: ${nota.titulo}, ${nota.delegacao?.nome}`}
 						/>
-						<button class="nota-na-fila" type="button" onclick={() => abrir(nota.id)}>
+						<button class="nota-na-fila" type="button" onclick={() => abrir(nota.id)} {@attach dica(t('Abre a nota ao lado para ler e responder.'))}>
 							<span class="com-bandeira"><Bandeira codigo={nota.delegacao?.bandeira} /> {nota.delegacao?.nome}</span>
 							<strong>{nota.titulo}</strong>
 							<span class="detalhe">
@@ -306,6 +319,7 @@
 						class="botao botao--secundario"
 						type="button"
 						onclick={() => executar(supabase.rpc('assumir_nota', { p_id: notaAberta.id }), t('Nota assumida.'))}
+						{@attach dica(t('Marca que você cuida desta nota, para ninguém da equipe responder junto.'))}
 						>{t('Assumir esta nota')}</button
 					>
 				{/if}
@@ -322,16 +336,18 @@
 					<div class="acoes" role="group" aria-label={t('Respostas prontas')}>
 						{#each respostasProntas() as pronta (pronta)}
 							<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => (resposta = pronta)}
+								{@attach dica(t('Põe esta resposta pronta no campo, para você completar.'))}
 								>{pronta.split(/[.:]/)[0]}</button
 							>
 						{/each}
 					</div>
 					<div class="acoes">
-						<button class="botao" type="button" onclick={() => responder('aprovada')}>{t('Aprovar')}</button>
+						<button class="botao" type="button" onclick={() => responder('aprovada')} {@attach dica(t('Aprova o pedido e manda a resposta à delegação.'))}>{t('Aprovar')}</button>
 						<button class="botao botao--secundario" type="button" onclick={() => responder('pede_ajuste')}
+							{@attach dica(t('Devolve com a resposta, para a delegação mudar e mandar de novo.'))}
 							>{t('Pedir ajuste')}</button
 						>
-						<button class="botao botao--secundario" type="button" onclick={() => responder('rejeitada')}>{t('Rejeitar')}</button>
+						<button class="botao botao--secundario" type="button" onclick={() => responder('rejeitada')} {@attach dica(t('Recusa o pedido e manda a resposta à delegação.'))}>{t('Rejeitar')}</button>
 					</div>
 				</div>
 			{/if}
@@ -403,6 +419,7 @@
 						<input type="number" min="1" max="240" bind:value={e.minutos} />
 					</label>
 					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => (efeitos = efeitos.filter((_, j) => j !== i))}
+						{@attach dica(t('Tira esta delegação da lista das atingidas.'))}
 						>{t('Tirar')}</button
 					>
 				</div>
@@ -410,7 +427,8 @@
 			<button
 				class="botao botao--secundario botao--pequeno"
 				type="button"
-				onclick={() => (efeitos = [...efeitos, { delegacao_id: '', texto: '', minutos: null }])}>{t('Adicionar uma delegação atingida')}</button
+				onclick={() => (efeitos = [...efeitos, { delegacao_id: '', texto: '', minutos: null }])}
+				{@attach dica(t('Escolha uma delegação que fica sem voz por causa da crise.'))}>{t('Adicionar uma delegação atingida')}</button
 			>
 		</fieldset>
 		{#if erroModal}<p class="erro" role="alert">{erroModal}</p>{/if}

@@ -5,6 +5,7 @@
 	import { abrirPrevia } from '#lib/ficha.svelte.ts';
 	import { STATUS_DPO as STATUS } from '#lib/impressao.ts';
 	import Modal from '#lib/ui/Modal.svelte';
+	import { dica } from '#lib/dica.ts';
 	import Quando from '#lib/ui/Quando.svelte';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import NomeDelegacao from '#lib/ui/NomeDelegacao.svelte';
@@ -139,7 +140,7 @@
 						<p class="suave">{t('Há um texto escrito no app antes de o DPO virar arquivo. Envie o PDF para o comitê ler.')}</p>
 					{/if}
 					<div class="acoes">
-						<label class={['botao', enviado(d) && 'botao--secundario']}>
+						<label class={['botao', enviado(d) && 'botao--secundario']} {@attach dica(t('Escolher no seu aparelho um PDF de até 5 MB para este tópico.'))}>
 							<FileUp aria-hidden="true" size={18} strokeWidth={1.75} />
 							{enviando === topico ? t('Enviando…') : d?.arquivo ? t('Trocar o PDF') : t('Enviar o PDF')}
 							<input
@@ -152,11 +153,20 @@
 							/>
 						</label>
 						{#if d?.arquivo && data.links.get(d.arquivo)}
-							<a class="botao botao--secundario" href={data.links.get(d.arquivo)} target="_blank" rel="noopener"
+							<a
+								class="botao botao--secundario"
+								href={data.links.get(d.arquivo)}
+								target="_blank"
+								rel="noopener"
+								{@attach dica(t('O arquivo abre numa aba nova do navegador.'))}
 								><FileText aria-hidden="true" size={18} strokeWidth={1.75} /> {t('Abrir o PDF')}</a
 							>
 						{:else if d?.texto.trim()}
-							<button class="botao botao--secundario" type="button" onclick={() => abrirPrevia('dpo', d.id)}>{t('Ler o texto')}</button>
+							<button
+								class="botao botao--secundario"
+								type="button"
+								{@attach dica(t('Uma prévia ao lado, sem sair desta tela.'))}
+								onclick={() => abrirPrevia('dpo', d.id)}>{t('Ler o texto')}</button>
 						{/if}
 					</div>
 				</section>
@@ -184,22 +194,29 @@
 							target="_blank"
 							rel="noopener"
 							aria-label={`${t('Abrir o PDF')}: ${t('DPO de {delegacao}', { delegacao: d.delegacao?.nome ?? '' })}, ${t('Tópico')} ${d.topico}`}
+							{@attach dica(t('O arquivo abre numa aba nova do navegador.'))}
 							><FileText aria-hidden="true" size={16} strokeWidth={1.75} /> {t('Abrir o PDF')}</a
 						>
 					{:else if d.texto.trim()}
-						<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => abrirPrevia('dpo', d.id)}>{t('Ler o texto')}</button>
+						<button
+							class="botao botao--secundario botao--pequeno"
+							type="button"
+							{@attach dica(t('Uma prévia ao lado, sem sair desta tela.'))}
+							onclick={() => abrirPrevia('dpo', d.id)}>{t('Ler o texto')}</button>
 					{/if}
 					{#if ehMesa && d.status !== 'retirado'}
 						<button
 							class="botao botao--secundario botao--pequeno"
 							type="button"
 							aria-label={`${data.comentarios.has(d.id) ? t('Ver o comentário') : t('Comentar')}: ${t('DPO de {delegacao}', { delegacao: d.delegacao?.nome ?? '' })}, ${t('Tópico')} ${d.topico}`}
+							{@attach dica(t('Um recado da mesa que só esta delegação lê.'))}
 							onclick={() => abrir(d, 'comentar')}>{data.comentarios.has(d.id) ? t('Ver o comentário') : t('Comentar')}</button
 						>
 						<button
 							class="botao botao--secundario botao--pequeno"
 							type="button"
 							aria-label={`${t('Retirar')}: ${t('DPO de {delegacao}', { delegacao: d.delegacao?.nome ?? '' })}, ${t('Tópico')} ${d.topico}`}
+							{@attach dica(t('Tira o arquivo do comitê, com um motivo que a delegação vê.'))}
 							onclick={() => abrir(d, 'retirar')}>{t('Retirar')}</button
 						>
 					{/if}

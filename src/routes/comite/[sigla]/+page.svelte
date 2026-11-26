@@ -3,6 +3,7 @@
 	import { bilingue, t } from '#lib/i18n.svelte.ts';
 	import Bandeira from '#lib/ui/Bandeira.svelte';
 	import { abrirFicha } from '#lib/ficha.svelte.ts';
+	import { dica } from '#lib/dica.ts';
 	import BookOpen from '@lucide/svelte/icons/book-open';
 	import FileText from '@lucide/svelte/icons/file-text';
 	import Gavel from '@lucide/svelte/icons/gavel';
@@ -92,7 +93,9 @@
 				</li>
 			{/each}
 		</ul>
-		<p><a class="botao botao--secundario botao--pequeno" href={`/comite/${data.comite.sigla}/documentos`}>{t('Todos os documentos')}</a></p>
+		<p><a class="botao botao--secundario botao--pequeno" href={`/comite/${data.comite.sigla}/documentos`} {@attach dica(t('DPOs, projetos, cartas e os documentos da mesa, numa lista só.'))}
+				>{t('Todos os documentos')}</a
+			></p>
 	</section>
 {/if}
 
@@ -117,7 +120,9 @@
 			     Passo 55: abre a ficha, como o país em qualquer tela; a página fica a um clique dela. -->
 			<li class:minha={d.id === minha}>
 				<Bandeira codigo={d.bandeira} />
-				<button class="grade-delegacoes-nome" type="button" onclick={() => abrirFicha(data.comite.sigla, d.id)}>{d.nome}</button>
+				<button class="grade-delegacoes-nome" type="button" onclick={() => abrirFicha(data.comite.sigla, d.id)} {@attach dica(t('Abre a ficha da delegação: delegados, votos, documentos e anotações.'))}
+					>{d.nome}</button
+				>
 				<span class="detalhe">{d.nome_oficial}{SITUACOES[d.situacao] ? ` · ${SITUACOES[d.situacao]}` : ''}</span>
 			</li>
 		{/each}

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { t } from '#lib/i18n.svelte.ts';
+	import { dica } from '#lib/dica.ts';
 	import { invalidate } from '$app/navigation';
 	import { mensagemDeErro } from '#lib/sessao.ts';
 	import { supabase } from '#lib/supabase.ts';
@@ -23,6 +24,11 @@
 		if (error) onerro?.(mensagemDeErro(error));
 		await invalidate('app:sessao-ao-vivo');
 	}
+	const DICA: Record<Escolha, () => string> = {
+		a_favor: () => t('Registra o voto da delegação a favor da proposta.'),
+		contra: () => t('Registra o voto da delegação contra a proposta.'),
+		abstencao: () => t('Registra que a delegação não vota nem a favor nem contra.')
+	};
 </script>
 
 {#if meuVoto}
@@ -30,7 +36,8 @@
 {:else if escolhas.length}
 	<div class="acoes">
 		{#each escolhas as escolha (escolha)}
-			<button class="botao botao--grande" type="button" onclick={() => votar(escolha)}>{ESCOLHAS[escolha]}</button>
+			<button class="botao botao--grande" type="button" onclick={() => votar(escolha)} {@attach dica(DICA[escolha]())}>
+{ESCOLHAS[escolha]}</button>
 		{/each}
 	</div>
 {/if}

@@ -13,6 +13,7 @@
 	import { supabase } from '#lib/supabase.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import type { PageProps } from './$types';
+	import { dica } from '#lib/dica.ts';
 
 	let { data }: PageProps = $props();
 
@@ -89,8 +90,8 @@
 </header>
 {#if souPress || modero}
 	<p class="acoes">
-		{#if souPress}<a class="botao" href="/press/escrever">{t('Escrever matéria')}</a>{/if}
-		<a class="botao botao--secundario" href={`/imprimir/edicao/${data.comite.sigla}`}>{t('Edição do dia')}</a>
+		{#if souPress}<a class="botao" href="/press/escrever" {@attach dica(t('Abre o editor para escrever e publicar uma matéria.'))}>{t('Escrever matéria')}</a>{/if}
+		<a class="botao botao--secundario" href={`/imprimir/edicao/${data.comite.sigla}`} {@attach dica(t('Abre as matérias do comitê para imprimir ou salvar em PDF.'))}>{t('Edição do dia')}</a>
 	</p>
 {/if}
 
@@ -121,13 +122,13 @@
 			</p>
 			{#if souPress && noticia.status === 'publicada'}
 				<div class="acoes">
-					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => compartilhar('post')}>{t('Imagem para post')}</button>
-					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => compartilhar('story')}>{t('Imagem para story')}</button>
+					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => compartilhar('post')} {@attach dica(t('Gera a imagem da matéria no formato de post, para as redes.'))}>{t('Imagem para post')}</button>
+					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => compartilhar('story')} {@attach dica(t('Gera a imagem da matéria no formato de story, para as redes.'))}>{t('Imagem para story')}</button>
 				</div>
 				<div class="acoes">
-					<a class="botao botao--secundario botao--pequeno" href={linkWhatsApp(legendaPronta)} target="_blank" rel="noopener">WhatsApp</a>
-					<a class="botao botao--secundario botao--pequeno" href={linkX(legendaPronta)} target="_blank" rel="noopener">X</a>
-					<button class="botao botao--secundario botao--pequeno" type="button" onclick={copiarLegenda}>{t('Copiar legenda')}</button>
+					<a class="botao botao--secundario botao--pequeno" href={linkWhatsApp(legendaPronta)} target="_blank" rel="noopener" {@attach dica(t('Abre o WhatsApp com a legenda da matéria pronta para enviar.'))}>WhatsApp</a>
+					<a class="botao botao--secundario botao--pequeno" href={linkX(legendaPronta)} target="_blank" rel="noopener" {@attach dica(t('Abre o X com a legenda da matéria pronta para postar.'))}>X</a>
+					<button class="botao botao--secundario botao--pequeno" type="button" onclick={copiarLegenda} {@attach dica(t('Copia a legenda da matéria para colar no Instagram.'))}>{t('Copiar legenda')}</button>
 				</div>
 				{#if copiada}
 					<p class="sucesso" role="status">{t('Legenda copiada.')}</p>
@@ -156,6 +157,7 @@
 				<div class="formulario formulario--largo">
 					{#if noticia.status === 'aguardando'}
 						<button class="botao" type="button" onclick={() => executar(supabase.rpc('aprovar_noticia', { p_noticia: noticia.id }), t('Notícia publicada.'))}
+							{@attach dica(t('Torna a matéria visível para todo o evento.'))}
 							>{t('Aprovar e publicar')}</button
 						>
 					{/if}
@@ -175,7 +177,7 @@
 				</div>
 			{:else if !souPress}
 				<details class="denunciar">
-					<summary>{t('Denunciar')}</summary>
+					<summary {@attach dica(t('Abre o campo para avisar a Diretoria da Press de um problema na matéria.'))}>{t('Denunciar')}</summary>
 					<div class="formulario">
 						<label class="campo">
 							{t('Motivo da denúncia')}
@@ -186,7 +188,9 @@
 							type="button"
 							onclick={() =>
 								executar(supabase.rpc('denunciar_noticia', { p_noticia: noticia.id, p_motivo: motivo }), t('Denúncia enviada à Diretoria da Press.'))}
+							{@attach dica(t('Manda o motivo à Diretoria da Press, que decide se oculta a matéria.'))}
 							>{t('Enviar denúncia')}</button
+
 						>
 					</div>
 				</details>

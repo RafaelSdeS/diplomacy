@@ -18,6 +18,7 @@
 	import { abrirIrPara, irPara } from '#lib/ir-para.svelte.ts';
 	import { menu } from '#lib/menu.ts';
 	import { caixa } from '#lib/caixa.ts';
+	import { dica } from '#lib/dica.ts';
 	import { ehCacheDeDados } from '#lib/cache-dados.ts';
 	import { esquecerConta } from '#lib/conta.ts';
 	import { esquecerRascunhos } from '#lib/rascunho.ts';
@@ -325,8 +326,8 @@
 							type="button"
 							aria-label={t('Ir para…')}
 							aria-keyshortcuts="Control+K Meta+K"
-							title={t('Ir para… (Ctrl+K)')}
 							onclick={abrirIrPara}
+							{@attach dica(t('Digite o nome de uma tela, comitê ou delegação para ir direto a ela.'))}
 						>
 							<Search aria-hidden="true" size={16} strokeWidth={1.75} />
 						</button>
@@ -334,8 +335,8 @@
 							class="botao botao--secundario botao--pequeno botao--icone"
 							href="/avisos"
 							aria-label={t('Avisos')}
-							title={t('Avisos')}
 							aria-current={page.url.pathname === '/avisos' ? 'page' : undefined}
+							{@attach dica(t('Os avisos da organização e da mesa para você.'))}
 						>
 							<Bell aria-hidden="true" size={16} strokeWidth={1.75} />
 						</a>
@@ -344,8 +345,8 @@
 								class="botao botao--secundario botao--pequeno botao--icone"
 								type="button"
 								aria-label={t('Caderno')}
-								title={t('Caderno: anotar e ler')}
 								onclick={() => abrirAnotacao()}
+								{@attach dica(t('Abre suas anotações para escrever ou consultar, sem sair desta tela.'))}
 							>
 								<NotebookPen aria-hidden="true" size={16} strokeWidth={1.75} />
 							</button>
@@ -376,8 +377,8 @@
 						class={['botao botao--secundario botao--pequeno botao--icone', temMais && 'so-largo']}
 						type="button"
 						aria-label={escuro ? t('Usar o tema claro') : t('Usar o tema escuro')}
-						title={escuro ? t('Usar o tema claro') : t('Usar o tema escuro')}
 						onclick={alternarTema}
+						{@attach dica(t('Troca as cores da tela entre claro e escuro.'))}
 					>
 						{#if escuro}<Sun aria-hidden="true" size={16} strokeWidth={1.75} />{:else}<Moon aria-hidden="true" size={16} strokeWidth={1.75} />{/if}
 					</button>
@@ -385,8 +386,8 @@
 						class={['botao botao--secundario botao--pequeno', temMais && 'so-largo']}
 						type="button"
 						aria-label={idioma.atual === 'en' ? `EN · ${TROCAR_IDIOMA.pt}` : `PT · ${TROCAR_IDIOMA.en}`}
-						title={idioma.atual === 'en' ? TROCAR_IDIOMA.pt : TROCAR_IDIOMA.en}
 						onclick={() => data.usuario && alternarIdioma(data.usuario.id)}
+						{@attach dica(t('Muda o idioma do app entre português e inglês.'))}
 					>
 						<Languages aria-hidden="true" size={16} strokeWidth={1.75} />
 						{idioma.atual === 'en' ? 'EN' : 'PT'}
@@ -396,8 +397,8 @@
 							class="botao botao--secundario botao--pequeno botao--icone"
 							href="/perfil"
 							aria-label={t('Perfil')}
-							title={t('Perfil')}
 							aria-current={page.url.pathname === '/perfil' ? 'page' : undefined}
+							{@attach dica(t('Seus dados, seus papéis no evento e suas preferências.'))}
 							><CircleUser aria-hidden="true" size={16} strokeWidth={1.75} /></a
 						>
 					{/if}
@@ -406,7 +407,7 @@
 						class="botao botao--secundario botao--pequeno botao--icone"
 						type="button"
 						aria-label={t('Sair')}
-						title={t('Sair')}
+						{@attach dica(t('Sai da sua conta neste aparelho; antes, pede para confirmar.'))}
 						onclick={pedirSaida}><LogOut aria-hidden="true" size={16} strokeWidth={1.75} /></button
 					>
 					<Modal bind:this={avisoSaida} rotulo="aviso-saida-titulo">
@@ -421,10 +422,18 @@
 						{/if}
 						<form method="dialog" class="acoes">
 							{#if pendentes}
-								<button class="botao" type="button" disabled={enviandoAntes} onclick={enviarESair}>
+								<button
+									class="botao"
+									type="button"
+									disabled={enviandoAntes}
+									onclick={enviarESair}
+									{@attach dica(t('Manda os itens guardados agora e, depois, sai da conta.'))}
+								>
 									{enviandoAntes ? t('Enviando…') : t('Enviar agora')}
 								</button>
-								<button class="botao botao--secundario" onclick={() => void sair()}>{t('Sair mesmo assim')}</button>
+								<button class="botao botao--secundario" onclick={() => void sair()} {@attach dica(t('Sai sem enviar: os itens guardados neste aparelho se perdem.'))}
+									>{t('Sair mesmo assim')}</button
+								>
 							{:else}
 								<button class="botao" onclick={() => void sair()}>{t('Sair')}</button>
 							{/if}
@@ -483,7 +492,7 @@
 		<div class="aviso-chegou" role="status">
 			<MessageSquare aria-hidden="true" size={18} strokeWidth={1.75} />
 			<span>{aviso.texto}</span>
-			<a class="botao botao--pequeno" href={aviso.href} onclick={() => (aviso = null)}>{t('Abrir')}</a>
+			<a class="botao botao--pequeno" href={aviso.href} onclick={() => (aviso = null)} {@attach dica(t('Vai para a conversa onde a mensagem chegou.'))}>{t('Abrir')}</a>
 		</div>
 	{/if}
 	{#if fichaDelegacao}{#await fichaDelegacao then { default: Ficha }}<Ficha participacoes={data.participacoes} />{/await}{/if}

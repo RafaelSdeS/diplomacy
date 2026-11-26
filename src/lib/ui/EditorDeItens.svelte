@@ -5,6 +5,7 @@
 	// "Colar uma lista" monta os itens de um texto já escrito, com a sintaxe antiga.
 	import { flushSync } from 'svelte';
 	import { t } from '#lib/i18n.svelte.ts';
+	import { dica } from '#lib/dica.ts';
 	import { inserir, mover, NIVEL_MAX, recuar, remover } from '#lib/itens.ts';
 	import { lerEsboco, type ItemEsboco } from '#lib/votacao.ts';
 	import ArrowDown from '@lucide/svelte/icons/arrow-down';
@@ -55,19 +56,24 @@
 				onkeydown={(e) => tecla(e, i)}
 			/>
 			<span class="editor-item-acoes">
-				<button class="botao botao--secundario botao--pequeno botao--icone" type="button" aria-label={t('Subir um nível: item {n}', { n: i + 1 })} title={t('Subir um nível')} disabled={item.nivel === 0} onclick={() => (itens = recuar(itens, i, -1))}
+				<button class="botao botao--secundario botao--pequeno botao--icone" type="button" aria-label={t('Subir um nível: item {n}', { n: i + 1 })} disabled={item.nivel === 0} onclick={() => (itens = recuar(itens, i, -1))}
+					{@attach dica(t('Tira o item de dentro do item de cima.'))}
 					><IndentDecrease aria-hidden="true" size={16} strokeWidth={1.75} /></button
 				>
-				<button class="botao botao--secundario botao--pequeno botao--icone" type="button" aria-label={t('Descer um nível: item {n}', { n: i + 1 })} title={t('Descer um nível')} disabled={!podeDescer(i)} onclick={() => (itens = recuar(itens, i, 1))}
+				<button class="botao botao--secundario botao--pequeno botao--icone" type="button" aria-label={t('Descer um nível: item {n}', { n: i + 1 })} disabled={!podeDescer(i)} onclick={() => (itens = recuar(itens, i, 1))}
+					{@attach dica(t('Põe o item dentro do item de cima, como subitem.'))}
 					><IndentIncrease aria-hidden="true" size={16} strokeWidth={1.75} /></button
 				>
-				<button class="botao botao--secundario botao--pequeno botao--icone" type="button" aria-label={t('Para cima: item {n}', { n: i + 1 })} title={t('Para cima')} disabled={i === 0} onclick={() => (itens = mover(itens, i, -1))}
+				<button class="botao botao--secundario botao--pequeno botao--icone" type="button" aria-label={t('Para cima: item {n}', { n: i + 1 })} disabled={i === 0} onclick={() => (itens = mover(itens, i, -1))}
+					{@attach dica(t('Troca o item de lugar com o de cima.'))}
 					><ArrowUp aria-hidden="true" size={16} strokeWidth={1.75} /></button
 				>
-				<button class="botao botao--secundario botao--pequeno botao--icone" type="button" aria-label={t('Para baixo: item {n}', { n: i + 1 })} title={t('Para baixo')} disabled={i === itens.length - 1} onclick={() => (itens = mover(itens, i, 1))}
+				<button class="botao botao--secundario botao--pequeno botao--icone" type="button" aria-label={t('Para baixo: item {n}', { n: i + 1 })} disabled={i === itens.length - 1} onclick={() => (itens = mover(itens, i, 1))}
+					{@attach dica(t('Troca o item de lugar com o de baixo.'))}
 					><ArrowDown aria-hidden="true" size={16} strokeWidth={1.75} /></button
 				>
-				<button class="botao botao--secundario botao--pequeno botao--icone" type="button" aria-label={t('Tirar: item {n}', { n: i + 1 })} title={t('Tirar')} disabled={itens.length === 1} onclick={() => (itens = remover(itens, i))}
+				<button class="botao botao--secundario botao--pequeno botao--icone" type="button" aria-label={t('Tirar: item {n}', { n: i + 1 })} disabled={itens.length === 1} onclick={() => (itens = remover(itens, i))}
+					{@attach dica(t('Apaga este item da agenda proposta.'))}
 					><X aria-hidden="true" size={16} strokeWidth={1.75} /></button
 				>
 			</span>
@@ -75,19 +81,22 @@
 	{/each}
 </ol>
 <div class="acoes">
-	<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => novo(0)}><Plus aria-hidden="true" size={16} strokeWidth={1.75} /> {t('Item')}</button>
+	<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => novo(0)} {@attach dica(t('Acrescenta um item no fim, no primeiro nível.'))}><Plus aria-hidden="true" size={16} strokeWidth={1.75} /> {t('Item')}</button>
 	<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => novo((itens.at(-1)?.nivel ?? -1) + 1)}
+		{@attach dica(t('Acrescenta um subitem dentro do último item.'))}
 		><Plus aria-hidden="true" size={16} strokeWidth={1.75} /> {t('Subitem')}</button
 	>
 </div>
 <p class="suave">{t('Enter cria o próximo item; Tab põe o item dentro do de cima, e Shift+Tab o tira.')}</p>
 <details class="colar-lista">
-	<summary>{t('Colar uma lista')}</summary>
+	<summary {@attach dica(t('Monta os itens a partir de um texto já escrito.'))}>{t('Colar uma lista')}</summary>
 	<label class="campo">
 		{t('Uma linha por item. Dois espaços (ou um traço) no começo põem o item dentro do anterior.')}
 		<textarea rows="5" bind:value={colar}></textarea>
 	</label>
 	<button class="botao botao--secundario botao--pequeno" type="button" disabled={!colar.trim()} onclick={() => ((itens = lerEsboco(colar)), (colar = ''))}
+		{@attach dica(t('Troca todos os itens acima pelos da lista colada.'))}
+
 		>{t('Montar os itens')}</button
 	>
 </details>

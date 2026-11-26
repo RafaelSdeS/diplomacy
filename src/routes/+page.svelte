@@ -132,7 +132,7 @@
 {#if erro}<p class="erro" role="alert">{erro}</p>{/if}
 
 {#snippet decidir()}
-	<a class="botao botao--pequeno" href={`/documento/${paraDecidir[0].documento.id}/sala`}
+	<a class="botao botao--pequeno" href={`/documento/${paraDecidir[0].documento.id}/sala`} {@attach dica(t('Abre o documento para decidir as propostas que já têm consenso.'))}
 		>{paraDecidir.length === 1 ? t('1 proposta com consenso para decidir') : t('{n} propostas com consenso para decidir', { n: paraDecidir.length })}</a
 	>
 {/snippet}
@@ -180,7 +180,7 @@
 					{/if}
 					{#if votacao}
 						<p class="destaque" id="a-votacao" tabindex="-1">{t('Votação aberta')}:
-							<button class="abre-ficha" type="button" onclick={() => (verVotacao = true)}>{votacao.objeto}</button></p
+							<button class="abre-ficha" type="button" onclick={() => (verVotacao = true)} {@attach dica(t('Mostra os detalhes do que está em votação.'))}>{votacao.objeto}</button></p
 						>
 						<Votar votacaoId={votacao.id} escolhas={posso} {meuVoto} onerro={(m) => (erro = m)} />
 					{/if}
@@ -228,7 +228,7 @@
 				{/if}
 				{#if data.chamadaColetiva}
 					<li>
-						<a class="botao botao--pequeno" href="/press/coletiva">{t('Sua delegação foi chamada na coletiva')}</a>
+						<a class="botao botao--pequeno" href="/press/coletiva" {@attach dica(t('Vai à coletiva de imprensa, onde sua delegação deve responder.'))}>{t('Sua delegação foi chamada na coletiva')}</a>
 						<span class="detalhe">{data.chamadaColetiva.veiculo?.nome}</span>
 					</li>
 				{/if}
@@ -245,7 +245,7 @@
 					</li>
 				{/each}
 				{#each data.bilhetes as b (b.id)}
-					<li><span><strong>{b.de?.nome}</strong> {b.texto}</span> <a class="botao botao--secundario botao--pequeno" href={`/comite/${sigla}/mensagens`}>{t('Responder')}</a></li>
+					<li><span><strong>{b.de?.nome}</strong> {b.texto}</span> <a class="botao botao--secundario botao--pequeno" href={`/comite/${sigla}/mensagens`} {@attach dica(t('Abre as mensagens do comitê para responder ao bilhete.'))}>{t('Responder')}</a></li>
 				{/each}
 				{#if nadaParaDelegacao}
 					<li class="suave">{t('Nada esperando você agora.')}</li>
@@ -275,17 +275,21 @@
 					>{t('Pedidos para o bureau')} <span class="selo">{paraJulgar}</span></a
 				>
 				<a class={['botao botao--pequeno', !documentosEnviados && 'botao--secundario']} href={`/comite/${sigla}/documentos`}
+					{@attach dica(t('Os documentos que as delegações mandaram e esperam a mesa.'))}
 					>{t('Documentos enviados à mesa')} <span class="selo">{documentosEnviados}</span></a
 				>
 				<!-- Passo 56: na mesma linha, para a trilha do tópico caber sem rolar. -->
-				<a class="botao botao--pequeno" href={`/comite/${sigla}/sessao/presidencia`}>{t('Abrir o painel')}</a>
+				<a class="botao botao--pequeno" href={`/comite/${sigla}/sessao/presidencia`} {@attach dica(t('Dar a palavra, decidir pontos e moções e conduzir as votações.'))}
+						>{t('Abrir o painel')}</a
+					>
 			</div>
 			{#if projetoDoTopico || wpsDoTopico.length}
 				<div class="acoes">
 					{#if projetoDoTopico}
-						<a class="botao botao--secundario botao--pequeno" href={`/documento/${projetoDoTopico.id}/sala`}>{t('Projeto do tópico')}</a>
+						<a class="botao botao--secundario botao--pequeno" href={`/documento/${projetoDoTopico.id}/sala`} {@attach dica(t('Abre o projeto de resolução do tópico em debate.'))}>{t('Projeto do tópico')}</a>
 					{:else}
 						<a class="botao botao--secundario botao--pequeno" href={`/documento/${wpsDoTopico[0].id}/sala`}
+							{@attach dica(t('Abre os working papers do tópico em debate.'))}
 							>{t('Working papers do tópico {n}', { n: topicoAtual ?? 0 })}</a
 						>
 					{/if}
@@ -317,8 +321,8 @@
 				{/each}
 			</ul>
 			<div class="acoes">
-				<a class="botao" href="/press/escrever">{t('Escrever')}</a>
-				<a class="botao botao--secundario" href="/press/entrevistas">{t('Entrevistas')}</a>
+				<a class="botao" href="/press/escrever" {@attach dica(t('Escreve uma matéria para o jornal do evento.'))}>{t('Escrever')}</a>
+				<a class="botao botao--secundario" href="/press/entrevistas" {@attach dica(t('Marca e acompanha as entrevistas com as delegações.'))}>{t('Entrevistas')}</a>
 			</div>
 		</article>
 	{/if}
@@ -328,9 +332,9 @@
 		<article class={['cartao', !data.papel && 'cartao--destaque']} aria-labelledby="c-secretaria">
 			<h2 id="c-secretaria">{t('Secretaria')}</h2>
 			<div class="acoes">
-				<a class={['botao', data.papel && 'botao--pequeno']} href="/secretaria/checkin">{t('Check-in')}</a>
-				<a class={['botao botao--secundario', data.papel && 'botao--pequeno']} href="/secretaria/participantes">{t('Participantes')}</a>
-				{#if !data.papel}<a class="botao botao--secundario" href="/avisos">{t('Avisos')}</a>{/if}
+				<a class={['botao', data.papel && 'botao--pequeno']} href="/secretaria/checkin" {@attach dica(t('Registra a chegada dos participantes ao evento.'))}>{t('Check-in')}</a>
+				<a class={['botao botao--secundario', data.papel && 'botao--pequeno']} href="/secretaria/participantes" {@attach dica(t('Quem está no evento, com papéis e comitês.'))}>{t('Participantes')}</a>
+				{#if !data.papel}<a class="botao botao--secundario" href="/avisos" {@attach dica(t('Os avisos publicados para o evento.'))}>{t('Avisos')}</a>{/if}
 			</div>
 		</article>
 	{/if}
@@ -350,7 +354,7 @@
 				{/if}
 			</div>
 			{#if atuais.length > 1 || data.comitesAoVivo.length}
-				<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => modalAgora?.abrir()}>{t('Ver tudo')}</button>
+				<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => modalAgora?.abrir()} {@attach dica(t('Mostra tudo o que acontece agora, inclusive nos comitês.'))}>{t('Ver tudo')}</button>
 			{/if}
 		</article>
 		<article class="linha-evento" aria-labelledby="c-depois">
@@ -363,7 +367,7 @@
 					<p class="suave">{t('Nada mais no cronograma.')}</p>
 				{/if}
 			</div>
-			<a class="botao botao--secundario botao--pequeno" href="/cronograma">{t('Cronograma')}</a>
+			<a class="botao botao--secundario botao--pequeno" href="/cronograma" {@attach dica(t('Todos os horários do evento.'))}>{t('Cronograma')}</a>
 		</article>
 		<article class="linha-evento" aria-labelledby="c-avisos">
 			<h3 id="c-avisos">
@@ -373,18 +377,18 @@
 			<div class="linha-evento-resumo">
 				{#if data.avisos[0]}<p class="linha-evento-texto">{data.avisos[0].texto}</p>{:else}<p class="suave">{t('Nenhum aviso.')}</p>{/if}
 			</div>
-			<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => modalAvisos?.abrir()}>{t('Ver tudo')}</button>
+			<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => modalAvisos?.abrir()} {@attach dica(t('Mostra os avisos mais recentes.'))}>{t('Ver tudo')}</button>
 		</article>
 		{#if data.respostasCrise.length}
 			<article class="linha-evento" aria-labelledby="c-crise">
 				<h3 id="c-crise">{t('Respostas da crise')} <span class="selo">{data.respostasCrise.length}</span></h3>
 				<div class="linha-evento-resumo">
 					<p class="linha-evento-texto">
-						<button class="abre-ficha" type="button" onclick={() => (notaVista = data.respostasCrise[0].id)}>{data.respostasCrise[0].titulo}</button>
+						<button class="abre-ficha" type="button" onclick={() => (notaVista = data.respostasCrise[0].id)} {@attach dica(t('Mostra a nota e a resposta da equipe de crise.'))}>{data.respostasCrise[0].titulo}</button>
 						<span class="detalhe">{data.respostasCrise[0].resposta}</span>
 					</p>
 				</div>
-				<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => modalCrise?.abrir()}>{t('Ver tudo')}</button>
+				<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => modalCrise?.abrir()} {@attach dica(t('Mostra todas as respostas da crise à sua delegação.'))}>{t('Ver tudo')}</button>
 			</article>
 		{/if}
 		{#if data.citacoes.length}
@@ -392,11 +396,11 @@
 				<h3 id="c-press">{t('Na press')} <span class="selo">{data.citacoes.length}</span></h3>
 				<div class="linha-evento-resumo">
 					<p class="linha-evento-texto">
-						<button class="abre-ficha" type="button" onclick={() => abrirPrevia('noticia', data.citacoes[0].id)}>{data.citacoes[0].titulo}</button>
+						<button class="abre-ficha" type="button" onclick={() => abrirPrevia('noticia', data.citacoes[0].id)} {@attach dica(t('Lê a matéria sem sair desta tela.'))}>{data.citacoes[0].titulo}</button>
 						<span class="detalhe">{t('{veiculo} cita a sua delegação', { veiculo: data.citacoes[0].veiculo?.nome ?? '' })}</span>
 					</p>
 				</div>
-				<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => modalPress?.abrir()}>{t('Ver tudo')}</button>
+				<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => modalPress?.abrir()} {@attach dica(t('Mostra todas as matérias que citam sua delegação.'))}>{t('Ver tudo')}</button>
 			</article>
 		{/if}
 	</section>
@@ -426,7 +430,7 @@
 		{/each}
 	</ul>
 	<div class="acoes">
-		<a class="botao botao--secundario" href="/avisos">{t('Ver todos os avisos')}</a>
+		<a class="botao botao--secundario" href="/avisos" {@attach dica(t('Abre a página com todos os avisos.'))}>{t('Ver todos os avisos')}</a>
 		<button class="botao botao--secundario" type="button" onclick={() => modalAvisos?.fechar()}>{t('Fechar')}</button>
 	</div>
 </Modal>
@@ -437,7 +441,7 @@
 			<li>
 				<span>
 					<span class="selo {SELO_NOTA[nota.status as StatusNota]}">{STATUS_NOTA[nota.status as StatusNota]}</span>
-					<button class="abre-ficha" type="button" onclick={() => (notaVista = nota.id)}>{nota.titulo}</button>
+					<button class="abre-ficha" type="button" onclick={() => (notaVista = nota.id)} {@attach dica(t('Mostra a nota e a resposta da equipe de crise.'))}>{nota.titulo}</button>
 					<span class="detalhe">{nota.resposta}</span>
 				</span>
 			</li>
@@ -446,6 +450,7 @@
 	<div class="acoes">
 		{#if data.respostasCrise[0]}
 			<a class="botao botao--secundario" href={`/comite/${data.participacoes.find((p) => p.comite_id === data.respostasCrise[0].comite_id)?.comite_sigla}/crise`}
+				{@attach dica(t('Abre a página de crise do comitê, com todas as notas.'))}
 				>{t('Ver as notas de crise')}</a
 			>
 		{/if}
@@ -458,7 +463,7 @@
 		{#each data.citacoes as n (n.id)}
 			<li>
 				<span>
-					<button class="abre-ficha" type="button" onclick={() => abrirPrevia('noticia', n.id)}>{n.titulo}</button>
+					<button class="abre-ficha" type="button" onclick={() => abrirPrevia('noticia', n.id)} {@attach dica(t('Lê a matéria sem sair desta tela.'))}>{n.titulo}</button>
 					<span class="detalhe">{t('{veiculo} cita a sua delegação', { veiculo: n.veiculo?.nome ?? '' })}</span>
 				</span>
 			</li>

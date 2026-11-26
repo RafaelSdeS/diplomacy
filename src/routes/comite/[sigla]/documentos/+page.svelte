@@ -14,6 +14,7 @@
 	import NomeDelegacao from '#lib/ui/NomeDelegacao.svelte';
 	import GradeAtalhos, { type Atalho } from '#lib/ui/GradeAtalhos.svelte';
 	import Modal from '#lib/ui/Modal.svelte';
+	import { dica } from '#lib/dica.ts';
 	import TrilhaDoTopico from '#lib/ui/TrilhaDoTopico.svelte';
 	import Mail from '@lucide/svelte/icons/mail';
 	import NotebookPen from '@lucide/svelte/icons/notebook-pen';
@@ -100,7 +101,7 @@
 {#snippet documento(d: Documento)}
 	<li>
 		<span>
-			<button class="abre-ficha" type="button" onclick={() => abrirPrevia('documento', d.id)}>{nomeDoDocumento(d)}</button>
+			<button class="abre-ficha" type="button" onclick={() => abrirPrevia('documento', d.id)} {@attach dica(t('Uma prévia ao lado, sem sair desta tela.'))}>{nomeDoDocumento(d)}</button>
 			<span class="detalhe">
 				{d.bloco?.nome}
 				{#if d.assinaturas.length}
@@ -132,25 +133,32 @@
 				{#if paraAvaliar}
 					<li>
 						<span>{paraAvaliar === 1 ? t('1 documento espera a avaliação da mesa') : t('{n} documentos esperam a avaliação da mesa', { n: paraAvaliar })}</span>
-						<button class="botao botao--pequeno" type="button" onclick={() => modalAvaliar?.abrir()}>{t('Ler e avaliar')}</button>
+						<button
+							class="botao botao--pequeno"
+							type="button"
+							{@attach dica(t('Os documentos que as delegações enviaram e esperam a decisão da mesa.'))}
+							onclick={() => modalAvaliar?.abrir()}>{t('Ler e avaliar')}</button>
 					</li>
 				{/if}
 				{#if dposPorFazer.length}
 					<li>
 						<span>{t('Seu DPO')} <span class="suave">· {t('Tópico')} {dposPorFazer.map((d) => d.topico).join(', ')}</span></span>
-						<a class="botao botao--secundario botao--pequeno" href={`/comite/${sigla}/dpo`}>{t('Abrir')}</a>
+						<a class="botao botao--secundario botao--pequeno" href={`/comite/${sigla}/dpo`} {@attach dica(t('Enviar ou trocar o PDF do DPO da sua delegação.'))}>{t('Abrir')}</a>
 					</li>
 				{/if}
 				{#if semMinhaAssinatura.length === 1}
 					<li>
 						<span>{nomeDoDocumento(semMinhaAssinatura[0])} <span class="detalhe">{t('falta a assinatura da sua delegação')}</span></span>
-						<a class="botao botao--secundario botao--pequeno" href={`/documento/${semMinhaAssinatura[0].id}`}>{t('Abrir')}</a>
+						<a
+							class="botao botao--secundario botao--pequeno"
+							href={`/documento/${semMinhaAssinatura[0].id}`}
+							{@attach dica(t('O documento que espera a assinatura da sua delegação.'))}>{t('Abrir')}</a>
 					</li>
 				{:else if semMinhaAssinatura.length}
 					<!-- Uma linha só, para não rolar: os documentos ficam na aba Blocos. -->
 					<li>
 						<span>{t('{n} documentos sem a sua assinatura', { n: semMinhaAssinatura.length })}</span>
-						<a class="botao botao--secundario botao--pequeno" href={`/comite/${sigla}/blocos`}>{t('Abrir')}</a>
+						<a class="botao botao--secundario botao--pequeno" href={`/comite/${sigla}/blocos`} {@attach dica(t('Os documentos ficam na aba Blocos, cada um no seu bloco.'))}>{t('Abrir')}</a>
 					</li>
 				{/if}
 				{#if nadaParaVoce}<li class="suave">{t('Nada esperando você agora.')}</li>{/if}
@@ -173,7 +181,11 @@
 						<p class="suave">{t('Nada publicado pela mesa ainda.')}</p>
 					{/if}
 				</div>
-				<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => modalDaMesa?.abrir()}>{t('Ver todos')}</button>
+				<button
+					class="botao botao--secundario botao--pequeno"
+					type="button"
+					{@attach dica(t('Tudo o que a mesa publicou para o comitê.'))}
+					onclick={() => modalDaMesa?.abrir()}>{t('Ver todos')}</button>
 			</article>
 		{/if}
 		<!-- Passo 61: o que é do bloco não some ao assinar: uma linha fixa, que abre a lista. -->
@@ -183,27 +195,35 @@
 				<div class="linha-evento-resumo">
 					<p class="suave">{data.meusBlocos.length ? t('dos seus blocos') : t('Sua delegação ainda não está num bloco.')}</p>
 				</div>
-				<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => modalSeus?.abrir()}>{t('Ver todos')}</button>
+				<button
+					class="botao botao--secundario botao--pequeno"
+					type="button"
+					{@attach dica(t('Os documentos dos blocos da sua delegação.'))}
+					onclick={() => modalSeus?.abrir()}>{t('Ver todos')}</button>
 			</article>
 		{/if}
 		<article class="linha-evento" aria-labelledby="t-dpos">
 			<h3 id="t-dpos">{t('DPOs')} <span class="selo">{t('{n} de {total}', { n: dposVisiveis.length, total: data.totalDelegacoes })}</span></h3>
 			<div class="linha-evento-resumo"></div>
-			<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => modalDpos?.abrir()}>{t('Ver todos')}</button>
+			<button
+				class="botao botao--secundario botao--pequeno"
+				type="button"
+				{@attach dica(t('Os DPOs que as delegações já enviaram.'))}
+				onclick={() => modalDpos?.abrir()}>{t('Ver todos')}</button>
 		</article>
 		<article class="linha-evento" aria-labelledby="t-cartas">
 			<h3 id="t-cartas">{t('Cartas')} <span class="selo">{data.cartas.length}</span></h3>
 			<div class="linha-evento-resumo">
 				{#if data.cartas[0]}
 					<p class="linha-evento-texto">
-						<button class="abre-ficha" type="button" onclick={() => abrirPrevia('carta', data.cartas[0].id)}>{data.cartas[0].titulo}</button>
+						<button class="abre-ficha" type="button" onclick={() => abrirPrevia('carta', data.cartas[0].id)} {@attach dica(t('Uma prévia ao lado, sem sair desta tela.'))}>{data.cartas[0].titulo}</button>
 						<span class="detalhe">{data.cartas[0].remetente?.nome}</span>
 					</p>
 				{:else}
 					<p class="suave">{t('Nenhuma carta ainda.')}</p>
 				{/if}
 			</div>
-			<a class="botao botao--secundario botao--pequeno" href={`/comite/${sigla}/cartas`}>{t('Ver todas')}</a>
+			<a class="botao botao--secundario botao--pequeno" href={`/comite/${sigla}/cartas`} {@attach dica(t('A tela das cartas, para ler e escrever.'))}>{t('Ver todas')}</a>
 		</article>
 	</section>
 
@@ -244,7 +264,11 @@
 		{#each data.documentos.filter((d) => d.status === 'enviado') as d (d.id)}
 			<li>
 				<span>{nomeDoDocumento(d)} <span class="detalhe">{d.bloco?.nome}</span></span>
-				<a class="botao botao--secundario botao--pequeno" href={`/documento/${d.id}`}>{t('Ler e avaliar')}</a>
+				<a
+					class="botao botao--secundario botao--pequeno"
+					href={`/documento/${d.id}`}
+					{@attach dica(t('O documento inteiro, com as decisões da mesa.'))}>{t('Ler e avaliar')}</a
+				>
 			</li>
 		{/each}
 	</ul>
@@ -272,7 +296,7 @@
 		<form class="formulario" aria-label={t('Novo documento da mesa')} onsubmit={criarDaMesa}>
 			<label class="campo">{t('Novo documento da mesa')} <input required maxlength="200" placeholder={t('Título')} bind:value={tituloNovo} /></label>
 			{#if erroNovo}<p class="erro">{erroNovo}</p>{/if}
-			<button class="botao">{t('Criar e escrever')}</button>
+			<button class="botao" {@attach dica(t('Abre o editor do novo documento, ainda como rascunho.'))}>{t('Criar e escrever')}</button>
 		</form>
 	{/if}
 	<form method="dialog" class="acoes"><button class="botao botao--secundario">{t('Fechar')}</button></form>
@@ -300,6 +324,7 @@
 					class="botao botao--secundario botao--pequeno"
 					type="button"
 					aria-label={`${t('Ler')}: ${t('DPO de {delegacao}', { delegacao: dpo.delegacao?.nome ?? '' })}, ${t('Tópico')} ${dpo.topico}`}
+					{@attach dica(t('Uma prévia ao lado, sem sair desta tela.'))}
 					onclick={() => abrirPrevia('dpo', dpo.id)}>{t('Ler')}</button
 				>
 			</li>

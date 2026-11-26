@@ -17,6 +17,7 @@
 	import SairDoTelao from '#lib/ui/SairDoTelao.svelte';
 	import { marcacaoParaHtml } from '#lib/marcacao.ts';
 	import { supabase } from '#lib/supabase.ts';
+	import { dica } from '#lib/dica.ts';
 	import { mensagemDeErro } from '#lib/sessao.ts';
 	import type { PageProps } from './$types';
 
@@ -163,7 +164,7 @@
 			<div class="telao-documento-texto">{@html marcacaoParaHtml(data.documento.corpo)}</div>
 			{#if mexendo}
 				<p class="acoes">
-					<button class="botao" type="button" onclick={voltarASessao}>{t('Voltar à sessão')}</button>
+					<button class="botao" type="button" onclick={voltarASessao} {@attach dica(t('O telão deixa o documento e volta a mostrar o orador e a lista.'))}>{t('Voltar à sessão')}</button>
 					{#if erroTelao}<span class="erro" role="alert">{erroTelao}</span>{/if}
 				</p>
 			{/if}

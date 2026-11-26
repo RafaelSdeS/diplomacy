@@ -1661,6 +1661,661 @@ export const EN: Record<string, string> = {
 	'Ler o briefing': 'Read the briefing',
 	'Ler o briefing: {titulo}': 'Read the briefing: {titulo}',
 	'Atingidas': 'Affected',
+	// Passo 62 (lote 6): as dicas de todas as ações
+	'Outras telas da sessão, como a agenda, as votações e o telão.':
+		'Other session screens, such as the agenda, the votes and the big screen.',
+	'Abre o pedido de ponto ou moção enquanto a pausa dura.':
+		'Opens a point or motion request while the pause lasts.',
+	'A mesa confirma a presença, e sua delegação passa a votar.':
+		'The dais confirms your attendance, and your delegation can vote.',
+	'Sua assinatura ajuda o pedido de não-confiança a ir a voto.':
+		'Your signature helps the no-confidence request go to a vote.',
+	'Ver os detalhes e os votos desta votação.':
+		'See the details and the votes of this vote.',
+	'Ver os detalhes deste pedido.':
+		'See the details of this request.',
+	'Inscreve sua delegação para discursar a favor desta moção.':
+		'Signs your delegation up to speak in favor of this motion.',
+	'Inscreve sua delegação para discursar contra esta moção.':
+		'Signs your delegation up to speak against this motion.',
+	'Cancela a retirada: o pedido continua com a mesa.':
+		'Cancels the withdrawal: the request stays with the dais.',
+	'Tira o pedido da mesa; dá para desfazer logo em seguida.':
+		'Takes the request back from the dais; you can undo it right after.',
+	'Ver quais delegações estão com a placa levantada.':
+		'See which delegations have their placard raised.',
+	'Para erguer o celular ou o notebook como placa na sala.':
+		'To hold up your phone or laptop as a placard in the room.',
+	'Mudar o texto, incluir um item depois, mudar de lugar ou retirar.':
+		'Change the text, add an item after it, move it or remove it.',
+	'A agenda e as alterações propostas deste tópico.':
+		'The agenda of this topic and the proposed changes.',
+	'Abre o editor para escrever os itens da agenda deste tópico.':
+		'Opens the editor to write the agenda items for this topic.',
+	'Sugere um item novo no fim da agenda, para a sala debater.':
+		'Suggests a new item at the end of the agenda, for the room to debate.',
+	'Corrigir os itens antes de liberar a agenda.':
+		'Fix the items before releasing the agenda.',
+	'As delegações passam a ver a agenda e a propor alterações.':
+		'Delegations can then see the agenda and propose changes.',
+	'Registra que a sala adotou a agenda; a presidência marca o andamento dos itens.':
+		'Records that the room adopted the agenda; the chair marks the progress of each item.',
+	'Desfaz o registro: a agenda deixa de constar como adotada.':
+		'Undoes the record: the agenda is no longer marked as adopted.',
+	'Marca sua posição nesta alteração; tocar de novo desmarca.':
+		'Marks your position on this change; tap again to clear it.',
+	'Aplica esta alteração à agenda.':
+		'Applies this change to the agenda.',
+	'A alteração não entra na agenda e fica entre as respondidas.':
+		'The change stays out of the agenda and moves to the answered ones.',
+	'A alteração vai à sala, que debate e marca a posição.':
+		'The change goes to the room, which debates it and marks positions.',
+	'Sorteia a ordem em que as delegações membros presidem as sessões.':
+		'Draws the order in which member delegations chair the sessions.',
+	'Começa uma nova sessão; em seguida, faça a chamada aqui.':
+		'Starts a new session; then take the roll call here.',
+	'Para começar rápido; depois, toque nas que faltaram.':
+		'For a quick start; then tap the ones that are missing.',
+	'Um toque alterna entre presente e ausente.':
+		'One tap switches between present and absent.',
+	'Vai ao painel da presidência, que conduz o resto da sessão.':
+		'Goes to the chair panel, which runs the rest of the session.',
+	'Começa a próxima sessão e leva à chamada das delegações.':
+		'Starts the next session and takes you to the roll call.',
+	'O caso excepcional: a mesa assume ou devolve a presidência.':
+		'The exceptional case: the dais takes over or hands back the chair.',
+	'A delegação da vez volta a conduzir o debate.':
+		'The delegation whose turn it is runs the debate again.',
+	'A mesa age no lugar de uma delegação que faltou.':
+		'The dais acts on behalf of a delegation that is absent.',
+	'Vai à tela da sessão para pedir a palavra e votar por ela.':
+		'Goes to the session screen to ask for the floor and vote for it.',
+	'Você deixa de agir no lugar desta delegação.':
+		'You stop acting on behalf of this delegation.',
+	'Você passa a agir pela delegação escolhida nesta sessão.':
+		'You start acting for the chosen delegation in this session.',
+	'Põe a delegação na lista curta dos próximos, até quatro.':
+		'Adds the delegation to the short list of next speakers, up to four.',
+	'Os escolhidos passam a ser os próximos, nesta ordem.':
+		'The chosen delegations become the next speakers, in this order.',
+	'Abaixa as placas de todas as delegações (atalho: B).':
+		'Lowers the placards of all delegations (shortcut: B).',
+	'A mesa levanta a placa pela delegação, na tecnologia restrita.':
+		'The dais raises the placard for the delegation, under restricted technology.',
+	'Termina a pausa para pontos e moções e volta ao debate.':
+		'Ends the pause for points and motions and returns to the debate.',
+	'O tempo acabou: o debate volta à forma formal-informal.':
+		'Time is up: the debate goes back to the formal-informal format.',
+	'Avança a plenária de abertura para a próxima etapa.':
+		'Moves the opening plenary on to the next stage.',
+	'Para ou continua o cronômetro da fala (atalho: Espaço).':
+		'Stops or resumes the speaking timer (shortcut: Space).',
+	'Dá mais 30 segundos à fala.':
+		'Gives the speech 30 more seconds.',
+	'Tira 10 segundos da fala.':
+		'Takes 10 seconds off the speech.',
+	'A delegação deixa de falar, e o cronômetro para.':
+		'The delegation stops speaking, and the timer stops.',
+	'Para ou continua o relógio do tempo do debate.':
+		'Stops or resumes the debate clock.',
+	'Dá mais 1 minuto ao debate.':
+		'Gives the debate 1 more minute.',
+	'Tira 1 minuto do debate.':
+		'Takes 1 minute off the debate.',
+	'Mudar o tempo de fala e a forma de debate.':
+		'Change the speaking time and the debate format.',
+	'Vale para as próximas falas e ajusta a fala em curso.':
+		'Applies to the next speeches and adjusts the current one.',
+	'Passa o debate para a forma escolhida, com os minutos dados.':
+		'Switches the debate to the chosen format, with the given minutes.',
+	'Sua delegação passa a falar, e o cronômetro começa.':
+		'Your delegation starts speaking, and the timer starts.',
+	'A delegação passou a vez e será chamada de novo no fim.':
+		'The delegation passed and will be called again at the end.',
+	'Marca ou desmarca a delegação como parte na disputa, que se abstém.':
+		'Marks or unmarks the delegation as a party to the dispute, which abstains.',
+	'Registra o voto que a delegação deu na sala.':
+		'Records the vote the delegation cast in the room.',
+	'Os pedidos das delegações para aceitar, votar ou recusar.':
+		"The delegations' requests to accept, vote on or reject.",
+	'Os projetos que a mesa aprovou, para consenso ou votação.':
+		'The drafts the dais approved, for consensus or a vote.',
+	'A delegação entra na chamada e passa a votar.':
+		'The delegation joins the roll call and can vote.',
+	'Sem objeção na sala, o projeto é aprovado sem votação.':
+		'With no objection in the room, the draft passes without a vote.',
+	'Fecha a sala para votar; dá para dividir a questão antes.':
+		'Closes the room for voting; the question can be divided first.',
+	'As delegações votam o projeto inteiro agora.':
+		'Delegations vote on the whole draft now.',
+	'As delegações votam só as operativas marcadas.':
+		'Delegations vote only on the checked operative clauses.',
+	'Ver a sessão como as delegações a veem.':
+		'See the session as delegations see it.',
+	'O pedido segue para a presidência conceder.':
+		'The request goes on to the chair to grant.',
+	'Recusa o pedido, com o motivo ao lado, se houver.':
+		'Rejects the request, with the reason beside it, if any.',
+	'A votação seguinte será nominal, com chamada em ordem alfabética.':
+		'The next vote will be a roll call vote, in alphabetical order.',
+	'Concede o ponto, e a delegação é atendida agora.':
+		'Grants the point, and the delegation is answered now.',
+	'Abre a lista com até 2 discursos a favor e 2 contra.':
+		'Opens the list with up to 2 speeches in favor and 2 against.',
+	'A sala vota esta moção agora.':
+		'The room votes on this motion now.',
+	'A presidência não concede o pedido.':
+		'The chair does not grant the request.',
+	'O telão deixa o documento e volta a mostrar o orador e a lista.':
+		'The big screen leaves the document and shows the speaker and the list again.',
+	'Escolher outra delegação do bloco para redigir no lugar da sua.':
+		'Choose another delegation in the bloc to draft in place of yours.',
+	'Mensagens só entre as delegações deste bloco.':
+		'Messages only among the delegations in this bloc.',
+	'Escrever com o bloco uma resposta à atualização de crise.':
+		'Write a response to the crisis update with your bloc.',
+	'Sua delegação passa a fazer parte deste bloco e dos documentos dele.':
+		'Your delegation joins this bloc and its documents.',
+	'Anotações livres da sua delegação.':
+		"Your delegation's free-form notes.",
+	'O que vocês anotaram sobre cada delegação.':
+		'What you noted about each delegation.',
+	'Discursos escritos antes, com o tempo estimado de fala.':
+		'Speeches written ahead, with the estimated speaking time.',
+	'Abre o texto num quadro grande, para ler enquanto fala.':
+		'Opens the text in a large box, to read while you speak.',
+	'Tira a anotação do caderno de vez.':
+		'Removes the note from the notebook for good.',
+	'Uma prévia ao lado, sem sair desta tela.':
+		'A preview on the side, without leaving this screen.',
+	'A carta inteira numa página própria, para imprimir ou compartilhar.':
+		'The whole letter on its own page, to print or share.',
+	'Os documentos que as delegações enviaram e esperam a decisão da mesa.':
+		"The documents delegations submitted that await the dais's decision.",
+	'Enviar ou trocar o PDF do DPO da sua delegação.':
+		"Upload or replace your delegation's position paper (DPO) PDF.",
+	'O documento que espera a assinatura da sua delegação.':
+		"The document waiting for your delegation's signature.",
+	'Os documentos ficam na aba Blocos, cada um no seu bloco.':
+		'The documents are in the Blocs tab, each under its bloc.',
+	'Tudo o que a mesa publicou para o comitê.':
+		'Everything the dais has published for the committee.',
+	'Os documentos dos blocos da sua delegação.':
+		"The documents of your delegation's blocs.",
+	'Os DPOs que as delegações já enviaram.':
+		'The position papers (DPO) delegations have already submitted.',
+	'A tela das cartas, para ler e escrever.':
+		'The letters screen, to read and write.',
+	'O documento inteiro, com as decisões da mesa.':
+		"The full document, with the dais's decisions.",
+	'Abre o editor do novo documento, ainda como rascunho.':
+		'Opens the editor for the new document, still as a draft.',
+	'O que entrou e o que saiu desde a publicação anterior.':
+		'What was added and removed since the previous publication.',
+	'O arquivo abre numa aba nova do navegador.':
+		'The file opens in a new browser tab.',
+	'Salva o seu texto por cima do que a outra pessoa salvou.':
+		'Saves your text over what the other person saved.',
+	'Deixa o seu texto de lado e fica com o que a outra pessoa salvou.':
+		'Sets your text aside and keeps what the other person saved.',
+	'Guarda o texto para a mesa, sem publicar para o comitê.':
+		'Saves the text for the dais, without publishing it to the committee.',
+	'O comitê passa a ler esta versão, ao vivo.':
+		'The committee starts reading this version, live.',
+	'Pede confirmação e mostra esta versão a todo o comitê.':
+		'Asks for confirmation and shows this version to the whole committee.',
+	'A tela do projetor volta a mostrar a sessão.':
+		'The projector screen goes back to showing the session.',
+	'O documento aparece na tela do projetor da sala.':
+		"The document appears on the room's projector screen.",
+	'Um PDF que o comitê pode abrir junto com o texto.':
+		'A PDF the committee can open along with the text.',
+	'Remove o arquivo anexado. O texto fica como está.':
+		'Removes the attached file. The text stays as it is.',
+	'Apaga o documento, e o comitê deixa de vê-lo.':
+		'Deletes the document, and the committee no longer sees it.',
+	'Escolher no seu aparelho um PDF de até 5 MB para este tópico.':
+		'Choose a PDF of up to 5 MB from your device for this topic.',
+	'Um recado da mesa que só esta delegação lê.':
+		'A note from the dais that only this delegation reads.',
+	'Tira o arquivo do comitê, com um motivo que a delegação vê.':
+		'Takes the file out of the committee, with a reason the delegation sees.',
+	'Sua delegação concorda com esta cláusula.':
+		'Your delegation agrees with this clause.',
+	'Sua delegação aceita, mas com reservas.':
+		'Your delegation accepts, but with reservations.',
+	'Sua delegação não aceita esta cláusula.':
+		'Your delegation does not accept this clause.',
+	'Sua delegação deixa de apoiar o documento.':
+		'Your delegation stops supporting the document.',
+	'Sua delegação mostra acordo com o texto e apoia o documento.':
+		'Your delegation shows agreement with the text and supports the document.',
+	'A mesa recebe o texto para avaliar, e ele deixa de ser editado.':
+		'The dais receives the text for review, and it can no longer be edited.',
+	'A mesa aceita o texto enviado pelo bloco.':
+		'The dais accepts the text submitted by the bloc.',
+	'O bloco recebe o texto de volta para continuar editando.':
+		'The bloc gets the text back to keep editing.',
+	'Outras ações, como a versão para imprimir.':
+		'Other actions, such as the printable version.',
+	'O documento formatado, pronto para imprimir ou guardar.':
+		'The formatted document, ready to print or save.',
+	'Os comentários novos deixam de aparecer como novos.':
+		'The new comments stop showing as new.',
+	'Acrescenta um parágrafo de texto livre.':
+		'Adds a free-text paragraph.',
+	'Acrescenta uma cláusula que dá o contexto e os motivos.':
+		'Adds a clause that gives the context and the reasons.',
+	'Acrescenta uma cláusula numerada com o que o comitê decide.':
+		'Adds a numbered clause with what the committee decides.',
+	'Troca a primeira palavra da cláusula por este verbo.':
+		"Replaces the clause's first word with this verb.",
+	'Guarda o texto. No teclado, Enter salva e Esc cancela.':
+		'Saves the text. On the keyboard, Enter saves and Esc cancels.',
+	'Acrescenta um item com letra dentro desta operativa.':
+		'Adds a lettered item inside this operative clause.',
+	'Mostra a todos que esta cláusula está em debate no bloco.':
+		'Shows everyone that this clause is under debate in the bloc.',
+	'Trava a cláusula: só volta a mudar se as delegações pedirem.':
+		'Locks the clause: it only changes again if delegations ask.',
+	'A cláusula fica em destaque para quem está no documento.':
+		'The clause is highlighted for everyone in the document.',
+	'Sobe a cláusula uma posição (Alt + ↑).':
+		'Moves the clause up one position (Alt + ↑).',
+	'Desce a cláusula uma posição (Alt + ↓).':
+		'Moves the clause down one position (Alt + ↓).',
+	'Tira a cláusula do documento.':
+		'Removes the clause from the document.',
+	'Sua delegação pede que a cláusula volte ao debate.':
+		'Your delegation asks for the clause to return to debate.',
+	'O comentário fica nesta cláusula para o bloco ler.':
+		'The comment stays on this clause for the bloc to read.',
+	'A posição fica marcada, sem comentário.':
+		'Your position stays marked, without a comment.',
+	'O comentário foi atendido e sai da lista.':
+		'The comment was addressed and leaves the list.',
+	'Guarda o comentário para depois, fora da lista principal.':
+		'Keeps the comment for later, out of the main list.',
+	'O texto proposto substitui o da cláusula.':
+		"The proposed text replaces the clause's text.",
+	'A proposta é fechada, e a cláusula fica como está.':
+		'The proposal is closed, and the clause stays as it is.',
+	'O redator do bloco decide se o texto proposto entra.':
+		"The bloc's drafter decides whether the proposed text goes in.",
+	'Sua delegação concorda com esta proposta.':
+		'Your delegation agrees with this proposal.',
+	'Sua delegação não aceita esta proposta.':
+		'Your delegation does not accept this proposal.',
+	'Cada proposta ainda em aberto, com ou sem consenso.':
+		'Every proposal still open, with or without consensus.',
+	'Sem delegação contra e com o apoio de pelo menos metade da sala.':
+		'No delegation against, and support from at least half the room.',
+	'As propostas que ainda não chegaram ao consenso.':
+		'The proposals that have not reached consensus yet.',
+	'A mudança proposta passa a valer no texto.':
+		'The proposed change takes effect in the text.',
+	'A proposta sai do debate, e o texto fica como está.':
+		'The proposal leaves the debate, and the text stays as it is.',
+	'O projeto de resolução do tópico, feito dos working papers.':
+		"The topic's draft resolution, made from the working papers.",
+	'Um working paper do tópico, de um item da agenda.':
+		'A working paper for the topic, from an agenda item.',
+	'Este working paper já virou projeto: o debate segue lá.':
+		'This working paper is now a draft resolution: the debate continues there.',
+	'Sugerir um texto novo, que a sala debate antes de entrar.':
+		'Suggest new text, which the room debates before it goes in.',
+	'Gera um código novo para cada pessoa e monta os crachás com QR para imprimir.':
+		'Issues a new code for each person and lays out the QR badges to print.',
+	'Digite o nome de uma tela, comitê ou delegação para ir direto a ela.':
+		'Type the name of a screen, committee or delegation to go straight to it.',
+	'Os avisos da organização e da mesa para você.':
+		'Announcements for you from the organizers and the dais.',
+	'Abre suas anotações para escrever ou consultar, sem sair desta tela.':
+		'Opens your notes to write or look things up without leaving this screen.',
+	'Troca as cores da tela entre claro e escuro.':
+		'Switches the screen colors between light and dark.',
+	'Muda o idioma do app entre português e inglês.':
+		'Switches the app language between Portuguese and English.',
+	'Seus dados, seus papéis no evento e suas preferências.':
+		'Your details, your roles at the event and your preferences.',
+	'Sai da sua conta neste aparelho; antes, pede para confirmar.':
+		'Signs you out on this device; it asks you to confirm first.',
+	'Manda os itens guardados agora e, depois, sai da conta.':
+		'Sends the saved items now and then signs you out.',
+	'Sai sem enviar: os itens guardados neste aparelho se perdem.':
+		'Signs out without sending: the items saved on this device are lost.',
+	'Vai para a conversa onde a mensagem chegou.':
+		'Goes to the conversation where the message arrived.',
+	'Abre o documento para decidir as propostas que já têm consenso.':
+		'Opens the document to decide the proposals that already have consensus.',
+	'Mostra os detalhes do que está em votação.':
+		'Shows the details of what is being voted on.',
+	'Vai à coletiva de imprensa, onde sua delegação deve responder.':
+		'Goes to the press conference, where your delegation is expected to answer.',
+	'Abre as mensagens do comitê para responder ao bilhete.':
+		'Opens the committee messages to reply to the note.',
+	'Os documentos que as delegações mandaram e esperam a mesa.':
+		'The documents delegations have sent that are waiting for the dais.',
+	'Abre o projeto de resolução do tópico em debate.':
+		'Opens the draft resolution for the topic under debate.',
+	'Abre os working papers do tópico em debate.':
+		'Opens the working papers for the topic under debate.',
+	'Escreve uma matéria para o jornal do evento.':
+		'Write an article for the event newspaper.',
+	'Marca e acompanha as entrevistas com as delegações.':
+		'Schedule and follow interviews with delegations.',
+	'Registra a chegada dos participantes ao evento.':
+		'Records participants as they arrive at the event.',
+	'Quem está no evento, com papéis e comitês.':
+		'Who is at the event, with roles and committees.',
+	'Os avisos publicados para o evento.':
+		'The announcements published for the event.',
+	'Mostra tudo o que acontece agora, inclusive nos comitês.':
+		'Shows everything happening now, including in the committees.',
+	'Todos os horários do evento.':
+		'The full event schedule.',
+	'Mostra os avisos mais recentes.':
+		'Shows the latest announcements.',
+	'Mostra a nota e a resposta da equipe de crise.':
+		"Shows the note and the crisis team's reply.",
+	'Mostra todas as respostas da crise à sua delegação.':
+		'Shows all the crisis replies to your delegation.',
+	'Lê a matéria sem sair desta tela.':
+		'Read the article without leaving this screen.',
+	'Mostra todas as matérias que citam sua delegação.':
+		'Shows all the articles that mention your delegation.',
+	'Abre a página com todos os avisos.':
+		'Opens the page with all announcements.',
+	'Abre a página de crise do comitê, com todas as notas.':
+		"Opens the committee's crisis page, with all the notes.",
+	'Apaga este aviso para todos, na hora.':
+		'Deletes this announcement for everyone, right away.',
+	'DPOs, projetos, cartas e os documentos da mesa, numa lista só.':
+		'Position papers, drafts, letters and dais documents, in one list.',
+	'Abre a ficha da delegação: delegados, votos, documentos e anotações.':
+		'Opens the delegation card: delegates, votes, documents and notes.',
+	'A sessão ao vivo do comitê: placa, pontos e votos.':
+		"The committee's live session: placard, points and votes.",
+	'Um recado curto e privado para esta delegação.':
+		'A short, private note to this delegation.',
+	'Esta delegação volta a poder mandar bilhetes à sua.':
+		'This delegation will be able to send notes to yours again.',
+	'Esta delegação deixa de mandar bilhetes à sua. Dá para desfazer.':
+		'This delegation will no longer send notes to yours. You can undo it.',
+	'Abre o caderno para anotar sobre esta delegação.':
+		'Opens your notebook to write about this delegation.',
+	'Lê o documento de posição sem sair desta tela.':
+		'Read the position paper without leaving this screen.',
+	'Lê a carta sem sair desta tela.':
+		'Read the letter without leaving this screen.',
+	'Escolha de quais delegações a sua não recebe bilhetes.':
+		'Choose which delegations your delegation will not receive notes from.',
+	'Se a mesa lê os bilhetes, se eles ficam bloqueados e quais ocultar.':
+		'Whether the dais reads notes, whether notes are blocked, and which to hide.',
+	'Vale na hora para todas as delegações do comitê.':
+		'Takes effect right away for every delegation in the committee.',
+	'Esconde o bilhete das delegações, por estar fora do personagem.':
+		'Hides the note from delegations for being out of character.',
+	'Abre a conversa e marca as mensagens como lidas.':
+		'Opens the conversation and marks its messages as read.',
+	'Mostra a opção de bloquear os bilhetes desta delegação.':
+		'Shows the option to block notes from this delegation.',
+	'Avisa a mesa que esta mensagem está fora do personagem ou é ofensiva.':
+		'Tells the dais this message is out of character or offensive.',
+	'Manda a mensagem para {quem}.':
+		'Sends the message to {quem}.',
+	'Uma novidade da crise que as delegações leem na página de crise do comitê.':
+		"Crisis news that delegations read on the committee's crisis page.",
+	'Diga se a crise foi resolvida ou fracassou e o que aconteceu.':
+		'Say whether the crisis was resolved or failed, and what happened.',
+	'Mostra as atualizações já publicadas neste comitê.':
+		'Shows the updates already published in this committee.',
+	'A conversa privada da equipe de crise com a mesa do comitê.':
+		"The crisis team's private conversation with the committee dais.",
+	'Mostra de novo todas as notas da fila.':
+		'Shows all the notes in the queue again.',
+	'Abre a nota ao lado para ler e responder.':
+		'Opens the note alongside so you can read and reply.',
+	'Marca que você cuida desta nota, para ninguém da equipe responder junto.':
+		'Marks that you are handling this note, so no one else on the team replies too.',
+	'Põe esta resposta pronta no campo, para você completar.':
+		'Puts this ready-made reply in the field for you to complete.',
+	'Aprova o pedido e manda a resposta à delegação.':
+		'Approves the request and sends the reply to the delegation.',
+	'Devolve com a resposta, para a delegação mudar e mandar de novo.':
+		'Sends it back with the reply so the delegation can revise and resend it.',
+	'Recusa o pedido e manda a resposta à delegação.':
+		'Rejects the request and sends the reply to the delegation.',
+	'Tira esta delegação da lista das atingidas.':
+		'Removes this delegation from the affected list.',
+	'Escolha uma delegação que fica sem voz por causa da crise.':
+		'Choose a delegation that loses its voice because of the crisis.',
+	'Tira este horário do cronograma, para todos, na hora.':
+		'Removes this slot from the schedule for everyone, right away.',
+	'Entra com o e-mail e a senha que a secretaria cadastrou.':
+		'Signs in with the email and password the secretariat registered.',
+	'Entra com a sua conta Google, se for o e-mail cadastrado no evento.':
+		'Signs in with your Google account, if it is the email registered for the event.',
+	'Entra com o código que a secretaria deu a você.':
+		'Signs in with the code the secretariat gave you.',
+	'Manda um link e um código para o seu e-mail, sem precisar de senha.':
+		'Sends a link and a code to your email, no password needed.',
+	'Entra com o código que chegou no seu e-mail.':
+		'Signs in with the code that arrived in your email.',
+	'Baixe tudo o que o app guarda sobre você ou peça a exclusão da conta.':
+		'Download everything the app keeps about you or ask for your account to be deleted.',
+	'Uma pesquisa anônima e curta sobre como o app ajudou no evento.':
+		'A short, anonymous survey on how the app helped at the event.',
+	'Os delegados e os documentos abertos da sua delegação.':
+		"Your delegation's delegates and public documents.",
+	'Para de receber os avisos fora do app neste aparelho.':
+		'Stops announcements from arriving outside the app on this device.',
+	'Recebe os avisos importantes mesmo com o app fechado.':
+		'Get important announcements even when the app is closed.',
+	'Salva o arquivo neste aparelho; nada muda na sua conta.':
+		'Saves the file to this device; nothing changes in your account.',
+	'Manda o pedido à secretaria, que apaga a conta e avisa você.':
+		'Sends the request to the secretariat, which deletes the account and lets you know.',
+	'Antes de enviar, o app pede para você confirmar.':
+		'The app asks you to confirm before sending.',
+	'Manda a pesquisa sem o seu nome. Depois não dá para mudar.':
+		'Sends the survey without your name. It cannot be changed afterwards.',
+	'O que o app guarda, para quê e quem vê cada coisa.':
+		'What the app keeps, what for, and who sees each thing.',
+	'Abre a agenda do tópico, com os itens e as propostas.':
+		"Opens the topic's agenda, with its items and proposals.",
+	'Abre a câmera e marca a presença de quem mostrar o QR do crachá.':
+		'Opens the camera and checks in whoever shows their badge QR code.',
+	'Abre a ficha da delegação por cima da tela, com as suas anotações.':
+		"Opens the delegation's card over the screen, with your notes.",
+	'Abre a janela de impressão do navegador para esta página.':
+		"Opens the browser's print window for this page.",
+	'Abre a lista, com filtro, para escolher uma.':
+		'Opens the list, with a filter, to pick one.',
+	'Abre a lista, com filtro, para marcar quantas quiser.':
+		'Opens the list, with a filter, to tick as many as you like.',
+	'Abre a lista de documentos do comitê.':
+		"Opens the committee's document list.",
+	'Abre a página da delegação.':
+		"Opens the delegation's page.",
+	'Abre a página do caderno com todas as anotações da delegação.':
+		"Opens the notebook page with all of the delegation's notes.",
+	'Abre a página do seu veículo, com as matérias publicadas.':
+		"Opens your outlet's page, with its published stories.",
+	'Abre a pauta de perguntas da press às delegações.':
+		'Opens the list of questions from the press to the delegations.',
+	'Abre a sessão do comitê.':
+		'Opens the committee session.',
+	'Abre as matérias do comitê para imprimir ou salvar em PDF.':
+		"Opens the committee's stories to print or save as PDF.",
+	'Abre as resoluções deste tópico.':
+		"Opens this topic's resolutions.",
+	'Abre a tela da coletiva para projetar na sala.':
+		'Opens the press conference screen to project in the room.',
+	'Abre o arquivo da edição para imprimir ou salvar em PDF.':
+		"Opens this edition's archive to print or save as PDF.",
+	'Abre o arquivo numa aba nova.':
+		'Opens the file in a new tab.',
+	'Abre o briefing inteiro da crise, com quem foi atingido.':
+		'Opens the full crisis briefing, with who was affected.',
+	'Abre o caderno com todas as anotações sobre esta delegação.':
+		'Opens the notebook with all the notes about this delegation.',
+	'Abre o campo para avisar a Diretoria da Press de um problema na matéria.':
+		'Opens a field to tell the Press Directorate about a problem with the story.',
+	'Abre o editor de matéria já com as falas e as notas do seu veículo.':
+		"Opens the story editor already filled with your outlet's quotes and notes.",
+	'Abre o editor para escrever e publicar uma matéria.':
+		'Opens the editor to write and publish a story.',
+	'Abre o painel da presidência.':
+		"Opens the chair's panel.",
+	'Abre o pedido para aceitar com um horário ou recusar.':
+		'Opens the request to accept it with a time or decline it.',
+	'Abre o projeto de resolução da sala.':
+		"Opens the room's draft resolution.",
+	'Abre os certificados emitidos para imprimir ou salvar em PDF.':
+		'Opens the issued certificates to print or save as PDF.',
+	'Abre os crachás de todos os participantes para imprimir.':
+		"Opens every participant's badge for printing.",
+	'Abre os projetos de resolução deste tópico.':
+		"Opens this topic's draft resolutions.",
+	'Abre os resultados das votações do comitê.':
+		"Opens the committee's voting results.",
+	'Abre os working papers deste tópico.':
+		"Opens this topic's working papers.",
+	'Abre o WhatsApp com a legenda da matéria pronta para enviar.':
+		"Opens WhatsApp with the story's caption ready to send.",
+	'Abre o working paper da sala.':
+		"Opens the room's working paper.",
+	'Abre o X com a legenda da matéria pronta para postar.':
+		"Opens X with the story's caption ready to post.",
+	'Abre uma nota rápida ou o rascunho da sua próxima fala, sem sair da sessão.':
+		'Opens a quick note or the draft of your next speech, without leaving the session.',
+	'Aceita a entrevista no horário escolhido; o veículo fica sabendo.':
+		'Accepts the interview at the chosen time; the outlet is told.',
+	'Acrescenta um item no fim, no primeiro nível.':
+		'Adds an item at the end, at the top level.',
+	'Acrescenta um subitem dentro do último item.':
+		'Adds a sub-item inside the last item.',
+	'Apaga a conta e os dados pessoais de quem pediu a exclusão.':
+		'Deletes the account and personal data of the person who asked for deletion.',
+	'Apaga este item da agenda proposta.':
+		'Removes this item from the proposed agenda.',
+	'Apaga o convite; quem já recebeu o papel continua com ele.':
+		'Deletes the invitation; anyone who already got the role keeps it.',
+	'Avisa a Diretoria que a delegação está pronta para responder.':
+		'Tells the Directorate the delegation is ready to answer.',
+	'Avisa a próxima delegação da pauta que chegou a vez dela.':
+		'Tells the next delegation on the list that it is their turn.',
+	'Baixa o arquivo do evento e apaga os dados pessoais no fim.':
+		'Downloads the event archive and deletes personal data at the end.',
+	'Cancela a remoção; o item continua na fila.':
+		'Cancels the removal; the item stays in the queue.',
+	'Começa uma coletiva com este título; a press já pode mandar perguntas.':
+		'Starts a press conference with this title; the press can send questions right away.',
+	'Copia a legenda da matéria para colar no Instagram.':
+		"Copies the story's caption to paste on Instagram.",
+	'Cria o certificado de quem fez check-in e ainda não tem o seu.':
+		'Creates a certificate for everyone who checked in and does not have one yet.',
+	'Cria o evento novo com o nome e o ano escritos acima.':
+		'Creates the new event with the name and year written above.',
+	'Cria os convites a partir da planilha CSV das inscrições.':
+		'Creates the invitations from the registrations CSV spreadsheet.',
+	'Cria os convites da prévia; as linhas com problema ficam de fora.':
+		'Creates the invitations in the preview; rows with problems are left out.',
+	'Cria um código de entrada de 30 minutos para quem perdeu o crachá.':
+		'Creates a 30-minute sign-in code for someone who lost their badge.',
+	'Emite e imprime os certificados de quem fez check-in.':
+		'Issues and prints certificates for everyone who checked in.',
+	'Escreve no caderno uma anotação sobre esta delegação.':
+		'Writes a note about this delegation in the notebook.',
+	'Escreve uma carta diplomática privada, com título, para esta delegação.':
+		'Writes a private diplomatic letter, with a title, to this delegation.',
+	'Escreve uma mensagem curta para esta delegação.':
+		'Writes a short message to this delegation.',
+	'Fecha a câmera sem marcar ninguém.':
+		'Closes the camera without checking anyone in.',
+	'Fecha a ficha e abre a página inteira da delegação.':
+		"Closes the card and opens the delegation's full page.",
+	'Fecha a lista com o que foi escolhido.':
+		'Closes the list, keeping what was chosen.',
+	'Fecha a prévia e abre a página completa.':
+		'Closes the preview and opens the full page.',
+	'Gera a imagem da matéria no formato de post, para as redes.':
+		"Creates the story's image in post format, for social media.",
+	'Gera a imagem da matéria no formato de story, para as redes.':
+		"Creates the story's image in story format, for social media.",
+	'Guarda o que a delegação disse, para usar na matéria.':
+		'Saves what the delegation said, to use in the story.',
+	'Manda esta pergunta para o fim da fila e segue com a próxima.':
+		'Moves this question to the end of the list and goes on to the next one.',
+	'Manda o motivo à Diretoria da Press, que decide se oculta a matéria.':
+		'Sends the reason to the Press Directorate, which decides whether to hide the story.',
+	'Marca quem chegou, pela lista ou pelo QR do crachá.':
+		'Checks in arrivals, from the list or by badge QR code.',
+	'Monta os itens a partir de um texto já escrito.':
+		'Builds the items from text you have already written.',
+	'Mostra a matéria numa prévia, sem sair da página.':
+		'Shows the story in a preview, without leaving the page.',
+	'Mostra a pergunta à delegação e começa a contar o tempo da resposta.':
+		'Shows the question to the delegation and starts timing the answer.',
+	'Mostra o que ficou neste aparelho esperando a internet.':
+		'Shows what is waiting on this device for the internet to come back.',
+	'O crachá e os códigos desta pessoa deixam de entrar no app.':
+		"This person's badge and codes stop signing in to the app.",
+	'Pede a palavra; a presidência escolhe quem fala entre as placas.':
+		'Asks for the floor; the chair picks who speaks among the placards.',
+	'Pede entrevistas às delegações e mostra as respostas.':
+		'Requests interviews with delegations and shows their answers.',
+	'Põe a pergunta na fila da coletiva; a delegação só a ouve na hora.':
+		'Adds the question to the press conference list; the delegation only hears it live.',
+	'Põe esta tela nos favoritos, para achar mais rápido.':
+		'Adds this screen to your favorites, to find it faster.',
+	'Põe o item dentro do item de cima, como subitem.':
+		'Puts the item inside the one above, as a sub-item.',
+	'Publica a matéria no seu veículo; sem internet, ela sai depois sozinha.':
+		'Publishes the story in your outlet; offline, it goes out on its own later.',
+	'Recusa o pedido; o veículo fica sabendo.':
+		'Declines the request; the outlet is told.',
+	'Registra o voto da delegação a favor da proposta.':
+		"Records the delegation's vote in favour of the proposal.",
+	'Registra o voto da delegação contra a proposta.':
+		"Records the delegation's vote against the proposal.",
+	'Registra que a delegação não vota nem a favor nem contra.':
+		'Records that the delegation votes neither for nor against.',
+	'Registra que esta pessoa chegou hoje.':
+		'Records that this person arrived today.',
+	'Retira o pedido de palavra da delegação.':
+		"Withdraws the delegation's request for the floor.",
+	'Sai da tela cheia e volta para a página de antes.':
+		'Leaves full screen and goes back to the previous page.',
+	'Salva a anotação no caderno, ligada à delegação escolhida.':
+		'Saves the note in the notebook, linked to the chosen delegation.',
+	'Salva as respostas da pesquisa num arquivo JSON.':
+		'Saves the survey answers to a JSON file.',
+	'Salva no caderno com o tópico, a hora e quem tinha a palavra.':
+		'Saves to the notebook with the topic, the time and who had the floor.',
+	'Salva os documentos públicos da edição num arquivo JSON.':
+		"Saves this edition's public documents to a JSON file.",
+	'Tenta enviar tudo agora, sem esperar.':
+		'Tries to send everything now, without waiting.',
+	'Tira a busca e os filtros e mostra todos de novo.':
+		'Clears the search and filters and shows everyone again.',
+	'Tira a presença de hoje desta pessoa.':
+		"Removes this person's check-in for today.",
+	'Tira esta tela dos favoritos.':
+		'Removes this screen from your favorites.',
+	'Tira o item da fila; ele não será enviado.':
+		'Removes the item from the queue; it will not be sent.',
+	'Tira o item de dentro do item de cima.':
+		'Moves the item out of the one above.',
+	'Torna a matéria visível para todo o evento.':
+		'Makes the story visible to the whole event.',
+	'Troca o item de lugar com o de baixo.':
+		'Swaps the item with the one below.',
+	'Troca o item de lugar com o de cima.':
+		'Swaps the item with the one above.',
+	'Troca todos os itens acima pelos da lista colada.':
+		'Replaces all the items above with the ones from the pasted list.',
 	// Passo 62 (lote 6): as dicas das ações
 	'Dar a palavra, decidir pontos e moções e conduzir as votações.':
 		'Give the floor, decide points and motions, and run the votes.',
@@ -1686,6 +2341,47 @@ export const EN: Record<string, string> = {
 		"The panel's keys: give the floor, pause and move to the next.",
 	'Esta delegação passa a falar, e o cronômetro começa.':
 		'This delegation takes the floor, and the timer starts.',
+	// Sobre: como é feito
+	'Como é feito':
+		'How it is built',
+	'Para quem quiser os detalhes técnicos.':
+		'For those who want the technical details.',
+	'Interface':
+		'Interface',
+	'Um app web em SvelteKit (Svelte 5 e TypeScript), sem nada a instalar: funciona no navegador do celular, do notebook e do projetor.':
+		'A web app in SvelteKit (Svelte 5 and TypeScript), with nothing to install: it works in the browser of a phone, a laptop and a projector.',
+	'Hospedagem':
+		'Hosting',
+	'Arquivos estáticos no Cloudflare Workers. Não há servidor próprio: o app fala direto com o banco.':
+		'Static files on Cloudflare Workers. There is no server of its own: the app talks straight to the database.',
+	'Banco de dados':
+		'Database',
+	'Postgres no Supabase, em São Paulo. As regras do comitê ficam no próprio banco, em funções que conferem quem pode fazer cada coisa.':
+		'Postgres on Supabase, in São Paulo. The committee rules live in the database itself, in functions that check who may do each thing.',
+	'Segurança':
+		'Security',
+	'Cada leitura passa pela segurança por linha (RLS), ligada em todas as tabelas: cada pessoa só vê o que o papel dela permite. O login é por e-mail, Google ou QR do crachá.':
+		'Every read goes through row-level security (RLS), on in every table: each person only sees what their role allows. Sign-in is by e-mail, Google or the badge QR code.',
+	'Tempo real':
+		'Real time',
+	'O banco avisa na hora o que mudou (Supabase Realtime), e a tela relê só aquilo, para gastar pouco dado móvel.':
+		'The database announces right away what changed (Supabase Realtime), and the screen rereads only that, to use little mobile data.',
+	'Sem internet':
+		'Offline',
+	'Um service worker guarda o app e as últimas leituras; o que você envia sem rede fica na caixa de saída e sai sozinho quando a conexão volta, sem duplicar.':
+		'A service worker keeps the app and the latest reads; what you send offline waits in the outbox and goes out on its own when the connection returns, without duplicates.',
+	'Idiomas e acessibilidade':
+		'Languages and accessibility',
+	'Português e inglês. Segue as diretrizes WCAG 2.2 AA, com tema escuro e uso pelo teclado; toda ação explica o que faz.':
+		'Portuguese and English. It follows WCAG 2.2 AA, with a dark theme and keyboard use; every action explains what it does.',
+	'Testes':
+		'Tests',
+	'Testes do banco (pgTAP), de unidade (Vitest) e de ponta a ponta no celular, no notebook e no telão (Playwright), rodados a cada mudança.':
+		'Database tests (pgTAP), unit tests (Vitest) and end-to-end tests on phone, laptop and big screen (Playwright), run on every change.',
+	'O repositório público, com o código, o plano e a documentação técnica.':
+		'The public repository, with the code, the plan and the technical documentation.',
+	'Código-fonte':
+		'Source code',
 	// Passo 63: a tela do documento da sala
 	'consenso ou voto': 'consensus or vote',
 	'cada grande item da agenda tem um, de toda a sala. O redator de cada bloco (ou a delegação sem bloco) propõe mudanças; todas marcam posição; quem preside aceita ou rejeita depois do debate. Assinar é opcional e mostra acordo.':

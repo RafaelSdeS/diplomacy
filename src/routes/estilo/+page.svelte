@@ -5,6 +5,7 @@
 	import X from '@lucide/svelte/icons/x';
 	import Modal from '#lib/ui/Modal.svelte';
 	import Escolha from '#lib/ui/Escolha.svelte';
+	import { dica } from '#lib/dica.ts';
 
 	// Referência visual do app e base dos testes de aparência. Não tem dados e não fica no menu.
 	let dialogo = $state<Modal>();
@@ -62,8 +63,8 @@
 <section aria-labelledby="t-botoes">
 	<h2 id="t-botoes">Botões</h2>
 	<div class="linha">
-		<button class="botao" type="button">Dar a palavra</button>
-		<button class="botao botao--secundario" type="button">Pausar</button>
+		<button class="botao" type="button" {@attach dica('Exemplo de botão principal, com a dica da ação.')}>Dar a palavra</button>
+		<button class="botao botao--secundario" type="button" {@attach dica('Exemplo de botão secundário.')}>Pausar</button>
 	</div>
 </section>
 
@@ -109,7 +110,7 @@
 
 <section aria-labelledby="t-dialogo">
 	<h2 id="t-dialogo">Diálogo</h2>
-	<button class="botao botao--secundario" type="button" onclick={() => dialogo?.abrir()}>
+	<button class="botao botao--secundario" type="button" onclick={() => dialogo?.abrir()} {@attach dica('Abre um exemplo de diálogo de confirmação.')}>
 		Abrir diálogo
 	</button>
 	<Modal bind:this={dialogo} rotulo="t-dialogo-titulo">
