@@ -9,6 +9,7 @@ const DENTRO_DE_ACAO: Record<string, string> = {
 	'src/lib/ui/ListaVotos.svelte': 'sem sigla, só fora do comitê',
 	'src/lib/ui/GradeVotos.svelte': 'sem sigla, só no telão',
 	'src/routes/comite/[sigla]/sessao/chamada/+page.svelte': 'dentro do botão que marca a presença',
+	'src/routes/comite/[sigla]/blocos/+page.svelte': 'dentro da opção que escolhe a quem passar a redação',
 	'src/routes/crise/[sigla]/+page.svelte': 'dentro do botão que abre a nota',
 	'src/routes/perfil/+page.svelte': 'a credencial da própria pessoa'
 };
