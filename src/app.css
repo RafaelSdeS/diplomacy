@@ -504,6 +504,13 @@ main.main-sem-moldura {
 	cursor: progress;
 }
 
+/* Passo 62 (lote 6): a ação indisponível por um motivo fica com aria-disabled (e não disabled),
+   para receber o mouse, o foco e o toque e mostrar a dica com o porquê. */
+.botao[aria-disabled='true'] {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
 /* Formulários */
 
 .formulario {

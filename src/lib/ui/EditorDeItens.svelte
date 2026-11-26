@@ -56,24 +56,24 @@
 				onkeydown={(e) => tecla(e, i)}
 			/>
 			<span class="editor-item-acoes">
-				<button class="botao botao--secundario botao--pequeno botao--icone" type="button" aria-label={t('Subir um nível: item {n}', { n: i + 1 })} disabled={item.nivel === 0} onclick={() => (itens = recuar(itens, i, -1))}
-					{@attach dica(t('Tira o item de dentro do item de cima.'))}
+				<button class="botao botao--secundario botao--pequeno botao--icone" type="button" aria-label={t('Subir um nível: item {n}', { n: i + 1 })} onclick={() => (itens = recuar(itens, i, -1))}
+					{@attach dica(item.nivel === 0 ? t('O item já está no primeiro nível.') : t('Tira o item de dentro do item de cima.'), item.nivel === 0)}
 					><IndentDecrease aria-hidden="true" size={16} strokeWidth={1.75} /></button
 				>
-				<button class="botao botao--secundario botao--pequeno botao--icone" type="button" aria-label={t('Descer um nível: item {n}', { n: i + 1 })} disabled={!podeDescer(i)} onclick={() => (itens = recuar(itens, i, 1))}
-					{@attach dica(t('Põe o item dentro do item de cima, como subitem.'))}
+				<button class="botao botao--secundario botao--pequeno botao--icone" type="button" aria-label={t('Descer um nível: item {n}', { n: i + 1 })} onclick={() => (itens = recuar(itens, i, 1))}
+					{@attach dica(podeDescer(i) ? t('Põe o item dentro do item de cima, como subitem.') : t('Só desce um nível abaixo do item de cima.'), !podeDescer(i))}
 					><IndentIncrease aria-hidden="true" size={16} strokeWidth={1.75} /></button
 				>
-				<button class="botao botao--secundario botao--pequeno botao--icone" type="button" aria-label={t('Para cima: item {n}', { n: i + 1 })} disabled={i === 0} onclick={() => (itens = mover(itens, i, -1))}
-					{@attach dica(t('Troca o item de lugar com o de cima.'))}
+				<button class="botao botao--secundario botao--pequeno botao--icone" type="button" aria-label={t('Para cima: item {n}', { n: i + 1 })} onclick={() => (itens = mover(itens, i, -1))}
+					{@attach dica(i === 0 ? t('Já é o primeiro item.') : t('Troca o item de lugar com o de cima.'), i === 0)}
 					><ArrowUp aria-hidden="true" size={16} strokeWidth={1.75} /></button
 				>
-				<button class="botao botao--secundario botao--pequeno botao--icone" type="button" aria-label={t('Para baixo: item {n}', { n: i + 1 })} disabled={i === itens.length - 1} onclick={() => (itens = mover(itens, i, 1))}
-					{@attach dica(t('Troca o item de lugar com o de baixo.'))}
+				<button class="botao botao--secundario botao--pequeno botao--icone" type="button" aria-label={t('Para baixo: item {n}', { n: i + 1 })} onclick={() => (itens = mover(itens, i, 1))}
+					{@attach dica(i === itens.length - 1 ? t('Já é o último item.') : t('Troca o item de lugar com o de baixo.'), i === itens.length - 1)}
 					><ArrowDown aria-hidden="true" size={16} strokeWidth={1.75} /></button
 				>
-				<button class="botao botao--secundario botao--pequeno botao--icone" type="button" aria-label={t('Tirar: item {n}', { n: i + 1 })} disabled={itens.length === 1} onclick={() => (itens = remover(itens, i))}
-					{@attach dica(t('Apaga este item da agenda proposta.'))}
+				<button class="botao botao--secundario botao--pequeno botao--icone" type="button" aria-label={t('Tirar: item {n}', { n: i + 1 })} onclick={() => (itens = remover(itens, i))}
+					{@attach dica(itens.length === 1 ? t('A agenda precisa de pelo menos um item.') : t('Apaga este item da agenda proposta.'), itens.length === 1)}
 					><X aria-hidden="true" size={16} strokeWidth={1.75} /></button
 				>
 			</span>
@@ -94,8 +94,8 @@
 		{t('Uma linha por item. Dois espaços (ou um traço) no começo põem o item dentro do anterior.')}
 		<textarea rows="5" bind:value={colar}></textarea>
 	</label>
-	<button class="botao botao--secundario botao--pequeno" type="button" disabled={!colar.trim()} onclick={() => ((itens = lerEsboco(colar)), (colar = ''))}
-		{@attach dica(t('Troca todos os itens acima pelos da lista colada.'))}
+	<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => ((itens = lerEsboco(colar)), (colar = ''))}
+		{@attach dica(colar.trim() ? t('Troca todos os itens acima pelos da lista colada.') : t('Cole a lista no campo acima primeiro.'), !colar.trim())}
 
 		>{t('Montar os itens')}</button
 	>

@@ -47,7 +47,12 @@
 	</label>
 	{#if erro}<p class="erro" role="alert">{erro}</p>{/if}
 	<div class="acoes">
-		<button class="botao" type="button" disabled={!horario} onclick={() => responder(true)} {@attach dica(t('Aceita a entrevista no horário escolhido; o veículo fica sabendo.'))}>{t('Aceitar')}</button>
+		<button
+			class="botao"
+			type="button"
+			onclick={() => responder(true)}
+			{@attach dica(horario ? t('Aceita a entrevista no horário escolhido; o veículo fica sabendo.') : t('Escolha o horário da entrevista primeiro.'), !horario)}
+			>{t('Aceitar')}</button>
 		<button class="botao botao--secundario" type="button" onclick={() => responder(false)} {@attach dica(t('Recusa o pedido; o veículo fica sabendo.'))}>
 {t('Recusar')}</button>
 		<button class="botao botao--secundario" type="button" onclick={() => modal?.fechar()}>{t('Cancelar')}</button>

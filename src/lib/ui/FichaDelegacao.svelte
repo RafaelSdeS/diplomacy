@@ -206,7 +206,7 @@
 			</label>
 			{#if falha}<p class="erro" role="alert">{falha}</p>{/if}
 			<div class="acoes">
-				<button class="botao" disabled={enviando}>{escrever === 'bilhete' ? t('Enviar bilhete') : t('Enviar carta')}</button>
+				<button class="botao" disabled={enviando}>{enviando ? t('Enviando…') : escrever === 'bilhete' ? t('Enviar bilhete') : t('Enviar carta')}</button>
 				<button class="botao botao--secundario" type="button" onclick={() => (escrever = '')}>{t('Voltar')}</button>
 			</div>
 		</form>

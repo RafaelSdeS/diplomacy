@@ -104,7 +104,7 @@
 		</label>
 		{#if erro}<p class="erro" role="alert">{erro}</p>{/if}
 		<div class="acoes">
-			<button class="botao" disabled={enviando} {@attach dica(t('Salva a anotação no caderno, ligada à delegação escolhida.'))}>{t('Guardar no caderno')}</button>
+			<button class="botao" disabled={enviando} {@attach dica(t('Salva a anotação no caderno, ligada à delegação escolhida.'))}>{enviando ? t('Guardando…') : t('Guardar no caderno')}</button>
 			<button class="botao botao--secundario" type="button" onclick={() => modal?.fechar()}>{t('Fechar')}</button>
 		</div>
 	</form>

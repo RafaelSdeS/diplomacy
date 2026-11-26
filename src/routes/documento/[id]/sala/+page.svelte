@@ -331,10 +331,10 @@
 				acao={() => executar(supabase.rpc('aprovar_documento', { p_documento: d.id, p_aprovar: true }), t('O projeto está na fase de ação.'))}
 			/>
 		{:else}
-			<button class="botao" type="button" disabled aria-describedby="faltam-assinaturas"
+			<button class="botao" type="button" {@attach dica(t('Faltam assinaturas: {n} de {min}.', { n: assinaturasQueContam, min: minimo }), true)}
 				>{t('Levar à fase de ação')}</button
 			>
-			<span class="suave" id="faltam-assinaturas">{t('Faltam assinaturas: {n} de {min}.', { n: assinaturasQueContam, min: minimo })}</span>
+			<span class="suave">{t('Faltam assinaturas: {n} de {min}.', { n: assinaturasQueContam, min: minimo })}</span>
 		{/if}
 	{/if}
 </div>

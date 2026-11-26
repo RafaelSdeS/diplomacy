@@ -185,7 +185,13 @@
 						<input autocomplete="off" bind:value={confirmacao} />
 					</label>
 					{#if erro}<p class="erro" role="alert">{erro}</p>{/if}
-					<button class="botao" disabled={confirmacao.trim() !== data.nomeEvento}>Apagar os dados pessoais</button>
+					<button
+						class="botao"
+						{@attach dica(
+							confirmacao.trim() !== data.nomeEvento ? t('Digite o nome do evento, exatamente como aparece, para confirmar.') : t('Apaga os dados pessoais do evento; não tem volta.'),
+							confirmacao.trim() !== data.nomeEvento
+						)}>Apagar os dados pessoais</button
+					>
 				</form>
 			</AcaoEmModal>
 		</div>

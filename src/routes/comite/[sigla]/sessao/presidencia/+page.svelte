@@ -225,7 +225,7 @@
 	// placas. Só fora de campos e botões.
 	function atalho(evento: KeyboardEvent) {
 		const alvo = evento.target as HTMLElement;
-		if (alvo.closest('input, textarea, select, button, a, summary, dialog, [contenteditable]')) return;
+		if (alvo.closest('input, textarea, select, button:not([aria-disabled="true"]), a, summary, dialog, [contenteditable]')) return;
 		const seguinte = proximos[0]?.delegacao?.id ?? proximo?.delegacao?.id;
 		if (evento.key === ' ') {
 			evento.preventDefault();
@@ -481,8 +481,11 @@
 				</ul>
 				{#if fila.length}
 					<div class="acoes">
-						<button class="botao botao--secundario botao--pequeno" type="button" disabled={!escolhidos.length} onclick={definirProximos}
-							{@attach dica(t('Os escolhidos passam a ser os próximos, nesta ordem.'))}
+						<button class="botao botao--secundario botao--pequeno" type="button" onclick={definirProximos}
+							{@attach dica(
+								escolhidos.length ? t('Os escolhidos passam a ser os próximos, nesta ordem.') : t('Escolha pelo menos uma delegação entre as placas.'),
+								!escolhidos.length
+							)}
 							>{t('Definir os próximos ({n})', { n: escolhidos.length })}</button
 						>
 						<button class="botao botao--secundario botao--pequeno" type="button" onclick={baixarTodas} {@attach dica(t('Abaixa as placas de todas as delegações (atalho: B).'))}>{t('Baixar todas as placas')}</button>
@@ -558,25 +561,30 @@
 				{/if}
 				<Cronometro cronometro={data.estado} avisoSeg={data.regras.aviso_fala_seg} {diferenca} grande />
 				<div class="acoes">
-					<button class="botao" type="button" disabled={!pausado && !correndo} onclick={pausarOuRetomar} {@attach dica(t('Para ou continua o cronômetro da fala (atalho: Espaço).'))}>
+					<button
+						class="botao"
+						type="button"
+						onclick={pausarOuRetomar}
+						{@attach dica(
+							!pausado && !correndo ? t('Não há fala em andamento.') : t('Para ou continua o cronômetro da fala (atalho: Espaço).'),
+							!pausado && !correndo
+						)}>
 						{pausado ? t('Retomar') : t('Pausar')}
 					</button>
 					<button
 						class="botao botao--secundario"
 						type="button"
-						disabled={!data.estado.cronometro_inicio}
-						{@attach dica(t('Dá mais 30 segundos à fala.'))}
+						{@attach dica(!data.estado.cronometro_inicio ? t('Não há fala em andamento.') : t('Dá mais 30 segundos à fala.'), !data.estado.cronometro_inicio)}
 						onclick={() => rpc('somar_segundos', { p_comite: comite, p_seg: 30 })}>{t('+30 s')}</button
 					>
 					<button
 						class="botao botao--secundario"
 						type="button"
-						disabled={!data.estado.cronometro_inicio}
-						{@attach dica(t('Tira 10 segundos da fala.'))}
+						{@attach dica(!data.estado.cronometro_inicio ? t('Não há fala em andamento.') : t('Tira 10 segundos da fala.'), !data.estado.cronometro_inicio)}
 						onclick={() => rpc('somar_segundos', { p_comite: comite, p_seg: -10 })}>{t('−10 s')}</button
 					>
-					<button class="botao botao--secundario" type="button" disabled={!data.estado.orador} onclick={() => darPalavra(null)}
-						{@attach dica(t('A delegação deixa de falar, e o cronômetro para.'))}
+					<button class="botao botao--secundario" type="button" onclick={() => darPalavra(null)}
+						{@attach dica(data.estado.orador ? t('A delegação deixa de falar, e o cronômetro para.') : t('Ninguém está com a palavra.'), !data.estado.orador)}
 						>{t('Encerrar fala')}</button
 					>
 				</div>
@@ -951,8 +959,7 @@
 											<button
 												class="botao botao--secundario botao--pequeno"
 												type="button"
-												disabled={!parte.length}
-												{@attach dica(t('As delegações votam só as operativas marcadas.'))}
+												{@attach dica(parte.length ? t('As delegações votam só as operativas marcadas.') : t('Marque as operativas desta parte primeiro.'), !parte.length)}
 												onclick={() => rpc('abrir_votacao_parte', { p_documento: p.id, p_clausulas: parte }).then(() => (parte = []))}
 												>{t('Votar esta parte')}</button
 											>

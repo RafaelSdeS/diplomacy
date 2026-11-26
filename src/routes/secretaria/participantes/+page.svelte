@@ -142,7 +142,7 @@
 			{#if erro}
 				<p class="erro" role="alert">{erro}</p>
 			{/if}
-			<button class="botao" disabled={enviando}>Convidar</button>
+			<button class="botao" disabled={enviando}>{enviando ? 'Enviando…' : 'Convidar'}</button>
 		</form>
 	</AcaoEmModal>
 	<nav class="acoes" aria-label="Ferramentas da secretaria">

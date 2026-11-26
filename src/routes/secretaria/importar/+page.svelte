@@ -126,7 +126,12 @@
 				{#each resultado.problemas as p (p.linha)}<li>Linha {p.linha}: {p.mensagem}</li>{/each}
 			</ul>
 		{/if}
-		<button class="botao" type="button" disabled={enviando || !resultado.convites.length} onclick={criar} {@attach dica(t('Cria os convites da prévia; as linhas com problema ficam de fora.'))}>
+		<button class="botao" type="button" disabled={enviando}
+			onclick={criar}
+			{@attach dica(
+				resultado.convites.length ? t('Cria os convites da prévia; as linhas com problema ficam de fora.') : t('Nenhum convite válido na prévia: confira a planilha.'),
+				!resultado.convites.length
+			)}>
 
 			Criar {resultado.convites.length} convites
 		</button>

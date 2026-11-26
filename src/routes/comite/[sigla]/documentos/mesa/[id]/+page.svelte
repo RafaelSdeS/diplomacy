@@ -245,7 +245,10 @@
 			{#if naoPublicado && doc.versao}{t('O comitê ainda lê a publicação anterior.')}{/if}
 		</p>
 		<div class="acoes">
-			<button class="botao botao--secundario" disabled={ocupado || salvo} {@attach dica(t('Guarda o texto para a mesa, sem publicar para o comitê.'))}>{t('Salvar rascunho')}</button>
+			<button
+				class="botao botao--secundario"
+				disabled={ocupado}
+				{@attach dica(salvo ? t('Nada mudou desde o último salvamento.') : t('Guarda o texto para a mesa, sem publicar para o comitê.'), salvo)}>{t('Salvar rascunho')}</button>
 			{#if confirmando}
 				<button class="botao" type="button" disabled={ocupado} onclick={publicar} {@attach dica(t('O comitê passa a ler esta versão, ao vivo.'))}>{t('Confirmar: publicar para o comitê')}</button>
 				<button class="botao botao--secundario" type="button" onclick={() => (confirmando = false)}>{t('Cancelar')}</button>
@@ -253,8 +256,15 @@
 				<button
 					class="botao"
 					type="button"
-					disabled={ocupado || !titulo.trim() || (!naoPublicado && salvo)}
-					{@attach dica(t('Pede confirmação e mostra esta versão a todo o comitê.'))}
+					disabled={ocupado}
+					{@attach dica(
+						!titulo.trim()
+							? t('Dê um título ao documento primeiro.')
+							: !naoPublicado && salvo
+								? t('Nada mudou desde a última publicação.')
+								: t('Pede confirmação e mostra esta versão a todo o comitê.'),
+						!titulo.trim() || (!naoPublicado && salvo)
+					)}
 					onclick={publicar}
 					>{doc.versao ? t('Publicar alterações') : t('Publicar')}</button
 				>

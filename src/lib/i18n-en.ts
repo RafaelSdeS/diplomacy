@@ -825,6 +825,8 @@ export const EN: Record<string, string> = {
 	'Eles estão só neste aparelho. Se sair agora, eles se perdem.': 'They are only on this device. If you sign out now, they will be lost.',
 	'Ainda sem conexão: os itens continuam guardados.': 'Still offline: the items are still saved.',
 	'Enviando…': 'Sending…',
+	'Guardando…': 'Saving…',
+	'Aguarde…': 'Please wait…',
 	'Enviar agora': 'Send now',
 	'Sair mesmo assim': 'Sign out anyway',
 	// Passo 47
@@ -1661,6 +1663,59 @@ export const EN: Record<string, string> = {
 	'Ler o briefing': 'Read the briefing',
 	'Ler o briefing: {titulo}': 'Read the briefing: {titulo}',
 	'Atingidas': 'Affected',
+	// Passo 62 (lote 6): o motivo de uma ação indisponível
+	'Nada esperando na caixa de saída.':
+		'Nothing waiting in the outbox.',
+	'O item já está no primeiro nível.':
+		'The item is already at the top level.',
+	'Só desce um nível abaixo do item de cima.':
+		'It can only go one level below the item above.',
+	'Já é o primeiro item.':
+		'It is already the first item.',
+	'Já é o último item.':
+		'It is already the last item.',
+	'A agenda precisa de pelo menos um item.':
+		'The agenda needs at least one item.',
+	'Cole a lista no campo acima primeiro.':
+		'Paste the list in the field above first.',
+	'Escolha o horário da entrevista primeiro.':
+		'Choose the interview time first.',
+	'A delegação escolhida passa a ser a redatora do bloco.':
+		"The chosen delegation becomes the bloc's drafter.",
+	'Escolha a delegação que recebe a redação.':
+		'Choose the delegation that takes over drafting.',
+	'Nada mudou desde o último salvamento.':
+		'Nothing has changed since the last save.',
+	'Dê um título ao documento primeiro.':
+		'Give the document a title first.',
+	'Nada mudou desde a última publicação.':
+		'Nothing has changed since the last publication.',
+	'Guarda a agenda; as delegações só a veem depois de liberada.':
+		'Saves the agenda; delegations only see it once it is released.',
+	'Escreva pelo menos um item.':
+		'Write at least one item.',
+	'Escolha pelo menos uma delegação entre as placas.':
+		'Choose at least one delegation among the placards.',
+	'Não há fala em andamento.':
+		'No speech is under way.',
+	'Ninguém está com a palavra.':
+		'Nobody has the floor.',
+	'Marque as operativas desta parte primeiro.':
+		'Tick the operative clauses of this part first.',
+	'Acrescente cláusulas antes de enviar.':
+		'Add clauses before sending.',
+	'Faltam assinaturas para enviar à mesa.':
+		'More signatures are needed to send it to the chair.',
+	'Escreva o texto da cláusula primeiro.':
+		'Write the clause text first.',
+	'Sua delegação já pediu a reabertura desta cláusula.':
+		'Your delegation has already asked to reopen this clause.',
+	'Digite o nome do evento, exatamente como aparece, para confirmar.':
+		'Type the event name, exactly as shown, to confirm.',
+	'Apaga os dados pessoais do evento; não tem volta.':
+		"Erases the event's personal data; it cannot be undone.",
+	'Nenhum convite válido na prévia: confira a planilha.':
+		'No valid invitation in the preview: check the spreadsheet.',
 	// Passo 62 (lote 6): as dicas de todas as ações
 	'Outras telas da sessão, como a agenda, as votações e o telão.':
 		'Other session screens, such as the agenda, the votes and the big screen.',

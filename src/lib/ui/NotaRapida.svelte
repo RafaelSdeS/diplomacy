@@ -126,7 +126,7 @@
 		</label>
 		{#if tipo !== 'fala'}<p class="detalhe">{descricao}</p>{/if}
 		<div class="acoes">
-			<button class="botao" disabled={enviando} {@attach dica(t('Salva no caderno com o tópico, a hora e quem tinha a palavra.'))}>{t('Guardar no caderno')}</button>
+			<button class="botao" disabled={enviando} {@attach dica(t('Salva no caderno com o tópico, a hora e quem tinha a palavra.'))}>{enviando ? t('Guardando…') : t('Guardar no caderno')}</button>
 
 			<button class="botao botao--secundario" type="button" onclick={() => modal?.fechar()}>{t('Fechar')}</button>
 		</div>

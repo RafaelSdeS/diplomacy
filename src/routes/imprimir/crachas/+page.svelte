@@ -97,7 +97,7 @@
 			{#if erro}
 				<p class="erro" role="alert">{erro}</p>
 			{/if}
-			<button class="botao" type="button" disabled={emitindo} onclick={emitir} {@attach dica(t('Gera um código novo para cada pessoa e monta os crachás com QR para imprimir.'))}>Emitir e montar os crachás</button>
+			<button class="botao" type="button" disabled={emitindo} onclick={emitir} {@attach dica(t('Gera um código novo para cada pessoa e monta os crachás com QR para imprimir.'))}>{emitindo ? 'Emitindo…' : 'Emitir e montar os crachás'}</button>
 			<p><a href="/secretaria/participantes">Voltar</a></p>
 		</div>
 	{/if}

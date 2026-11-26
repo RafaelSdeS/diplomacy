@@ -58,7 +58,9 @@
 		{/each}
 	</ul>
 	<div class="acoes">
-		<button class="botao" type="button" disabled={enviando || !itens.length} onclick={enviarAgora} {@attach dica(t('Tenta enviar tudo agora, sem esperar.'))}>
+		<button class="botao" type="button" disabled={enviando}
+			onclick={enviarAgora}
+			{@attach dica(itens.length ? t('Tenta enviar tudo agora, sem esperar.') : t('Nada esperando na caixa de saída.'), !itens.length)}>
 {t('Enviar agora')}</button>
 		<form method="dialog"><button class="botao botao--secundario">{t('Fechar')}</button></form>
 	</div>

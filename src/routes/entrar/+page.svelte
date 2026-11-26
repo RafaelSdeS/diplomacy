@@ -90,7 +90,7 @@
 		{#if erro}
 			<p class="erro" role="alert">{erro}</p>
 		{/if}
-		<button class="botao" disabled={enviando} {@attach dica(t('Entra com o e-mail e a senha que a secretaria cadastrou.'))}>{t('Entrar')}</button>
+		<button class="botao" disabled={enviando} {@attach dica(t('Entra com o e-mail e a senha que a secretaria cadastrou.'))}>{enviando ? t('Entrando…') : t('Entrar')}</button>
 	</form>
 
 	{#if LOGIN_GOOGLE}
@@ -119,7 +119,7 @@
 			{#if erroCodigo}
 				<p class="erro" role="alert">{erroCodigo}</p>
 			{/if}
-			<button class="botao botao--secundario" disabled={enviando} {@attach dica(t('Entra com o código que a secretaria deu a você.'))}>{t('Entrar com o código')}</button>
+			<button class="botao botao--secundario" disabled={enviando} {@attach dica(t('Entra com o código que a secretaria deu a você.'))}>{enviando ? t('Entrando…') : t('Entrar com o código')}</button>
 		</form>
 	</section>
 
@@ -132,7 +132,7 @@
 					<input type="email" autocomplete="email" required bind:value={emailOtp} />
 				</label>
 				<button class="botao botao--secundario" disabled={enviando} {@attach dica(t('Manda um link e um código para o seu e-mail, sem precisar de senha.'))}
-					>{t('Receber link e código')}</button
+					>{enviando ? t('Enviando…') : t('Receber link e código')}</button
 				>
 			</form>
 		{:else}
@@ -152,7 +152,7 @@
 					<p class="erro" role="alert">{erroEmail}</p>
 				{/if}
 				<button class="botao botao--secundario" disabled={enviando} {@attach dica(t('Entra com o código que chegou no seu e-mail.'))}
-					>{t('Entrar com o código do e-mail')}</button
+					>{enviando ? t('Entrando…') : t('Entrar com o código do e-mail')}</button
 				>
 			</form>
 		{/if}

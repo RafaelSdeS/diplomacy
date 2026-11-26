@@ -364,7 +364,7 @@
 		<EditorDeItens bind:itens />
 		{#if erro}<p class="erro" role="alert">{erro}</p>{/if}
 		<div class="acoes">
-			<button class="botao" disabled={!preenchidos(itens).length}>{t('Salvar a agenda do bureau')}</button>
+			<button class="botao" {@attach dica(preenchidos(itens).length ? t('Guarda a agenda; as delegações só a veem depois de liberada.') : t('Escreva pelo menos um item.'), !preenchidos(itens).length)}>{t('Salvar a agenda do bureau')}</button>
 			<button class="botao botao--secundario" type="button" onclick={() => editor?.fechar()}>{t('Cancelar')}</button>
 		</div>
 	</form>

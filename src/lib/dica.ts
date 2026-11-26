@@ -1,11 +1,15 @@
 // Passo 62 (lote 6): a dica de uma ação, ao passar o mouse e no foco do teclado (o `title`
 // nativo não aparece no foco nem no celular). Um balão ligado por aria-describedby, fora do
-// nome do botão. Uso: <button {@attach dica(texto)}>, com o texto traduzido. Ação desativada não
-// recebe eventos: o motivo dela vai em texto à vista, ao lado.
+// nome do botão. Uso: <button {@attach dica(texto)}>, com o texto traduzido.
+//
+// A ação indisponível por um motivo: <button {@attach dica(motivo ?? texto, !!motivo)}>. Em vez
+// de `disabled` (que não recebe o mouse, o foco nem o toque), fica com aria-disabled, o clique e o
+// envio do formulário não fazem nada, e a dica diz o porquê. O `disabled` fica só para o instante
+// de um envio, com o rótulo dizendo "Enviando…".
 
 let proximo = 0;
 
-export function dica(texto: string | null | undefined) {
+export function dica(texto: string | null | undefined, indisponivel = false) {
 	return (alvo: HTMLElement) => {
 		if (!texto) return;
 		const balao = document.createElement('span');
@@ -29,6 +33,13 @@ export function dica(texto: string | null | undefined) {
 		const tecla = (e: KeyboardEvent) => {
 			if (e.key === 'Escape') esconder();
 		};
+		// Indisponível: o clique (também o do Enter e do Espaço) não chega a quem trata, e no
+		// celular o toque mostra a dica com o motivo.
+		const barrar = (e: Event) => {
+			e.preventDefault();
+			e.stopImmediatePropagation();
+			mostrar();
+		};
 		const eventos: [string, EventListener][] = [
 			['pointerenter', mostrar],
 			['pointerleave', esconder],
@@ -36,10 +47,15 @@ export function dica(texto: string | null | undefined) {
 			['focusout', esconder],
 			['keydown', tecla as EventListener]
 		];
+		if (indisponivel) {
+			alvo.setAttribute('aria-disabled', 'true');
+			eventos.push(['click', barrar]);
+		}
 		for (const [nome, f] of eventos) alvo.addEventListener(nome, f);
 		return () => {
 			for (const [nome, f] of eventos) alvo.removeEventListener(nome, f);
 			balao.remove();
+			if (indisponivel) alvo.removeAttribute('aria-disabled');
 			if (descricao) alvo.setAttribute('aria-describedby', descricao);
 			else alvo.removeAttribute('aria-describedby');
 		};

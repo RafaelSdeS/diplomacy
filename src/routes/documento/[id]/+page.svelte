@@ -311,7 +311,18 @@
 			>
 		{/if}
 		{#if data.souRedator && editavel}
-			<button class="botao" type="button" disabled={faltam > 0 || !data.clausulas.length} onclick={() => modalEnvio?.abrir()} {@attach dica(t('A mesa recebe o texto para avaliar, e ele deixa de ser editado.'))}>{t('Enviar à mesa')}</button>
+			<button
+				class="botao"
+				type="button"
+				onclick={() => modalEnvio?.abrir()}
+				{@attach dica(
+					!data.clausulas.length
+						? t('Acrescente cláusulas antes de enviar.')
+						: faltam > 0
+							? t('Faltam assinaturas para enviar à mesa.')
+							: t('A mesa recebe o texto para avaliar, e ele deixa de ser editado.'),
+					faltam > 0 || !data.clausulas.length
+				)}>{t('Enviar à mesa')}</button>
 		{/if}
 		{#if ehMesa && d.status === 'enviado'}
 			<button
@@ -416,7 +427,11 @@
 		{@render verbos(novoTexto, nova!.tipo, (v) => (novoTexto = v))}
 		<p class="suave">{t('Enter salva e abre a próxima; Esc cancela.')}</p>
 		<div class="acoes">
-			<button class="botao botao--pequeno" type="button" disabled={!novoTexto.trim()} onclick={salvarNova} {@attach dica(t('Guarda o texto. No teclado, Enter salva e Esc cancela.'))}>{t('Salvar')}</button>
+			<button
+				class="botao botao--pequeno"
+				type="button"
+				onclick={salvarNova}
+				{@attach dica(novoTexto.trim() ? t('Guarda o texto. No teclado, Enter salva e Esc cancela.') : t('Escreva o texto da cláusula primeiro.'), !novoTexto.trim())}>{t('Salvar')}</button>
 			<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => (nova = null)}>{t('Cancelar')}</button>
 		</div>
 	</div>
@@ -565,8 +580,12 @@
 			<button
 				class="botao botao--secundario botao--pequeno"
 				type="button"
-				{@attach dica(t('Sua delegação pede que a cláusula volte ao debate.'))}
-				disabled={pedidos.some((p) => p.delegacao_id === eu?.delegacao_id)}
+				{@attach dica(
+					pedidos.some((p) => p.delegacao_id === eu?.delegacao_id)
+						? t('Sua delegação já pediu a reabertura desta cláusula.')
+						: t('Sua delegação pede que a cláusula volte ao debate.'),
+					pedidos.some((p) => p.delegacao_id === eu?.delegacao_id)
+				)}
 				onclick={() => executar(supabase.rpc('pedir_reabertura', { p_clausula: c.id }), t('Pedido de reabertura registrado.'))}
 				>{t('Pedir reabertura')}</button
 			>

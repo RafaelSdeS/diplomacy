@@ -245,7 +245,7 @@
 			</fieldset>
 			{#if erro}<p class="erro" role="alert">{erro}</p>{/if}
 			<div class="acoes">
-				<button class="botao" type="button" disabled={!para} onclick={passarRedacao}>{t('Confirmar: passar a redação')}</button>
+				<button class="botao" type="button" onclick={passarRedacao} {@attach dica(para ? t('A delegação escolhida passa a ser a redatora do bloco.') : t('Escolha a delegação que recebe a redação.'), !para)}>{t('Confirmar: passar a redação')}</button>
 				<button class="botao botao--secundario" type="button" onclick={() => (passando = null)}>{t('Cancelar')}</button>
 			</div>
 		{/if}

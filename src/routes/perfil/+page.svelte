@@ -237,7 +237,7 @@
 					onclick={alternarPush}
 					{@attach dica(push === 'ativo' ? t('Para de receber os avisos fora do app neste aparelho.') : t('Recebe os avisos importantes mesmo com o app fechado.'))}
 				>
-					{push === 'ativo' ? t('Desativar notificações neste aparelho') : t('Ativar notificações neste aparelho')}
+					{mudandoPush ? t('Aguarde…') : push === 'ativo' ? t('Desativar notificações neste aparelho') : t('Ativar notificações neste aparelho')}
 				</button>
 			{/if}
 			{#if avisoPush}

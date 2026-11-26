@@ -142,10 +142,15 @@
 						type="button"
 						aria-pressed={favorita}
 						aria-label={t('Favorita: {tela}', { tela: tela.rotulo })}
-						title={!favorita && cheio ? t('Até {n} favoritas: tire uma antes', { n: MAX_FAVORITOS }) : undefined}
-						disabled={!favorita && cheio}
 						onclick={() => alternarFavorito(tela.href)}
-						{@attach dica(favorita ? t('Tira esta tela dos favoritos.') : t('Põe esta tela nos favoritos, para achar mais rápido.'))}
+						{@attach dica(
+							!favorita && cheio
+								? t('Até {n} favoritas: tire uma antes', { n: MAX_FAVORITOS })
+								: favorita
+									? t('Tira esta tela dos favoritos.')
+									: t('Põe esta tela nos favoritos, para achar mais rápido.'),
+							!favorita && cheio
+						)}
 						><Star aria-hidden="true" size={16} strokeWidth={1.75} fill={favorita ? 'currentColor' : 'none'} /></button
 					>
 				</li>

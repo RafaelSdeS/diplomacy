@@ -123,7 +123,7 @@
 						<p class="erro" role="alert">{erro}</p>
 					{/if}
 					<div class="acoes">
-						<button class="botao" disabled={enviando}>{t('Enviar à crise')}</button>
+						<button class="botao" disabled={enviando}>{enviando ? t('Enviando…') : t('Enviar à crise')}</button>
 						<button class="botao botao--secundario" type="button" onclick={() => escrever?.fechar()}>{t('Cancelar')}</button>
 					</div>
 				</form>
