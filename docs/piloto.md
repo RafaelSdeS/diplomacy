@@ -43,8 +43,8 @@ Roteiro para testar o app com um grupo pequeno (passo 12), no formato do **mock*
 | 20 min | Plenária de abertura | Briefing; discursos de abertura pela lista de oradores; moção do tópico no topo votada no celular; a agenda informal com as propostas lado a lado, e a mesa adota uma (sem agenda adotada, o working paper não abre: passo 56) |
 | 20 min | Debate formal-informal | O rodízio sorteia a delegação que preside; placas levantadas no celular; cronômetro no telão; pontos e moções |
 | 10 min | Crise | A equipe de crise publica uma atualização (plantão no telão); as delegações mandam notas; a crise responde |
-| 20 min | Working paper e projeto | Um bloco escreve um working paper (o redator aceita propostas); a mesa aprova; o projeto junta as cláusulas, ganha 5 assinaturas e vai à mesa |
-| 10 min | Votação | A mesa assume a presidência, aprova o projeto e abre a votação no painel (**Projetos de resolução**); as delegações votam no celular; o telão mostra o resultado |
+| 20 min | Working paper e projeto | No working paper do item em debate (um por grande item da agenda, de toda a sala), os redatores dos blocos propõem mudanças; a sala marca posição, e quem preside aceita ou rejeita; a mesa ouve a sala e transforma os working papers em projeto, que já traz as assinaturas (mínimo 5) (passo 63) |
+| 10 min | Fase de ação | A mesa assume a presidência, um signatário lê o projeto e a mesa pergunta se alguém se opõe; com objeção, abre a votação no painel (**Projetos de resolução**); as delegações votam no celular; o telão mostra o resultado |
 | o tempo todo | Press | A press publica do celular; uma nota urgente vira plantão no telão; a delegação citada vê na Agora |
 | 5 min | Troca de conta (passo 44) | Num celular: sair, entrar com outra conta, ficar sem rede (modo avião) e conferir que nada da conta anterior aparece; sair com uma nota ainda na caixa de saída mostra o aviso |
 | 10 min | Fim | Questionário (abaixo) |
@@ -74,7 +74,7 @@ Anote o horário, o que parou e em quantos aparelhos: isso entra no relatório.
 As consultas ficam em `supabase/consultas/` (veja o README de lá):
 
 - tempo de resposta da crise e notas sem resposta no fim da sessão;
-- tempo do envio do projeto até a votação;
+- tempo de "Transformar em projeto" até o resultado da fase de ação;
 - matérias publicadas por veículo.
 
 ### Questionário (5 minutos, por função)
@@ -89,14 +89,14 @@ Delegado:
 5. Levantar a placa, votar e mandar nota de crise pelo celular foi mais fácil ou mais difícil do que no papel?
 6. Você leu as matérias da press no app?
 7. Durante o debate, você anotou algo no app? O que faltou para preparar a sua fala sem sair da sessão?
-8. Se o seu bloco escreveu um working paper ou projeto: a rodada de propostas deu conta? O que travou (ver o que mudou, comparar versões, prazo, discussão que não acabava)?
+8. Se o seu bloco propôs mudanças no working paper: propor, marcar posição e esperar a decisão de quem preside deu conta? O que travou (ver o que mudou, propostas que se contradizem, discussão que não acabava)?
 9. A ordem do tópico (agenda, working paper, projeto, resolução) ficou clara na tela? Você soube em que etapa o comitê estava?
 10. (coletiva, só depois do passo 45 parte B) Se a sua delegação foi chamada na coletiva: Ficou claro quando falar, sem ver a pergunta antes?
 
 Mesa:
 5. O painel da presidência deu conta do ritmo da sessão? O que faltou?
 6. **Você usaria o app no evento?** Por quê?
-7. Os documentos dos blocos chegaram prontos para avaliar, ou faltou ver o que mudou entre as versões?
+7. Ficou claro quando os working papers estavam prontos para virar projeto? Faltou ver o que mudou ou de qual item veio cada cláusula?
 
 Crise:
 5. A fila de notas deu conta? Alguma nota se perdeu ou chegou duplicada?

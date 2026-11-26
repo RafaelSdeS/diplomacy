@@ -18,7 +18,7 @@ Recomendação geral: não começar todos os itens ao mesmo tempo. Trabalhar por
 
 ## Ordem recomendada
 
-A sequência de execução tem o **piloto depois da interface**. Os passos 44, 45 parte A, 46 e 47 estão feitos. Em 24/11/2026 a sessão de teste foi adiada: a interface ainda está carregada, com ações simples que levam a outra página, pedem rolagem ou passam por menus genéricos, e testar assim mediria esse excesso, não o app. Primeiro vieram o passo 47 ampliado; depois de usá-lo, em 24/11/2026, a interface ainda pareceu pouco intuitiva (formulários sempre abertos sem dizer para que servem, botões que parecem links, caderno longe), e os testes, lentos. Por isso vêm agora o passo 52 (testes rápidos) e os lotes 0, 1 e 2 do passo 51 (ações em botões e modais, presidência e Agora); depois a sessão de teste do passo 12; só então o resto, já com o que o piloto mostrou. Ainda em 24/11/2026, depois dos lotes 1 e 2, o uso na conta da secretaria (que também é mesa) mostrou defeitos e pedidos novos: a conta não via o comitê, modais fora do centro, telão sem saída, lista de oradores solta, a ordem agenda → working papers → resolução pouco clara, agenda, documentos e bilhetes pouco intuitivos, e a falta de documentos da mesa. Viraram os passos 54 a 58 e o lote 3 do 51; os que o roteiro do piloto usa (54 a 56 e a parte A do 57) vêm antes dele. A coletiva segue dividida em duas partes (ver a seção 2): o texto protegido já está feito, o fluxo oral completo vem depois do piloto.
+A sequência de execução tem o **piloto depois da interface**. Os passos 44, 45 parte A, 46 e 47 estão feitos. Em 24/11/2026 a sessão de teste foi adiada: a interface ainda está carregada, com ações simples que levam a outra página, pedem rolagem ou passam por menus genéricos, e testar assim mediria esse excesso, não o app. Primeiro vieram o passo 47 ampliado; depois de usá-lo, em 24/11/2026, a interface ainda pareceu pouco intuitiva (formulários sempre abertos sem dizer para que servem, botões que parecem links, caderno longe), e os testes, lentos. Por isso vêm agora o passo 52 (testes rápidos) e os lotes 0, 1 e 2 do passo 51 (ações em botões e modais, presidência e Agora); depois a sessão de teste do passo 12; só então o resto, já com o que o piloto mostrou. Ainda em 24/11/2026, depois dos lotes 1 e 2, o uso na conta da secretaria (que também é mesa) mostrou defeitos e pedidos novos: a conta não via o comitê, modais fora do centro, telão sem saída, lista de oradores solta, a ordem agenda → working papers → resolução pouco clara, agenda, documentos e bilhetes pouco intuitivos, e a falta de documentos da mesa. Viraram os passos 54 a 58 e o lote 3 do 51; os que o roteiro do piloto usa (54 a 56 e a parte A do 57) vêm antes dele. A coletiva segue dividida em duas partes (ver a seção 2): o texto protegido já está feito, o fluxo oral completo vem depois do piloto. Em 26/11/2026, o uso do CSNU-T online populado mostrou a crise tomando a tela, metade da Agora vazia e a ordem difícil de ler (passo 62), e o usuário decidiu o caminho dos documentos como no UFRGSMUN: um working paper por grande item da agenda, de toda a sala, e um projeto por tópico (passo 63). Os dois vêm antes do piloto.
 
 | Ordem | Passo | Plano | Esforço | Por que nesta posição | Escopo mínimo |
 |---:|---|---|:-:|---|---|
@@ -37,16 +37,17 @@ A sequência de execução tem o **piloto depois da interface**. Os passos 44, 4
 | 13 | [61](implementacao/61-saber-onde-estou.md) | Saber onde estou e o que chegou (**pronto**) | M | Mesmo quem conhece as regras se perdeu na plenária, não viu bilhete chegar e achou que o documento assinado sumiu | Linha do comitê desde a plenária, com "Agora/Depois" por papel; "Como funciona"; contagem e aviso de bilhetes; "Seus documentos" |
 | 14 | [60](implementacao/60-agenda-do-bureau.md) | A agenda parte do documento do bureau (**pronto**) | M–G | O roteiro começa pela agenda, e o bureau já chega com ela pronta | Agenda do bureau cadastrada antes e liberada no dia; uma agenda por tópico, alterada como um working paper (por item, com posição e comentários), aceita pela presidência e adotada pela sala |
 | 15 | [58](implementacao/58-documentos-da-mesa.md) | Documentos da mesa para o comitê (**pronto**; o telão e o "está editando" em 26/11/2026) | M | Pedido novo; o piloto manda o guia por fora, e pode subir se a mesa do piloto pedir | Texto e PDF publicados ao vivo, versão conferida ao salvar, "o que mudou", telão |
-| 15a | [62](implementacao/62-fluxo-do-comite.md) | O fluxo do comitê: o que importa à vista, travas e a ordem clara (lote 1 em andamento, 26/11/2026) | G | O uso de 26/11, com o CSNU-T online populado, mostrou a crise tomando a tela, metade da Agora vazia, a ordem difícil de ler, quase nenhuma dica e travas faltando | Crise compacta; Agora sem buracos; trilha com nomes; destaque por papel; dicas; travas de envio, rodada e redator único |
-| 15b | [63](implementacao/63-um-projeto-por-topico.md) | Um working paper por item da agenda, de toda a sala, e um projeto por tópico | G | Vários textos por tópico fragmentam o debate e excluem as delegações pequenas; no UFRGSMUN a sala inteira trabalha num working paper por item | Um working paper por grande item da agenda; os redatores (ou a delegação sem bloco) propõem; quem preside aceita ou rejeita; a mesa ouve a sala e transforma em projeto, com as assinaturas; sem emendas |
+| 15a | [62](implementacao/62-fluxo-do-comite.md) **lotes 1, 2 e 3** | O fluxo do comitê: as regras do bloco (lote 1, **pronto** em 26/11/2026), a crise compacta e a Agora sem buracos | M | O uso de 26/11, com o CSNU-T online populado, mostrou a crise tomando a tela, metade da Agora vazia e o bloco podendo ficar sem redator | Um bloco por vez e o bloco nunca sem redator (feito); crise numa faixa, com o briefing num modal; Agora numa coluna por importância |
+| 15b | [63](implementacao/63-um-projeto-por-topico.md) | Um working paper por item da agenda, de toda a sala, e um projeto por tópico | G | Vários textos por tópico fragmentam o debate e excluem as delegações pequenas; no UFRGSMUN a sala inteira trabalha num working paper por item | Um working paper por grande item, criado com a agenda; os redatores (ou a delegação sem bloco) propõem; quem preside aceita ou rejeita; a mesa transforma em projeto, com as assinaturas; consenso primeiro, voto com objeção; sem emendas. Absorve a primeira entrega do 49 e a parte B do 57 |
+| 15c | [62](implementacao/62-fluxo-do-comite.md) **lotes 5 e 6** | Uma trilha só, com nomes; destaque por papel e dicas | M | Vêm depois do 63 porque a trilha e os destaques usam o fluxo novo | Agenda → Working papers → Projeto → Fase de ação → Resolução; duas ou três ações por papel; cada ação diz o que faz e por que está desativada |
 | — | [12](implementacao/12-teste-do-piloto.md) | **Sessão de teste do piloto** ([piloto.md](piloto.md)) | — | Valida o app já com a interface limpa, antes de construir mais | Roteiro, questionário e plano B em papel |
 | 16 | [53](implementacao/53-dpo-como-arquivo.md) | DPO como arquivo público (**pronto**, 26/11/2026, antes do piloto, a pedido) | M | O DPO é preparado antes do evento e é público; hoje o app o escreve num editor e esconde por regra | PDF por tópico, aberto ao comitê, sem aprovação; prévia; editor e impressão saem |
 | 17 | [48](implementacao/48-demonstracao-online.md) | Demonstração online com acesso rápido por papel | M | Depende da segurança, da coletiva e dos modais; mostra o app inteiro por papel | Projeto separado, um comitê completo, `/demo` por papel e reinício |
-| 18 | [49](implementacao/49-edicao-por-clausula.md) e [57](implementacao/57-escrita-de-documentos.md) **parte B** | Edição colaborativa por cláusula | G | Resolve o problema central de documentos sem discussões infinitas, **se o piloto confirmar**; a parte A do 57 já o diminui | Proposta estruturada, rodada com prazo, comparação e fusão básica |
+| 18 | [49](implementacao/49-edicao-por-clausula.md) e [57](implementacao/57-escrita-de-documentos.md) **parte B** | Edição colaborativa por cláusula (**absorvida pelo 63** em 26/11/2026) | — | A proposta estruturada, a decisão explícita, a comparação e a junção com a origem foram para o 63, antes do piloto | Só o que o piloto ainda pedir |
 | 19 | [50](implementacao/50-preparacao-da-fala.md) | Preparação de discursos e notas | M | Permite acompanhar outras delegações enquanto prepara a próxima fala, **se o piloto confirmar** | Captura rápida por tipo, painel curto da delegação e rascunho da fala |
 | 20 | [51](implementacao/51-melhorias-gerais-de-interface.md) **demais lotes** | Melhorias gerais (**prontos**, 26/11/2026: crise, blocos, secretaria, perfil e preferências) | G | Acabamento das demais telas | Lote 3 (bilhetes como conversa) em 25/11; em 26/11, crise, blocos (passar a redação), secretaria, perfil, favoritos, tamanho do texto e densidade, estados vazios e rascunho guardado. Ainda em 26/11, o voltar com filtro e rolagem e a votação aberta sem rolar. Fica a troca de redator por consenso (se o piloto pedir) |
 
-Esforço **P**, **M** ou **G** como nos passos 01 a 43. Os itens 18 e 19 só começam depois da validação com o piloto (abaixo).
+Esforço **P**, **M** ou **G** como nos passos 01 a 43. O item 19, e o que sobrar do 18 depois do 63, só começam depois da validação com o piloto (abaixo).
 
 ## O piloto depois da interface
 
@@ -56,8 +57,9 @@ A sessão do piloto ([piloto.md](piloto.md), passo 12) não está registrada com
 - **Antes do piloto:** 52 (testes rápidos) e os lotes 0, 1 e 2 do 51 (feitos); depois, 54 (correções do uso de 24/11), 55 (países clicáveis), 56 (ordem do tópico, Agenda e Documentos) e a parte A do 57 (escrita de documentos), as telas que o roteiro mais usa (feitos em 25/11/2026). Do uso de 25/11/2026, como mesa, presidência e delegação, saíram o 59 (uma presidência só, numa tela só), o 61 (saber onde estou e o que chegou) e o 60 (agenda do bureau), também antes do piloto: mesmo quem conhece as regras se perdeu.
 - **Feitos antes do piloto, em 25/11/2026, a pedido:** o lote 3 do 51 (mensagens como conversa) e o 58 (documentos da mesa); o telão e o "está editando" do 58 vieram em 26/11/2026.
 - **Feito antes do piloto, em 26/11/2026, a pedido:** o 53 (DPO como arquivo).
+- **Antes do piloto, do uso de 26/11/2026:** o 62 (lote 1 feito; lotes 2 e 3), depois o 63 (um working paper por item da agenda, de toda a sala, e um projeto por tópico), depois os lotes 5 e 6 do 62 (trilha com nomes, destaque e dicas). O roteiro do piloto já descreve o fluxo do 63.
 - **Depois do piloto:** o 48 tem requisitos claros (a 45 parte B já foi feita) e entram em seguida, ajustados ao que a sessão mostrar. A coletiva completa e a demonstração não fazem parte do roteiro do piloto.
-- **Só com dor confirmada:** **os passos 49 e 50 só começam depois que o questionário do piloto responder às perguntas deles** (a rodada de propostas deu conta? o que faltou ao preparar a fala?). Se o piloto não mostrar dor, os dois ficam para depois do evento. O que o passo 46 já entrega (nota e próxima fala visíveis) pode bastar.
+- **Só com dor confirmada:** **o passo 50, e o que sobrar do 49 depois do 63, só começam depois que o questionário do piloto responder às perguntas deles** (a rodada de propostas deu conta? o que faltou ao preparar a fala?). Se o piloto não mostrar dor, os dois ficam para depois do evento. O que o passo 46 já entrega (nota e próxima fala visíveis) pode bastar.
 - Os demais lotes do 51 entram aos poucos, o ano todo.
 
 As seções abaixo descrevem cada plano; a sequência de execução é a da tabela acima.
@@ -239,7 +241,7 @@ Não misturar dados da demonstração com os dados reais do evento.
 
 Documento: [Plano de edição colaborativa](plano-editor-documentos.pdf) · Passo: [49](implementacao/49-edicao-por-clausula.md)
 
-**Depende da validação com o piloto.**
+**A primeira entrega foi absorvida pelo [passo 63](implementacao/63-um-projeto-por-topico.md) em 26/11/2026, antes do piloto:** propostas estruturadas no working paper de toda a sala, decididas por quem preside, com o texto atual e o proposto lado a lado e a junção com a origem. O que sobrar depende da validação com o piloto.
 
 Fonte: [Plano HTML](plano-editor-documentos.html)
 
@@ -338,6 +340,11 @@ Testes rápidos no dia a dia (52)                      (feito)
                            └─ Escrita de documentos, parte A (57)  (feito)
 Uma presidência só (59) ── Saber onde estou (61) ── Agenda do bureau (60)   (feito)
 Mensagens como conversa (51, lote 3) e documentos da mesa (58)            (feito)
+Fluxo do comitê (62): regras do bloco, lote 1                             (feito)
+  └─ crise compacta e Agora sem buracos (62, lotes 2 e 3)
+       └─ Working paper da sala e projeto por tópico (63)
+            └─ depende da agenda (60), da escrita (57, parte A) e do lote 1 do 62
+            └─ Trilha com nomes, destaque e dicas (62, lotes 5 e 6)
 
 PILOTO (passo 12) ── mostra o que ajustar e o que vale construir
 
@@ -350,7 +357,7 @@ Demonstração (48)
   └─ depende de segurança (44), coletiva (45), modais (47) e do DPO como arquivo (53)
 
 Editor por cláusula (49) e preparação de discursos (50)
-  └─ só se o questionário do piloto confirmar a dor
+  └─ a primeira entrega do 49 foi para o 63; o resto, só se o questionário do piloto confirmar a dor
   └─ 49 depende de sessão, documentos e RLS; 50, da sessão unificada (46) e do caderno
 
 Demais lotes das melhorias gerais (51)                                    (feitos em 26/11/2026)
@@ -394,6 +401,13 @@ Do passo 47 (feito): modal base; saída com confirmação e `Confirmar`; fichas 
 4. as mensagens como conversa, em duas colunas, com quem escreveu e a sessão de cada mensagem (51, lote 3);
 5. os documentos da mesa, com rascunho, publicação, alterações e conflito entre duas pessoas da mesa (58; o telão e o "está editando" vieram em 26/11/2026).
 
+### Lote B4 — uso de 26/11, antes do piloto (passos 62 e 63)
+
+1. as regras do bloco: um bloco por vez e o bloco nunca sem redator (62, lote 1; feito em 26/11/2026);
+2. a crise compacta e a Agora sem buracos (62, lotes 2 e 3);
+3. um working paper por grande item da agenda, de toda a sala, e um projeto por tópico (63);
+4. a trilha com nomes, o destaque por papel e as dicas (62, lotes 5 e 6).
+
 ### Piloto (passo 12)
 
 Roteiro de [piloto.md](piloto.md), com a troca de conta no mesmo aparelho. A coletiva completa e a demonstração ainda não existem e ficam de fora.
@@ -405,7 +419,7 @@ Roteiro de [piloto.md](piloto.md), com a troca de conta no mesmo aparelho. A col
 
 ### Lote D — produtividade (depois do piloto)
 
-1. editor por cláusula (49 e a parte B do 57);
+1. editor por cláusula: só o que sobrar do 49 e da parte B do 57 depois do 63;
 2. preparação da fala;
 3. busca e documentação.
 
@@ -440,8 +454,8 @@ O [plano completo](plano-do-app.pdf) (seção 17) prevê validação de dezembro
 
 Proposta de encaixe, a confirmar quando a data sair:
 
-- **antes da sessão do piloto:** lotes A, B, B2 e B3 (feitos) e, a pedido, o 53 e os demais lotes do 51;
-- **depois da sessão do piloto:** o 48, ajustado ao que a sessão mostrar, e em seguida o lote D (passos 49 e 50), só com o que o questionário confirmar;
+- **antes da sessão do piloto:** lotes A, B, B2 e B3 (feitos), a pedido o 53 e os demais lotes do 51 (feitos), e o lote B4 (passos 62 e 63);
+- **depois da sessão do piloto:** o 48, ajustado ao que a sessão mostrar, e em seguida o lote D (o 50 e o que sobrar do 49), só com o que o questionário confirmar;
 - **lote E (demais lotes do passo 51):** feito em 26/11/2026; o que o piloto pedir entra em lotes pequenos, o ano todo, e congela antes do ensaio de outubro.
 
 Para cada passo o esforço (P, M ou G) está na tabela; a duração em semanas depende de quanto tempo por semana a pessoa do projeto tem, e isso o documento não sabe.

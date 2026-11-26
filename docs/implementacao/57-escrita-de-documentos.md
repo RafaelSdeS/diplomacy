@@ -3,8 +3,8 @@
 **Parte de:** pedido de 24/11/2026 ("a escrita de documentos mais fácil e intuitiva, como nos projetos de resolução, que não está bom agora"; "as assinaturas em algum lugar bem visível"; "melhore os comentários das cláusulas: bem dinâmico, para não atrapalhar o debate e o fluxo")
 **Depende de:** 09 (editor), 47 (modais), 55 (signatários com bandeira), 56 (projeto a partir de working papers)
 **Esforço:** G (em duas partes)
-**Situação:** parte A pronta (25/11/2026); a parte B espera o piloto (passo 49).
-**Quando:** a parte A antes do piloto, porque o roteiro tem 20 minutos de working paper e projeto. A parte B entra junto com o passo 49, se o piloto pedir.
+**Situação:** parte A pronta (25/11/2026); a parte B foi absorvida pelo [passo 63](63-um-projeto-por-topico.md) em 26/11/2026.
+**Quando:** a parte A antes do piloto, porque o roteiro tem 20 minutos de working paper e projeto. A parte B foi para o passo 63, antes do piloto.
 **Objetivo:** o documento se lê como o documento final e se escreve no lugar. As assinaturas ficam no topo. Opinar numa cláusula custa um toque.
 
 ## Como é hoje (`/documento/<id>`, cerca de 24 KB)
@@ -78,7 +78,9 @@
 - `comentario.resolvido`;
 - `comentario.texto` passa a ter até 280 caracteres. Os antigos ficam como estão: o limite novo vale só para novos, com o `check` na RPC.
 
-## Parte B · Junto com o passo 49 (se o piloto pedir)
+## Parte B · Absorvida pelo passo 63 (26/11/2026)
+
+O [passo 63](63-um-projeto-por-topico.md) faz a proposta estruturada, o texto atual e o proposto lado a lado e o histórico, no working paper de toda a sala; quem decide é quem preside a sessão, e não há rodada. O texto abaixo é o plano original.
 
 A proposta estruturada (alterar, adicionar, remover, mover), a comparação do que mudou, o fim da rodada que congela propostas e o histórico. Está descrita no [passo 49](49-edicao-por-clausula.md). Com a parte A pronta, o 49 fica menor: a posição num toque já cobre o "manter" e o "perguntar".
 

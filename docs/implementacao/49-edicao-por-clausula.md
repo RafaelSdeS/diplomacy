@@ -3,6 +3,7 @@
 **Parte de:** planos posteriores ([plano da edição colaborativa](../plano-editor-documentos.pdf), fonte em [HTML](../plano-editor-documentos.html))
 **Depende de:** 09 e 44, e da validação do piloto (abaixo)
 **Esforço:** G
+**Situação (26/11/2026):** a primeira entrega foi absorvida pelo [passo 63](63-um-projeto-por-topico.md), que já não espera o piloto: a proposta estruturada (incluir, alterar, mover, retirar), a decisão explícita (por quem preside a sessão, não pelo redator), o texto atual e o proposto lado a lado, o histórico e a junção de working papers com a origem. A rodada com prazo sai. O que sobrar daqui só volta se o piloto pedir.
 **Objetivo:** um bloco fecha um texto sem horas de comentários soltos: propostas curtas e estruturadas por cláusula, prazo e decisão explícita. Não é um editor em que todos digitam ao mesmo tempo.
 
 ## Antes de começar: validar com o piloto

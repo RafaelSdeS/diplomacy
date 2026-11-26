@@ -62,7 +62,7 @@ Cada passo só começa quando os passos de que ele depende estão prontos. As re
 | [46](46-agora-e-sessao-unificadas.md) | Agora operacional e sessão unificada: nota rápida e próxima fala sempre visíveis | 43 |
 | [47](47-modais-saida-e-icones.md) | Modais, menus de escolha, saída com confirmação e ícones do cabeçalho: modal base, fichas de votação, ponto, moção e nota, modais de ação curta | 43, 44 |
 | [48](48-demonstracao-online.md) | Demonstração online separada, com entrada por papel | 44, 45, 47 |
-| [49](49-edicao-por-clausula.md) | Edição colaborativa por cláusula (depois da validação do piloto) | 09, 44 |
+| [49](49-edicao-por-clausula.md) | Edição colaborativa por cláusula (a primeira entrega foi absorvida pelo 63) | 09, 44 |
 | [50](50-preparacao-da-fala.md) | Preparação de discursos durante o debate (depois da validação do piloto) | 34, 46 |
 | [51](51-melhorias-gerais-de-interface.md) | Melhorias gerais de interface, por tela: ações em botões e modais, presidência e Agora sem rolagem (antes do piloto), troca de redator, estados, densidade e preferências (**lotes 0 a 3, crise, blocos, secretaria e preferências prontos**) | 47, 52 |
 | [52](52-testes-do-dia-a-dia.md) | Testes rápidos no dia a dia: só os testes da tela mexida, sem build à toa, sem espera fixa, capturas de uma tela | 39 |
@@ -75,7 +75,7 @@ Cada passo só começa quando os passos de que ele depende estão prontos. As re
 | [59](59-presidencia-e-sessao.md) | Uma presidência só, numa tela só: o bureau só na plenária, na fase de ação e em casos excepcionais, presidência muda só no fim da sessão ou na não-confiança, placas sem ordem, ponto ou moção em cima | 29, 30, 43, 46, 51, 54 |
 | [60](60-agenda-do-bureau.md) | A agenda parte do documento do bureau, liberada no dia: uma agenda por tópico, alterada como um working paper e adotada pela sala | 22, 56, 57 |
 | [61](61-saber-onde-estou.md) | Saber onde estou e o que chegou: linha do comitê desde a plenária, "Como funciona", aviso de bilhetes, "Seus documentos" | 51, 55, 56, 59 |
-| [62](62-fluxo-do-comite.md) | O fluxo do comitê: crise compacta, Agora sem buracos, trilha com nomes, destaque por papel, dicas e travas (envio, rodada, redator único) | 51, 56, 57, 59, 61 |
+| [62](62-fluxo-do-comite.md) | O fluxo do comitê: um bloco por vez e o bloco nunca sem redator (lote 1, feito), crise compacta, Agora sem buracos, trilha com nomes, destaque por papel e dicas | 51, 56, 57, 59, 61 |
 | [63](63-um-projeto-por-topico.md) | Um working paper por item da agenda, de toda a sala, e um projeto por tópico: os redatores propõem, quem preside aceita ou rejeita, e a mesa transforma em projeto | 09, 56, 57, 60, 62 |
 
 ## Melhorias depois da revisão
@@ -251,6 +251,8 @@ Cada passo tem uma seção "Testes" com os testes que provam que ele funciona e 
 | 59 | sim | — | sim | sim |
 | 60 | sim | sim | sim | — |
 | 61 | — | — | sim | sim |
+| 62 | sim | sim | sim | — |
+| 63 | sim | — | sim | sim |
 
 ## Aparência
 
