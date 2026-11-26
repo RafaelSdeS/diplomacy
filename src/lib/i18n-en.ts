@@ -1686,6 +1686,7 @@ export const EN: Record<string, string> = {
 	'Este working paper já virou projeto: as assinaturas passaram para ele.':
 		'This working paper is already a draft resolution: the signatures moved to it.',
 	'O tópico já tem projeto.': 'The topic already has a draft resolution.',
+	'Só os membros do bloco escrevem na conversa dele.': "Only the bloc's members write in its conversation.",
 	'Os working papers do tópico ainda não têm cláusulas.': "The topic's working papers have no clauses yet.",
 	'Só o projeto do tópico, antes da votação, recebe correções de forma.':
 		"Only the topic's draft, before the vote, takes corrections of form.",

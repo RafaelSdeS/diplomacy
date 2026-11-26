@@ -1251,14 +1251,14 @@ isOneToOne: false
                   ]
                 },"mensagem": {
                   Row: {
-                    "autor_id": string | null,"comite_id": string,"criado_em": string,"crise_comite_id": string | null,"de_delegacao_id": string | null,"id": string,"oculta": boolean,"para_delegacao_id": string | null,"texto": string,"tipo": string
+                    "autor_id": string | null,"bloco_id": string | null,"comite_id": string,"criado_em": string,"crise_comite_id": string | null,"de_delegacao_id": string | null,"id": string,"oculta": boolean,"para_delegacao_id": string | null,"texto": string,"tipo": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "autor_id"?: string | null,"comite_id": string,"criado_em"?: string,"crise_comite_id"?: never,"de_delegacao_id"?: string | null,"id": string,"oculta"?: boolean,"para_delegacao_id"?: string | null,"texto": string,"tipo": string
+                    "autor_id"?: string | null,"bloco_id"?: string | null,"comite_id": string,"criado_em"?: string,"crise_comite_id"?: never,"de_delegacao_id"?: string | null,"id": string,"oculta"?: boolean,"para_delegacao_id"?: string | null,"texto": string,"tipo": string
                   }
                   Update: {
-                    "autor_id"?: string | null,"comite_id"?: string,"criado_em"?: string,"crise_comite_id"?: never,"de_delegacao_id"?: string | null,"id"?: string,"oculta"?: boolean,"para_delegacao_id"?: string | null,"texto"?: string,"tipo"?: string
+                    "autor_id"?: string | null,"bloco_id"?: string | null,"comite_id"?: string,"criado_em"?: string,"crise_comite_id"?: never,"de_delegacao_id"?: string | null,"id"?: string,"oculta"?: boolean,"para_delegacao_id"?: string | null,"texto"?: string,"tipo"?: string
                   }
                   Relationships: [
                     {
@@ -1267,6 +1267,12 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "pessoa"
       referencedColumns: ["id"]
+    },{
+      foreignKeyName: "mensagem_bloco_fkey"
+      columns: ["bloco_id","comite_id"]
+isOneToOne: false
+      referencedRelation: "bloco"
+      referencedColumns: ["id","comite_id"]
     },{
       foreignKeyName: "mensagem_comite_id_fkey"
       columns: ["comite_id"]
@@ -2535,6 +2541,9 @@ isOneToOne: false
                            },
 "meu_bloco":
 { Args: { "p_comite": string }; Returns: string
+                           },
+"meus_blocos":
+{ Args: Record<PropertyKey, never>; Returns: string[]
                            },
 "meus_comites":
 { Args: { "p_papeis": (Database["public"]['Enums']["papel"])[] }; Returns: string[]
