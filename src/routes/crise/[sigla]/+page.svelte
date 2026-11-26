@@ -30,7 +30,7 @@
 	import Megaphone from '@lucide/svelte/icons/megaphone';
 	import MessagesSquare from '@lucide/svelte/icons/messages-square';
 	import FlagOff from '@lucide/svelte/icons/flag-off';
-	import type { PageProps } from './$types';
+	import type { PageProps, Snapshot } from './$types';
 
 	let { data }: PageProps = $props();
 
@@ -166,6 +166,12 @@
 		}
 		await invalidate('app:crise');
 	}
+
+	// O "Voltar" devolve o filtro e a nota aberta (snapshot do SvelteKit).
+	export const snapshot: Snapshot<[string, boolean, string | null]> = {
+		capture: () => [filtro, soEsperando, aberta],
+		restore: (v) => ([filtro, soEsperando, aberta] = v)
+	};
 </script>
 
 <svelte:head>
@@ -233,7 +239,9 @@
 	{/if}
 
 	<div class="crise">
-		<section class="cartao" aria-labelledby="t-fila">
+		<!-- Passo 51: as colunas rolam sozinhas no notebook; com tabindex, o teclado também as rola. -->
+		<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+		<section class="cartao" aria-labelledby="t-fila" tabindex="0">
 			<h2 id="t-fila">{t('Notas')}</h2>
 			<div class="acoes">
 				<label class="campo">
@@ -277,7 +285,8 @@
 			</ol>
 		</section>
 
-		<section class="cartao" id="nota-aberta" aria-labelledby="t-aberta">
+		<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+		<section class="cartao" id="nota-aberta" aria-labelledby="t-aberta" tabindex="0">
 			<h2 id="t-aberta">{selecionadas.length > 1 ? t('{n} notas selecionadas', { n: selecionadas.length }) : t('Nota aberta')}</h2>
 			{#if selecionadas.length > 1}
 				<ul class="lista">

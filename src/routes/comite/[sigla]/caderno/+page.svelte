@@ -16,7 +16,7 @@
 	import AcaoEmModal from '#lib/ui/AcaoEmModal.svelte';
 	import Mic from '@lucide/svelte/icons/mic';
 	import NotebookPen from '@lucide/svelte/icons/notebook-pen';
-	import type { PageProps } from './$types';
+	import type { PageProps, Snapshot } from './$types';
 
 	let { data }: PageProps = $props();
 	const agora = new Date();
@@ -80,6 +80,9 @@
 		lendo = a;
 		leitura?.abrir();
 	}
+
+	// O "Voltar" devolve a aba (snapshot do SvelteKit).
+	export const snapshot: Snapshot<'nota' | 'sobre' | 'fala'> = { capture: () => aba, restore: (v) => (aba = v) };
 </script>
 
 <svelte:head>

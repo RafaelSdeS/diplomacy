@@ -91,7 +91,7 @@ test('a mesa mostra o documento no telão, que volta à sessão pelo próprio te
 	const alemanha = await (await browser.newContext()).newPage();
 	await entrar(alemanha, ALEMANHA);
 	await alemanha.goto(`/comite/${C.sigla}`);
-	const daMesa = alemanha.getByRole('region', { name: 'Da mesa' }).getByRole('listitem').filter({ hasText: titulo });
+	const daMesa = alemanha.getByRole('region', { name: 'Documentos da mesa' }).getByRole('listitem').filter({ hasText: titulo });
 	await expect(daMesa).toContainText('Novo');
 	await alemanha.context().close();
 

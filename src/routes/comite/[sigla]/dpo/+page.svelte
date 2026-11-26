@@ -193,7 +193,7 @@
 						<button
 							class="botao botao--secundario botao--pequeno"
 							type="button"
-							aria-label={`${t('Comentar')}: ${t('DPO de {delegacao}', { delegacao: d.delegacao?.nome ?? '' })}, ${t('Tópico')} ${d.topico}`}
+							aria-label={`${data.comentarios.has(d.id) ? t('Ver o comentário') : t('Comentar')}: ${t('DPO de {delegacao}', { delegacao: d.delegacao?.nome ?? '' })}, ${t('Tópico')} ${d.topico}`}
 							onclick={() => abrir(d, 'comentar')}>{data.comentarios.has(d.id) ? t('Ver o comentário') : t('Comentar')}</button
 						>
 						<button

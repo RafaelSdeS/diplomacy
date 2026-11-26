@@ -1652,6 +1652,10 @@ export const EN: Record<string, string> = {
 	'Para marcar até cinco telas favoritas, use a estrela no "Ir para…" (a lupa do topo).': 'To mark up to five favorite screens, use the star in "Go to…" (the magnifier at the top).',
 	'Todos os documentos': 'All documents',
 	'Rascunho guardado neste aparelho.': 'Draft saved on this device.',
+	'Conduzir a votação': 'Run the vote',
+	'Documentos da mesa': 'Documents from the dais',
+	'Abst.': 'Abst.',
+	'Falta': 'Missing',
 };
 
 /** Mensagens do banco com partes variáveis: [padrão em português, tradução]. */

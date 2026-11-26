@@ -5,7 +5,7 @@
 	import { semAcentos } from '#lib/palavroes.ts';
 	import { mensagemDeErro } from '#lib/sessao.ts';
 	import { supabase } from '#lib/supabase.ts';
-	import type { PageProps } from './$types';
+	import type { PageProps, Snapshot } from './$types';
 
 	let { data }: PageProps = $props();
 
@@ -82,6 +82,9 @@
 		fluxo?.getTracks().forEach((t) => t.stop());
 	}
 	onDestroy(parar);
+
+	// O "Voltar" devolve a busca (snapshot do SvelteKit).
+	export const snapshot: Snapshot<string> = { capture: () => busca, restore: (v) => (busca = v) };
 </script>
 
 <svelte:head>

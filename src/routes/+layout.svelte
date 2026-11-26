@@ -36,6 +36,10 @@
 	import { supabase, type Papel } from '#lib/supabase.ts';
 	import { assinar, assinarAvisos, esquecerLeituras, recarregarAoVivo } from '#lib/tempo-real.ts';
 	import type { LayoutProps } from './$types';
+	import { capturarRolagens, restaurarRolagens } from '#lib/rolagem.ts';
+
+	// Passo 51: no "Voltar", as colunas que rolam por dentro voltam à mesma posição.
+	export const snapshot = { capture: capturarRolagens, restore: restaurarRolagens };
 
 	let { data, children }: LayoutProps = $props();
 

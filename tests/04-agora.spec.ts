@@ -107,7 +107,7 @@ test('a página do comitê mostra tópicos, mesa e as 15 delegações com bandei
 
 	await expect(page.getByRole('heading', { level: 1, name: 'Conselho de Segurança (teste)' })).toBeVisible();
 	await expect(page.getByRole('region', { name: 'Tópicos' })).toContainText('Iêmen');
-	await expect(page.getByRole('region', { name: 'Mesa' })).toContainText('Mesa 01');
+	await expect(page.getByRole('region', { name: 'Mesa', exact: true })).toContainText('Mesa 01');
 
 	const delegacoes = page.getByRole('region', { name: /^Delegações/ });
 	await expect(delegacoes.getByRole('listitem')).toHaveCount(15);

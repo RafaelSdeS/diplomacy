@@ -1,6 +1,10 @@
 import { expect, test, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { abrirAcao, CONTAS, entrar } from './ajuda.ts';
+import { isolado } from '../scripts/delegacoes.ts';
+import { abrirAcao, comiteEmDebate, CONTAS, entrar } from './ajuda.ts';
+
+// A votação aberta no painel usa a cópia do CSNU-T (15 delegações) só deste arquivo.
+const V = isolado('51a');
 
 // Passo 51 (lotes da crise, blocos e secretaria, e o que vale em todos): nas telas revisadas,
 // toda ação é uma caixa à vista, com fundo ou contorno (não parece link), e o axe passa nos
@@ -70,4 +74,45 @@ test('o texto digitado num modal de criar sobrevive a fechar e reabrir', async (
 	await expect(modal).toBeHidden();
 	await abrirAcao(page, 'Novo bloco');
 	await expect(modal.getByLabel('Nome do novo bloco')).toHaveValue('Bloco do Atlântico');
+});
+
+test('com a votação aberta, o painel mostra só a votação e o que decidir, sem rolar (passo 51)', async ({ page }) => {
+	const { mesa, comite } = await comiteEmDebate(V.conta(CONTAS.mesa), V.sigla, V.conta(CONTAS.delegado));
+	const votacao = await mesa.rpc('abrir_votacao_livre', { p_comite: comite, p_objeto: 'Votação de teste do painel', p_tipo: 'procedimental' });
+	expect(votacao.error).toBeNull();
+	try {
+		await page.setViewportSize({ width: 1366, height: 768 });
+		await entrar(page, V.conta(CONTAS.mesa));
+		await page.goto(`/comite/${V.sigla}/sessao/presidencia`);
+		await expect(page.locator('[data-ao-vivo="sim"]')).toBeVisible({ timeout: 10_000 });
+		await expect(page.getByRole('region', { name: 'Votação aberta' })).toBeVisible();
+		await expect(page.getByRole('region', { name: 'Com a palavra' })).toBeHidden();
+		await expect(page.getByRole('region', { name: 'Conduzir a votação' }).getByRole('button', { name: 'Encerrar a votação' })).toBeVisible();
+		await expect(page.getByRole('region', { name: 'Para decidir' })).toBeVisible();
+		expect(await page.evaluate(() => document.documentElement.scrollHeight - innerHeight)).toBeLessThanOrEqual(2);
+		const sobras = await page.locator('.painel > .painel-coluna').evaluateAll((colunas) => colunas.map((c) => c.scrollHeight - c.clientHeight));
+		for (const sobra of sobras) expect(sobra).toBeLessThanOrEqual(2);
+	} finally {
+		await mesa.rpc('encerrar_votacao', { p_votacao: votacao.data! });
+	}
+});
+
+test('o "Voltar" devolve a tela com a busca, o filtro e a rolagem da coluna (passo 51)', async ({ page }) => {
+	await page.setViewportSize({ width: 1366, height: 768 });
+	await entrar(page, CONTAS.secretaria);
+	await page.goto('/secretaria/participantes');
+	await page.getByLabel('Filtrar por papel').selectOption('delegado');
+	await page.getByRole('searchbox', { name: 'Buscar' }).fill('de');
+	const coluna = page.locator('.colunas-que-rolam > .cartao').first();
+	await coluna.evaluate((e) => (e.scrollTop = 600));
+	const antes = await coluna.evaluate((e) => e.scrollTop);
+	expect(antes).toBeGreaterThan(100);
+
+	await page.getByRole('link', { name: 'Check-in' }).click();
+	await expect(page.getByRole('heading', { level: 1, name: 'Check-in' })).toBeVisible();
+	await page.getByRole('link', { name: '‹ Voltar para Participantes' }).click();
+	await expect(page.getByRole('heading', { level: 1, name: 'Participantes' })).toBeVisible();
+	await expect(page.getByRole('searchbox', { name: 'Buscar' })).toHaveValue('de');
+	await expect(page.getByLabel('Filtrar por papel')).toHaveValue('delegado');
+	await expect.poll(() => coluna.evaluate((e) => e.scrollTop)).toBe(antes);
 });

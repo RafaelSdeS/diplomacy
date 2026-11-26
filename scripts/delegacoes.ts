@@ -77,6 +77,7 @@ export const ISOLADOS = {
 	'46': 'TREINO',
 	'47': 'TREINO',
 	'51': 'TREINO',
+	'51a': 'CSNU-T',
 	'54': 'CE-T',
 	'55': 'TREINO',
 	'56': 'CE-T',

@@ -170,10 +170,17 @@
   - `51-acabamento`: toda ação tem fundo, e o axe passa nos dois temas, nas telas revisadas; Participantes e a fila da crise não rolam a página; o texto de um modal de criar sobrevive a fechar e reabrir.
   - `43-fluxo`: a favorita fica no topo e o texto grande vale depois de recarregar.
   - `47-fichas`: passar a redação.
-- **Ainda não:**
-  - A presidência com a votação aberta, a 1366 × 768, ainda rola, como já registrado no lote 1.
-  - O "voltar" não preserva o filtro e a rolagem.
-  - A densidade automática por papel ficou como "a de cada tela", para não mudar as telas que já passaram pelo uso.
+- **Ainda não:** a densidade automática por papel ficou como "a de cada tela", para não mudar as telas que já passaram pelo uso.
+
+**Sobras resolvidas (26/11/2026, depois de popular o CSNU-T online com dados reais):**
+
+- **Votação aberta na presidência:** com a votação aberta, o painel do notebook mostra só a votação (larga, a grade de votos em colunas, cada voto numa linha com texto curto e o texto completo para o leitor de tela), "Conduzir a votação" (registrar os votos de placa e encerrar) e "Para decidir". As placas e "Com a palavra" voltam quando ela fecha. A 1366 × 768, com 15 delegações, nem a página nem as colunas rolam.
+- **O "Voltar" devolve a tela como estava:** os snapshots do SvelteKit guardam no histórico a busca e os filtros (Participantes, Check-in, Chamada, Mensagens, Crise com a nota aberta e a aba do Caderno), e o layout guarda a rolagem das colunas que rolam por dentro. A rolagem da janela, o SvelteKit já devolvia.
+- **O que os dados reais mostraram:**
+  - Com cronograma e avisos, a Agora do delegado passava 15 px da tela. O relógio vazio sai quando ninguém tem a palavra, e a faixa de quem preside fica na coluna da esquerda.
+  - Um título de carta longo cobria o "Ver todas" em Documentos (`minmax(0, 1fr)`).
+  - A conversa nas Mensagens e as colunas da crise e de Participantes rolam sozinhas e agora recebem foco pelo teclado.
+  - A crise e Participantes usam o mesmo esquema de altura do painel: as colunas ficam com o que sobra, qualquer que seja o topo (alerta de crise, filtros).
 
 ## Fora desta etapa
 
@@ -186,9 +193,9 @@ Itens que dependem de um segundo evento, habilidades especiais para delegações
 - [x] Lote 0: Perfil e Sair só com ícone, com nome acessível, no notebook e no celular (`47-cabecalho`).
 - [x] Lote 0: nenhuma ação sem fundo nas telas revisadas (botões têm fundo; links sublinhados só em texto corrido), conferido pelo estilo calculado em `51-acabamento`.
 
-- [ ] Ponta a ponta, a 1366 × 768: a área principal da presidência não rola em cada fase (debate, votação aberta, plenária) e a da Agora não rola para a mesa e para o delegado; o teste compara a altura do conteúdo com a da janela.
+- [ ] Ponta a ponta, a 1366 × 768: a área principal da presidência não rola em cada fase (debate, votação aberta, plenária) e a da Agora não rola para a mesa e para o delegado; o teste compara a altura do conteúdo com a da janela. Feitos: o debate e a Agora (`43-fluxo`) e a votação aberta (`51-acabamento`); falta um teste da plenária.
 - [x] Axe nas telas revisadas, no tema claro e no escuro (`51-acabamento` e os testes de cada tela). As capturas cobrem as telas que já tinham.
-- [ ] Ponta a ponta: o voltar leva à tela de origem e preserva filtro e rolagem.
+- [x] Ponta a ponta: o voltar leva à tela de origem e preserva filtro e rolagem (`51-acabamento`).
 - [x] Ponta a ponta: um favorito marcado aparece no topo do "Ir para…" e continua lá depois de recarregar (`43-fluxo`).
 - [ ] Teclado e leitor de tela nas modais e nas fichas.
 - [ ] Manual: uma pessoa nova encontra uma tarefa comum em poucos passos.

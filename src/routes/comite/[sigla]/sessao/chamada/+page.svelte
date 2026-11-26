@@ -10,7 +10,7 @@
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import Bandeira from '#lib/ui/Bandeira.svelte';
 	import NomeDelegacao from '#lib/ui/NomeDelegacao.svelte';
-	import type { PageProps } from './$types';
+	import type { PageProps, Snapshot } from './$types';
 
 	let { data }: PageProps = $props();
 	let busca = $state('');
@@ -43,6 +43,9 @@
 			t('Não foi possível marcar a presença.')
 		);
 	}
+
+	// O "Voltar" devolve a busca (snapshot do SvelteKit).
+	export const snapshot: Snapshot<string> = { capture: () => busca, restore: (v) => (busca = v) };
 </script>
 
 <svelte:head>

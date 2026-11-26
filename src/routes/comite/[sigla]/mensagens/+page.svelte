@@ -27,7 +27,7 @@
 	import Ban from '@lucide/svelte/icons/ban';
 	import ShieldCheck from '@lucide/svelte/icons/shield-check';
 	import Escolha from '#lib/ui/Escolha.svelte';
-	import type { PageProps } from './$types';
+	import type { PageProps, Snapshot } from './$types';
 
 	let { data }: PageProps = $props();
 	const agora = new Date();
@@ -226,6 +226,8 @@
 		bloqueados = !!data.regras.bilhetes_bloqueados;
 	});
 
+	// O "Voltar" devolve a busca (snapshot do SvelteKit).
+	export const snapshot: Snapshot<string> = { capture: () => busca, restore: (v) => (busca = v) };
 </script>
 
 <svelte:head>
@@ -503,7 +505,9 @@
 					</details>
 				{/if}
 			</header>
-			<ol class="chat-mensagens" bind:this={rolagem} aria-label={t('Mensagens com {quem}', { quem: c.titulo })}>
+			<!-- Passo 51: a conversa rola sozinha; com tabindex, o teclado também a rola (axe, rolagem focável). -->
+			<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+			<ol class="chat-mensagens" bind:this={rolagem} tabindex="0" aria-label={t('Mensagens com {quem}', { quem: c.titulo })}>
 				{#each c.msgs as m, i (m.id)}
 					{@const minha = minhaMsg(c, m)}
 					{#if i === 0 || separador(c.msgs[i - 1].criado_em) !== separador(m.criado_em)}

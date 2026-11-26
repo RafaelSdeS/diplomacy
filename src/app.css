@@ -1177,6 +1177,71 @@ kbd {
 	}
 }
 
+/* Passo 51: com a votação aberta, o painel do notebook é só a votação (larga, com a grade em
+   colunas) e o que decidir; placas e "Com a palavra" voltam quando ela fecha. */
+@media (min-width: 1024px) {
+	.painel--votacao {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.painel--votacao > .painel-coluna:not(.painel-coluna--decisao) {
+		display: none;
+	}
+
+	.painel--votacao > .painel-coluna--decisao {
+		grid-template-columns: minmax(0, 3fr) minmax(0, 1fr);
+		grid-auto-flow: row dense;
+		align-content: start;
+		align-items: start;
+	}
+
+	.painel--votacao > .painel-coluna--decisao > * {
+		grid-column: 1;
+	}
+
+	.painel--votacao > .painel-coluna--decisao > :is(.para-decidir, .controles-votacao) {
+		grid-column: 2;
+	}
+
+	.painel--votacao > .painel-coluna--decisao > .cartao-votacao {
+		grid-row: span 2;
+	}
+
+	.painel--votacao .cartao-votacao p {
+		margin-block: 0.25rem;
+	}
+
+	.painel--votacao .cartao-votacao .destaque {
+		font-size: 1.25rem;
+	}
+
+	.painel--votacao .grade-votos {
+		grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+		margin: 0.35rem 0;
+	}
+
+	.painel--votacao .voto {
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.35rem;
+		padding: 0.2rem 0.4rem;
+	}
+
+	.grade-votos--compacta .voto-escolha {
+		flex: none;
+		font-size: 0.85rem;
+	}
+
+	/* O país numa linha só (o nome inteiro segue no leitor de tela e na ficha). */
+	.grade-votos--compacta .nome-delegacao {
+		min-width: 0;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
+}
+
 .cronometro {
 	display: flex;
 	flex-wrap: wrap;
@@ -1638,28 +1703,38 @@ kbd {
 	align-items: end;
 }
 
-@media (min-width: 1024px) and (min-height: 640px) {
+@media (min-width: 1024px) and (min-height: 600px) {
 	.colunas-que-rolam {
 		grid-template-columns: 1fr 1fr;
-		height: calc(100dvh - 26rem);
-	}
-
-	.colunas-que-rolam > .cartao {
-		max-height: 100%;
-		overflow-y: auto;
 	}
 }
 
-/* Passo 51 (lote da crise): no notebook, a fila e a nota aberta rolam por dentro; a página não. */
-@media (min-width: 1024px) and (min-height: 640px) {
-	.crise {
-		height: calc(100dvh - 22rem);
-		margin-bottom: 0;
+/* Passo 51 (lotes da crise e da secretaria): no notebook, como no painel da presidência, a página
+   ocupa a tela e as colunas ficam com o que sobra (qualquer que seja o topo: alerta de crise,
+   filtros), cada uma rolando por dentro. */
+@media (min-width: 1024px) and (min-height: 600px) {
+	.app:has(:is(.crise, .colunas-que-rolam)) {
+		height: 100dvh;
 	}
 
-	.crise .cartao {
-		max-height: 100%;
+	.app:has(:is(.crise, .colunas-que-rolam)) main {
+		display: flex;
+		flex-direction: column;
+		min-height: 0;
+		overflow: hidden;
+	}
+
+	:is(.crise, .colunas-que-rolam) {
+		flex: 1;
+		min-height: 0;
+		margin-bottom: 0;
+		grid-template-rows: minmax(0, 1fr);
+		align-items: stretch;
+	}
+
+	:is(.crise, .colunas-que-rolam) > .cartao {
 		overflow-y: auto;
+		overscroll-behavior: contain;
 	}
 }
 
@@ -2143,7 +2218,8 @@ dialog.escolha-modal {
 
 .linha-evento {
 	display: grid;
-	grid-template-columns: 11rem 1fr auto;
+	/* minmax(0, …): um título longo encolhe com reticências, sem cobrir o botão (passo 51). */
+	grid-template-columns: 11rem minmax(0, 1fr) auto;
 	align-items: center;
 	gap: 0.25rem 1rem;
 	padding: 0.3rem 0;
@@ -2162,7 +2238,7 @@ dialog.escolha-modal {
 
 @media (max-width: 639px) {
 	.linha-evento {
-		grid-template-columns: 1fr auto;
+		grid-template-columns: minmax(0, 1fr) auto;
 	}
 
 	.linha-evento-resumo {

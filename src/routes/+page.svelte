@@ -128,15 +128,16 @@
 	{#if data.papel === 'delegado' && data.aoVivo}
 		<article class="cartao cartao--ao-vivo cartao--largo" aria-labelledby="c-ao-vivo">
 			<h2 id="c-ao-vivo">{t('Sessão ao vivo')} · {sigla}</h2>
-			{#if sessao && estado && !preside}
-				<QuemPreside fase={data.aoVivo.fase} mesaAssumiu={estado.mesa_assumiu} motivo={estado.motivo_mesa} presidencia={sessao.presidencia} {minhaDelegacao} {sigla} />
-			{/if}
 			{#if !sessao || !estado}
 				<p class="suave">{t('Nenhuma sessão aberta.')}</p>
 			{:else}
-				<!-- Passo 51 (lote 2): no notebook, o que acontece à esquerda e as ações à direita. -->
+				<!-- Passo 51 (lote 2): no notebook, o que acontece à esquerda e as ações à direita. A faixa
+					 de quem preside fica na coluna da esquerda, e as ações sobem ao lado dela. -->
 				<div class="ao-vivo-grade">
 					<div>
+					{#if !preside}
+						<QuemPreside fase={data.aoVivo.fase} mesaAssumiu={estado.mesa_assumiu} motivo={estado.motivo_mesa} presidencia={sessao.presidencia} {minhaDelegacao} {sigla} />
+					{/if}
 					<p class="suave">{t('Sessão {n}', { n: sessao.numero })} · {FASES[data.aoVivo.fase]} · {FORMAS[estado.forma]}</p>
 					<LinhaDoComite compacta {sigla} estado={{ fase: data.aoVivo.fase, etapa_plenaria: estado.etapa_plenaria, topico_atual: estado.topico_atual }} papel="delegacao" ordem={data.aoVivo.ordem} />
 					{#if momento === 'pausa'}<p class="telegrama" role="status">{t('Há pontos ou moções?')}</p>{/if}
@@ -144,7 +145,8 @@
 						<span class="rotulo">{t('Com a palavra')}</span>
 						{estado.orador ? estado.orador.nome : t('Ninguém com a palavra.')}
 					</p>
-					<Cronometro cronometro={estado} avisoSeg={data.aoVivo.regras.aviso_fala_seg} {diferenca} />
+					<!-- Passo 51: sem ninguém com a palavra, o relógio vazio não diz nada; sai e a Agora cabe na tela. -->
+					{#if estado.orador}<Cronometro cronometro={estado} avisoSeg={data.aoVivo.regras.aviso_fala_seg} {diferenca} />{/if}
 					{#if temDebate(estado)}
 						<p class="rotulo">{FORMAS[estado.forma]} · {t('tempo do debate')}</p>
 						<Cronometro cronometro={relogioDebate(estado)} avisoSeg={60} {diferenca} />

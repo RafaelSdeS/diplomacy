@@ -74,8 +74,9 @@ test('uma votação nominal completa, do painel da mesa ao telão', async ({ bro
 	await expect(telao.getByText(/^Votação nominal · /)).toBeVisible({ timeout: 10_000 });
 	await expect(celular.getByText('Votação nominal:', { exact: true })).toBeVisible({ timeout: 10_000 });
 
-	// Chamada em ordem alfabética: a Argentina passa a vez e vota no fim.
-	const chamada = painel.getByRole('region', { name: 'Votação aberta' });
+	// Chamada em ordem alfabética: a Argentina passa a vez e vota no fim. Passo 51: os controles
+	// da votação ficam no cartão "Conduzir a votação".
+	const chamada = painel.getByRole('region', { name: 'Conduzir a votação' });
 	await chamada.getByRole('button', { name: 'Passou a vez: Argentina' }).click();
 	await expect(chamada.getByText('Passou a vez')).toBeVisible();
 	for (const [nome] of DELEGACOES_TREINO.filter(([n]) => n !== 'Argentina')) {

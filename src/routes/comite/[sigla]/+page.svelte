@@ -79,7 +79,7 @@
 
 {#if data.daMesa.length}
 	<section aria-labelledby="t-da-mesa">
-		<h2 id="t-da-mesa">{t('Da mesa')}</h2>
+		<h2 id="t-da-mesa">{t('Documentos da mesa')}</h2>
 		<ul class="lista">
 			{#each data.daMesa as d (d.id)}
 				{@const selo = seloDaPublicacao(lidas, d.id, d.versao)}

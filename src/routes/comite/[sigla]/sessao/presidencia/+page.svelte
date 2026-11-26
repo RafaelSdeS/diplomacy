@@ -389,7 +389,8 @@
 		<p class="erro" role="alert">{erro}</p>
 	{/if}
 
-	<div class="painel">
+	<!-- Passo 51: com a votação aberta, ninguém fala; o painel mostra só a votação e o que decidir. -->
+	<div class={['painel', data.podePresidir && votacao?.aberta && 'painel--votacao']}>
 		{#if !data.podePresidir}
 			<!-- Passo 59: com a delegação da vez conduzindo, a mesa é só bureau. -->
 			<div class="painel-coluna">{@render bureau()}</div>
@@ -641,7 +642,8 @@
 		</div>
 		{/if}
 
-		<div class="painel-coluna">
+		<div class="painel-coluna painel-coluna--decisao">
+			{#if votacao?.aberta}<AlertaCrise incidentes={data.incidentes} {diferenca} />{/if}
 			{#if souDaVez && minha}
 				<section class="cartao" aria-labelledby="t-sua-delegacao">
 					<h2 id="t-sua-delegacao">{t('Sua delegação')} · {minha.delegacao_nome}</h2>
@@ -655,7 +657,7 @@
 				</section>
 			{/if}
 			{#if votacao}
-				<section class="cartao cartao--destaque" aria-labelledby="t-votacao">
+				<section class="cartao cartao--destaque cartao-votacao" aria-labelledby="t-votacao">
 					<h2 id="t-votacao">{votacao.aberta ? t('Votação aberta') : t('Última votação')}</h2>
 					<!-- Passo 51 (lote 1): encerrada, a votação ocupa pouco; aberta, ganha destaque. -->
 					<p class={votacao.aberta ? 'destaque' : undefined}><button class="abre-ficha" type="button" onclick={() => (verVotacao = true)}>{votacao.objeto}</button></p>
@@ -672,67 +674,72 @@
 								: t('procedimental')}, {REGRAS_VOTACAO[votacao.regra]}
 							{#if votacao.nominal}· <strong>{t('votação nominal')}</strong>, {t('em ordem alfabética')}{/if}
 						</p>
-						<GradeVotos sigla={data.comite.sigla} delegacoes={votantes} votos={votacao.votos} />
-						{#if ehMesa}
-							<details bind:open={chamadaAberta}>
-								<summary>{votacao.nominal ? t('Chamada nominal') : t('Registrar votos de placa')}</summary>
-								{#if votantes.length > LISTA_LONGA}
-									<label class="campo">{t('Filtrar')} <input type="search" bind:value={buscaVotos} /></label>
-								{/if}
-								<ul class="lista">
-									{#each filtrarDelegacoes(votantes, buscaVotos) as d (d.id)}
-										{@const passou = votacao.passes.some((x) => x.delegacao_id === d.id)}
-										{@const parteNaDisputa = votacao.partes.includes(d.id)}
-										<li>
-											<span>
-												{d.nome}
-												{#if passou}<span class="selo">{t('Passou a vez')}</span>{/if}
-												{#if parteNaDisputa}<span class="selo selo--alerta">{t('Parte na disputa')}</span>{/if}
-											</span>
-											<span class="acoes">
-												{#if votacao.nominal && !passou && !votacao.votos.some((v) => v.delegacao_id === d.id)}
-													<button
-														class="botao botao--secundario botao--pequeno"
-														type="button"
-														aria-label={`Passou a vez: ${d.nome}`}
-														onclick={() => rpc('passar_vez', { p_votacao: votacao.id, p_delegacao: d.id })}>{t('Passou')}</button
-													>
-												{/if}
-												{#if votacao.regra === 'csnu'}
-													<button
-														class="botao botao--secundario botao--pequeno"
-														type="button"
-														aria-label={`${parteNaDisputa ? t('Não é parte') : t('Parte na disputa')}: ${d.nome}`}
-														onclick={() => rpc('marcar_parte', { p_votacao: votacao.id, p_delegacao: d.id, p_parte: !parteNaDisputa })}
-														>{parteNaDisputa ? t('Não é parte') : t('Parte')}</button
-													>
-												{/if}
-												{#each escolhasPermitidas(votacao.tipo, d.situacao, sessao.presenca.find((p) => p.delegacao_id === d.id)?.situacao) as escolha (escolha)}
-													<button
-														class="botao botao--secundario botao--pequeno"
-														type="button"
-														aria-label={`${ESCOLHAS[escolha]}: ${d.nome}`}
-														onclick={() => registrar(d.id, escolha)}>{ESCOLHAS[escolha]}</button
-													>
-												{/each}
-											</span>
-										</li>
-									{/each}
-								</ul>
-							</details>
-						{/if}
-						{#if data.podePresidir}
-							<Confirmar
-								rotulo={t('Encerrar a votação')}
-								pergunta={t('Encerrar a votação de {objeto}?', { objeto: votacao.objeto })}
-								explicacao={t('Quem não votou fica sem voto, e o resultado sai na hora.')}
-								acao={() => rpc('encerrar_votacao', { p_votacao: votacao.id })}
-							/>
-						{/if}
+						<GradeVotos sigla={data.comite.sigla} delegacoes={votantes} votos={votacao.votos} compacta />
 					{:else}
 						<p>{textoResultado(votacao)}</p>
 					{/if}
 				</section>
+				<!-- Passo 51: os controles da votação num cartão próprio; no notebook, ao lado da grade. -->
+				{#if votacao.aberta && (ehMesa || data.podePresidir)}
+					<section class="cartao controles-votacao" aria-label={t('Conduzir a votação')}>
+					{#if ehMesa}
+						<details bind:open={chamadaAberta}>
+							<summary>{votacao.nominal ? t('Chamada nominal') : t('Registrar votos de placa')}</summary>
+							{#if votantes.length > LISTA_LONGA}
+								<label class="campo">{t('Filtrar')} <input type="search" bind:value={buscaVotos} /></label>
+							{/if}
+							<ul class="lista">
+								{#each filtrarDelegacoes(votantes, buscaVotos) as d (d.id)}
+									{@const passou = votacao.passes.some((x) => x.delegacao_id === d.id)}
+									{@const parteNaDisputa = votacao.partes.includes(d.id)}
+									<li>
+										<span>
+											{d.nome}
+											{#if passou}<span class="selo">{t('Passou a vez')}</span>{/if}
+											{#if parteNaDisputa}<span class="selo selo--alerta">{t('Parte na disputa')}</span>{/if}
+										</span>
+										<span class="acoes">
+											{#if votacao.nominal && !passou && !votacao.votos.some((v) => v.delegacao_id === d.id)}
+												<button
+													class="botao botao--secundario botao--pequeno"
+													type="button"
+													aria-label={`Passou a vez: ${d.nome}`}
+													onclick={() => rpc('passar_vez', { p_votacao: votacao.id, p_delegacao: d.id })}>{t('Passou')}</button
+												>
+											{/if}
+											{#if votacao.regra === 'csnu'}
+												<button
+													class="botao botao--secundario botao--pequeno"
+													type="button"
+													aria-label={`${parteNaDisputa ? t('Não é parte') : t('Parte na disputa')}: ${d.nome}`}
+													onclick={() => rpc('marcar_parte', { p_votacao: votacao.id, p_delegacao: d.id, p_parte: !parteNaDisputa })}
+													>{parteNaDisputa ? t('Não é parte') : t('Parte')}</button
+												>
+											{/if}
+											{#each escolhasPermitidas(votacao.tipo, d.situacao, sessao.presenca.find((p) => p.delegacao_id === d.id)?.situacao) as escolha (escolha)}
+												<button
+													class="botao botao--secundario botao--pequeno"
+													type="button"
+													aria-label={`${ESCOLHAS[escolha]}: ${d.nome}`}
+													onclick={() => registrar(d.id, escolha)}>{ESCOLHAS[escolha]}</button
+												>
+											{/each}
+										</span>
+									</li>
+								{/each}
+							</ul>
+						</details>
+					{/if}
+					{#if data.podePresidir}
+						<Confirmar
+							rotulo={t('Encerrar a votação')}
+							pergunta={t('Encerrar a votação de {objeto}?', { objeto: votacao.objeto })}
+							explicacao={t('Quem não votou fica sem voto, e o resultado sai na hora.')}
+							acao={() => rpc('encerrar_votacao', { p_votacao: votacao.id })}
+						/>
+					{/if}
+					</section>
+				{/if}
 			{/if}
 
 			<!-- Passo 51 (lote 1): o que espera uma decisão vira contagem; cada linha abre um modal no centro.

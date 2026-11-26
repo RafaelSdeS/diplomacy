@@ -7,7 +7,7 @@
 	import Escolha from '#lib/ui/Escolha.svelte';
 	import AcaoEmModal from '#lib/ui/AcaoEmModal.svelte';
 	import UserPlus from '@lucide/svelte/icons/user-plus';
-	import type { PageProps } from './$types';
+	import type { PageProps, Snapshot } from './$types';
 
 	let { data }: PageProps = $props();
 
@@ -89,6 +89,12 @@
 		}
 		await invalidate('app:participantes');
 	}
+
+	// O "Voltar" devolve a busca e os filtros (snapshot do SvelteKit).
+	export const snapshot: Snapshot<[string, string, string]> = {
+		capture: () => [busca, filtroComite, filtroPapel],
+		restore: (v) => ([busca, filtroComite, filtroPapel] = v)
+	};
 </script>
 
 <svelte:head>
@@ -178,7 +184,8 @@
 {/if}
 
 <div class="colunas-que-rolam">
-	<section class="cartao" aria-labelledby="t-inscritos">
+	<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+	<section class="cartao" aria-labelledby="t-inscritos" tabindex="0">
 		<h2 id="t-inscritos">Com acesso ({filtrando ? `${inscritos.length} de ${data.inscritos.length}` : data.inscritos.length})</h2>
 		<ul class="lista">
 			{#each inscritos as p (p.id)}
@@ -201,7 +208,8 @@
 		</ul>
 	</section>
 
-	<section class="cartao" aria-labelledby="t-convites">
+	<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+	<section class="cartao" aria-labelledby="t-convites" tabindex="0">
 		<h2 id="t-convites">Convites ({filtrando ? `${convites.length} de ${data.convites.length}` : data.convites.length})</h2>
 		<ul class="lista">
 			{#each convites as c (c.id)}
