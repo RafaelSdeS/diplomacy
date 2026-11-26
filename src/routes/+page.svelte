@@ -98,8 +98,22 @@
 	const ausente = $derived(
 		!!sessao && !!minhaDelegacao && !sessao.presenca.some((p) => p.delegacao_id === minhaDelegacao)
 	);
+	// Passo 63: os working papers da sala. Quem preside vê as propostas com consenso para decidir; o
+	// redator, as suas em debate; a mesa, os documentos do tópico atual.
+	const topicoAtual = $derived(estado?.topico_atual ?? null);
+	const wpsDoTopico = $derived((data.sala?.documentos ?? []).filter((x) => x.tipo === 'working_paper' && x.topico === topicoAtual));
+	const projetoDoTopico = $derived((data.sala?.documentos ?? []).find((x) => x.tipo === 'projeto' && x.topico === topicoAtual));
+	const minhasPropostas = $derived((data.sala?.propostas ?? []).filter((p) => p.delegacao_id === minhaDelegacao));
+	// O sinal de consenso, como na agenda: ninguém contra e o apoio de pelo menos metade das delegações.
+	const metade = $derived(Math.ceil((data.aoVivo?.delegacoes.length ?? 0) / 2));
+	const paraDecidir = $derived(
+		(data.sala?.propostas ?? []).filter(
+			(p) => !p.posicoes.some((x) => x.posicao === 'contra') && p.posicoes.filter((x) => x.posicao === 'apoio').length >= metade
+		)
+	);
+	const mesaPreside = $derived(!!data.aoVivo && (data.aoVivo.fase !== 'debate' || !!estado?.mesa_assumiu || !sessao?.presidencia));
 	const nadaParaDelegacao = $derived(
-		!data.rodadas.length && !data.pedidosEntrevista.length && !data.chamadaColetiva && !dposPendentes.length && !data.bilhetes.length && !meusPontos && !ausente
+		!data.rodadas.length && !data.pedidosEntrevista.length && !data.chamadaColetiva && !dposPendentes.length && !data.bilhetes.length && !meusPontos && !ausente && !minhasPropostas.length
 	);
 	// A mesa: três ações, e o que espera por ela em cada uma.
 	const documentosEnviados = $derived(data.mesa?.documentos ?? 0);
@@ -116,6 +130,12 @@
 <h1>{t('Agora')}</h1>
 {#if erro}<p class="erro" role="alert">{erro}</p>{/if}
 
+{#snippet decidir()}
+	<a class="botao botao--pequeno" href={`/documento/${paraDecidir[0].documento.id}/sala`}
+		>{paraDecidir.length === 1 ? t('1 proposta com consenso para decidir') : t('{n} propostas com consenso para decidir', { n: paraDecidir.length })}</a
+	>
+{/snippet}
+
 <!-- Passo 62 (lote 3): por ordem de importância; duas colunas só quando as duas têm conteúdo. -->
 <div class="cartoes cartoes--agora">
 	{#if data.aoVivo}<AlertaCrise incidentes={data.aoVivo.incidentes} {diferenca} />{/if}
@@ -123,6 +143,9 @@
 		<article class="cartao cartao--presidencia" aria-labelledby="c-preside">
 			<h2 id="c-preside">{t('Você preside a sessão {n}', { n: sessao.numero })}</h2>
 			<a class="botao" href={`/comite/${sigla}/sessao/presidencia`}>{t('Abrir o painel')}</a>
+			{#if paraDecidir.length}
+				{@render decidir()}
+			{/if}
 		</article>
 	{/if}
 
@@ -192,6 +215,12 @@
 						<span class="selo selo--info">{meusPontos}</span>
 					</li>
 				{/if}
+				{#if minhasPropostas.length}
+					<li>
+						<a href={`/documento/${minhasPropostas[0].documento.id}/sala`}>{t('Suas propostas em debate')}</a>
+						<span class="selo selo--info">{minhasPropostas.length}</span>
+					</li>
+				{/if}
 				{#if data.chamadaColetiva}
 					<li>
 						<a class="botao botao--pequeno" href="/press/coletiva">{t('Sua delegação foi chamada na coletiva')}</a>
@@ -246,6 +275,18 @@
 				<!-- Passo 56: na mesma linha, para a trilha do tópico caber sem rolar. -->
 				<a class="botao botao--pequeno" href={`/comite/${sigla}/sessao/presidencia`}>{t('Abrir o painel')}</a>
 			</div>
+			{#if projetoDoTopico || wpsDoTopico.length}
+				<div class="acoes">
+					{#if projetoDoTopico}
+						<a class="botao botao--secundario botao--pequeno" href={`/documento/${projetoDoTopico.id}/sala`}>{t('Projeto do tópico')}</a>
+					{:else}
+						<a class="botao botao--secundario botao--pequeno" href={`/documento/${wpsDoTopico[0].id}/sala`}
+							>{t('Working papers do tópico {n}', { n: topicoAtual ?? 0 })}</a
+						>
+					{/if}
+					{#if mesaPreside && paraDecidir.length}{@render decidir()}{/if}
+				</div>
+			{/if}
 		</article>
 	{/if}
 

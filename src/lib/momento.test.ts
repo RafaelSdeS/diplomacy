@@ -14,7 +14,7 @@ describe('momentoDoComite', () => {
 	it('no debate, segue a ordem do tópico; na fase de ação, a mesa conduz', () => {
 		const debate = { fase: 'debate', etapa_plenaria: null, topico_atual: 1 };
 		expect(momentoDoComite(debate, 'delegacao', { adotada: false, documentos: [] })).toMatchObject({ passo: 'topico', depois: 'Working papers' });
-		expect(momentoDoComite(debate, 'delegacao', { adotada: true, documentos: [] }).agora).toMatch(/working paper/);
+		expect(momentoDoComite(debate, 'delegacao', { adotada: true, documentos: [] }).agora).toMatch(/redator do seu bloco/);
 		expect(momentoDoComite(debate, 'presidencia', { adotada: true, documentos: [] }).agora).toMatch(/Conduza o debate/);
 		expect(momentoDoComite({ fase: 'acao', etapa_plenaria: null, topico_atual: 1 }, 'mesa').agora).toMatch(/conduza/);
 	});

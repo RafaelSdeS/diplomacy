@@ -48,5 +48,6 @@
 
 - [x] pgTAP (`62-fluxo`): entrar em outro bloco, ou criar um, tira do atual; a redação passa a quem está no bloco há mais tempo; o banco recusa uma delegação em dois blocos.
 - [x] Ponta a ponta (`35-crise-com-prazo`), a 1366 × 768 com uma crise de briefing longo: a Agora do delegado mostra a sessão na primeira tela e nenhuma metade vazia; o briefing abre inteiro no modal; o painel mostra "Com a palavra".
-- [ ] Unidade: a trilha tem as cinco etapas com nome e ignora o projeto rejeitado.
+- [x] Unidade: a trilha ignora o projeto rejeitado (passo 63, `ordem.test.ts`).
+- [ ] Unidade: a trilha tem as cinco etapas com nome (lote 5).
 - [ ] Ponta a ponta: cada ação principal diz o que faz ao passar o mouse, e o botão desativado diz o motivo.

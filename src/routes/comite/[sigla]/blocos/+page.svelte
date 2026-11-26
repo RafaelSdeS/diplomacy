@@ -191,7 +191,9 @@
 				{#if eu}
 					<div class="acoes">
 						{#if membro}
-							<button class="botao botao--pequeno" type="button" onclick={() => (novoEm = bloco.id)}>{t('Novo documento')}</button>
+							<!-- Passo 63: a conversa do bloco, só dos membros, na tela de mensagens. -->
+							<a class="botao botao--pequeno" href={`/comite/${data.comite.sigla}/mensagens?conversa=bl:${bloco.id}`}>{t('Conversa do bloco')}</a>
+							<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => (novoEm = bloco.id)}>{t('Novo documento')}</button>
 							<!-- Passo 62: o bloco nunca fica sem redator (o banco passa a redação a quem está há mais tempo). -->
 							{@const unicoRedator = souRedator(bloco) && redatoresDe(bloco).length === 1 && bloco.membros.length > 1}
 							<button

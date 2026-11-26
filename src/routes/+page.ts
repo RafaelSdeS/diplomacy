@@ -68,7 +68,7 @@ export const load: PageLoad = async ({ parent, depends }) => {
 		)
 	]);
 	const minhaDelegacao = papel === 'delegado' ? (minha?.delegacao_id ?? null) : null;
-	const [aoVivo, bilhetes, rodadas, mesa, crise, entrevistas, pedidosEntrevista, chamadaColetiva] = await Promise.all([
+	const [aoVivo, bilhetes, rodadas, mesa, crise, entrevistas, pedidosEntrevista, chamadaColetiva, sala] = await Promise.all([
 		comiteAoVivo
 			? Promise.all([
 					carregarSessao(comiteAoVivo),
@@ -126,7 +126,11 @@ export const load: PageLoad = async ({ parent, depends }) => {
 			? ler('coletiva-chamada', ['coletiva_pergunta'], () =>
 					supabase.from('coletiva_pergunta').select('id, veiculo(nome)').eq('delegacao_id', minhaDelegacao).eq('status', 'chamando').limit(1)
 				)
-			: { data: [], error: null }
+			: { data: [], error: null },
+		// Passo 63: os documentos da sala e as propostas em debate neles (para quem preside, para o
+		// redator e para a mesa). Leitura direta: essas tabelas avisam no canal do documento, não no
+		// do comitê, e o cache do lerAoVivo ficaria velho.
+		comiteAoVivo ? carregarSala(comiteAoVivo).catch(() => null) : null
 	]);
 	for (const r of [bilhetes, rodadas, entrevistas, pedidosEntrevista, chamadaColetiva]) if (r.error) throw r.error;
 	if (dpos.error) throw dpos.error;
@@ -157,6 +161,25 @@ export const load: PageLoad = async ({ parent, depends }) => {
 		notasPendentes: crise,
 		entrevistas: (entrevistas.data ?? []).filter((e) => (e.horario ?? '') >= agoraIso).reverse().slice(0, 3),
 		pedidosEntrevista: pedidosEntrevista.data ?? [],
-		chamadaColetiva: chamadaColetiva.data?.[0] ?? null
+		chamadaColetiva: chamadaColetiva.data?.[0] ?? null,
+		sala
 	};
 };
+
+/** Passo 63: os documentos da sala do comitê e as propostas em debate neles (só leituras GET,
+ * que o service worker guarda: sem rede, a Agora abre com a última versão). */
+async function carregarSala(comite: string) {
+	const [documentos, propostas] = await Promise.all([
+		supabase.from('documento').select('id, tipo, titulo, status, topico').eq('comite_id', comite).is('bloco_id', null).neq('status', 'rejeitado'),
+		supabase
+			.from('proposta_alteracao')
+			.select('id, delegacao_id, documento!inner(id, status, bloco_id), posicoes:posicao_proposta(posicao)')
+			.eq('comite_id', comite)
+			.eq('status', 'aberta')
+			.is('documento.bloco_id', null)
+			.eq('documento.status', 'rascunho')
+	]);
+	// Extra, como as contagens: sem rede, a Agora abre sem os atalhos dos documentos da sala.
+	if (documentos.error || propostas.error) return null;
+	return { documentos: documentos.data, propostas: propostas.data };
+}

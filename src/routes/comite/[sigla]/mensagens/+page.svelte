@@ -6,6 +6,7 @@
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import Gavel from '@lucide/svelte/icons/gavel';
 	import Siren from '@lucide/svelte/icons/siren';
+	import Users from '@lucide/svelte/icons/users';
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import Quando from '#lib/ui/Quando.svelte';
 	import { contador } from '#lib/contador.ts';
@@ -39,7 +40,8 @@
 	const canais = $derived([
 		...(eu?.delegacao_id ? [`delegacao:${eu.delegacao_id}`] : []),
 		...(ehMesa ? [`mesa:${data.comite.id}`] : []),
-		...(ehCrise ? [`crise:${data.comite.id}`] : [])
+		...(ehCrise ? [`crise:${data.comite.id}`] : []),
+		...(data.meuBloco ? [`bloco:${data.meuBloco.id}`] : [])
 	]);
 	const nome = (id: string | null) => data.delegacoes.find((d) => d.id === id)?.nome ?? t('Mesa');
 	// Passo 51 (lote 3): as conversas como num aplicativo de mensagens. Cada uma tem a chave da
@@ -47,7 +49,7 @@
 	// mesa pela delegação; o canal interno (mesa e crise) fica fixo, sem contagem.
 	type Msg = (typeof data.mensagens)[number];
 	type Delegacao = (typeof data.delegacoes)[number];
-	type Conversa = { id: string; titulo: string; tipo: 'bilhete' | 'mesa' | 'interno'; msgs: Msg[]; destino: string | null; delegacao?: Delegacao };
+	type Conversa = { id: string; titulo: string; tipo: 'bilhete' | 'mesa' | 'interno' | 'bloco'; msgs: Msg[]; destino: string | null; delegacao?: Delegacao };
 	const quando = (m: { criado_em: string }) => Date.parse(m.criado_em);
 	const lista = $derived.by((): Conversa[] => {
 		const r: Conversa[] = [];
@@ -55,6 +57,9 @@
 			r.push({ id: 'interno', titulo: ehMesa ? t('Equipe de crise') : t('Mesa diretora'), tipo: 'interno', msgs: do_tipo('interno'), destino: null });
 		if (eu?.delegacao_id) {
 			r.push({ id: `m:${eu.delegacao_id}`, titulo: t('Mesa diretora'), tipo: 'mesa', msgs: do_tipo('mesa'), destino: null });
+			// Passo 63: a conversa do bloco, só dos membros.
+			if (data.meuBloco)
+				r.push({ id: `bl:${data.meuBloco.id}`, titulo: t('Bloco {nome}', { nome: data.meuBloco.nome }), tipo: 'bloco', msgs: do_tipo('bloco'), destino: data.meuBloco.id });
 			for (const c of conversas) r.push({ id: `b:${c.id}`, titulo: c.delegacao?.nome ?? '', tipo: 'bilhete', msgs: c.msgs, destino: c.id, delegacao: c.delegacao });
 		} else if (ehMesa) {
 			for (const c of conversasDaMesa) r.push({ id: `m:${c.id}`, titulo: c.delegacao?.nome ?? '', tipo: 'mesa', msgs: c.msgs, destino: c.id, delegacao: c.delegacao });
@@ -72,6 +77,9 @@
 	$effect(() => {
 		if (escolhida || !lista.length) return;
 		escolhida = true;
+		// Passo 63: a conversa pedida na URL (a do bloco, pela tela de blocos) abre primeiro.
+		const pedida = untrack(() => page.url.searchParams.get('conversa'));
+		if (pedida && lista.some((c) => c.id === pedida)) return untrack(() => abrir(pedida));
 		const recente = [...lista].filter((c) => c.msgs.length).sort((a, b) => quando(b.msgs.at(-1)!) - quando(a.msgs.at(-1)!))[0];
 		if (matchMedia('(min-width: 1024px)').matches) untrack(() => abrir((recente ?? lista[0]).id));
 	});
@@ -104,9 +112,17 @@
 	};
 	// De quem é cada mensagem: o meu lado à direita.
 	const minhaMsg = (c: Conversa, m: Msg) =>
-		c.tipo === 'bilhete' ? m.de_delegacao_id === eu?.delegacao_id : c.tipo === 'mesa' ? (eu ? !!m.de_delegacao_id : !m.de_delegacao_id) : m.autor_id === data.usuario?.id;
+		c.tipo === 'bilhete' || c.tipo === 'bloco'
+			? m.de_delegacao_id === eu?.delegacao_id
+			: c.tipo === 'mesa'
+				? eu
+					? !!m.de_delegacao_id
+					: !m.de_delegacao_id
+				: m.autor_id === data.usuario?.id;
 	const quemEscreveu = (c: Conversa, m: Msg) =>
-		[c.tipo === 'bilhete' ? c.titulo : c.tipo === 'mesa' ? (eu ? t('Mesa') : c.titulo) : '', m.autor?.nome].filter(Boolean).join(' · ');
+		[c.tipo === 'bilhete' ? c.titulo : c.tipo === 'bloco' ? nome(m.de_delegacao_id) : c.tipo === 'mesa' ? (eu ? t('Mesa') : c.titulo) : '', m.autor?.nome]
+			.filter(Boolean)
+			.join(' · ');
 	const podeEscrever = (c: Conversa) =>
 		c.tipo === 'bilhete' ? !!eu && !data.regras.bilhetes_bloqueados && !!c.destino && !meBloquearam.has(c.destino) : true;
 	// Os separadores por sessão: a sessão em que a mensagem foi escrita.
@@ -184,7 +200,7 @@
 			sim ? t('Bilhetes de {delegacao} bloqueados.', { delegacao: nome(delegacao) }) : t('Bilhetes de {delegacao} desbloqueados.', { delegacao: nome(delegacao) })
 		);
 
-	async function enviarTexto(tipo: 'bilhete' | 'mesa' | 'interno', conteudo: string, destino: string | null, enviado: string) {
+	async function enviarTexto(tipo: Conversa['tipo'], conteudo: string, destino: string | null, enviado: string) {
 		erro = mensagem = '';
 		const id = crypto.randomUUID();
 		const resultado = await caixa.enviar({
@@ -462,7 +478,7 @@
 						onclick={() => abrir(c.id)}
 					>
 						<span class="chat-avatar" aria-hidden="true"
-							>{#if c.delegacao}<Bandeira codigo={c.delegacao.bandeira} />{:else if c.tipo === 'interno'}<Siren size={18} strokeWidth={1.75} />{:else}<Gavel
+							>{#if c.delegacao}<Bandeira codigo={c.delegacao.bandeira} />{:else if c.tipo === 'interno'}<Siren size={18} strokeWidth={1.75} />{:else if c.tipo === 'bloco'}<Users size={18} strokeWidth={1.75} />{:else}<Gavel
 									size={18}
 									strokeWidth={1.75}
 								/>{/if}</span
@@ -517,7 +533,7 @@
 						<span class="balao-autor">{minha ? (m.autor_id === data.usuario?.id ? t('Você') : (m.autor?.nome ?? t('Sua delegação'))) : quemEscreveu(c, m)}</span>
 						<p class="balao-texto">{m.texto}</p>
 						<span class="balao-hora"><Quando iso={m.criado_em} /></span>
-						{#if !minha && c.tipo === 'bilhete'}
+						{#if !minha && (c.tipo === 'bilhete' || c.tipo === 'bloco')}
 							<details class="denunciar">
 								<summary>{t('Denunciar')}</summary>
 								<button
@@ -531,7 +547,11 @@
 						{/if}
 					</li>
 				{:else}
-					<li class="suave">{c.tipo === 'mesa' && eu ? t('Dúvidas e pedidos privados à mesa: só a mesa lê.') : t('Nenhuma mensagem ainda.')}</li>
+					<li class="suave">{c.tipo === 'mesa' && eu
+							? t('Dúvidas e pedidos privados à mesa: só a mesa lê.')
+							: c.tipo === 'bloco'
+								? t('A conversa do seu bloco: só os membros leem. Leve aqui as sugestões ao redator.')
+								: t('Nenhuma mensagem ainda.')}</li>
 				{/each}
 			</ol>
 			{#if podeEscrever(c)}

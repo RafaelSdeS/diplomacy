@@ -103,7 +103,12 @@ No UFRGSMUN o caminho é outro. No UNOCT de 2026, a agenda do tópico A tinha tr
    - "Pôr em foco" para quem preside e a mesa; as assinaturas; o histórico das decididas; as abas com os documentos do tópico;
    - para a mesa: "Transformar em projeto"; no projeto, "Corrigir" (correção de forma) e "Levar à fase de ação" com o mínimo de assinaturas;
    - falta: os comentários por cláusula e a folha com a ação principal no celular (hoje a proposta fica embaixo da cláusula).
-3. **Documentos, Blocos, Mensagens, Agora e a trilha.**
+3. **Documentos, Blocos, Mensagens, Agora e a trilha. Feito em 26/11/2026:**
+   - **trilha:** ignora o projeto rejeitado, e "o que fazer" segue o fluxo novo (a mesa transforma em projeto e leva à fase de ação; a delegação propõe pelo redator e assina);
+   - **Documentos:** em cada tópico, as etapas "Working papers" e "Projeto" da trilha levam direto ao documento da sala (sem eles, abrem a lista, como antes); uma linha a mais faria a aba rolar a 1366 × 768;
+   - **Blocos:** "Conversa do bloco" para os membros;
+   - **Mensagens:** a conversa do bloco na lista, com o canal ao vivo, as não lidas e a denúncia; `?conversa=` abre uma conversa pela URL;
+   - **Agora:** para quem preside (e para a mesa quando preside), "N propostas com consenso para decidir"; para o redator, "Suas propostas em debate"; para a mesa, o projeto ou os working papers do tópico atual. Só leituras GET, que funcionam sem rede.
 4. **Saem as rodadas, o envio, os documentos por bloco e as emendas.** Atualizar as regras, o "Como funciona" e o roteiro do piloto; marcar o passo 49 e a parte B do 57 como absorvidos.
 5. **Ponta a ponta:** um tópico inteiro com três blocos, da agenda à resolução e de volta depois de uma rejeição.
 

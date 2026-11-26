@@ -81,6 +81,12 @@
 		if (error) erroNovo = mensagemDeErro(error);
 		else await goto(`/comite/${sigla}/documentos/mesa/${id}`);
 	}
+	// Passo 63: os documentos da sala de cada tópico, à vista: o projeto primeiro, depois os
+	// working papers na ordem dos itens da agenda.
+	const salaDoTopico = (topico: number) =>
+		data.documentos
+			.filter((d) => !d.bloco_id && d.topico === topico && d.status !== 'rejeitado')
+			.sort((a, b) => (a.tipo === 'projeto' ? -1 : b.tipo === 'projeto' ? 1 : (a.ponto_pauta?.ordem ?? 0) - (b.ponto_pauta?.ordem ?? 0)));
 	function abrirLista(topico: number, etapa: Etapa) {
 		lista = { topico, etapa };
 		modalLista?.abrir();
@@ -216,10 +222,18 @@
 	{#each data.comite.topicos as titulo, i (titulo)}
 		{@const topico = i + 1}
 		{@const resumo = doTopico(data.ordem, topico)}
+		{@const daSala = salaDoTopico(topico)}
+		{@const wps = daSala.filter((d) => d.tipo === 'working_paper')}
 		<article class="cartao" aria-labelledby={`t-topico-${topico}`}>
 			<h2 id={`t-topico-${topico}`}>{t('Tópico {n}', { n: topico })} <span class="detalhe">{titulo}</span></h2>
 			<!-- Cada etapa da trilha abre a lista dela; a agenda leva à aba Agenda. -->
-			<TrilhaDoTopico {sigla} mesa={data.ehMesa} {...resumo} onetapa={(etapa) => abrirLista(topico, etapa === 'working_papers' ? 'working_paper' : etapa)} />
+			<TrilhaDoTopico {sigla} mesa={data.ehMesa} {...resumo} onetapa={(etapa) => {
+					// Passo 63: com documentos da sala, a etapa leva direto a eles (a tela de cada um tem
+					// as abas dos outros); sem eles, abre a lista num modal.
+					const daSalaNaEtapa = etapa === 'working_papers' ? wps[0] : etapa === 'projeto' ? daSala.find((d) => d.tipo === 'projeto') : undefined;
+					if (daSalaNaEtapa) void goto(`/documento/${daSalaNaEtapa.id}/sala`);
+					else abrirLista(topico, etapa === 'working_papers' ? 'working_paper' : etapa);
+				}} />
 		</article>
 	{/each}
 

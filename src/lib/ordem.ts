@@ -13,7 +13,8 @@ export type Resumo = { adotada: boolean; documentos: Doc[] };
 /** A etapa em que o tópico está; 'encerrado' depois da resolução aprovada (uma por tópico). */
 export function etapaAtual({ adotada, documentos }: Resumo): Etapa | 'encerrado' {
 	if (!adotada) return 'agenda';
-	const projetos = documentos.filter((d) => d.tipo === 'projeto');
+	// Passo 63: o projeto rejeitado fica no histórico; o tópico volta aos working papers.
+	const projetos = documentos.filter((d) => d.tipo === 'projeto' && d.status !== 'rejeitado');
 	if (projetos.some((p) => p.status === 'aprovado')) return 'encerrado';
 	// Aprovado pela mesa, o projeto vai a consenso ou a voto: é a etapa da resolução.
 	if (projetos.some((p) => p.status === 'aprovado_mesa' || p.status === 'em_votacao')) return 'resolucao';
@@ -42,14 +43,14 @@ export function oQueFazer(atual: Etapa | 'encerrado', mesa: boolean): string {
 	if (mesa)
 		return {
 			agenda: t('Adote uma agenda quando o comitê decidir.'),
-			working_papers: t('Avalie os working papers que os blocos enviarem.'),
-			projeto: t('Avalie o projeto e leve-o a consenso ou a voto.'),
-			resolucao: t('Conduza o consenso ou a votação do projeto.')
+			working_papers: t('Ouça a sala e transforme os working papers em projeto.'),
+			projeto: t('Reúna as assinaturas e leve o projeto à fase de ação.'),
+			resolucao: t('Pergunte se alguma delegação se opõe; com objeção, abra a votação.')
 		}[atual];
 	return {
 		agenda: t('Proponha ou apoie uma agenda.'),
-		working_papers: t('Escreva um working paper com o seu bloco.'),
-		projeto: t('Junte os working papers num projeto e reúna as assinaturas.'),
+		working_papers: t('Proponha pelo redator do seu bloco e marque a sua posição.'),
+		projeto: t('Assine o projeto do tópico, se concordar com ele.'),
 		resolucao: t('Acompanhe o consenso ou a votação do projeto.')
 	}[atual];
 }

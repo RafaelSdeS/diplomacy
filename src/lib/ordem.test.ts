@@ -12,6 +12,8 @@ describe('etapaAtual', () => {
 		expect(etapaAtual({ adotada: true, documentos: [wp(), projeto('enviado')] })).toBe('projeto');
 		expect(etapaAtual({ adotada: true, documentos: [projeto('em_votacao')] })).toBe('resolucao');
 		expect(etapaAtual({ adotada: true, documentos: [projeto('rejeitado'), projeto('aprovado')] })).toBe('encerrado');
+		// Passo 63: rejeitado, o tópico volta aos working papers.
+		expect(etapaAtual({ adotada: true, documentos: [wp(), projeto('rejeitado')] })).toBe('working_papers');
 	});
 	it('marca as etapas antes da atual como feitas', () => {
 		expect(estadoDaEtapa('agenda', 'projeto')).toBe('feita');

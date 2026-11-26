@@ -14,7 +14,7 @@ export const load: PageLoad = async ({ parent, depends }) => {
 		supabase.from('dpo').select('id, topico, status, delegacao(id, nome, bandeira)').eq('comite_id', comite.id).order('topico'),
 		supabase
 			.from('documento')
-			.select('id, tipo, numero, titulo, status, topico, bloco_id, bloco(nome), assinaturas:assinatura(delegacao(id, nome, bandeira))')
+			.select('id, tipo, numero, titulo, status, topico, bloco_id, bloco(nome), ponto_pauta(ordem), assinaturas:assinatura(delegacao(id, nome, bandeira))')
 			.eq('comite_id', comite.id)
 			.order('criado_em', { ascending: false }),
 		minha ? supabase.from('bloco_membro').select('bloco_id').eq('delegacao_id', minha) : Promise.resolve({ data: [], error: null }),
