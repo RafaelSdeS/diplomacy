@@ -37,15 +37,15 @@
 			<li><strong>{t('Agenda')}:</strong> {t('a primeira sessão do tópico discute o que será debatido e em que ordem.')}</li>
 			<li>
 				<strong>{t('Working papers')}:</strong>
-				{t('os blocos escrevem sobre os itens da agenda. São assinados, não votados; a mesa os aprova para que possam ser citados.')}
+				{t('cada grande item da agenda tem um, de toda a sala. O redator de cada bloco (ou a delegação sem bloco) propõe mudanças; todas marcam posição; quem preside aceita ou rejeita depois do debate. Assinar é opcional e mostra acordo.')}
 			</li>
 			<li>
 				<strong>{t('Projeto de resolução')}:</strong>
-				{t('junta os working papers do tópico e precisa de signatários. Vai à mesa, que o aprova para a votação.')}
+				{t('um por tópico: a mesa ouve a sala e transforma os working papers nele, com os preâmbulos primeiro e as assinaturas junto. Nasce fechado e vai à fase de ação com 5 assinaturas.')}
 			</li>
 			<li>
 				<strong>{t('Fase de ação')}:</strong>
-				{t('a mesa conduz as emendas e a votação do projeto. Aprovado, ele é a resolução do tópico, e o comitê passa ao próximo.')}
+				{t('um signatário lê o projeto, e a mesa pergunta se alguma delegação se opõe: sem objeção, ele é aprovado por consenso; com objeção, vai a voto. Aprovado, é a resolução do tópico; rejeitado, os working papers reabrem.')}
 			</li>
 		</ol>
 	</li>
@@ -56,17 +56,17 @@
 	<div>
 		<dt>{t('Delegação')}</dt>
 		<dd>
-			{t('Levanta a placa para pedir a palavra (a presidência escolhe quem fala: as placas não são uma fila), faz pontos e moções pelo botão do topo da Sessão, vota, escreve e assina documentos com o bloco.')}
+			{t('Levanta a placa para pedir a palavra (a presidência escolhe quem fala: as placas não são uma fila), faz pontos e moções pelo botão do topo da Sessão, vota, marca posição nas propostas e assina; no bloco, quem propõe é o redator.')}
 		</dd>
 	</div>
 	<div>
 		<dt>{t('Presidência')}</dt>
-		<dd>{t('A delegação da vez conduz o debate no Painel: escolhe os próximos entre as placas, dá a palavra, decide os pontos e moções aprovados pela mesa. Também vota e discursa.')}</dd>
+		<dd>{t('A delegação da vez conduz o debate no Painel: escolhe os próximos entre as placas, dá a palavra, decide os pontos e moções aprovados pela mesa e aceita ou rejeita as propostas nos working papers. Também vota e discursa.')}</dd>
 	</div>
 	<div>
 		<dt>{t('Mesa')}</dt>
 		<dd>
-			{t('Conduz a plenária de abertura e a fase de ação. No debate, é o bureau: aprova os pontos e moções, confirma as chegadas e avalia os documentos. Assume a presidência só num caso excepcional.')}
+			{t('Conduz a plenária de abertura e a fase de ação. No debate, é o bureau: aprova os pontos e moções, confirma as chegadas e transforma os working papers em projeto. Assume a presidência só num caso excepcional.')}
 		</dd>
 	</div>
 </dl>

@@ -43,7 +43,8 @@ select pg_temp.entrar(1);
 insert into ids values ('bloco', public.criar_bloco('00000000-0000-0000-0000-0000000000c1', 'Bloco'));
 select pg_temp.entrar(2); select public.entrar_bloco(pg_temp.id('bloco'));
 select pg_temp.entrar(1);
-insert into ids values ('doc', public.criar_documento(pg_temp.id('bloco'), 'working_paper', 'Água'));
+-- Passo 63: o editor do bloco fica para a resolução de crise.
+insert into ids values ('doc', public.criar_documento(pg_temp.id('bloco'), 'resolucao_crise', 'Água'));
 insert into ids values ('p1', public.adicionar_clausula(pg_temp.id('doc'), 'preambular', 'Recordando A'));
 insert into ids values ('o1', public.adicionar_clausula(pg_temp.id('doc'), 'operativa', 'Decide B'));
 insert into ids values ('o2', public.adicionar_clausula(pg_temp.id('doc'), 'operativa', 'Pede C'));
@@ -77,8 +78,13 @@ select throws_ok($$select public.resolver_comentario((select id from public.come
 select pg_temp.entrar(1);
 select lives_ok($$select public.resolver_comentario((select id from public.comentario where texto = 'Falta o prazo'), true)$$, 'o redator resolve');
 
--- A mesa: depois do envio, ela vê, comenta e marca posição (como "Mesa")
-select public.enviar_documento(pg_temp.id('doc'));
+-- A mesa: depois do envio, ela vê, comenta e marca posição (como "Mesa"). O bloco tem 2
+-- membros: o mínimo de assinaturas do comitê fica em 2.
+reset role;
+update public.comite set regras = '{"assinaturas_projeto_min": 2}' where id = '00000000-0000-0000-0000-0000000000c1';
+select pg_temp.entrar(n), public.assinar(pg_temp.id('doc'), true) from generate_series(1, 2) as n;
+select pg_temp.entrar(1);
+select public.enviar_documento(pg_temp.id('doc'), 'votacao');
 select pg_temp.entrar(8);
 select lives_ok($$select public.comentar(pg_temp.id('o1'), 'Ajuste a forma do verbo')$$, 'a mesa comenta o documento enviado');
 select lives_ok($$select public.marcar_posicao(pg_temp.id('o1'), 'ressalva')$$, 'e marca a posição da mesa');

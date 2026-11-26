@@ -27,18 +27,13 @@
 	let { data }: PageProps = $props();
 
 	const sigla = $derived(data.comite.sigla);
-	const agora = Date.now();
 	type Documento = (typeof data.documentos)[number];
-	// A rodada aberta de cada documento (a mais recente que ainda não acabou).
-	const rodadaAte = $derived(
-		new Map(data.rodadas.filter((r) => Date.parse(r.fim) > agora).map((r) => [r.documento_id, r.fim] as const))
-	);
 	const meusDpos = $derived(data.dpos.filter((d) => d.delegacao?.id === data.minha));
 	const dosMeusBlocos = $derived(data.documentos.filter((d) => !!d.bloco_id && data.meusBlocos.includes(d.bloco_id)));
 	const paraAvaliar = $derived(
 		data.ehMesa ? data.documentos.filter((d) => d.status === 'enviado').length : 0
 	);
-	// O que espera a delegação: o DPO por fazer, a rodada aberta e a assinatura que falta.
+	// O que espera a delegação: o DPO por fazer e a assinatura que falta (na resolução de crise do bloco).
 	const dposPorFazer = $derived(
 		data.minha
 			? data.comite.topicos
@@ -46,11 +41,10 @@
 					.filter(({ dpo }) => dpo?.status !== 'enviado' && dpo?.status !== 'aprovado')
 			: []
 	);
-	const emRodada = $derived(dosMeusBlocos.filter((d) => rodadaAte.has(d.id)));
 	const semMinhaAssinatura = $derived(
-		dosMeusBlocos.filter((d) => d.status === 'rascunho' && !rodadaAte.has(d.id) && !d.assinaturas.some((a) => a.delegacao?.id === data.minha))
+		dosMeusBlocos.filter((d) => d.tipo === 'resolucao_crise' && d.status === 'rascunho' && !d.assinaturas.some((a) => a.delegacao?.id === data.minha))
 	);
-	const nadaParaVoce = $derived(!paraAvaliar && !dposPorFazer.length && !emRodada.length && !semMinhaAssinatura.length);
+	const nadaParaVoce = $derived(!paraAvaliar && !dposPorFazer.length && !semMinhaAssinatura.length);
 	// Passo 53: enviado, o DPO é do comitê.
 	const dposVisiveis = $derived(data.dpos.filter((d) => d.status === 'enviado' || d.status === 'aprovado'));
 
@@ -147,12 +141,6 @@
 						<a class="botao botao--secundario botao--pequeno" href={`/comite/${sigla}/dpo`}>{t('Abrir')}</a>
 					</li>
 				{/if}
-				{#each emRodada as d (d.id)}
-					<li>
-						<span>{nomeDoDocumento(d)} <span class="detalhe">{t('rodada até {hora}', { hora: formatarHora(rodadaAte.get(d.id)!) })}</span></span>
-						<a class="botao botao--pequeno" href={`/documento/${d.id}`}>{t('Abrir')}</a>
-					</li>
-				{/each}
 				{#if semMinhaAssinatura.length === 1}
 					<li>
 						<span>{nomeDoDocumento(semMinhaAssinatura[0])} <span class="detalhe">{t('falta a assinatura da sua delegação')}</span></span>

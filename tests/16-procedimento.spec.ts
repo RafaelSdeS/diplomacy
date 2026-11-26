@@ -1,6 +1,6 @@
 import { expect, test, type Browser, type Page } from '@playwright/test';
 import { contaDoTreino, DELEGACOES_TREINO, isolado } from '../scripts/delegacoes.ts';
-import { clienteComo, entrar, escolher, abrirAcao, abrirPainel } from './ajuda.ts';
+import { clienteComo, entrar, escolher, abrirAcao, abrirPainel, projetoPronto } from './ajuda.ts';
 
 // Passo 39: a cópia do TREINO só deste arquivo (scripts/delegacoes.ts).
 const C = isolado('16');
@@ -41,19 +41,10 @@ async function sessaoAberta(contaMesa: string, sigla: string) {
 
 test('uma votação nominal completa, do painel da mesa ao telão', async ({ browser }) => {
 	test.setTimeout(120_000);
-	const { mesa, comite } = await sessaoAberta(C.conta('mesa-treino@exemplo.test'), C.sigla);
+	await sessaoAberta(C.conta('mesa-treino@exemplo.test'), C.sigla);
 
-	// Um projeto aprovado pela mesa (sem tópico: o teste roda várias vezes).
-	const [redator, ...outros] = await Promise.all(
-		['Brasil', 'Argentina', 'Chile', 'Paraguai', 'Uruguai'].map((n) => clienteComo(C.conta(contaDoTreino(n))))
-	);
-	const bloco = await redator.rpc('criar_bloco', { p_comite: comite, p_nome: `Bloco nominal ${Date.now()}` });
-	for (const c of outros) expect((await c.rpc('entrar_bloco', { p_bloco: bloco.data! })).error).toBeNull();
-	const projeto = (await redator.rpc('criar_documento', { p_bloco: bloco.data!, p_tipo: 'projeto', p_titulo: TITULO })).data!;
-	await redator.rpc('adicionar_clausula', { p_documento: projeto, p_tipo: 'operativa', p_texto: 'Cria a comissão das águas' });
-	for (const c of [redator, ...outros]) expect((await c.rpc('assinar', { p_documento: projeto, p_assinar: true })).error).toBeNull();
-	expect((await redator.rpc('enviar_documento', { p_documento: projeto, p_aprovacao: 'votacao' })).error).toBeNull();
-	expect((await mesa.rpc('aprovar_documento', { p_documento: projeto, p_aprovar: true })).error).toBeNull();
+	// Um projeto da sala aprovado pela mesa (sem tópico: o teste roda várias vezes).
+	await projetoPronto(C.sigla, TITULO, [['operativa', 'Cria a comissão das águas']], ['Brasil', 'Argentina', 'Chile', 'Paraguai', 'Uruguai']);
 
 	const telao = await abrir(browser, C.conta('mesa-treino@exemplo.test'), `/telao/${C.sigla}`, { width: 1920, height: 1080 });
 	const painel = await abrir(browser, C.conta('mesa-treino@exemplo.test'), `/comite/${C.sigla}/sessao/presidencia`);

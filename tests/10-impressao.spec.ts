@@ -2,7 +2,7 @@ import { expect, test, type Browser, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { contaDaDelegacao, isolado } from '../scripts/delegacoes.ts';
 import { pdfDeTexto } from '../scripts/demonstracao/pdf.ts';
-import { adotarAgenda, clienteComo, CONTAS, entrar, abrirAcao } from './ajuda.ts';
+import { clienteComo, CONTAS, entrar, abrirAcao, projetoPronto } from './ajuda.ts';
 
 // Passo 39: a cópia do CSNU-T só deste arquivo (scripts/delegacoes.ts).
 const C = isolado('10');
@@ -88,43 +88,24 @@ test('o DPO em PDF: enviado no celular, lido por outra delegação, trocado, com
 });
 
 test('o projeto impresso tem a linha do comitê e os signatários', async ({ page }) => {
-	// O projeto é montado pela API, como o app faria (o editor já foi testado no passo 09).
-	const eua = await clienteComo(C.conta(CONTAS.delegado));
-	const comite = (await eua.from('comite').select('id').eq('sigla', C.sigla).single()).data!.id;
-	const bloco = await eua.rpc('criar_bloco', { p_comite: comite, p_nome: `Bloco da impressão ${Date.now()}` });
-	expect(bloco.error).toBeNull();
-	for (const nome of ['Rússia', 'China', 'Reino Unido', 'França']) {
-		const cliente = await clienteComo(C.conta(contaDaDelegacao(nome)));
-		expect((await cliente.rpc('entrar_bloco', { p_bloco: bloco.data! })).error).toBeNull();
-	}
-	await adotarAgenda(C.conta(CONTAS.mesa), C.sigla, 1);
-	const documento = await eua.rpc('criar_documento', {
-		p_bloco: bloco.data!,
-		p_tipo: 'projeto',
-		p_titulo: 'Segurança marítima',
-		p_topico: 1
-	});
-	expect(documento.error).toBeNull();
-	projeto = documento.data!;
-	for (const [tipo, texto] of [
-		['preambular', 'Recordando a resolução 2722'],
-		['operativa', 'Condena os ataques a navios mercantes'],
-		['operativa', 'Decide continuar ocupando-se da questão']
-	]) {
-		expect((await eua.rpc('adicionar_clausula', { p_documento: projeto, p_tipo: tipo, p_texto: texto })).error).toBeNull();
-	}
-	for (const conta of [C.conta(CONTAS.delegado), ...['Rússia', 'China', 'Reino Unido', 'França'].map((n) => C.conta(contaDaDelegacao(n)))]) {
-		const cliente = await clienteComo(conta);
-		expect((await cliente.rpc('assinar', { p_documento: projeto, p_assinar: true })).error).toBeNull();
-	}
+	// O projeto da sala, montado direto no banco (o caminho do working paper ao projeto tem o teste 63).
+	projeto = await projetoPronto(
+		C.sigla,
+		'Segurança marítima',
+		[
+			['preambular', 'Recordando a resolução 2722'],
+			['operativa', 'Condena os ataques a navios mercantes'],
+			['operativa', 'Decide continuar ocupando-se da questão']
+		],
+		['EUA', 'Rússia', 'China', 'Reino Unido', 'França'],
+		'enviado'
+	);
 
 	await entrar(page, C.conta(CONTAS.delegado));
-	await page.goto(`/documento/${projeto}`);
-	// Passo 57: a impressão fica em "Mais opções", na faixa das assinaturas.
-	await page.getByText('Mais opções').click();
+	await page.goto(`/documento/${projeto}/sala`);
 	await page.getByRole('link', { name: 'Imprimir ou salvar como PDF' }).click();
 	const folha = page.getByRole('article', { name: 'Documento para impressão' });
-	await expect(folha.getByRole('heading', { level: 1 })).toHaveText('Projeto de resolução: Segurança marítima');
+	await expect(folha.getByRole('heading', { level: 1 })).toHaveText(/^Projeto de resolução( \d+)?: Segurança marítima$/);
 	await expect(folha).toContainText('O Conselho de Segurança:');
 	await expect(folha).toContainText('1. Condena os ataques a navios mercantes;');
 	await expect(folha).toContainText('2. Decide continuar ocupando-se da questão.');

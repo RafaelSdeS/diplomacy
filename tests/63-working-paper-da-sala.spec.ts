@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { contaDoTreino, isolado } from '../scripts/delegacoes.ts';
-import { adotarAgenda, clienteComo, entrar } from './ajuda.ts';
+import { adotarAgenda, clienteComo, entrar, reabrirTopicoDaSala, rejeitarProjeto } from './ajuda.ts';
 
 // Passo 63: o working paper de cada item da agenda é de toda a sala. A redatora do bloco
 // propõe; quem entra no bloco passa a escrita a ela, mas marca posição; quem preside (a mesa,
@@ -128,4 +128,68 @@ test('a conversa do bloco, "Suas propostas" na Agora e os documentos da sala na 
 	await chile.goto(`/comite/${C.sigla}/documentos`);
 	await chile.getByRole('navigation', { name: 'Ordem do tópico 1' }).getByRole('button', { name: /^Working papers/ }).click();
 	await expect(chile).toHaveURL(/\/documento\/.+\/sala$/);
+});
+
+test('do working paper ao projeto: a mesa transforma, preâmbulos primeiro e assinaturas junto; rejeitado, os working papers reabrem', async ({
+	page
+}) => {
+	// O tópico 2 desta cópia, do começo: agenda com dois itens grandes, cada um com o seu working paper.
+	const comite = await reabrirTopicoDaSala(C.sigla, 2);
+	const mesaApi = await clienteComo(MESA);
+	const ok = <T>(r: { data: T; error: { message: string } | null }) => {
+		expect(r.error?.message ?? null).toBeNull();
+		return r.data as NonNullable<T>;
+	};
+	if (!ok(await mesaApi.rpc('agenda_adotada', { p_comite: comite, p_topico: 2 }))) {
+		const proposta = ok(
+			await mesaApi.rpc('salvar_proposta_agenda', {
+				p_comite: comite,
+				p_topico: 2,
+				p_itens: [
+					{ texto: 'A. Causas', nivel: 0 },
+					{ texto: 'B. Respostas', nivel: 0 }
+				]
+			})
+		);
+		ok(await mesaApi.rpc('adotar_proposta', { p_proposta: proposta }));
+	}
+	const wps = ok(await mesaApi.from('documento').select('id, titulo').eq('comite_id', comite).eq('topico', 2).is('bloco_id', null).eq('tipo', 'working_paper'));
+	const [itemA, itemB] = [wps.find((w) => w.titulo === 'A. Causas')!, wps.find((w) => w.titulo === 'B. Respostas')!];
+
+	// O Uruguai, sem bloco, é o próprio redator: propõe nos dois itens; quem preside (a mesa) aceita.
+	const uruguai = await clienteComo(C.conta(contaDoTreino('Uruguai')));
+	for (const [wp, tipo, texto] of [
+		[itemA.id, 'operativa', 'Decide A'],
+		[itemB.id, 'operativa', 'Decide B'],
+		[itemB.id, 'preambular', 'Lembrando B']
+	] as const) {
+		const proposta = ok(await uruguai.rpc('propor_no_documento', { p_documento: wp, p_acao: 'incluir', p_texto: texto, p_tipo: tipo }));
+		ok(await mesaApi.rpc('decidir_proposta', { p_proposta: proposta, p_aceitar: true }));
+	}
+	for (const nome of ['Uruguai', 'Brasil', 'Argentina', 'Chile', 'Paraguai']) {
+		const cliente = await clienteComo(C.conta(contaDoTreino(nome)));
+		ok(await cliente.rpc('assinar', { p_documento: nome === 'Chile' ? itemB.id : itemA.id, p_assinar: true }));
+	}
+
+	// A mesa ouve a sala e transforma: o projeto junta os dois, com os preâmbulos primeiro.
+	await entrar(page, MESA);
+	await page.goto(`/documento/${itemA.id}/sala`);
+	await page.getByRole('button', { name: 'Transformar em projeto' }).click();
+	await page.getByRole('dialog').getByRole('button', { name: 'Transformar em projeto' }).click();
+	await expect(page.getByRole('heading', { level: 1, name: 'Projeto de resolução' })).toBeVisible();
+	const projeto = page.url().split('/').at(-2)!;
+	const texto = page.getByRole('article', { name: 'Texto do documento' });
+	await expect(texto.locator('.clausula-sala-texto')).toHaveText([/Lembrando B/, /1\.\s*Decide A/, /2\.\s*Decide B/]);
+	await expect(page.getByRole('region', { name: /^Assinaturas/ }).getByRole('listitem')).toHaveCount(5);
+
+	// Com as 5 assinaturas, a mesa leva o projeto à fase de ação.
+	await page.getByRole('button', { name: 'Levar à fase de ação' }).click();
+	await page.getByRole('dialog').getByRole('button', { name: 'Levar à fase de ação' }).click();
+	await expect(page.getByRole('status')).toHaveText('O projeto está na fase de ação.');
+
+	// Rejeitado na votação (aqui direto no banco), os working papers do tópico reabrem.
+	await rejeitarProjeto(projeto);
+	await page.goto(`/documento/${itemB.id}/sala`);
+	await expect(page.getByText(/^Aberto a propostas\./)).toBeVisible();
+	await expect(page.getByRole('button', { name: 'Transformar em projeto' })).toBeVisible();
 });

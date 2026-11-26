@@ -58,24 +58,11 @@
 
 	let nomeBloco = $state('');
 	let erro = $state('');
-	// Formulário de novo documento (um por vez, no bloco escolhido).
+	// Passo 63: o bloco escreve só a resolução de crise (o working paper e o projeto são da sala).
 	let novoEm = $state<string | null>(null);
-	let tipo = $state('working_paper');
 	let titulo = $state('');
 	let topico = $state(1);
-	let subtopico = $state('');
 	let atualizacao = $state('');
-	// Passo 56: working paper e projeto só em tópico com a agenda adotada; o working paper é
-	// sobre um item da agenda (o primeiro vem escolhido).
-	const precisaAgenda = $derived(tipo === 'projeto' || tipo === 'working_paper');
-	const itens = $derived(data.subtopicos.filter((s) => s.topico === topico));
-	$effect(() => {
-		if (precisaAgenda && !data.topicosAdotados.includes(topico) && data.topicosAdotados.length)
-			topico = data.topicosAdotados[0];
-	});
-	$effect(() => {
-		if (!itens.some((s) => s.id === subtopico)) subtopico = itens[0]?.id ?? '';
-	});
 
 	async function executar(acao: PromiseLike<{ error: { code?: string; message?: string } | null }>) {
 		erro = '';
@@ -98,11 +85,10 @@
 		erro = '';
 		const { data: id, error } = await supabase.rpc('criar_documento', {
 			p_bloco: novoEm!,
-			p_tipo: tipo,
+			p_tipo: 'resolucao_crise',
 			p_titulo: titulo,
 			p_topico: topico,
-			p_ponto_pauta: subtopico || undefined,
-			p_atualizacao: tipo === 'resolucao_crise' && atualizacao ? atualizacao : undefined
+			p_atualizacao: atualizacao || undefined
 		});
 		if (error) {
 			erro = mensagemDeErro(error);
@@ -193,7 +179,11 @@
 						{#if membro}
 							<!-- Passo 63: a conversa do bloco, só dos membros, na tela de mensagens. -->
 							<a class="botao botao--pequeno" href={`/comite/${data.comite.sigla}/mensagens?conversa=bl:${bloco.id}`}>{t('Conversa do bloco')}</a>
-							<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => (novoEm = bloco.id)}>{t('Novo documento')}</button>
+							{#if data.atualizacoes.length && !observadora}
+								<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => (novoEm = bloco.id)}
+									>{t('Nova resolução de crise')}</button
+								>
+							{/if}
 							<!-- Passo 62: o bloco nunca fica sem redator (o banco passa a redação a quem está há mais tempo). -->
 							{@const unicoRedator = souRedator(bloco) && redatoresDe(bloco).length === 1 && bloco.membros.length > 1}
 							<button
@@ -248,20 +238,8 @@
 
 	<!-- Passo 51: o novo documento abre num modal no centro, a partir do bloco. -->
 	<Modal aberto={!!novoEm} rotulo="novo-documento-titulo" classe="modal-acao" onclose={() => (novoEm = null)}>
-		<form class="formulario" onsubmit={criarDocumento} aria-label={t('Novo documento')}>
-			<h3 id="novo-documento-titulo">{t('Novo documento')} · {data.blocos.find((b) => b.id === novoEm)?.nome}</h3>
-			<label class="campo">
-				{t('Tipo')}
-				<select bind:value={tipo}>
-					<option value="working_paper">{TIPOS_DOCUMENTO.working_paper}</option>
-					{#if !observadora}
-						<option value="projeto">{TIPOS_DOCUMENTO.projeto}</option>
-						{#if data.atualizacoes.length}
-							<option value="resolucao_crise">{TIPOS_DOCUMENTO.resolucao_crise}</option>
-						{/if}
-					{/if}
-				</select>
-			</label>
+		<form class="formulario" onsubmit={criarDocumento} aria-label={t('Nova resolução de crise')}>
+			<h3 id="novo-documento-titulo">{t('Nova resolução de crise')} · {data.blocos.find((b) => b.id === novoEm)?.nome}</h3>
 			<label class="campo">
 				{t('Título')}
 				<input required maxlength="200" bind:value={titulo} {@attach contador(titulo)} />
@@ -269,39 +247,19 @@
 			<label class="campo">
 				{t('Tópico')}
 				<select bind:value={topico}>
-					{#each data.comite.topicos as tp, i (tp)}
-						{@const semAgenda = precisaAgenda && !data.topicosAdotados.includes(i + 1)}
-						<option value={i + 1} disabled={semAgenda}>{i + 1}. {tp}{semAgenda ? ` · ${t('agenda ainda não adotada')}` : ''}</option>
+					{#each data.comite.topicos as tp, i (tp)}<option value={i + 1}>{i + 1}. {tp}</option>{/each}
+				</select>
+			</label>
+			<label class="campo">
+				{t('Atualização de crise')}
+				<select bind:value={atualizacao} required>
+					{#each data.atualizacoes as a (a.id)}
+						<option value={a.id}>{a.texto.slice(0, 80)}</option>
 					{/each}
 				</select>
 			</label>
-			{#if precisaAgenda && !data.topicosAdotados.length}
-				<p class="suave" role="note">
-					{t('Primeiro a agenda: quando a mesa adotar a agenda de um tópico, os blocos escrevem working papers sobre os itens dela, e depois o projeto de resolução.')}
-				</p>
-			{/if}
-			{#if tipo === 'working_paper' && itens.length}
-				<label class="campo">
-					{t('Item da agenda')}
-					<select bind:value={subtopico} required>
-						{#each itens as s (s.id)}
-							<option value={s.id}>{s.texto}</option>
-						{/each}
-					</select>
-				</label>
-			{/if}
-			{#if tipo === 'resolucao_crise'}
-				<label class="campo">
-					{t('Atualização de crise')}
-					<select bind:value={atualizacao} required>
-						{#each data.atualizacoes as a (a.id)}
-							<option value={a.id}>{a.texto.slice(0, 80)}</option>
-						{/each}
-					</select>
-				</label>
-			{/if}
 			<div class="acoes">
-				<button class="botao" disabled={precisaAgenda && !data.topicosAdotados.length}>{t('Criar e abrir')}</button>
+				<button class="botao">{t('Criar e abrir')}</button>
 				<button class="botao botao--secundario" type="button" onclick={() => (novoEm = null)}>{t('Cancelar')}</button>
 			</div>
 		</form>

@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { abrirAcao, adotarAgenda, clienteComo, CONTAS, entrar } from './ajuda.ts';
+import { abrirAcao, clienteComo, CONTAS, entrar } from './ajuda.ts';
 
 // Passo 18: um comitê em inglês (UNOCT-T, do seed) funciona em inglês, inclusive o
 // projeto impresso; as datas seguem o idioma; o perfil troca o idioma da pessoa. A
@@ -60,15 +60,15 @@ test('as telas do comitê em inglês saem em inglês, para a delegação e para 
 
 let projeto = '';
 
-test('o editor sugere verbos em inglês, e o projeto impresso sai em inglês', async ({ page }) => {
+// Passo 63: o editor do bloco fica para a resolução de crise (o working paper e o projeto são da sala).
+test('o editor sugere verbos em inglês, e a resolução de crise impressa sai em inglês', async ({ page }) => {
 	const franca = await clienteComo(FRANCA);
 	const comite = (await franca.from('comite').select('id').eq('sigla', 'UNOCT-T').single()).data!.id;
 	const bloco = await franca.rpc('criar_bloco', { p_comite: comite, p_nome: `Bloc ${Date.now()}` });
 	expect(bloco.error).toBeNull();
-	await adotarAgenda('unoct-mesa@exemplo.test', 'UNOCT-T', 1);
 	const documento = await franca.rpc('criar_documento', {
 		p_bloco: bloco.data!,
-		p_tipo: 'projeto',
+		p_tipo: 'resolucao_crise',
 		p_titulo: 'Countering the financing of terrorism',
 		p_topico: 1
 	});
@@ -81,7 +81,7 @@ test('o editor sugere verbos em inglês, e o projeto impresso sai em inglês', a
 
 	await entrar(page, FRANCA);
 	await page.goto(`/documento/${projeto}`);
-	await expect(page.getByRole('heading', { level: 1 })).toHaveText('Draft resolution: Countering the financing of terrorism');
+	await expect(page.getByRole('heading', { level: 1 })).toHaveText('Crisis resolution: Countering the financing of terrorism');
 	// Passo 57: a cláusula nova abre no lugar, já em edição.
 	await page.getByRole('group', { name: 'Add at the end' }).getByRole('button', { name: 'Preambular', exact: true }).click();
 	const nova = page.getByLabel(/^New clause/);
@@ -96,7 +96,7 @@ test('o editor sugere verbos em inglês, e o projeto impresso sai em inglês', a
 	await page.getByRole('link', { name: 'Print or save as PDF' }).click();
 	const folha = page.getByRole('article', { name: 'Document for printing' });
 	await expect(folha).toHaveAttribute('lang', 'en');
-	await expect(folha.getByRole('heading', { level: 1 })).toHaveText('Draft resolution: Countering the financing of terrorism');
+	await expect(folha.getByRole('heading', { level: 1 })).toHaveText('Crisis resolution: Countering the financing of terrorism');
 	await expect(folha).toContainText('Recalling resolution 2462 (2019);');
 	await expect(folha).toContainText('The United Nations Office of Counter-Terrorism:');
 	await expect(folha).toContainText('1. Decides to remain seized of the matter.');
@@ -135,10 +135,10 @@ test('cada pessoa troca o idioma do app no perfil, e o impresso segue o do comit
 		await expect(page.locator('html')).toHaveAttribute('lang', 'pt-BR');
 		await page.goto('/');
 		await expect(page.getByRole('heading', { level: 1, name: 'Agora' })).toBeVisible();
-		// O projeto impresso segue o idioma do comitê, não o da tela.
+		// O documento impresso segue o idioma do comitê, não o da tela.
 		await page.goto(`/imprimir/documento/${projeto}`);
 		const folha = page.getByRole('article', { name: 'Documento para impressão' });
-		await expect(folha.getByRole('heading', { level: 1 })).toHaveText('Draft resolution: Countering the financing of terrorism');
+		await expect(folha.getByRole('heading', { level: 1 })).toHaveText('Crisis resolution: Countering the financing of terrorism');
 		await expect(folha).toContainText('Signatories: French Republic.');
 	} finally {
 		// Volta ao idioma do comitê para as próximas execuções.

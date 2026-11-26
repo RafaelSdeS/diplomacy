@@ -23,8 +23,8 @@ test.beforeAll(async ({}, info) => {
 	const comite = (await alemanha.from('comite').select('id').eq('sigla', C.sigla).single()).data!.id;
 	const bloco = (await alemanha.rpc('criar_bloco', { p_comite: comite, p_nome: `Bloco do Mosela ${marca}` })).data!;
 	expect((await franca.rpc('entrar_bloco', { p_bloco: bloco })).error).toBeNull();
-	// Sem tópico (só pela API): o working paper não depende da agenda neste teste.
-	documento = (await alemanha.rpc('criar_documento', { p_bloco: bloco, p_tipo: 'working_paper', p_titulo: `Rio Mosela ${marca}` })).data!;
+	// Passo 63: o editor do bloco fica para a resolução de crise (sem tópico, só pela API).
+	documento = (await alemanha.rpc('criar_documento', { p_bloco: bloco, p_tipo: 'resolucao_crise', p_titulo: `Rio Mosela ${marca}` })).data!;
 	for (const texto of ['Decide A', 'Pede C'])
 		expect((await alemanha.rpc('adicionar_clausula', { p_documento: documento, p_tipo: 'operativa', p_texto: texto })).error).toBeNull();
 });

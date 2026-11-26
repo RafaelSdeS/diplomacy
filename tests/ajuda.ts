@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { expect, type Locator, type Page } from '@playwright/test';
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '../src/lib/database.types.ts';
+import { conectarAdmin } from '../scripts/admin.ts';
 
 // Contas do seed (scripts/seed.ts). Os testes de ponta a ponta precisam do
 // Supabase local com o seed: npm run db:iniciar && npm run seed.
@@ -159,4 +160,67 @@ export async function comiteEmDebate(contaMesa: string, sigla: string, contaDele
 	// Os testes que exercitam a condução usam a mesa assim; os do bureau pedem mesaConduz: false.
 	ok(await mesa.rpc('assumir_presidencia', { p_comite: comite, p_assumir: mesaConduz }));
 	return { mesa, comite };
+}
+
+let admin: Awaited<ReturnType<typeof conectarAdmin>>['db'] | null = null;
+/**
+ * Passo 63: um projeto da sala pronto para a fase de ação (aprovado pela mesa, por padrão),
+ * feito direto no banco local, com o service role. Sem tópico: um tópico só tem um projeto
+ * e uma resolução, e os testes rodam várias vezes no mesmo banco. O caminho de verdade (o
+ * working paper vira projeto) tem o teste dele (63-working-paper-da-sala).
+ */
+export async function projetoPronto(
+	sigla: string,
+	titulo: string,
+	clausulas: [tipo: 'preambular' | 'operativa', texto: string][],
+	signatarios: string[],
+	status: 'enviado' | 'aprovado_mesa' = 'aprovado_mesa'
+) {
+	admin ??= (await conectarAdmin('TESTES_PERMITIR_REMOTO')).db;
+	const ok = <T>(r: { data: T; error: { message: string } | null }) => {
+		if (r.error) throw new Error(r.error.message);
+		return r.data as NonNullable<T>;
+	};
+	const comite = ok(await admin.from('comite').select('id').eq('sigla', sigla).single()).id;
+	const ultimo = ok(await admin.from('documento').select('numero').eq('comite_id', comite).eq('tipo', 'projeto').order('numero', { ascending: false, nullsFirst: false }).limit(1));
+	const documento = ok(
+		await admin
+			.from('documento')
+			.insert({ comite_id: comite, tipo: 'projeto', titulo, status, numero: (ultimo[0]?.numero ?? 0) + 1, enviado_em: new Date().toISOString() })
+			.select('id')
+			.single()
+	).id;
+	ok(await admin.from('clausula').insert(clausulas.map(([tipo, texto], i) => ({ documento_id: documento, comite_id: comite, tipo, texto, ordem: i + 1 }))));
+	const delegacoes = ok(await admin.from('delegacao').select('id').eq('comite_id', comite).in('nome', signatarios));
+	ok(await admin.from('assinatura').insert(delegacoes.map((d) => ({ documento_id: documento, comite_id: comite, delegacao_id: d.id }))));
+	return documento;
+}
+
+/**
+ * Passo 63: o tópico volta ao começo do caminho da sala, para um teste rodar de novo no mesmo
+ * banco: saem o projeto da sala e o que os working papers do tópico receberam (cláusulas,
+ * propostas, assinaturas), e eles reabrem. Só no Supabase local (service role).
+ */
+export async function reabrirTopicoDaSala(sigla: string, topico: number) {
+	admin ??= (await conectarAdmin('TESTES_PERMITIR_REMOTO')).db;
+	const comite = (await admin.from('comite').select('id').eq('sigla', sigla).single()).data!.id;
+	const sala = (await admin.from('documento').select('id, tipo').eq('comite_id', comite).eq('topico', topico).is('bloco_id', null)).data!;
+	const projetos = sala.filter((d) => d.tipo === 'projeto').map((d) => d.id);
+	const wps = sala.filter((d) => d.tipo === 'working_paper').map((d) => d.id);
+	for (const r of [
+		await admin.from('documento').delete().in('id', projetos),
+		await admin.from('proposta_alteracao').delete().in('documento_id', wps),
+		await admin.from('clausula').delete().in('documento_id', wps),
+		await admin.from('assinatura').delete().in('documento_id', wps),
+		await admin.from('documento').update({ status: 'rascunho' }).in('id', wps)
+	])
+		if (r.error) throw new Error(r.error.message);
+	return comite;
+}
+
+/** Passo 63: o projeto rejeitado na votação, direto no banco local (a votação tem o teste dela). */
+export async function rejeitarProjeto(id: string) {
+	admin ??= (await conectarAdmin('TESTES_PERMITIR_REMOTO')).db;
+	const { error } = await admin.from('documento').update({ status: 'rejeitado' }).eq('id', id);
+	if (error) throw new Error(error.message);
 }

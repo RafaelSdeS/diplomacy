@@ -13,7 +13,6 @@
 	import { supabase } from '#lib/supabase.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import NomeDelegacao from '#lib/ui/NomeDelegacao.svelte';
-	import FileInput from '@lucide/svelte/icons/file-input';
 	import Modal from '#lib/ui/Modal.svelte';
 	import Quando from '#lib/ui/Quando.svelte';
 	import { separarVerbo, sugerirVerbos } from '#lib/verbos.ts';
@@ -36,17 +35,10 @@
 		data.participacoes.some((p) => (p.papel === 'mesa' && p.comite_id === d.comite_id) || p.papel === 'secretaria')
 	);
 
-	// Relógio para as rodadas.
-	let agora = $state(Date.now());
-	$effect(() => {
-		const relogio = setInterval(() => (agora = Date.now()), 15_000);
-		return () => clearInterval(relogio);
-	});
-	const rodadaAtual = $derived(data.rodadas.find((r) => Date.parse(r.fim) > agora));
-	const rodadasAcabaram = $derived(
-		data.rodadas.length >= d.max_rodadas && data.rodadas.every((r) => Date.parse(r.fim) <= agora)
-	);
-	const editavel = $derived(d.status === 'rascunho' && !rodadasAcabaram);
+	// Passo 63: o editor do bloco fica para a resolução de crise; os outros documentos dos blocos
+	// ficaram só para leitura (o trabalho é no working paper da sala). As rodadas saíram.
+	const legado = $derived(d.tipo !== 'resolucao_crise');
+	const editavel = $derived(d.status === 'rascunho' && !legado);
 
 	const porId = $derived(new Map(data.clausulas.map((c) => [c.id, c])));
 	const formatado = $derived(
@@ -94,9 +86,7 @@
 	let comentario = $state('');
 	let novoTipo = $state('operativa');
 	let novoTexto = $state('');
-	let minutos = $state(15);
 	let aprovacao = $state('consenso');
-	let paraTrazer = $state<string[]>([]);
 
 	// O campo de edição acompanha a cláusula escolhida e a versão dela.
 	$effect(() => {
@@ -233,23 +223,6 @@
 		if (!(await executar(acao(texto), ok)) && !campo.ler()) campo.escrever(texto);
 	}
 
-	const ACOES_EMENDA: Record<string, string> = { acrescentar: t('Acrescenta'), suprimir: t('Suprime'), modificar: t('Modifica') };
-	let emendaAcao = $state('acrescentar');
-	let emendaClausula = $state('');
-	let emendaTexto = $state('');
-	async function proporEmenda(evento: SubmitEvent) {
-		evento.preventDefault();
-		const ok = await executar(
-			supabase.rpc('propor_emenda', {
-				p_documento: d.id,
-				p_acao: emendaAcao,
-				p_clausula: emendaAcao === 'acrescentar' ? (null as unknown as string) : emendaClausula,
-				p_texto: emendaAcao === 'suprimir' ? (null as unknown as string) : emendaTexto
-			}),
-			t('Emenda proposta. Ela precisa de mais assinaturas para ir a voto.')
-		);
-		if (ok) emendaTexto = '';
-	}
 
 	async function salvarTexto() {
 		await executar(
@@ -285,18 +258,6 @@
 		);
 	}
 
-	async function trazer(clausulas = paraTrazer) {
-		if (await executar(supabase.rpc('importar_clausulas', { p_documento: d.id, p_clausulas: clausulas }), t('Cláusulas trazidas.'))) {
-			paraTrazer = [];
-			modalTrazer?.fechar();
-		}
-	}
-	// Passo 56: "Trazer de working papers" num modal, na barra do documento; o projeto diz de
-	// quais working papers veio (a origem de cada cláusula).
-	let modalTrazer = $state<Modal>();
-	const baseadoEm = $derived(
-		data.workingPapers.filter((wp) => wp.clausulas.some((c) => data.clausulas.some((x) => x.origem_id === c.id))).map((wp) => nomeDoDocumento(wp))
-	);
 </script>
 
 <svelte:head>
@@ -312,17 +273,11 @@
 	<span class="selo {STATUS_DOCUMENTO[d.status].selo}">{STATUS_DOCUMENTO[d.status].rotulo}</span>
 	{#if d.ponto_pauta}<span class="suave">{t('Subtópico')}: {d.ponto_pauta.texto}</span>{/if}
 	{#if d.aprovacao}<span class="suave">{d.aprovacao === 'consenso' ? t('Aprovação por consenso') : t('Aprovação por votação')}</span>{/if}
-	{#if baseadoEm.length}<span class="suave">{t('Baseado em')}: {baseadoEm.join(', ')}</span>{/if}
 	<span class="suave">{t('{n} de {total} acordadas', { n: acordadas, total: data.clausulas.length })}</span>
-	{#if rodadaAtual}
-		<span class="selo selo--info"
-			>{t('Rodada {n} de {total}', { n: rodadaAtual.numero, total: d.max_rodadas })} · {t('termina às')}
-			{new Date(rodadaAtual.fim).toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' })}</span
-		>
-	{:else if rodadasAcabaram}
-		<span class="selo">{t('As {n} rodadas terminaram: o documento só pode ser enviado à mesa.', { n: d.max_rodadas })}</span>
-	{/if}
 </p>
+{#if legado}
+	<p class="aviso" role="note">{t('Documento antigo do bloco, só para leitura: o working paper e o projeto agora são da sala.')}</p>
+{/if}
 
 <!-- Passo 57: as assinaturas à vista, fixas no topo ao rolar, com a ação principal. -->
 <section class="faixa-assinaturas" aria-label={t('Assinaturas')}>
@@ -341,14 +296,14 @@
 		{/if}
 	</div>
 	<div class="acoes">
-		{#if souMembro && d.status === 'rascunho'}
+		{#if souMembro && editavel}
 			<button
 				class={['botao', assinei && 'botao--secundario']}
 				type="button"
 				onclick={() => executar(supabase.rpc('assinar', { p_documento: d.id, p_assinar: !assinei }))}>{assinei ? t('Retirar a assinatura') : t('Assinar')}</button
 			>
 		{/if}
-		{#if data.souRedator && d.status === 'rascunho'}
+		{#if data.souRedator && editavel}
 			<button class="botao" type="button" disabled={faltam > 0 || !data.clausulas.length} onclick={() => modalEnvio?.abrir()}>{t('Enviar à mesa')}</button>
 		{/if}
 		{#if ehMesa && d.status === 'enviado'}
@@ -364,26 +319,9 @@
 				>{t('Devolver ao bloco')}</button
 			>
 		{/if}
-		{#if data.souRedator && editavel && d.tipo !== 'working_paper'}
-			<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => modalTrazer?.abrir()}
-				><FileInput aria-hidden="true" size={16} strokeWidth={1.75} /> {t('Trazer de working papers')}</button
-			>
-		{/if}
 		<details class="mais-opcoes">
 			<summary class="botao botao--secundario botao--pequeno">{t('Mais opções')}</summary>
 			<div class="mais-opcoes-corpo">
-				{#if data.souRedator && editavel && !rodadaAtual && data.rodadas.length < d.max_rodadas}
-					<label class="campo campo--curto">
-						{t('Minutos da rodada')}
-						<input type="number" min="1" max="120" bind:value={minutos} />
-					</label>
-					<button
-						class="botao botao--secundario botao--pequeno"
-						type="button"
-						onclick={() => executar(supabase.rpc('abrir_rodada', { p_documento: d.id, p_minutos: minutos }), t('Rodada aberta.'))}
-						>{t('Abrir a rodada {n}', { n: data.rodadas.length + 1 })}</button
-					>
-				{/if}
 				<a class="botao botao--secundario botao--pequeno" href={`/imprimir/documento/${d.id}`}>{t('Imprimir ou salvar como PDF')}</a>
 			</div>
 		</details>
@@ -737,96 +675,6 @@
 	</div>
 </Modal>
 
-<Modal bind:this={modalTrazer} rotulo="t-fusao" classe="modal-largo">
-	<section aria-labelledby="t-fusao">
-		<h3 id="t-fusao">{t('Trazer cláusulas de working papers')}</h3>
-		<p class="suave">{d.topico ? t('Os working papers do tópico {n}, de qualquer bloco; os aprovados pela mesa primeiro.', { n: d.topico }) : t('Os working papers do comitê.')}</p>
-		{#each data.workingPapers as wp (wp.id)}
-			<fieldset class="cartao opcoes">
-				<legend>{nomeDoDocumento(wp)} <span class="detalhe">{wp.bloco?.nome}</span> {#if STATUS_DOCUMENTO[wp.status]}<span class="selo {STATUS_DOCUMENTO[wp.status].selo}">{STATUS_DOCUMENTO[wp.status].rotulo}</span>{/if}</legend>
-				{#each wp.clausulas as c (c.id)}
-					<label class="opcao"><input type="checkbox" value={c.id} bind:group={paraTrazer} /> {c.texto}</label>
-				{/each}
-				{#if wp.clausulas.length}
-					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => trazer(wp.clausulas.map((c) => c.id))}
-						>{t('Trazer todas as cláusulas')}</button
-					>
-				{/if}
-			</fieldset>
-		{:else}
-			<p class="suave">{t('Ainda não há working papers neste tópico.')}</p>
-		{/each}
-		<div class="acoes">
-			<button class="botao" type="button" disabled={!paraTrazer.length} onclick={() => trazer()}>
-				{t('Trazer {n} cláusulas para este documento', { n: paraTrazer.length || '' })}
-			</button>
-			<button class="botao botao--secundario" type="button" onclick={() => modalTrazer?.fechar()}>{t('Fechar')}</button>
-		</div>
-	</section>
-</Modal>
 
-{#if d.tipo !== 'working_paper' && (d.status === 'aprovado_mesa' || data.emendas.length)}
-	<section class="cartao" aria-labelledby="t-emendas">
-		<h2 id="t-emendas">{t('Emendas')}</h2>
-		<p class="suave">
-			{t('Cada emenda acrescenta, suprime ou modifica uma parte do projeto e precisa de {n} signatários para ir a voto. Aprovada, entra no projeto.', {
-				n: data.regras.assinaturas_emenda
-			})}
-		</p>
-		<ul class="lista">
-			{#each data.emendas as e (e.id)}
-				{@const assinou = e.assinaturas.some((a) => a.delegacao_id === eu?.delegacao_id)}
-				<li>
-					<span>
-						{ACOES_EMENDA[e.acao]}{e.clausula_id ? `: "${data.clausulas.find((c) => c.id === e.clausula_id)?.texto ?? t('cláusula removida')}"` : ''}{e.texto
-							? ` → "${e.texto}"`
-							: ''}
-						<span class="detalhe">
-							{e.delegacao?.nome} · {t('{n} de {total} assinaturas', { n: e.assinaturas.length, total: data.regras.assinaturas_emenda })}
-							{#if e.status !== 'proposta'}· <span class="selo {e.status === 'aprovada' ? 'selo--ok' : 'selo--erro'}">{e.status === 'aprovada' ? t('Aprovada') : t('Rejeitada')}</span>{/if}
-						</span>
-					</span>
-					{#if eu && e.status === 'proposta' && !assinou}
-						<button
-							class="botao botao--secundario botao--pequeno"
-							type="button"
-							aria-label={`Assinar a emenda de ${e.delegacao?.nome}`}
-							onclick={() => executar(supabase.rpc('assinar_emenda', { p_emenda: e.id }), t('Emenda assinada.'))}>{t('Assinar')}</button
-						>
-					{/if}
-				</li>
-			{:else}
-				<li class="suave">{t('Nenhuma emenda ainda.')}</li>
-			{/each}
-		</ul>
-		{#if eu && d.status === 'aprovado_mesa'}
-			<form class="formulario" aria-label={t('Nova emenda')} onsubmit={proporEmenda}>
-				<label class="campo">
-					{t('A emenda')}
-					<select bind:value={emendaAcao}>
-						<option value="acrescentar">{t('Acrescenta uma operativa')}</option>
-						<option value="modificar">{t('Modifica uma cláusula')}</option>
-						<option value="suprimir">{t('Suprime uma cláusula')}</option>
-					</select>
-				</label>
-				{#if emendaAcao !== 'acrescentar'}
-					<label class="campo">
-						{t('Cláusula')}
-						<select required bind:value={emendaClausula}>
-							{#each data.clausulas.filter((c) => c.tipo !== 'texto') as c (c.id)}<option value={c.id}>{c.texto}</option>{/each}
-						</select>
-					</label>
-				{/if}
-				{#if emendaAcao !== 'suprimir'}
-					<label class="campo">
-						{t('Texto da emenda')}
-						<textarea required rows="3" maxlength="2000" bind:value={emendaTexto} {@attach contador(emendaTexto)}></textarea>
-					</label>
-				{/if}
-				<button class="botao botao--secundario">{t('Propor emenda')}</button>
-			</form>
-		{/if}
-	</section>
-{/if}
 
 

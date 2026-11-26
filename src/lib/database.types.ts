@@ -2103,17 +2103,11 @@ isOneToOne: false
 "abrir_lista_especial":
 { Args: { "p_ponto": string }; Returns: undefined
                            },
-"abrir_rodada":
-{ Args: { "p_documento": string,"p_minutos": number }; Returns: undefined
-                           },
 "abrir_sessao":
 { Args: { "p_comite": string }; Returns: string
                            },
 "abrir_votacao":
 { Args: { "p_ponto": string }; Returns: string
-                           },
-"abrir_votacao_emenda":
-{ Args: { "p_emenda": string }; Returns: string
                            },
 "abrir_votacao_livre":
 { Args: { "p_comite": string,"p_objeto": string,"p_tipo"?: string }; Returns: string
@@ -2186,9 +2180,6 @@ isOneToOne: false
                            },
 "assinar":
 { Args: { "p_assinar": boolean,"p_documento": string }; Returns: undefined
-                           },
-"assinar_emenda":
-{ Args: { "p_emenda": string }; Returns: undefined
                            },
 "assinar_mocao":
 { Args: { "p_ponto": string }; Returns: undefined
@@ -2666,9 +2657,6 @@ isOneToOne: false
                            },
 "propor_alteracao_agenda":
 { Args: { "p_acao": string,"p_dentro"?: boolean,"p_depois"?: string,"p_motivo"?: string,"p_ponto"?: string,"p_proposta": string,"p_texto"?: string }; Returns: string
-                           },
-"propor_emenda":
-{ Args: { "p_acao": string,"p_clausula": string,"p_documento": string,"p_texto": string }; Returns: string
                            },
 "propor_no_documento":
 { Args: { "p_acao": string,"p_clausula"?: string,"p_depois"?: string,"p_documento": string,"p_id"?: string,"p_motivo"?: string,"p_texto"?: string,"p_tipo"?: string }; Returns: string

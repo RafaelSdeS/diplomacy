@@ -25,7 +25,7 @@ const RODADAS = Number(process.env.CARGA_RODADAS ?? 20);
 const CLIENTES = Number(process.env.CARGA_CLIENTES ?? 300);
 const ESPERA_MS = 5_000; // depois disso, o aviso conta como perdido
 const META_MS = 1_000;
-const BLOCO = 5; // delegações no bloco que escreve o working paper
+const BLOCO = 5; // delegações no bloco que escreve a resolução de crise (passo 63: o editor do bloco)
 
 const sigla = (c: number) => `CARGA${c}`;
 const dd = (n: number) => String(n).padStart(2, '0');
@@ -200,15 +200,15 @@ async function rodar() {
 			}
 			const redator = await entrar(contaDelegado(c, 1));
 			const existente = await verificar(
-				redator.from('documento').select('id').eq('comite_id', comite.id).eq('titulo', 'Working paper de carga').maybeSingle(),
+				redator.from('documento').select('id').eq('comite_id', comite.id).eq('titulo', 'Resolução de carga').maybeSingle(),
 				'documento'
 			);
 			if (existente) comite.documento = existente.id;
 			else {
 				const bloco = await verificar(redator.rpc('criar_bloco', { p_comite: comite.id, p_nome: 'Bloco de carga' }), 'bloco');
 				comite.documento = await verificar(
-					redator.rpc('criar_documento', { p_bloco: bloco, p_tipo: 'working_paper', p_titulo: 'Working paper de carga' }),
-					'working paper'
+					redator.rpc('criar_documento', { p_bloco: bloco, p_tipo: 'resolucao_crise', p_titulo: 'Resolução de carga' }),
+					'resolução de crise'
 				);
 				for (let d = 2; d <= BLOCO; d++) {
 					const membro = await entrar(contaDelegado(c, d));

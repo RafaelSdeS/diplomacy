@@ -1,7 +1,7 @@
 -- Passo 16: procedimento completo.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(26);
+select plan(24);
 
 -- Cenário: C1 no formato do CSNU (15 delegações, P1 a P5 permanentes) e C2 com
 -- unanimidade (U1 a U3). a1 é a mesa de C1; a2, delegado de D06 (C1); a3, a mesa de
@@ -129,7 +129,7 @@ select pg_temp.entrar(3);
 select lives_ok($$select public.registrar_pedido_fala('00000000-0000-0000-0000-0000000000c2', pg_temp.d('U1'))$$,
 	'a mesa registra o pedido de fala pela delegação');
 
--- Projeto em C1: emendas, sala fechada, divisão da questão e uma resolução por tópico
+-- Projeto em C1: sala fechada, divisão da questão e uma resolução por tópico (as emendas saíram no passo 63)
 reset role;
 insert into public.bloco (id, comite_id, nome) values ('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000c1', 'Bloco');
 insert into public.documento (id, comite_id, bloco_id, tipo, titulo, topico, status, numero) values
@@ -141,22 +141,6 @@ insert into public.clausula (documento_id, comite_id, tipo, texto, ordem) values
 	('00000000-0000-0000-0000-000000000d01', '00000000-0000-0000-0000-0000000000c1', 'operativa', 'Decide B', 3);
 select pg_temp.sessao('00000000-0000-0000-0000-0000000000c1', 1,
 	array['P1', 'P2', 'P3', 'P4', 'P5', 'D06', 'D07', 'D08', 'D09', 'D10', 'D11', 'D12', 'D13', 'D14', 'D15']);
-
-select pg_temp.entrar(2);
-insert into ids values ('emenda', public.propor_emenda('00000000-0000-0000-0000-000000000d01', 'acrescentar', null, 'Decide C'));
-select pg_temp.entrar(1);
-select throws_ok($$select public.abrir_votacao_emenda(pg_temp.id('emenda'))$$, 'P0001', null,
-	'emenda com menos de 3 signatários não vai a voto');
-reset role;
-insert into public.emenda_assinatura (emenda_id, comite_id, delegacao_id) values
-	(pg_temp.id('emenda'), '00000000-0000-0000-0000-0000000000c1', pg_temp.d('D07')),
-	(pg_temp.id('emenda'), '00000000-0000-0000-0000-0000000000c1', pg_temp.d('D08'));
-select pg_temp.entrar(1);
-insert into ids values ('ve', public.abrir_votacao_emenda(pg_temp.id('emenda')));
-select pg_temp.votos(pg_temp.id('ve'), array['D06', 'D07', 'D08', 'D09', 'D10', 'D11', 'D12', 'D13', 'D14'], 'a_favor');
-select public.encerrar_votacao(pg_temp.id('ve'));
-select results_eq($$select texto from public.clausula where documento_id = '00000000-0000-0000-0000-000000000d01' and tipo = 'operativa' order by ordem$$,
-	array['Decide A', 'Decide B', 'Decide C'], 'aprovada, a emenda entra no projeto');
 
 select public.iniciar_votacao_projeto('00000000-0000-0000-0000-000000000d01');
 select pg_temp.entrar(2);

@@ -68,7 +68,7 @@ export const load: PageLoad = async ({ parent, depends }) => {
 		)
 	]);
 	const minhaDelegacao = papel === 'delegado' ? (minha?.delegacao_id ?? null) : null;
-	const [aoVivo, bilhetes, rodadas, mesa, crise, entrevistas, pedidosEntrevista, chamadaColetiva, sala] = await Promise.all([
+	const [aoVivo, bilhetes, mesa, crise, entrevistas, pedidosEntrevista, chamadaColetiva, sala] = await Promise.all([
 		comiteAoVivo
 			? Promise.all([
 					carregarSessao(comiteAoVivo),
@@ -87,9 +87,6 @@ export const load: PageLoad = async ({ parent, depends }) => {
 						.order('criado_em', { ascending: false })
 						.limit(3)
 				)
-			: { data: [], error: null },
-		minhaDelegacao
-			? ler('rodadas', ['rodada'], () => supabase.from('rodada').select('fim, documento!inner(id, titulo)').order('fim', { ascending: false }).limit(10))
 			: { data: [], error: null },
 		papel === 'mesa' && minha?.comite_id
 			? contar(
@@ -132,7 +129,7 @@ export const load: PageLoad = async ({ parent, depends }) => {
 		// do comitê, e o cache do lerAoVivo ficaria velho.
 		comiteAoVivo ? carregarSala(comiteAoVivo).catch(() => null) : null
 	]);
-	for (const r of [bilhetes, rodadas, entrevistas, pedidosEntrevista, chamadaColetiva]) if (r.error) throw r.error;
+	for (const r of [bilhetes, entrevistas, pedidosEntrevista, chamadaColetiva]) if (r.error) throw r.error;
 	if (dpos.error) throw dpos.error;
 	if (citacoes.error) throw citacoes.error;
 	if (comitesAoVivo.error) throw comitesAoVivo.error;
@@ -156,7 +153,6 @@ export const load: PageLoad = async ({ parent, depends }) => {
 		minha: minha ?? null,
 		aoVivo,
 		bilhetes: bilhetes.data ?? [],
-		rodadas: (rodadas.data ?? []).filter((r) => r.fim > agoraIso).reverse(),
 		mesa,
 		notasPendentes: crise,
 		entrevistas: (entrevistas.data ?? []).filter((e) => (e.horario ?? '') >= agoraIso).reverse().slice(0, 3),

@@ -17,7 +17,7 @@ Os valores que podem mudar de uma edição ou de um comitê para outro ficam em 
 - Uma delegação preside **no máximo duas sessões**.
 - **O bureau preside:**
   1. a plenária de abertura (a delegação da vez só assume quando todos os procedimentos da plenária terminam);
-  2. a fase de ação (projetos de resolução e emendas);
+  2. a fase de ação (projeto de resolução; as emendas saíram no passo 63);
   3. casos excepcionais.
 - **Delegação da vez ausente** (25/11/2026): assume a próxima sorteada que estiver presente; a ausente não perde a vez.
 - **Uma presidência por vez** (confirmado em 25/11/2026): quem deixa de presidir perde na hora as ações de presidente. A presidência só passa no fim da sessão (a sessão seguinte começa com a próxima da lista) ou com a não-confiança aprovada. A presidência continua sendo uma delegação: vota e discursa.
@@ -72,18 +72,24 @@ Podem ser levantados entre discursos ou durante o próprio discurso.
 
 ## Documentos
 
-- **Working paper:** documento informal para ajudar o trabalho (notícias, resoluções anteriores, cláusulas de rascunho, mídia...). Sem formato fixo. Tem signatários, sem mínimo, e não é votado (confirmado em 24/11/2026). Só é apresentado depois da agenda do tópico adotada, e o projeto de resolução costuma juntar os working papers do tópico no final. Precisa da **aprovação prévia do bureau para ser mencionado** no comitê. Observadoras podem apresentar.
+Regras oficiais (UNOCT Rules of Procedure), com o caminho decidido pela organização em 26/11/2026 ([passo 63](implementacao/63-um-projeto-por-topico.md)). O que o app faz diferente das regras oficiais está marcado.
+
+- **Working paper:** documento informal para ajudar o trabalho (notícias, resoluções anteriores, cláusulas de rascunho, mídia...). Sem formato fixo, não é votado e **não exige signatários**; quem concorda pode assinar. Observadoras podem apresentar. No app:
+  - **um por grande item da agenda, de toda a sala** (não de um bloco), criado quando a agenda do tópico é adotada;
+  - o redator de cada bloco (ou a delegação sem bloco, que é a própria redatora) propõe incluir, alterar, mover ou retirar cláusulas; toda delegação marca apoio, ressalva ou contra; **quem preside a sessão aceita ou rejeita** depois do debate (o sinal de consenso, ninguém contra e apoio de metade, é só o termômetro);
+  - *diferente das regras oficiais:* não passa pela aprovação do bureau "para ser mencionado", porque já é da sala.
 - **Projeto de resolução:**
-  - precisa da aprovação do bureau e de **no mínimo 5 signatários**;
+  - precisa da aprovação do bureau e de **no mínimo 5 signatários** (as observadoras não assinam);
   - é aprovado por **maioria simples**;
   - **uma resolução por tópico**: aprovada a resolução, o debate do tópico acaba e o comitê passa ao próximo;
-  - ao entregar o projeto, os signatários dizem se querem a aprovação **por consenso ou por votação**.
+  - no app, **um projeto por tópico**: a mesa ouve a sala e transforma os working papers dele (primeiro os preâmbulos, depois as operativas, na ordem dos itens), e as assinaturas dos working papers passam junto.
 - **Passo a passo do projeto:**
-  1. Os signatários entregam o projeto ao bureau.
-  2. O bureau aprova e distribui (papel ou projeção).
+  1. A mesa transforma os working papers do tópico em projeto. Ele nasce fechado: só correções de forma, pela mesa.
+  2. Com 5 assinaturas, a mesa o leva à fase de ação.
   3. Um signatário lê o projeto; só cabem correções de gramática ou técnicas, nunca de conteúdo.
-  4. **Consenso:** o bureau pergunta se alguma delegação se opõe. Sem oposição, o projeto é aprovado.
-  5. **Sem consenso:** o projeto vira o único foco do debate (fluxo normal), com **emendas** de no mínimo **3 signatários** (acrescentar, suprimir ou modificar partes). As emendas são discutidas juntas e votadas em sequência. Depois, vota-se o projeto.
+  4. **Consenso primeiro:** o bureau pergunta se alguma delegação se opõe. Sem oposição, o projeto é aprovado. *Diferente das regras oficiais:* os signatários não escolhem antes entre consenso e votação.
+  5. **Com objeção:** vai a voto. *Diferente das regras oficiais:* sem emendas (as mudanças de conteúdo foram todas propostas nos working papers). Rejeitado, os working papers do tópico reabrem para propostas.
+- **Resolução de crise:** escrita por um bloco, que a envia à mesa com 5 signatários e a escolha entre consenso e votação.
 - **Votação do projeto:** a sala fica fechada (ninguém entra nem sai), e só duas moções estão em ordem: divisão da questão e votação nominal. A preferência é sempre o consenso.
 
 ## Do Guia de Regras (detalhes que o UNOCT não traz)

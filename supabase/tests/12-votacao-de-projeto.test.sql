@@ -3,7 +3,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 select plan(10);
 
--- Cenário: C1 com 6 membros (d1..d6); a1..a6 delegados; a7 mesa. Bloco de d1 a d5.
+-- Cenário: C1 com 6 membros (d1..d6); a1..a6 delegados; a7 mesa. d1 cria o bloco (redatora), d2 a d5 entram.
 insert into public.evento (id, nome, ano) values ('00000000-0000-0000-0000-0000000000e1', 'Evento 1', 2027);
 insert into public.comite (id, evento_id, sigla, nome, nome_oficial, topicos) values
 	('00000000-0000-0000-0000-0000000000c1', '00000000-0000-0000-0000-0000000000e1', 'C1', 'C1', 'O Comitê 1', array['T1', 'T2']);
@@ -33,23 +33,34 @@ create temp table ids (nome text primary key, id uuid);
 grant all on ids to authenticated;
 create function pg_temp.id(p_nome text) returns uuid language sql as $$ select id from ids where nome = p_nome $$;
 
--- A agenda dos dois tópicos já foi adotada (passo 22: projeto só depois dela).
-insert into public.proposta_agenda (comite_id, topico, adotada) values
-	('00000000-0000-0000-0000-0000000000c1', 1, true), ('00000000-0000-0000-0000-0000000000c1', 2, true);
+-- A agenda dos dois tópicos já foi adotada, com um item cada: cada item tem o working paper da sala.
+insert into public.proposta_agenda (id, comite_id, topico, adotada) values
+	('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000c1', 1, true),
+	('00000000-0000-0000-0000-0000000000b2', '00000000-0000-0000-0000-0000000000c1', 2, true);
+insert into public.ponto_pauta (proposta_id, comite_id, texto, ordem) values
+	('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000c1', 'Item do T1', 1),
+	('00000000-0000-0000-0000-0000000000b2', '00000000-0000-0000-0000-0000000000c1', 'Item do T2', 1);
 
--- Um projeto com 5 signatários, enviado e aprovado pela mesa.
+-- O projeto do tópico (passo 63): a redatora propõe uma operativa no working paper, as 5
+-- delegações assinam, quem preside (a mesa) aceita; a mesa transforma em projeto e o leva à
+-- fase de ação.
 create function pg_temp.projeto(p_nome text, p_topico int default 1) returns void language plpgsql as $$
+declare
+	v_wp uuid := (
+		select id from public.documento
+		where comite_id = '00000000-0000-0000-0000-0000000000c1' and topico = p_topico and tipo = 'working_paper' and bloco_id is null
+	);
+	v_proposta uuid;
 begin
 	perform pg_temp.entrar(1);
-	insert into ids values (p_nome, public.criar_documento(pg_temp.id('bloco'), 'projeto', p_nome, p_topico));
-	perform public.adicionar_clausula(pg_temp.id(p_nome), 'operativa', 'Decide');
+	v_proposta := public.propor_no_documento(v_wp, 'incluir', null, 'Decide', 'operativa');
 	for n in 1..5 loop
 		perform pg_temp.entrar(n);
-		perform public.assinar(pg_temp.id(p_nome), true);
+		perform public.assinar(v_wp, true);
 	end loop;
-	perform pg_temp.entrar(1);
-	perform public.enviar_documento(pg_temp.id(p_nome), 'votacao');
 	perform pg_temp.entrar(7);
+	perform public.decidir_proposta(v_proposta, true);
+	insert into ids values (p_nome, public.transformar_em_projeto('00000000-0000-0000-0000-0000000000c1', p_topico));
 	perform public.aprovar_documento(pg_temp.id(p_nome), true);
 end $$;
 
@@ -77,7 +88,7 @@ select pg_temp.entrar(7);
 insert into ids values ('v1', public.abrir_votacao_projeto(pg_temp.id('P1')));
 select results_eq($$select status from public.documento where id = pg_temp.id('P1')$$, array['em_votacao'], 'o projeto entra em votação');
 select results_eq($$select tipo, objeto from public.votacao where id = pg_temp.id('v1')$$,
-	$$values ('substantiva', 'Projeto de resolução 1: P1')$$, 'a votação é substantiva e tem o nome do projeto');
+	$$values ('substantiva', 'Projeto de resolução 1: T1')$$, 'a votação é substantiva e tem o nome do projeto');
 select throws_ok($$select public.abrir_votacao_projeto(pg_temp.id('P1'))$$, '23505', null, 'o mesmo projeto não vai a voto duas vezes');
 
 select pg_temp.entrar(1); select public.votar(pg_temp.id('v1'), 'a_favor');
@@ -106,7 +117,7 @@ select public.aprovar_por_consenso(pg_temp.id('P2'));
 select results_eq($$select status from public.documento where id = pg_temp.id('P2')$$, array['aprovado'],
 	'sem oposição, a mesa aprova por consenso');
 select pg_temp.entrar(6);
-select results_eq($$select count(*)::int from public.documento where status = 'aprovado'$$, array[2],
+select results_eq($$select count(*)::int from public.documento where tipo = 'projeto' and status = 'aprovado'$$, array[2],
 	'as resoluções aprovadas aparecem ao comitê');
 reset role;
 

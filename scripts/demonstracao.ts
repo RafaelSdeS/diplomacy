@@ -255,22 +255,23 @@ async function conteudo(c: Comite) {
 
 	if (c.sigla === 'CSNU') await csnuCompleto(c, ids, mesa);
 	else {
-		// Um bloco com working paper e um projeto em rodada de revisão.
+		// Passo 63: um bloco cuja redatora propõe no working paper da sala do primeiro item; quem
+		// preside (a mesa, sem sessão aberta) aceita quatro, e a última fica em debate.
 		const bloco = await chamar<string>(ca, 'criar_bloco', { p_comite: ids.comite, p_nome: tx('Bloco da cooperação', 'Cooperation bloc') });
 		await chamar(cb, 'entrar_bloco', { p_bloco: bloco });
-		const wp = await chamar<string>(ca, 'criar_documento', { p_bloco: bloco, p_tipo: 'working_paper', p_titulo: tx('Notas sobre o item A.1', 'Notes on item A.1'), p_topico: 1 });
-		await chamar(ca, 'adicionar_clausula', { p_documento: wp, p_tipo: 'texto', p_texto: tx('Levantamento dos atores e das resoluções anteriores.', 'Survey of the actors and previous resolutions.') });
-		const projeto = await chamar<string>(ca, 'criar_documento', { p_bloco: bloco, p_tipo: 'projeto', p_titulo: topico, p_topico: 1 });
-		for (const [tipo, texto] of [
+		const [wp] = await workingPapersDaSala(ids.comite, 1);
+		const clausulas = [
 			['preambular', tx('Reconhecendo a gravidade da situação,', 'Recognising the gravity of the situation,')],
 			['preambular', tx('Recordando as resoluções anteriores sobre o tema,', 'Recalling previous resolutions on the matter,')],
 			['operativa', tx('Exorta os Estados a ampliar a cooperação regional;', 'Urges States to expand regional cooperation;')],
 			['operativa', tx('Solicita ao Secretariado um relatório sobre o andamento das medidas;', 'Requests the Secretariat to report on progress;')],
 			['operativa', tx('Decide continuar ocupando-se ativamente da questão.', 'Decides to remain actively seized of the matter.')]
-		]) {
-			await chamar(ca, 'adicionar_clausula', { p_documento: projeto, p_tipo: tipo, p_texto: texto });
+		];
+		for (const [i, [tipo, texto]] of clausulas.entries()) {
+			const proposta = await chamar<string>(ca, 'propor_no_documento', { p_documento: wp, p_acao: 'incluir', p_texto: texto, p_tipo: tipo });
+			if (i < clausulas.length - 1) await chamar(mesa, 'decidir_proposta', { p_proposta: proposta, p_aceitar: true });
+			else await chamar(cb, 'marcar_posicao_proposta', { p_proposta: proposta, p_posicao: 'apoio' });
 		}
-		await chamar(ca, 'abrir_rodada', { p_documento: projeto, p_minutos: 120 });
 
 		// Duas notícias publicadas, citando delegações.
 		const press = await como(email(c.sigla, 'press'));
@@ -329,6 +330,21 @@ async function conteudo(c: Comite) {
 // Passo 43: o CSNU completo. 19 DPOs em situações diferentes, dois blocos com working
 // papers, um projeto aprovado pela mesa e outro em rodada (com propostas, comentários e
 // cláusulas acordadas), cartas, crise com notas e notícias. Nada vai a votação.
+/** Passo 63: os working papers da sala de um tópico, na ordem dos itens da agenda adotada. */
+async function workingPapersDaSala(comite: string, topico: number) {
+	const r = await db
+		.from('documento')
+		.select('id, ponto_pauta(ordem)')
+		.eq('comite_id', comite)
+		.eq('topico', topico)
+		.eq('tipo', 'working_paper')
+		.is('bloco_id', null);
+	if (r.error) throw new Error(`working papers da sala: ${r.error.message}`);
+	// O cliente do script não tem os tipos do banco: o item vem como objeto (é uma FK simples).
+	const ordem = (x: { ponto_pauta: unknown }) => (x.ponto_pauta as { ordem: number } | null)?.ordem ?? 0;
+	return r.data.sort((x, y) => ordem(x) - ordem(y)).map((x) => x.id);
+}
+
 async function csnuCompleto(c: Comite, ids: { comite: string; veiculo: string; delegacoes: Map<string, string> }, mesa: SupabaseClient) {
 	const indice = new Map(c.delegacoes.map((d, i) => [d[0], i]));
 	const clientes = new Map<string, SupabaseClient>();
@@ -364,29 +380,47 @@ async function csnuCompleto(c: Comite, ids: { comite: string; veiculo: string; d
 		for (const m of b.membros.slice(1)) await chamar(await de(m), 'entrar_bloco', { p_bloco: bloco });
 		blocos.push(bloco);
 	}
+	// Passo 63: as notas de cada bloco vão para a conversa dele.
 	for (const wp of WORKING_PAPERS) {
 		const autor = await de(BLOCOS[wp.bloco].membros[0]);
-		const doc = await chamar<string>(autor, 'criar_documento', { p_bloco: blocos[wp.bloco], p_tipo: 'working_paper', p_titulo: wp.titulo, p_topico: 1 });
-		for (const texto of wp.texto) await chamar(autor, 'adicionar_clausula', { p_documento: doc, p_tipo: 'texto', p_texto: texto });
+		for (const texto of [wp.titulo, ...wp.texto]) {
+			await chamar(autor, 'enviar_mensagem', { p_id: randomUUID(), p_comite: ids.comite, p_tipo: 'bloco', p_texto: texto, p_para: blocos[wp.bloco] });
+		}
 	}
-	const projeto = async (p: typeof PROJETO_A | typeof PROJETO_B) => {
+	// O conteúdo de cada projeto entra no working paper da sala de um item (A e B), proposto pela
+	// redatora do bloco e aceito por quem preside (a mesa, sem sessão aberta).
+	const [itemA, itemB] = await workingPapersDaSala(ids.comite, 1);
+	const noWorkingPaper = async (p: typeof PROJETO_A | typeof PROJETO_B, wp: string) => {
 		const autor = await de(BLOCOS[p.bloco].membros[0]);
-		const doc = await chamar<string>(autor, 'criar_documento', { p_bloco: blocos[p.bloco], p_tipo: 'projeto', p_titulo: p.titulo, p_topico: 1 });
-		for (const texto of p.preambulares) await chamar(autor, 'adicionar_clausula', { p_documento: doc, p_tipo: 'preambular', p_texto: texto });
 		const operativas: string[] = [];
-		for (const texto of p.operativas) operativas.push(await chamar<string>(autor, 'adicionar_clausula', { p_documento: doc, p_tipo: 'operativa', p_texto: texto }));
-		return { autor, doc, operativas };
+		for (const [tipo, texto] of [...p.preambulares.map((x) => ['preambular', x]), ...p.operativas.map((x) => ['operativa', x])]) {
+			const proposta = await chamar<string>(autor, 'propor_no_documento', { p_documento: wp, p_acao: 'incluir', p_texto: texto, p_tipo: tipo });
+			await chamar(mesa, 'decidir_proposta', { p_proposta: proposta, p_aceitar: true });
+		}
+		const lidas = await db.from('clausula').select('id').eq('documento_id', wp).eq('tipo', 'operativa').order('ordem');
+		if (lidas.error) throw new Error(`cláusulas: ${lidas.error.message}`);
+		operativas.push(...lidas.data.map((c) => c.id));
+		return { autor, operativas };
 	};
 
-	const a = await projeto(PROJETO_A);
-	for (const nome of PROJETO_A.signatarios) await chamar(await de(nome), 'assinar', { p_documento: a.doc, p_assinar: true });
-	await chamar(a.autor, 'enviar_documento', { p_documento: a.doc, p_aprovacao: 'votacao' });
-	await chamar(mesa, 'aprovar_documento', { p_documento: a.doc, p_aprovar: true });
+	await noWorkingPaper(PROJETO_A, itemA);
+	for (const nome of PROJETO_A.signatarios) await chamar(await de(nome), 'assinar', { p_documento: itemA, p_assinar: true });
 
-	const b = await projeto(PROJETO_B);
-	await chamar(b.autor, 'abrir_rodada', { p_documento: b.doc, p_minutos: 120 });
-	for (const i of PROJETO_B.acordadas) await chamar(b.autor, 'marcar_clausula', { p_clausula: b.operativas[i], p_status: 'acordada' });
-	for (const p of PROJETO_B.propostas) await chamar(await de(p.de), 'propor_alteracao', { p_clausula: b.operativas[p.operativa], p_texto: p.texto });
+	// No item B, o debate: os membros levam as sugestões à redatora na conversa do bloco; ela as
+	// propõe, e a sala marca posição e comenta.
+	const b = await noWorkingPaper(PROJETO_B, itemB);
+	for (const p of PROJETO_B.propostas) {
+		await chamar(await de(p.de), 'enviar_mensagem', { p_id: randomUUID(), p_comite: ids.comite, p_tipo: 'bloco', p_texto: p.texto, p_para: blocos[PROJETO_B.bloco] });
+		const proposta = await chamar<string>(b.autor, 'propor_no_documento', {
+			p_documento: itemB,
+			p_acao: 'alterar',
+			p_clausula: b.operativas[p.operativa],
+			p_texto: p.texto,
+			p_motivo: `Sugestão de ${p.de}`
+		});
+		for (const nome of BLOCOS[PROJETO_B.bloco].membros) await chamar(await de(nome), 'marcar_posicao_proposta', { p_proposta: proposta, p_posicao: 'apoio' });
+		await chamar(await de(BLOCOS[PROJETO_A.bloco].membros[0]), 'marcar_posicao_proposta', { p_proposta: proposta, p_posicao: 'ressalva' });
+	}
 	for (const x of PROJETO_B.comentarios) await chamar(await de(x.de), 'comentar', { p_clausula: b.operativas[x.operativa], p_texto: x.texto });
 
 	const crise = await como(email(c.sigla, 'crise1'));

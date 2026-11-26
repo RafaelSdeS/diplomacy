@@ -127,7 +127,6 @@
 	let modalBureau = $state<Modal>();
 	let modalChegadas = $state<Modal>();
 	let modalProjetos = $state<Modal>();
-	let modalEmendas = $state<Modal>();
 	// Passo 51 (lote 1): uma ação dentro do modal fecha ele e volta ao painel (a ficha, não).
 	const fecharAoAgir = (m: Modal | undefined) => (e: MouseEvent) => {
 		if ((e.target as Element).closest('button:not(.abre-ficha)')) setTimeout(() => m?.fechar(), 400);
@@ -190,7 +189,6 @@
 		if (votacao?.aberta && votacao.nominal) chamadaAberta = true;
 	});
 	let parte = $state<string[]>([]);
-	const ACOES_EMENDA: Record<string, string> = { acrescentar: t('Acrescenta'), suprimir: t('Suprime'), modificar: t('Modifica') };
 	const rpc = <F extends keyof Funcoes>(funcao: F, args: Funcoes[F]['Args']) => executar(supabase.rpc(funcao, args));
 
 	// Abrir, encerrar e aceitar quem chegou depois (passo 21).
@@ -777,13 +775,6 @@
 							>
 						</li>
 					{/if}
-					{#if ehMesa && data.emendas.length && !votacao?.aberta}
-						<li>
-							<button class="botao botao--secundario botao--pequeno linha-decidir" type="button" onclick={() => modalEmendas?.abrir()}
-								><span>{t('Emendas')}</span><span class="selo">{data.emendas.length}</span></button
-							>
-						</li>
-					{/if}
 				</ul>
 			</section>
 			<Modal bind:this={modalPontos} nome={t('Pontos e moções')} classe="modal-acao modal-painel">
@@ -934,38 +925,6 @@
 					</section>
 				</div>
 				<div class="acoes"><button class="botao botao--secundario" type="button" onclick={() => modalProjetos?.fechar()}>{t('Fechar')}</button></div>
-			</Modal>
-			<Modal bind:this={modalEmendas} nome={t('Emendas')} classe="modal-acao modal-painel">
-				<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-				<div onclick={fecharAoAgir(modalEmendas)}>
-					<section class="cartao" aria-labelledby="t-emendas">
-						<h2 id="t-emendas">{t('Emendas')}</h2>
-						<ul class="lista">
-							{#each data.emendas as e (e.id)}
-								<li>
-									<span>
-										{ACOES_EMENDA[e.acao]}{e.clausula ? `: "${e.clausula.texto}"` : ''}{e.texto ? ` → "${e.texto}"` : ''}
-										<span class="detalhe"
-											>{e.delegacao?.nome} ·
-											<Contagem
-												rotulo={t('{n} de {total} assinaturas', { n: e.assinaturas.length, total: data.regras.assinaturas_emenda })}
-												itens={e.assinaturas.map((x) => ({ texto: nomeDe(x.delegacao_id), href: paginaDe(x.delegacao_id) }))}
-											/></span
-										>
-									</span>
-									<button
-										class="botao botao--pequeno"
-										type="button"
-										disabled={e.assinaturas.length < data.regras.assinaturas_emenda}
-										aria-label={`Votar a emenda de ${e.delegacao?.nome}`}
-										onclick={() => rpc('abrir_votacao_emenda', { p_emenda: e.id })}>{t('Votar a emenda')}</button
-									>
-								</li>
-							{/each}
-						</ul>
-					</section>
-				</div>
-				<div class="acoes"><button class="botao botao--secundario" type="button" onclick={() => modalEmendas?.fechar()}>{t('Fechar')}</button></div>
 			</Modal>
 		</div>
 	</div>

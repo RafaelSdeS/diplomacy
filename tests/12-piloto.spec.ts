@@ -1,6 +1,6 @@
 import { expect, test, type Browser, type Page } from '@playwright/test';
 import { contaDoTreino, DELEGACOES_TREINO, isolado } from '../scripts/delegacoes.ts';
-import { clienteComo, entrar, abrirPainel } from './ajuda.ts';
+import { clienteComo, entrar, abrirPainel, projetoPronto } from './ajuda.ts';
 
 // Passo 39: a cópia do TREINO só deste arquivo (scripts/delegacoes.ts).
 const C = isolado('12');
@@ -48,30 +48,17 @@ test('preparação: sessão aberta, todas presentes e um projeto aprovado pela m
 	const fase = (await mesa.from('estado_sessao').select('fase').eq('comite_id', comite).single()).data!.fase;
 	if (fase === 'debate') expect((await mesa.rpc('assumir_presidencia', { p_comite: comite, p_assumir: true })).error).toBeNull();
 
-	// O projeto: um bloco, três cláusulas, cinco signatários, enviado e aprovado pela mesa.
-	const [redator, ...outros] = await Promise.all(SIGNATARIOS.map((nome) => clienteComo(C.conta(contaDoTreino(nome)))));
-	const bloco = await redator.rpc('criar_bloco', { p_comite: comite, p_nome: `Bloco do Prata ${Date.now()}` });
-	expect(bloco.error).toBeNull();
-	for (const cliente of outros) expect((await cliente.rpc('entrar_bloco', { p_bloco: bloco.data! })).error).toBeNull();
-	const projeto = await redator.rpc('criar_documento', {
-		p_bloco: bloco.data!,
-		p_tipo: 'projeto',
-		p_titulo: TITULO
-		// Sem tópico: um tópico só tem uma resolução aprovada, e o teste roda várias vezes.
-	});
-	expect(projeto.error).toBeNull();
-	for (const [tipo, texto] of [
-		['preambular', 'Preocupado com a seca no Rio Aurora'],
-		['operativa', 'Cria uma comissão binacional das águas'],
-		['operativa', 'Decide continuar ocupando-se da questão']
-	]) {
-		expect((await redator.rpc('adicionar_clausula', { p_documento: projeto.data!, p_tipo: tipo, p_texto: texto })).error).toBeNull();
-	}
-	for (const cliente of [redator, ...outros]) {
-		expect((await cliente.rpc('assinar', { p_documento: projeto.data!, p_assinar: true })).error).toBeNull();
-	}
-	expect((await redator.rpc('enviar_documento', { p_documento: projeto.data!, p_aprovacao: 'votacao' })).error).toBeNull();
-	expect((await mesa.rpc('aprovar_documento', { p_documento: projeto.data!, p_aprovar: true })).error).toBeNull();
+	// O projeto da sala (passo 63): três cláusulas, cinco signatários, aprovado pela mesa.
+	await projetoPronto(
+		C.sigla,
+		TITULO,
+		[
+			['preambular', 'Preocupado com a seca no Rio Aurora'],
+			['operativa', 'Cria uma comissão binacional das águas'],
+			['operativa', 'Decide continuar ocupando-se da questão']
+		],
+		SIGNATARIOS
+	);
 });
 
 test('a mesa abre a votação pelo teclado, o celular em 3G lento vota e o telão mostra o resultado', async ({ browser }) => {

@@ -381,6 +381,8 @@
 	{/if}
 </section>
 
+<p><a class="botao botao--secundario botao--pequeno" href={`/imprimir/documento/${d.id}`}>{t('Imprimir ou salvar como PDF')}</a></p>
+
 {#if decididas.length}
 	<details class="cartao">
 		<summary>{t('Decididas ({n})', { n: decididas.length })}</summary>

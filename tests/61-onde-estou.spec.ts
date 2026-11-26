@@ -84,7 +84,7 @@ test('um bilhete novo se anuncia em qualquer tela e conta no menu até a convers
 test('o documento assinado continua em "Seus documentos"; "Como funciona" abre pela aba Comitê', async ({ page }) => {
 	const alemanha = await clienteComo(ALEMANHA);
 	const bloco = (await alemanha.rpc('criar_bloco', { p_comite: comite, p_nome: `Bloco do Reno ${marca}` })).data!;
-	const wp = (await alemanha.rpc('criar_documento', { p_bloco: bloco, p_tipo: 'working_paper', p_titulo: `Rios ${marca}` })).data!;
+	const wp = (await alemanha.rpc('criar_documento', { p_bloco: bloco, p_tipo: 'resolucao_crise', p_titulo: `Rios ${marca}` })).data!;
 	await alemanha.rpc('adicionar_clausula', { p_documento: wp, p_tipo: 'operativa', p_texto: 'Decide cuidar dos rios' });
 	expect((await alemanha.rpc('assinar', { p_documento: wp, p_assinar: true })).error).toBeNull();
 

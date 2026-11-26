@@ -27,8 +27,10 @@ export default defineConfig({
 	// real só avisa (Broadcast) e relê o que mudou (passo 40): no computador, 10 processos
 	// num Supabase só passam. No CI, cada parte tem 2 vCPUs por processo de navegador.
 	// Passo 52: no computador, 6 processos (com 10, a carga passava de 30 e os testes
-	// estouravam o tempo; cada teste abre vários navegadores ao lado do Supabase).
-	workers: ci ? 2 : 6,
+	// estouravam o tempo; cada teste abre vários navegadores ao lado do Supabase). Em 26/11/2026,
+	// com 6, a memória (15 GiB, com o navegador do dia a dia aberto) acabou e a máquina travou;
+	// com 4, a suíte leva o mesmo tempo (2,6 min).
+	workers: ci ? 2 : 4,
 	forbidOnly: ci,
 	retries: ci ? 1 : 0,
 	// Passo 52: um teste que só passa na segunda tentativa é defeito, não sorte.

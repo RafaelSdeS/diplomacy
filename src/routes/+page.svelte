@@ -113,7 +113,7 @@
 	);
 	const mesaPreside = $derived(!!data.aoVivo && (data.aoVivo.fase !== 'debate' || !!estado?.mesa_assumiu || !sessao?.presidencia));
 	const nadaParaDelegacao = $derived(
-		!data.rodadas.length && !data.pedidosEntrevista.length && !data.chamadaColetiva && !dposPendentes.length && !data.bilhetes.length && !meusPontos && !ausente && !minhasPropostas.length
+		!data.pedidosEntrevista.length && !data.chamadaColetiva && !dposPendentes.length && !data.bilhetes.length && !meusPontos && !ausente && !minhasPropostas.length
 	);
 	// A mesa: três ações, e o que espera por ela em cada uma.
 	const documentosEnviados = $derived(data.mesa?.documentos ?? 0);
@@ -231,12 +231,6 @@
 					<li>
 						<span>{t('Pedido de entrevista de {veiculo}', { veiculo: e.veiculo?.nome ?? '' })} <span class="detalhe">{e.tema}</span></span>
 						<ResponderEntrevista entrevista={e} onfeito={() => invalidateAll()} />
-					</li>
-				{/each}
-				{#each data.rodadas as r (r.documento?.id)}
-					<li>
-						<a href={`/documento/${r.documento?.id}`}>{r.documento?.titulo}</a>
-						<span class="detalhe">{t('rodada até {hora}', { hora: formatarHora(r.fim) })}</span>
 					</li>
 				{/each}
 				{#each dposPendentes as dpo (dpo.id)}

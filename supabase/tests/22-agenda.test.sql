@@ -31,14 +31,14 @@ create function pg_temp.item(p_texto text) returns uuid language sql as $$
 	select id from public.ponto_pauta where texto = p_texto and comite_id = '00000000-0000-0000-0000-0000000000c1'
 $$;
 
--- Antes da agenda adotada, nem projeto nem working paper (passo 56)
+-- Antes da agenda adotada, não há working paper da sala; o bloco não cria working paper nem
+-- projeto (passo 63: são da sala)
 
 select pg_temp.entrar('00000000-0000-0000-0000-0000000000a1');
 insert into ids values ('bloco', public.criar_bloco('00000000-0000-0000-0000-0000000000c1', 'Bloco'));
-select throws_ok($$select public.criar_documento(pg_temp.id('bloco'), 'projeto', 'Projeto cedo', 1)$$,
-	'P0001', 'Adote a agenda do tópico antes de apresentar um projeto de resolução.', 'sem agenda adotada, não há projeto');
+select is_empty($$select 1 from public.documento where comite_id = '00000000-0000-0000-0000-0000000000c1' and bloco_id is null$$, 'sem agenda adotada, não há working paper da sala');
 select throws_ok($$select public.criar_documento(pg_temp.id('bloco'), 'working_paper', 'Notas', 1)$$,
-	'P0001', 'Adote a agenda do tópico antes de apresentar um working paper.', 'nem working paper (passo 56)');
+	'22023', 'O working paper e o projeto são da sala: nascem com a agenda e com a mesa.', 'o bloco não cria working paper');
 
 -- A delegação propõe, a mesa adota
 
@@ -50,9 +50,9 @@ select ok(public.agenda_adotada('00000000-0000-0000-0000-0000000000c1', 1), 'a a
 select ok(not public.agenda_adotada('00000000-0000-0000-0000-0000000000c1', 2), 'a do tópico 2, não');
 
 select pg_temp.entrar('00000000-0000-0000-0000-0000000000a1');
-select lives_ok($$select public.criar_documento(pg_temp.id('bloco'), 'projeto', 'Projeto do tópico 1', 1)$$,
-	'com a agenda adotada, o projeto entra');
-insert into ids values ('wp-b', public.criar_documento(pg_temp.id('bloco'), 'working_paper', 'Sobre B', 1, pg_temp.item('B. Respostas')));
+select results_eq($$select titulo from public.documento where comite_id = '00000000-0000-0000-0000-0000000000c1' and bloco_id is null order by titulo$$,
+	array['A. Causas', 'B. Respostas'], 'com a agenda adotada, cada item grande ganha o seu working paper');
+insert into ids values ('wp-b', (select id from public.documento where ponto_pauta_id = pg_temp.item('B. Respostas')));
 
 -- Editar a agenda adotada mantém o andamento dos itens de mesmo texto
 
@@ -74,9 +74,10 @@ select results_eq($$select status from public.ponto_pauta where id = pg_temp.id(
 	'o item de mesmo texto continua o mesmo, com o andamento');
 select results_eq($$select status from public.ponto_pauta where id = pg_temp.item('C. Financiamento')$$, array['pendente'],
 	'o item novo entra pendente');
-reset role; -- a mesa não vê rascunhos
 select results_eq($$select ponto_pauta_id from public.documento where id = pg_temp.id('wp-b')$$, array[null::uuid],
 	'o working paper do item que saiu fica sem item');
+select results_eq($$select count(*)::int from public.documento where comite_id = '00000000-0000-0000-0000-0000000000c1' and bloco_id is null and titulo = 'C. Financiamento'$$, array[1],
+	'o item novo ganha o seu working paper');
 
 -- Retirar a adoção
 
@@ -87,10 +88,8 @@ select public.retirar_adocao(pg_temp.id('proposta'));
 select ok(not public.agenda_adotada('00000000-0000-0000-0000-0000000000c1', 1), 'a mesa retira a adoção');
 
 select pg_temp.entrar('00000000-0000-0000-0000-0000000000a1');
-select throws_ok($$select public.criar_documento(pg_temp.id('bloco'), 'projeto', 'Outro projeto', 1)$$,
-	'P0001', null, 'sem adoção, novo projeto volta a ser recusado');
-select lives_ok($$select public.criar_documento(pg_temp.id('bloco'), 'projeto', 'Sem tópico')$$,
-	'projeto sem tópico (só pela API) fica sem a regra');
+select throws_ok($$select public.criar_documento(pg_temp.id('bloco'), 'projeto', 'Sem tópico')$$,
+	'22023', null, 'nem projeto, com ou sem tópico');
 
 select * from finish();
 rollback;

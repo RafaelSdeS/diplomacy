@@ -1662,9 +1662,24 @@ export const EN: Record<string, string> = {
 	'Ler o briefing: {titulo}': 'Read the briefing: {titulo}',
 	'Atingidas': 'Affected',
 	// Passo 63: a tela do documento da sala
+	'cada grande item da agenda tem um, de toda a sala. O redator de cada bloco (ou a delegação sem bloco) propõe mudanças; todas marcam posição; quem preside aceita ou rejeita depois do debate. Assinar é opcional e mostra acordo.':
+		"each main agenda item has one, for the whole room. Each bloc's drafter (or a delegation without a bloc) proposes changes; everyone marks a position; the chair accepts or rejects after the debate. Signing is optional and shows agreement.",
+	'um por tópico: a mesa ouve a sala e transforma os working papers nele, com os preâmbulos primeiro e as assinaturas junto. Nasce fechado e vai à fase de ação com 5 assinaturas.':
+		'one per topic: the dais listens to the room and turns the working papers into it, preambular clauses first and the signatures along. It is born closed and goes to the action phase with 5 signatures.',
+	'um signatário lê o projeto, e a mesa pergunta se alguma delegação se opõe: sem objeção, ele é aprovado por consenso; com objeção, vai a voto. Aprovado, é a resolução do tópico; rejeitado, os working papers reabrem.':
+		"a signatory reads the draft, and the dais asks whether any delegation objects: with no objection, it is approved by consensus; with an objection, it goes to a vote. Approved, it is the topic's resolution; rejected, the working papers reopen.",
+	'Levanta a placa para pedir a palavra (a presidência escolhe quem fala: as placas não são uma fila), faz pontos e moções pelo botão do topo da Sessão, vota, marca posição nas propostas e assina; no bloco, quem propõe é o redator.':
+		'Raises the placard to ask for the floor (the chair picks who speaks: placards are not a queue), makes points and motions with the button at the top of the Session, votes, marks positions on proposals and signs; in the bloc, the drafter proposes.',
+	'A delegação da vez conduz o debate no Painel: escolhe os próximos entre as placas, dá a palavra, decide os pontos e moções aprovados pela mesa e aceita ou rejeita as propostas nos working papers. Também vota e discursa.':
+		'The delegation whose turn it is chairs the debate in the Panel: picks the next speakers among the placards, gives the floor, decides the points and motions the dais approved, and accepts or rejects the proposals in the working papers. It also votes and speaks.',
+	'Conduz a plenária de abertura e a fase de ação. No debate, é o bureau: aprova os pontos e moções, confirma as chegadas e transforma os working papers em projeto. Assume a presidência só num caso excepcional.':
+		'Runs the opening plenary and the action phase. In the debate, it is the bureau: approves points and motions, confirms arrivals and turns the working papers into a draft resolution. It takes the chair only in an exceptional case.',
 	'pergunte se alguma delegação se opõe: sem objeção, consenso; com objeção, votação': 'ask whether any delegation objects: no objection, consensus; with an objection, a vote',
 	'Bloco {nome}': 'Bloc {nome}',
 	'Conversa do bloco': 'Bloc conversation',
+	'Nova resolução de crise': 'New crisis resolution',
+	'Documento antigo do bloco, só para leitura: o working paper e o projeto agora são da sala.':
+		"Old bloc document, read-only: the working paper and the draft resolution now belong to the room.",
 	'A conversa do seu bloco: só os membros leem. Leve aqui as sugestões ao redator.':
 		"Your bloc's conversation: only members read it. Bring your suggestions to the drafter here.",
 	'1 proposta com consenso para decidir': '1 proposal with consensus to decide',
@@ -1750,6 +1765,12 @@ export const EN: Record<string, string> = {
 	'Só gramática e digitação: o conteúdo do projeto não muda.': "Only grammar and typos: the content of the draft doesn't change.",
 	'Salvar a correção': 'Save the correction',
 	// Passo 63: o working paper da sala e o projeto do tópico
+	'O working paper e o projeto são da sala: nascem com a agenda e com a mesa.':
+		"The working paper and the draft resolution belong to the room: they come with the agenda and from the dais.",
+	'Delegação observadora não apresenta resolução de crise.': 'An observer delegation does not present a crisis resolution.',
+	'Os documentos dos blocos ficaram só para leitura: o trabalho agora é no working paper da sala.':
+		"The blocs' documents are now read-only: the work happens in the room's working paper.",
+	'O documento já foi enviado à mesa e não muda mais.': 'The document was already sent to the dais and no longer changes.',
 	'Só se propõe no working paper da sala.': "Proposals go only in the room's working paper.",
 	'Este working paper já virou projeto: as propostas estão fechadas.':
 		'This working paper is already a draft resolution: proposals are closed.',

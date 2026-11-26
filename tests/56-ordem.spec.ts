@@ -107,50 +107,6 @@ test('a mesa cadastra a agenda do bureau pelo teclado e a libera; a delegação 
 	await expect(etapaAtual(page)).toContainText(/Working papers|Projeto/, { timeout: 10_000 });
 });
 
-test('o projeto em branco traz pelo modal as cláusulas de working papers do tópico, de dois blocos', async ({ page }) => {
-	await adotarAgenda(MESA, C.sigla, 1);
-	await adotarAgenda(MESA, C.sigla, 2);
-	const alemanha = await clienteComo(ALEMANHA);
-	const franca = await clienteComo(FRANCA);
-	const mesa = await clienteComo(MESA);
-	const ok = <T>(r: { data: T; error: unknown }) => {
-		expect(r.error).toBeNull();
-		return r.data as NonNullable<T>;
-	};
-	const blocoA = ok(await alemanha.rpc('criar_bloco', { p_comite: comite, p_nome: `Bloco do Reno ${marca}` }));
-	const blocoB = ok(await franca.rpc('criar_bloco', { p_comite: comite, p_nome: `Bloco do Sena ${marca}` }));
-	const wp = async (cliente: typeof alemanha, bloco: string, topico: number, texto: string, aprovar: boolean) => {
-		const id = ok(await cliente.rpc('criar_documento', { p_bloco: bloco, p_tipo: 'working_paper', p_titulo: `${texto} ${marca}`, p_topico: topico }));
-		ok(await cliente.rpc('adicionar_clausula', { p_documento: id, p_tipo: 'operativa', p_texto: `${texto} ${marca}` }));
-		if (aprovar) {
-			ok(await cliente.rpc('enviar_documento', { p_documento: id }));
-			ok(await mesa.rpc('aprovar_documento', { p_documento: id, p_aprovar: true }));
-		}
-	};
-	await wp(alemanha, blocoA, 1, 'Pede um fundo para o Reno', false);
-	await wp(franca, blocoB, 1, 'Decide criar um observatório', true);
-	await wp(franca, blocoB, 2, 'Outro tópico', true);
-	const projeto = ok(await alemanha.rpc('criar_documento', { p_bloco: blocoA, p_tipo: 'projeto', p_titulo: `Projeto do Reno ${marca}`, p_topico: 1 }));
-
-	await entrar(page, ALEMANHA);
-	await page.goto(`/documento/${projeto}`);
-	await page.getByRole('button', { name: 'Trazer de working papers' }).click();
-	const modal = page.getByRole('dialog', { name: 'Trazer cláusulas de working papers' });
-	await expect(modal).not.toContainText(`Outro tópico ${marca}`);
-	// Os aprovados pela mesa primeiro.
-	await expect(modal.getByRole('group').first()).toContainText('Aprovado pela mesa');
-	await expect(modal.getByRole('group').last()).not.toContainText('Aprovado pela mesa');
-	await modal.getByRole('checkbox', { name: `Pede um fundo para o Reno ${marca}` }).check();
-	await modal.getByRole('button', { name: /^Trazer 1 cláusulas/ }).click();
-	await expect(page.getByRole('status')).toHaveText('Cláusulas trazidas.');
-	await page.getByRole('button', { name: 'Trazer de working papers' }).click();
-	await modal.getByRole('group').filter({ hasText: `observatório ${marca}` }).getByRole('button', { name: 'Trazer todas as cláusulas' }).click();
-	await expect(page.getByRole('status')).toHaveText('Cláusulas trazidas.');
-	await expect(page.locator('.cabecalho-documento')).toContainText('Baseado em');
-	await expect(page.locator('.cabecalho-documento')).toContainText(`Decide criar um observatório ${marca}`);
-	await expect(page.locator('.cabecalho-documento')).toContainText(`Pede um fundo para o Reno ${marca}`);
-});
-
 test('a 1366 × 768, Agenda e Documentos não rolam, e passam no axe nos dois temas', async ({ browser }) => {
 	for (const conta of [ALEMANHA, MESA]) {
 		for (const tema of ['light', 'dark'] as const) {

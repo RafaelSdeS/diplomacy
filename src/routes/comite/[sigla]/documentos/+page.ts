@@ -10,7 +10,7 @@ export const load: PageLoad = async ({ parent, depends }) => {
 	const minha = participacoes.find((p) => p.comite_id === comite.id && p.papel === 'delegado')?.delegacao_id ?? null;
 	const ehMesa = participacoes.some((p) => p.papel === 'secretaria' || (p.papel === 'mesa' && p.comite_id === comite.id));
 
-	const [dpos, documentos, meusBlocos, rodadas, cartas, delegacoes, ordem, daMesa] = await Promise.all([
+	const [dpos, documentos, meusBlocos, cartas, delegacoes, ordem, daMesa] = await Promise.all([
 		supabase.from('dpo').select('id, topico, status, delegacao(id, nome, bandeira)').eq('comite_id', comite.id).order('topico'),
 		supabase
 			.from('documento')
@@ -18,9 +18,6 @@ export const load: PageLoad = async ({ parent, depends }) => {
 			.eq('comite_id', comite.id)
 			.order('criado_em', { ascending: false }),
 		minha ? supabase.from('bloco_membro').select('bloco_id').eq('delegacao_id', minha) : Promise.resolve({ data: [], error: null }),
-		// Sem a hora atual na URL: a lista abre sem internet (o cache é pela URL). O filtro
-		// das rodadas abertas fica na tela.
-		supabase.from('rodada').select('fim, documento_id').order('fim', { ascending: false }).limit(50),
 		supabase
 			.from('carta')
 			.select('id, titulo, enviada_em, remetente:delegacao(nome)')
@@ -38,7 +35,7 @@ export const load: PageLoad = async ({ parent, depends }) => {
 			.order('fixado', { ascending: false })
 			.order('publicado_em', { ascending: false, nullsFirst: true })
 	]);
-	for (const r of [dpos, documentos, meusBlocos, rodadas, cartas, daMesa]) if (r.error) throw r.error;
+	for (const r of [dpos, documentos, meusBlocos, cartas, daMesa]) if (r.error) throw r.error;
 
 	return {
 		minha,
@@ -46,7 +43,6 @@ export const load: PageLoad = async ({ parent, depends }) => {
 		dpos: dpos.data!,
 		documentos: documentos.data!,
 		meusBlocos: meusBlocos.data!.map((b) => b.bloco_id),
-		rodadas: rodadas.data!,
 		cartas: cartas.data!,
 		totalDelegacoes: delegacoes.count ?? 0,
 		ordem,

@@ -1,7 +1,7 @@
 import { expect, test, type Browser, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { contaDaDelegacao, isolado } from '../scripts/delegacoes.ts';
-import { adotarAgenda, clienteComo, CONTAS, entrar, abrirAcao } from './ajuda.ts';
+import { clienteComo, CONTAS, entrar, abrirAcao } from './ajuda.ts';
 
 // Passo 39: a cópia do CSNU-T só deste arquivo (scripts/delegacoes.ts).
 const C = isolado('09');
@@ -10,7 +10,7 @@ const BLOCOS = `/comite/${C.sigla}/blocos`;
 // O nome do bloco muda a cada execução: blocos não se repetem no comitê.
 const BLOCO = `Bloco de teste ${Date.now()}`;
 const MEMBROS = ['Rússia', 'China', 'Reino Unido', 'França'];
-// O título também: a fusão escolhe as cláusulas pelo working paper desta execução.
+// O título também, para achar a resolução desta execução.
 const WP = `Financiamento ${Date.now()}`;
 
 // O fluxo do editor depende do passo anterior: roda em série, num projeto só.
@@ -36,9 +36,10 @@ async function semErrosDeAcessibilidade(page: Page) {
 }
 
 let workingPaper = '';
-let projeto = '';
 
-test('um bloco escreve um working paper, com verbos sugeridos', async ({ page }) => {
+// Passo 63: o editor do bloco fica para a resolução de crise; o working paper e o projeto são da
+// sala e têm o teste deles (63-working-paper-da-sala).
+test('um bloco escreve uma resolução de crise, com verbos sugeridos', async ({ page }) => {
 	await entrar(page, C.conta(CONTAS.delegado)); // EUA
 	await page.goto(BLOCOS);
 	await abrirAcao(page, 'Novo bloco');
@@ -59,14 +60,15 @@ test('um bloco escreve um working paper, com verbos sugeridos', async ({ page })
 	}
 	await expect(bloco.getByRole('listitem')).toHaveCount(5);
 
-	// Passo 56: o working paper também vem depois da agenda adotada.
-	await adotarAgenda(C.conta(CONTAS.mesa), C.sigla, 1);
-	await page.reload();
-	await bloco.getByRole('button', { name: 'Novo documento' }).click();
-	const novo = page.getByRole('form', { name: 'Novo documento' });
-	await novo.getByLabel('Título').fill(WP);
-	await novo.getByRole('button', { name: 'Criar e abrir' }).click();
-	await expect(page).toHaveURL(/\/documento\//);
+	// A resolução nasce pela API, como o app faria depois de uma atualização de crise.
+	const criada = await (await clienteComo(C.conta(CONTAS.delegado))).rpc('criar_documento', {
+		p_bloco: blocoId,
+		p_tipo: 'resolucao_crise',
+		p_titulo: WP,
+		p_topico: 1
+	});
+	expect(criada.error).toBeNull();
+	await page.goto(`/documento/${criada.data}`);
 	workingPaper = page.url();
 
 	// Passo 57: escreve no lugar. "+ Preambular" abre a cláusula já em edição; Enter salva e
@@ -137,12 +139,26 @@ test('a barra de progresso e a cláusula em foco atualizam para todos', async ({
 	await Promise.all([russia, eua].map((p) => p.context().close()));
 });
 
-test('o working paper vai à mesa e, aprovado, aparece ao comitê', async ({ browser }) => {
+test('a resolução de crise, com 5 assinaturas, vai à mesa e, aprovada, aparece ao comitê', async ({ browser }) => {
+	const id = workingPaper.split('/').pop()!;
+	for (const conta of [C.conta(CONTAS.delegado), ...MEMBROS.map((n) => C.conta(contaDaDelegacao(n)))]) {
+		expect((await (await clienteComo(conta)).rpc('assinar', { p_documento: id, p_assinar: true })).error).toBeNull();
+	}
 	const eua = await abrir(browser, C.conta(CONTAS.delegado), workingPaper);
-	await eua.getByRole('button', { name: 'Enviar à mesa' }).click();
-	await eua.getByRole('dialog', { name: 'Enviar à mesa?' }).getByRole('button', { name: 'Enviar à mesa' }).click();
+	const faixa = eua.getByRole('region', { name: 'Assinaturas' });
+	await expect(faixa).toContainText('5 de 5 assinaturas', { timeout: 10_000 });
+	await faixa.getByRole('button', { name: 'Enviar à mesa' }).click();
+	const envio = eua.getByRole('dialog', { name: 'Enviar à mesa?' });
+	await envio.getByRole('radio', { name: 'Por consenso' }).check();
+	await envio.getByRole('button', { name: 'Enviar à mesa' }).click();
 	await expect(eua.getByRole('status')).toHaveText('Documento enviado à mesa.');
-	await expect(eua.getByText('Working paper', { exact: false }).first()).toBeVisible();
+	// Ganha número no envio; o documento formatado tem a linha do comitê e os signatários oficiais.
+	await expect(eua.getByRole('heading', { level: 1 })).toHaveText(new RegExp(`^Resolução de crise \\d+: ${WP}$`));
+	const folha = eua.getByRole('article', { name: 'Documento formatado' });
+	await expect(folha).toContainText('O Conselho de Segurança:');
+	await expect(folha).toContainText('1. Pede cooperação internacional ampla;');
+	await expect(folha).toContainText('2. Decide criar um fundo.');
+	await expect(folha).toContainText('Signatários: French Republic, People');
 
 	const brasil = await abrir(browser, C.conta(contaDaDelegacao('Brasil')), BLOCOS);
 	const documentos = brasil.getByRole('region', { name: 'Documentos do comitê' });
@@ -154,58 +170,6 @@ test('o working paper vai à mesa e, aprovado, aparece ao comitê', async ({ bro
 
 	await expect(documentos).toContainText(WP, { timeout: 10_000 });
 	await Promise.all([eua, brasil, mesa].map((p) => p.context().close()));
-});
-
-test('o projeto junta cláusulas do working paper, recebe 5 assinaturas e vai à mesa', async ({ page }) => {
-	await adotarAgenda(C.conta(CONTAS.mesa), C.sigla, 1); // projeto só depois da agenda (passo 22)
-	await entrar(page, C.conta(CONTAS.delegado));
-	await page.goto(BLOCOS);
-	await page.getByRole('article', { name: `Bloco ${BLOCO}` }).getByRole('button', { name: 'Novo documento' }).click();
-	const novo = page.getByRole('form', { name: 'Novo documento' });
-	await novo.getByLabel('Tipo').selectOption('projeto');
-	await novo.getByLabel('Título').fill('Projeto sobre financiamento');
-	await novo.getByRole('button', { name: 'Criar e abrir' }).click();
-	await expect(page).toHaveURL(/\/documento\//);
-	projeto = page.url();
-
-	// Fusão: as cláusulas do working paper aprovado, cada uma guardando a origem.
-	// Passo 56: a fusão abre num modal, na barra do documento.
-	await page.getByRole('button', { name: 'Trazer de working papers' }).click();
-	const fusao = page.getByRole('region', { name: 'Trazer cláusulas de working papers' });
-	const wp = fusao.getByRole('group', { name: new RegExp(WP) });
-	for (const caixa of await wp.getByRole('checkbox').all()) await caixa.check();
-	await fusao.getByRole('button', { name: /^Trazer 3 cláusulas/ }).click();
-	await expect(page.getByRole('status')).toHaveText('Cláusulas trazidas.');
-	await page.getByRole('button', { name: /Operativa 1 Pede cooperação internacional ampla/ }).click();
-	await expect(page.getByRole('region', { name: 'Operativa 1' })).toContainText('Veio de um working paper');
-
-	// Sem 5 signatários, não vai.
-	await page.getByRole('button', { name: 'Assinar' }).click();
-	// Passo 57: sem 5 signatários, o envio fica desabilitado e a faixa diz quanto falta.
-	const faixa = page.getByRole('region', { name: 'Assinaturas' });
-	await expect(faixa.getByRole('button', { name: 'Enviar à mesa' })).toBeDisabled();
-	await expect(faixa).toContainText('Faltam 4 assinaturas para enviar à mesa');
-
-	const id = projeto.split('/').pop()!;
-	for (const nome of MEMBROS) {
-		const cliente = await clienteComo(C.conta(contaDaDelegacao(nome)));
-		expect((await cliente.rpc('assinar', { p_documento: id, p_assinar: true })).error).toBeNull();
-	}
-	await expect(faixa).toContainText('5 de 5 assinaturas', { timeout: 10_000 });
-	await faixa.getByRole('button', { name: 'Enviar à mesa' }).click();
-	const envio = page.getByRole('dialog', { name: 'Enviar à mesa?' });
-	await envio.getByRole('radio', { name: 'Por consenso' }).check();
-	await envio.getByRole('button', { name: 'Enviar à mesa' }).click();
-	await expect(page.getByRole('status')).toHaveText('Documento enviado à mesa.');
-	// O projeto ganha número no envio (o primeiro do comitê é o 1).
-	await expect(page.getByRole('heading', { level: 1 })).toHaveText(/^Projeto de resolução \d+: Projeto sobre financiamento$/);
-
-	// O documento formatado: linha do comitê e signatários com o nome oficial.
-	const folha = page.getByRole('article', { name: 'Documento formatado' });
-	await expect(folha).toContainText('O Conselho de Segurança:');
-	await expect(folha).toContainText('1. Pede cooperação internacional ampla;');
-	await expect(folha).toContainText('2. Decide criar um fundo.');
-	await expect(folha).toContainText('Signatários: French Republic, People');
 });
 
 test('aparência do documento aberto no celular e no notebook', async ({ browser }) => {
@@ -228,7 +192,7 @@ for (const tema of ['light', 'dark'] as const) {
 	test(`as telas do editor não têm erros de acessibilidade (tema ${tema})`, async ({ page }) => {
 		await page.emulateMedia({ colorScheme: tema });
 		await entrar(page, C.conta(CONTAS.delegado));
-		for (const rota of [BLOCOS, workingPaper, projeto]) {
+		for (const rota of [BLOCOS, workingPaper]) {
 			await page.goto(rota);
 			await expect(page.locator('[data-ao-vivo="sim"]')).toBeVisible({ timeout: 10_000 });
 			const primeira = page.getByRole('article', { name: 'Documento formatado' }).locator('.bloco-texto').first();

@@ -109,12 +109,18 @@ No UFRGSMUN o caminho é outro. No UNOCT de 2026, a agenda do tópico A tinha tr
    - **Blocos:** "Conversa do bloco" para os membros;
    - **Mensagens:** a conversa do bloco na lista, com o canal ao vivo, as não lidas e a denúncia; `?conversa=` abre uma conversa pela URL;
    - **Agora:** para quem preside (e para a mesa quando preside), "N propostas com consenso para decidir"; para o redator, "Suas propostas em debate"; para a mesa, o projeto ou os working papers do tópico atual. Só leituras GET, que funcionam sem rede.
-4. **Saem as rodadas, o envio, os documentos por bloco e as emendas.** Atualizar as regras, o "Como funciona" e o roteiro do piloto; marcar o passo 49 e a parte B do 57 como absorvidos.
-5. **Ponta a ponta:** um tópico inteiro com três blocos, da agenda à resolução e de volta depois de uma rejeição.
+4. **Saem as rodadas, o envio, os documentos por bloco e as emendas.** Atualizar as regras, o "Como funciona" e o roteiro do piloto; marcar o passo 49 e a parte B do 57 como absorvidos. **Feito em 26/11/2026** (migração `20270104090000_sai_o_fluxo_por_bloco.sql`):
+   - o bloco cria só a resolução de crise (`criar_documento`); os outros documentos antigos dos blocos ficaram só para leitura (`exigir_editavel`), com um aviso na tela;
+   - saíram as rodadas (`abrir_rodada`), as emendas (`propor_emenda`, `assinar_emenda`, `abrir_votacao_emenda`) e a fusão na tela do projeto do bloco; as tabelas ficam, com o histórico;
+   - os dados: o projeto mais adiantado de cada tópico virou o projeto da sala (o em rascunho nasce fechado), e os working papers desse tópico ficaram só para leitura;
+   - telas: Blocos ("Nova resolução de crise"), documento antigo, painel (sem emendas), Agora e Documentos (sem rodadas), impressão do documento da sala, "Como funciona" e `regras-de-procedimento.md`;
+   - testes: os do banco (09, 12, 16, 22, 57) e os de tela (09, 10, 12, 16, 18, 22, 55, 56, 57, 61) seguem o fluxo da sala ou a resolução de crise; `projetoPronto` (em `tests/ajuda.ts`) cria um projeto da sala sem tópico direto no banco local, para os testes da votação rodarem várias vezes;
+   - os scripts: a demonstração põe o conteúdo dos projetos nos working papers da sala (propostas aceitas e em debate) e as notas dos blocos nas conversas deles; a carga usa a resolução de crise.
+5. **Ponta a ponta:** um tópico inteiro com três blocos, da agenda à resolução e de volta depois de uma rejeição. **Feito em 26/11/2026** (`63-working-paper-da-sala`, o terceiro teste): dois itens, propostas aceitas nos dois, assinaturas, a mesa transforma pela tela (preâmbulos primeiro, 5 assinaturas) e leva à fase de ação; rejeitado (direto no banco: a votação tem o teste dela), os working papers reabrem. `reabrirTopicoDaSala` deixa o tópico do começo a cada execução.
 
 ## Testes
 
-- [ ] pgTAP:
+- [x] pgTAP:
   - adotada a agenda, cada grande item tem o seu working paper, e só um;
   - só um redator de bloco, ou a delegação sem bloco, propõe;
   - todas as delegações marcam posição;
@@ -125,8 +131,8 @@ No UFRGSMUN o caminho é outro. No UNOCT de 2026, a agenda do tópico A tinha tr
   - o banco recusa um segundo projeto no tópico, e o conteúdo do projeto não muda;
   - sem objeção, o projeto é aprovado por consenso; com objeção, vai a voto;
   - rejeitado o projeto, os working papers reabrem.
-- [ ] Ponta a ponta:
+- [x] Ponta a ponta:
   - três blocos propõem mudanças que se contradizem no mesmo item; a sala marca posição, e quem preside aceita uma e rejeita outra;
   - uma delegação sem bloco propõe, marca posição e assina;
   - a mesa transforma os working papers em projeto, e ele vai a voto com as assinaturas já lá.
-- [ ] Ponta a ponta, a 1366 × 768: na tela do working paper, a cláusula e as propostas dela ficam à vista, sem rolar a página. No celular de 360 px, a folha da proposta tem uma ação principal.
+- [x] Ponta a ponta, a 1366 × 768: na tela do working paper, a cláusula e as propostas dela ficam à vista, sem rolar a página. No celular de 360 px, a folha da proposta tem uma ação principal.

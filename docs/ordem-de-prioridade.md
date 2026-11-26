@@ -38,7 +38,7 @@ A sequência de execução tem o **piloto depois da interface**. Os passos 44, 4
 | 14 | [60](implementacao/60-agenda-do-bureau.md) | A agenda parte do documento do bureau (**pronto**) | M–G | O roteiro começa pela agenda, e o bureau já chega com ela pronta | Agenda do bureau cadastrada antes e liberada no dia; uma agenda por tópico, alterada como um working paper (por item, com posição e comentários), aceita pela presidência e adotada pela sala |
 | 15 | [58](implementacao/58-documentos-da-mesa.md) | Documentos da mesa para o comitê (**pronto**; o telão e o "está editando" em 26/11/2026) | M | Pedido novo; o piloto manda o guia por fora, e pode subir se a mesa do piloto pedir | Texto e PDF publicados ao vivo, versão conferida ao salvar, "o que mudou", telão |
 | 15a | [62](implementacao/62-fluxo-do-comite.md) **lotes 1, 2 e 3** | O fluxo do comitê: as regras do bloco, a crise compacta e a Agora sem buracos (**prontos** em 26/11/2026) | M | O uso de 26/11, com o CSNU-T online populado, mostrou a crise tomando a tela, metade da Agora vazia e o bloco podendo ficar sem redator | Um bloco por vez e o bloco nunca sem redator (feito); crise numa faixa, com o briefing num modal; Agora numa coluna por importância |
-| 15b | [63](implementacao/63-um-projeto-por-topico.md) | Um working paper por item da agenda, de toda a sala, e um projeto por tópico | G | Vários textos por tópico fragmentam o debate e excluem as delegações pequenas; no UFRGSMUN a sala inteira trabalha num working paper por item | Um working paper por grande item, criado com a agenda; os redatores (ou a delegação sem bloco) propõem; quem preside aceita ou rejeita; a mesa transforma em projeto, com as assinaturas; consenso primeiro, voto com objeção; sem emendas. Absorve a primeira entrega do 49 e a parte B do 57 |
+| 15b | [63](implementacao/63-um-projeto-por-topico.md) | Um working paper por item da agenda, de toda a sala, e um projeto por tópico (**pronto** em 26/11/2026) | G | Vários textos por tópico fragmentam o debate e excluem as delegações pequenas; no UFRGSMUN a sala inteira trabalha num working paper por item | Um working paper por grande item, criado com a agenda; os redatores (ou a delegação sem bloco) propõem; quem preside aceita ou rejeita; a mesa transforma em projeto, com as assinaturas; consenso primeiro, voto com objeção; sem emendas. Absorve a primeira entrega do 49 e a parte B do 57 |
 | 15c | [62](implementacao/62-fluxo-do-comite.md) **lotes 5 e 6** | Uma trilha só, com nomes; destaque por papel e dicas | M | Vêm depois do 63 porque a trilha e os destaques usam o fluxo novo | Agenda → Working papers → Projeto → Fase de ação → Resolução; duas ou três ações por papel; cada ação diz o que faz e por que está desativada |
 | — | [12](implementacao/12-teste-do-piloto.md) | **Sessão de teste do piloto** ([piloto.md](piloto.md)) | — | Valida o app já com a interface limpa, antes de construir mais | Roteiro, questionário e plano B em papel |
 | 16 | [53](implementacao/53-dpo-como-arquivo.md) | DPO como arquivo público (**pronto**, 26/11/2026, antes do piloto, a pedido) | M | O DPO é preparado antes do evento e é público; hoje o app o escreve num editor e esconde por regra | PDF por tópico, aberto ao comitê, sem aprovação; prévia; editor e impressão saem |
@@ -342,7 +342,7 @@ Uma presidência só (59) ── Saber onde estou (61) ── Agenda do bureau (
 Mensagens como conversa (51, lote 3) e documentos da mesa (58)            (feito)
 Fluxo do comitê (62): regras do bloco, lote 1                             (feito)
   └─ crise compacta e Agora sem buracos (62, lotes 2 e 3)                   (feito)
-       └─ Working paper da sala e projeto por tópico (63)
+       └─ Working paper da sala e projeto por tópico (63)                    (feito)
             └─ depende da agenda (60), da escrita (57, parte A) e do lote 1 do 62
             └─ Trilha com nomes, destaque e dicas (62, lotes 5 e 6)
 
@@ -405,7 +405,7 @@ Do passo 47 (feito): modal base; saída com confirmação e `Confirmar`; fichas 
 
 1. as regras do bloco: um bloco por vez e o bloco nunca sem redator (62, lote 1; feito em 26/11/2026);
 2. a crise compacta e a Agora sem buracos (62, lotes 2 e 3; feitos em 26/11/2026);
-3. um working paper por grande item da agenda, de toda a sala, e um projeto por tópico (63);
+3. um working paper por grande item da agenda, de toda a sala, e um projeto por tópico (63; feito em 26/11/2026);
 4. a trilha com nomes, o destaque por papel e as dicas (62, lotes 5 e 6).
 
 ### Piloto (passo 12)

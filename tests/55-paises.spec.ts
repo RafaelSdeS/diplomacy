@@ -29,7 +29,7 @@ test.beforeAll(async ({}, info) => {
 	bloco = (await paraguai.rpc('criar_bloco', { p_comite: comite, p_nome: `Bloco do Chaco ${marca}` })).data!;
 	expect((await chile.rpc('entrar_bloco', { p_bloco: bloco })).error).toBeNull();
 	await adotarAgenda(MESA, C.sigla, 1);
-	const doc = await paraguai.rpc('criar_documento', { p_bloco: bloco, p_tipo: 'working_paper', p_titulo: `Águas do Chaco ${marca}`, p_topico: 1 });
+	const doc = await paraguai.rpc('criar_documento', { p_bloco: bloco, p_tipo: 'resolucao_crise', p_titulo: `Águas do Chaco ${marca}`, p_topico: 1 });
 	expect(doc.error).toBeNull();
 	documento = doc.data!;
 	for (const c of [paraguai, chile]) expect((await c.rpc('assinar', { p_documento: documento, p_assinar: true })).error).toBeNull();
