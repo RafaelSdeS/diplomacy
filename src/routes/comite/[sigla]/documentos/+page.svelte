@@ -34,7 +34,7 @@
 		new Map(data.rodadas.filter((r) => Date.parse(r.fim) > agora).map((r) => [r.documento_id, r.fim] as const))
 	);
 	const meusDpos = $derived(data.dpos.filter((d) => d.delegacao?.id === data.minha));
-	const dosMeusBlocos = $derived(data.documentos.filter((d) => data.meusBlocos.includes(d.bloco_id)));
+	const dosMeusBlocos = $derived(data.documentos.filter((d) => !!d.bloco_id && data.meusBlocos.includes(d.bloco_id)));
 	const paraAvaliar = $derived(
 		data.ehMesa ? data.documentos.filter((d) => d.status === 'enviado').length : 0
 	);

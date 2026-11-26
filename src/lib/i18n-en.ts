@@ -1666,6 +1666,31 @@ export const EN: Record<string, string> = {
 	'Ler o briefing': 'Read the briefing',
 	'Ler o briefing: {titulo}': 'Read the briefing: {titulo}',
 	'Atingidas': 'Affected',
+	// Passo 63: o working paper da sala e o projeto do tópico
+	'Só se propõe no working paper da sala.': "Proposals go only in the room's working paper.",
+	'Este working paper já virou projeto: as propostas estão fechadas.':
+		'This working paper is already a draft resolution: proposals are closed.',
+	'Só as delegações do comitê propõem.': "Only the committee's delegations propose.",
+	'Quem propõe é o redator do seu bloco: leve a sugestão a ele na conversa do bloco.':
+		"Your bloc's drafter proposes: take your suggestion to them in the bloc conversation.",
+	'Escolha a cláusula.': 'Choose the clause.',
+	'Essa cláusula não é deste documento.': 'That clause is not in this document.',
+	'Só as delegações marcam posição.': 'Only delegations mark a position.',
+	'Esta proposta já foi decidida.': 'This proposal has already been decided.',
+	'Só quem preside a sessão aceita ou rejeita as propostas.': 'Only whoever chairs the session accepts or rejects proposals.',
+	'A cláusula desta proposta já saiu do texto.': "This proposal's clause is no longer in the text.",
+	'Só quem preside ou a mesa põe uma cláusula em foco.': 'Only the chair or the dais puts a clause in focus.',
+	'Só as delegações assinam.': 'Only delegations sign.',
+	'Na fase de ação, as assinaturas do projeto não mudam.': "In the action phase, the draft's signatures don't change.",
+	'Delegação observadora não assina o projeto.': 'An observer delegation does not sign the draft resolution.',
+	'Este working paper já virou projeto: as assinaturas passaram para ele.':
+		'This working paper is already a draft resolution: the signatures moved to it.',
+	'O tópico já tem projeto.': 'The topic already has a draft resolution.',
+	'Os working papers do tópico ainda não têm cláusulas.': "The topic's working papers have no clauses yet.",
+	'Só o projeto do tópico, antes da votação, recebe correções de forma.':
+		"Only the topic's draft, before the vote, takes corrections of form.",
+	'O projeto do tópico não volta: rejeitado na votação, os working papers reabrem.':
+		"The topic's draft doesn't go back: if rejected in the vote, the working papers reopen.",
 	'Abst.': 'Abst.',
 	'Falta': 'Missing',
 };

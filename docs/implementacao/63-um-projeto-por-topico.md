@@ -90,13 +90,13 @@ No UFRGSMUN o caminho é outro. No UNOCT de 2026, a agenda do tópico A tinha tr
 ## Lotes
 
 1. **Banco:**
-   - os working papers por item, criados com a agenda;
-   - as propostas, as posições, a decisão de quem preside e o histórico;
-   - "Transformar em projeto" (a junção e as assinaturas) e o projeto fechado;
-   - o consenso primeiro na fase de ação;
-   - a conversa do bloco;
-   - a conversão dos dados existentes;
-   - os testes em pgTAP.
+   - **feito em 26/11/2026** (migração `20270102090000_working_paper_da_sala.sql`, pgTAP `63-working-paper-da-sala`):
+     - os working papers por item, criados com a agenda (e para as agendas já adotadas);
+     - as propostas (`proposta_alteracao` ganhou a ação, o bloco, o motivo e a data da decisão), as posições (`posicao_proposta`), a decisão de quem preside (`decidir_proposta`) e o histórico;
+     - "Transformar em projeto" (`transformar_em_projeto`: a junção e as assinaturas), o projeto fechado, as correções de forma da mesa (`corrigir_clausula`), o mínimo de assinaturas para ir à fase de ação (`aprovar_documento`) e a reabertura depois da rejeição;
+     - o consenso primeiro já existe no banco (`aprovar_por_consenso` ou `abrir_votacao_projeto`); falta a tela;
+   - falta: a conversa do bloco;
+   - fica para o lote 4: a conversão dos dados existentes, junto com a saída dos documentos por bloco.
 2. **A tela do working paper,** no modelo da agenda, no notebook e no celular.
 3. **Documentos, Blocos, Mensagens, Agora e a trilha.**
 4. **Saem as rodadas, o envio, os documentos por bloco e as emendas.** Atualizar as regras, o "Como funciona" e o roteiro do piloto; marcar o passo 49 e a parte B do 57 como absorvidos.

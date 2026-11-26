@@ -50,7 +50,7 @@
 	const souDo = (bloco: (typeof data.blocos)[number]) => bloco.membros.some((m) => m.delegacao?.id === eu?.delegacao_id);
 	const meuBloco = $derived(data.blocos.find(souDo)); // um bloco por vez (passo 62)
 	const meusBlocos = $derived(new Set(data.blocos.filter(souDo).map((b) => b.id)));
-	const outrosDocumentos = $derived(data.documentos.filter((d) => !meusBlocos.has(d.bloco_id)));
+	const outrosDocumentos = $derived(data.documentos.filter((d) => !d.bloco_id || !meusBlocos.has(d.bloco_id)));
 	const observadora = $derived(
 		data.blocos.flatMap((b) => b.membros).find((m) => m.delegacao?.id === eu?.delegacao_id)?.delegacao?.situacao ===
 			'observadora'
