@@ -4229,3 +4229,54 @@ dialog.ir-para {
 		animation: none;
 	}
 }
+
+/* Passo 63: o documento da sala. Cada cláusula com as propostas dela ao lado (no notebook)
+   ou embaixo (no celular); a cláusula em foco fica marcada. */
+.documento-sala {
+	max-width: none;
+}
+
+.clausula-sala {
+	display: grid;
+	gap: 0.25rem 1.5rem;
+	padding-block: 0.5rem;
+	border-bottom: 1px solid var(--cor-linha);
+}
+
+.clausula-sala-texto {
+	margin: 0;
+}
+
+.clausula-sala-texto .numero {
+	margin-right: 0.5rem;
+	font-weight: 600;
+}
+
+.clausula-sala > .acoes {
+	margin: 0;
+}
+
+.clausula-sala--foco {
+	background: var(--cor-marinho-suave);
+	box-shadow: -0.75rem 0 0 var(--cor-marinho-suave), 0.75rem 0 0 var(--cor-marinho-suave);
+}
+
+.propostas-sala {
+	margin: 0;
+}
+
+@media (min-width: 1024px) {
+	.clausula-sala:has(> .propostas-sala) {
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		grid-template-rows: auto 1fr;
+	}
+
+	.clausula-sala > .acoes {
+		align-self: start;
+	}
+
+	.clausula-sala > .propostas-sala {
+		grid-column: 2;
+		grid-row: 1 / span 2;
+	}
+}

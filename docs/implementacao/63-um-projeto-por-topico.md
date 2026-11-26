@@ -97,7 +97,12 @@ No UFRGSMUN o caminho é outro. No UNOCT de 2026, a agenda do tópico A tinha tr
      - o consenso primeiro já existe no banco (`aprovar_por_consenso` ou `abrir_votacao_projeto`); falta a tela;
    - **feito em 26/11/2026:** a conversa do bloco (migração `20270103090000_conversa_do_bloco.sql`, pgTAP `63-conversa-do-bloco`): a mensagem do tipo `bloco`, o canal `bloco:<id>` e a denúncia como nos bilhetes;
    - fica para o lote 4: a conversão dos dados existentes, junto com a saída dos documentos por bloco.
-2. **A tela do working paper,** no modelo da agenda, no notebook e no celular.
+2. **A tela do working paper,** no modelo da agenda, no notebook e no celular. **Feito em 26/11/2026** (`/documento/<id>/sala`; o link antigo `/documento/<id>` leva a ela quando o documento é da sala; teste `63-working-paper-da-sala`):
+   - o texto formatado, com as propostas ao lado de cada cláusula no notebook (embaixo no celular), a posição num toque, "Aceitar" e "Rejeitar" para quem preside (sem o sinal de consenso, pede confirmação) e os filtros "Todas", "Com consenso" e "Em debate";
+   - "Propor uma cláusula nova" e, em cada cláusula, mudar, incluir depois, mover ou retirar, só para quem pode propor;
+   - "Pôr em foco" para quem preside e a mesa; as assinaturas; o histórico das decididas; as abas com os documentos do tópico;
+   - para a mesa: "Transformar em projeto"; no projeto, "Corrigir" (correção de forma) e "Levar à fase de ação" com o mínimo de assinaturas;
+   - falta: os comentários por cláusula e a folha com a ação principal no celular (hoje a proposta fica embaixo da cláusula).
 3. **Documentos, Blocos, Mensagens, Agora e a trilha.**
 4. **Saem as rodadas, o envio, os documentos por bloco e as emendas.** Atualizar as regras, o "Como funciona" e o roteiro do piloto; marcar o passo 49 e a parte B do 57 como absorvidos.
 5. **Ponta a ponta:** um tópico inteiro com três blocos, da agenda à resolução e de volta depois de uma rejeição.

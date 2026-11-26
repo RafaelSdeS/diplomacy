@@ -1666,6 +1666,78 @@ export const EN: Record<string, string> = {
 	'Ler o briefing': 'Read the briefing',
 	'Ler o briefing: {titulo}': 'Read the briefing: {titulo}',
 	'Atingidas': 'Affected',
+	// Passo 63: a tela do documento da sala
+	'(cláusula retirada)': '(clause removed)',
+	'Com consenso': 'With consensus',
+	'Mudar para: "{texto}"': 'Change to: "{texto}"',
+	'Retirar a cláusula': 'Remove the clause',
+	'Mover para depois de "{outra}"': 'Move after "{outra}"',
+	'Mover para o começo': 'Move to the start',
+	'Incluir ({tipo}): "{texto}"': 'Add ({tipo}): "{texto}"',
+	'Proposta aceita: o texto mudou.': 'Proposal accepted: the text changed.',
+	'Proposta rejeitada.': 'Proposal rejected.',
+	'Proposta feita. A sala debate e marca a posição; quem preside decide.':
+		'Proposal made. The room debates and marks positions; the chair decides.',
+	'Correção salva.': 'Correction saved.',
+	'Aberto a propostas. Os redatores dos blocos (ou a delegação sem bloco) propõem; toda delegação marca a posição; quem preside a sessão aceita ou rejeita depois do debate.':
+		"Open to proposals. The blocs' drafters (or a delegation without a bloc) propose; every delegation marks its position; the chair accepts or rejects after the debate.",
+	'Este working paper virou o projeto do tópico e fica só para leitura.':
+		"This working paper became the topic's draft resolution and is read-only.",
+	'O texto está fechado: só a mesa faz correções de forma. Com {n} assinaturas, a mesa o leva à fase de ação.':
+		'The text is closed: only the dais makes corrections of form. With {n} signatures, the dais takes it to the action phase.',
+	'Aprovado: é a resolução do tópico.': "Approved: it is the topic's resolution.",
+	'Rejeitado na votação. Os working papers do tópico reabriram para propostas.':
+		"Rejected in the vote. The topic's working papers reopened for proposals.",
+	'Na fase de ação: a mesa pergunta se alguma delegação se opõe; com objeção, vai a voto.':
+		'In the action phase: the dais asks whether any delegation objects; with an objection, it goes to a vote.',
+	'Sua posição sobre: {proposta}': 'Your position on: {proposta}',
+	'Decidir: {proposta}': 'Decide: {proposta}',
+	'Aceitar sem o sinal de consenso?': 'Accept without the consensus signal?',
+	'Há delegação contra, ou o apoio não chega à metade. O consenso se forma no debate: aceite se a sala chegou a ele.':
+		'A delegation is against, or support is below half. Consensus forms in the debate: accept if the room reached it.',
+	'em foco': 'in focus',
+	'Propor uma mudança em "{trecho}"': 'Propose a change to "{trecho}"',
+	'Propor uma mudança nesta cláusula': 'Propose a change to this clause',
+	'A sala e o telão passam a debater esta cláusula.': 'The room and the big screen move on to this clause.',
+	'Só correções de forma: gramática e digitação.': 'Only corrections of form: grammar and typos.',
+	'Corrigir': 'Correct',
+	'Propostas para esta cláusula': 'Proposals for this clause',
+	'Documentos do tópico': "The topic's documents",
+	'Abrir o projeto do tópico': "Open the topic's draft resolution",
+	'Propor uma cláusula nova': 'Propose a new clause',
+	'Transformar em projeto': 'Turn into a draft resolution',
+	'Transformar os working papers do tópico {n} em projeto?': 'Turn the working papers of topic {n} into a draft resolution?',
+	'O app junta os working papers do tópico: primeiro os preâmbulos, depois as operativas, na ordem dos itens. As assinaturas passam junto, e as propostas ainda em debate ficam de fora.':
+		"The app merges the topic's working papers: preambular clauses first, then operative ones, in the order of the items. The signatures carry over, and proposals still in debate are left out.",
+	'Levar à fase de ação': 'Take to the action phase',
+	'Levar o projeto à fase de ação?': 'Take the draft resolution to the action phase?',
+	'As assinaturas deixam de mudar. Um signatário lê o projeto, e a mesa pergunta se alguma delegação se opõe.':
+		'The signatures stop changing. A signatory reads the draft, and the dais asks whether any delegation objects.',
+	'O projeto está na fase de ação.': 'The draft resolution is in the action phase.',
+	'Faltam assinaturas: {n} de {min}.': 'Signatures missing: {n} of {min}.',
+	'Mostrar as propostas': 'Show the proposals',
+	'Texto do documento': 'Document text',
+	'Nenhuma cláusula ainda. Os redatores propõem as primeiras.': 'No clauses yet. The drafters propose the first ones.',
+	'Nenhuma cláusula.': 'No clauses.',
+	'Cláusulas novas propostas': 'Proposed new clauses',
+	'Assinar mostra acordo com o texto. Quando o working paper vira projeto, as assinaturas passam junto (menos as das observadoras).':
+		"Signing shows agreement with the text. When the working paper becomes a draft resolution, the signatures carry over (except observers').",
+	'O projeto precisa de {n} assinaturas de delegações membros para ir à fase de ação.':
+		'The draft resolution needs {n} signatures from member delegations to go to the action phase.',
+	'Assinatura retirada.': 'Signature withdrawn.',
+	'Documento assinado.': 'Document signed.',
+	'Decididas ({n})': 'Decided ({n})',
+	'aceita': 'accepted',
+	'rejeitada': 'rejected',
+	'Proposta em "{trecho}"': 'Proposal on "{trecho}"',
+	'Em nome do bloco {nome}.': 'On behalf of the bloc {nome}.',
+	'Incluir uma cláusula depois desta': 'Add a clause after this one',
+	'Mudar de lugar': 'Move it',
+	'Retirar do texto': 'Remove from the text',
+	'Tipo da cláusula nova': 'Type of the new clause',
+	'Correção de forma': 'Correction of form',
+	'Só gramática e digitação: o conteúdo do projeto não muda.': "Only grammar and typos: the content of the draft doesn't change.",
+	'Salvar a correção': 'Save the correction',
 	// Passo 63: o working paper da sala e o projeto do tópico
 	'Só se propõe no working paper da sala.': "Proposals go only in the room's working paper.",
 	'Este working paper já virou projeto: as propostas estão fechadas.':

@@ -83,7 +83,8 @@ export const ISOLADOS = {
 	'56': 'CE-T',
 	'57': 'CE-T',
 	'58': 'CE-T',
-	'61': 'CE-T'
+	'61': 'CE-T',
+	'63': 'TREINO'
 } as const;
 
 /** O comitê do arquivo NN e as contas dele: `conta('mesa01@exemplo.test')` vira `mesa01+NN@…`. */

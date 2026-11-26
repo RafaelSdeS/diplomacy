@@ -1,4 +1,4 @@
-import { error } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import type { Regras } from '#lib/regras.ts';
 import { supabase } from '#lib/supabase.ts';
 import type { PageLoad } from './$types';
@@ -20,6 +20,8 @@ export const load: PageLoad = async ({ params, depends }) => {
 	if (documento.error) throw documento.error;
 	if (!documento.data) error(404, 'Documento não encontrado.');
 	const d = documento.data;
+	// Passo 63: o documento da sala (sem bloco dono) tem a tela dele.
+	if (!d.bloco) redirect(307, `/documento/${d.id}/sala`);
 
 	const [clausulas, propostas, comentarios, rodadas, assinaturas, reaberturas, redator, regras, outros, posicoes] = await Promise.all([
 		supabase.from('clausula').select('id, tipo, pai_id, ordem, texto, status, versao, origem_id').eq('documento_id', d.id).order('ordem'),
