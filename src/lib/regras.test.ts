@@ -15,7 +15,6 @@ const GUIA: Regras = {
 	assinaturas_emenda: 3,
 	assinaturas_desconfianca_fracao: [1, 5],
 	reabrir_clausula_min_delegacoes: 3,
-	dpos_publicos: false,
 	mesa_le_bilhetes: false,
 	press_revisao: false
 };
@@ -54,9 +53,9 @@ describe('regrasLegiveis', () => {
 	});
 
 	it('mostra a unanimidade e as opções ligadas', () => {
-		const r: Regras = { ...GUIA, votacao_substantiva: 'unanimidade', dpos_publicos: true, press_revisao: true };
+		const r: Regras = { ...GUIA, votacao_substantiva: 'unanimidade', press_revisao: true };
 		expect(texto(r, 'Votação substantiva')).toBe('unanimidade');
-		expect(texto(r, 'DPOs')).toBe('públicos para o comitê');
+		expect(texto(r, 'DPOs')).toBe('um PDF por tópico, aberto ao comitê');
 		expect(texto(r, 'Press')).toBe('notícias revisadas pela Diretoria da Press');
 	});
 

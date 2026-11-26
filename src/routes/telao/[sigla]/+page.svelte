@@ -15,6 +15,9 @@
 	import { segundosAtePrazo } from '#lib/crise.ts';
 	import { formatarTempo } from '#lib/cronometro.ts';
 	import SairDoTelao from '#lib/ui/SairDoTelao.svelte';
+	import { marcacaoParaHtml } from '#lib/marcacao.ts';
+	import { supabase } from '#lib/supabase.ts';
+	import { mensagemDeErro } from '#lib/sessao.ts';
 	import type { PageProps } from './$types';
 
 	// O telão roda no notebook do projetor, logado com a conta da mesa, sem botões:
@@ -76,6 +79,13 @@
 
 	// Passo 38: o cursor some com o mouse parado (SairDoTelao conta o tempo).
 	let mexendo = $state(false);
+
+	// Passo 58: quem opera o telão (a mesa) volta ao painel da sessão; a regra fica no banco.
+	let erroTelao = $state('');
+	async function voltarASessao() {
+		const { error } = await supabase.rpc('mostrar_documento_mesa_no_telao', { p_comite: data.comite.id });
+		erroTelao = error ? mensagemDeErro(error) : '';
+	}
 </script>
 
 <!-- Passo 54: o clique num botão (Sair do telão) não põe a tela cheia. -->
@@ -115,7 +125,7 @@
 				<span class="rotulo">{t('Presidência')}</span>
 				<span>{presidenciaEmVigor(data.fase, data.estado?.mesa_assumiu, sessao.presidencia?.nome)}</span>
 			{/if}
-			<AoVivo comiteId={data.comite.id} tabelas={[...TABELAS_SESSAO, 'atualizacao_comite', 'noticia']} bind:diferenca />
+			<AoVivo comiteId={data.comite.id} tabelas={[...TABELAS_SESSAO, 'atualizacao_comite', 'noticia', 'documento_mesa']} bind:diferenca />
 		</div>
 	</header>
 
@@ -146,6 +156,19 @@
 		<p class="telao-analise"><span class="rotulo">{t('Em análise')}</span> {descreverPonto(emAnalise)} · {emAnalise.delegacao?.nome}</p>
 	{/if}
 
+	{#if data.documento}
+		<!-- Passo 58: o documento da mesa no lugar do orador e da fila; a mesa rola aqui mesmo. -->
+		<article class="telao-documento" aria-labelledby="t-telao-documento">
+			<h2 id="t-telao-documento">{data.documento.titulo}</h2>
+			<div class="telao-documento-texto">{@html marcacaoParaHtml(data.documento.corpo)}</div>
+			{#if mexendo}
+				<p class="acoes">
+					<button class="botao" type="button" onclick={voltarASessao}>{t('Voltar à sessão')}</button>
+					{#if erroTelao}<span class="erro" role="alert">{erroTelao}</span>{/if}
+				</p>
+			{/if}
+		</article>
+	{:else}
 	<section class="telao-orador" aria-label={t('Com a palavra')}>
 		{#if data.estado?.orador}
 			<Bandeira codigo={data.estado.orador.bandeira} />
@@ -181,5 +204,6 @@
 				{/each}
 			</svelte:element>
 		</aside>
+	{/if}
 	{/if}
 </div>

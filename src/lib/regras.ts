@@ -14,7 +14,6 @@ export type Regras = {
 	assinaturas_emenda: number;
 	assinaturas_desconfianca_fracao: [number, number];
 	reabrir_clausula_min_delegacoes: number;
-	dpos_publicos: boolean;
 	mesa_le_bilhetes: boolean;
 	bilhetes_bloqueados?: boolean;
 	press_revisao: boolean;
@@ -78,7 +77,7 @@ function regrasEmIngles(r: Regras): RegraLegivel[] {
 		},
 		{ grupo: 'Documents', rotulo: 'Amendment', texto: `signed by ${pluralEn(r.assinaturas_emenda, 'delegation', 'delegations')}` },
 		{ grupo: 'Documents', rotulo: 'Reopen an agreed clause', texto: `requested by ${pluralEn(r.reabrir_clausula_min_delegacoes, 'delegation', 'delegations')}` },
-		{ grupo: 'Documents', rotulo: 'Position papers', texto: r.dpos_publicos ? 'open to the committee' : 'only the dais reads them' },
+		{ grupo: 'Documents', rotulo: 'Position papers', texto: 'a PDF per topic, open to the committee' },
 		{ grupo: 'Communication', rotulo: 'Pending crisis notes', texto: `up to ${pluralEn(r.limite_notas_pendentes, 'note', 'notes')} per delegation` },
 		{
 			grupo: 'Communication',
@@ -117,7 +116,7 @@ export function regrasLegiveis(r: Regras): RegraLegivel[] {
 		},
 		{ grupo: 'Documentos', rotulo: 'Emenda', texto: `assinada por ${plural(r.assinaturas_emenda, 'delegação', 'delegações')}` },
 		{ grupo: 'Documentos', rotulo: 'Reabrir cláusula acordada', texto: `pedido de ${plural(r.reabrir_clausula_min_delegacoes, 'delegação', 'delegações')}` },
-		{ grupo: 'Documentos', rotulo: 'DPOs', texto: r.dpos_publicos ? 'públicos para o comitê' : 'só a mesa lê' },
+		{ grupo: 'Documentos', rotulo: 'DPOs', texto: 'um PDF por tópico, aberto ao comitê' },
 		{ grupo: 'Comunicação', rotulo: 'Notas de crise pendentes', texto: `até ${plural(r.limite_notas_pendentes, 'nota', 'notas')} por delegação` },
 		{
 			grupo: 'Comunicação',

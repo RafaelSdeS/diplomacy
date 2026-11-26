@@ -2,7 +2,8 @@
 // Textos fictícios e plausíveis (posições de cada país no tema), sem pessoas reais.
 // Só dados: scripts/demonstracao.ts os grava pelas mesmas funções que o app usa.
 
-type Situacao = 'aprovado' | 'enviado' | 'pede_ajustes' | 'rascunho';
+// Passo 53: sem aprovação; a mesa só comenta.
+type Situacao = 'enviado' | 'comentado' | 'nao_enviado';
 export type Dpo = { texto: string; referencias: string[]; situacao: Situacao; comentario?: string };
 
 const REF_CARTA = 'Carta das Nações Unidas, capítulos VI e VII (1945)';
@@ -16,25 +17,25 @@ export const DPOS: Record<string, Dpo> = {
 		texto:
 			'A República Popular da China acompanha com atenção a situação no Sahel e reafirma o respeito à soberania e à integridade territorial dos Estados da região.\n\nA China entende que a segurança duradoura depende do desenvolvimento: infraestrutura, energia e emprego reduzem o espaço dos grupos armados. Soluções impostas de fora tendem a agravar as tensões.\n\nA delegação apoiará textos que reforcem a cooperação Sul-Sul, o diálogo com os governos de transição e o financiamento previsível de iniciativas africanas, sem condicionalidades políticas.',
 		referencias: [REF_CARTA, REF_2719],
-		situacao: 'aprovado'
+		situacao: 'enviado'
 	},
 	'Estados Unidos': {
 		texto:
 			'Os Estados Unidos expressam profunda preocupação com o aumento de ataques contra civis no Sahel central e com o avanço de grupos ligados ao Estado Islâmico e à Al-Qaeda.\n\nA delegação defende o acesso humanitário pleno, a responsabilização por violações de direitos humanos e o apoio a forças regionais que respeitem o direito internacional humanitário.\n\nOs Estados Unidos estão dispostos a apoiar um relatório do Secretário-Geral sobre opções de proteção de civis e a financiar a mediação local, desde que haja transparência no uso dos recursos.',
 		referencias: [REF_CARTA, REF_OCHA, REF_1325],
-		situacao: 'aprovado'
+		situacao: 'enviado'
 	},
 	França: {
 		texto:
 			'A República Francesa acompanha com grave preocupação a deterioração da segurança no Sahel central, onde os ataques contra civis e trabalhadores humanitários aumentaram de forma contínua.\n\nA França reconhece as críticas à sua presença militar passada na região e defende que qualquer nova presença tenha mandato claro deste Conselho, comando regional e prestação de contas periódica.\n\nA delegação propõe três linhas de ação: acesso humanitário seguro, uma presença regional de proteção de civis construída com a União Africana e o financiamento estável da mediação local.',
 		referencias: [REF_CARTA, REF_2719, REF_OCHA],
-		situacao: 'aprovado'
+		situacao: 'enviado'
 	},
 	'Reino Unido': {
 		texto:
 			'O Reino Unido considera a crise no Sahel uma das mais graves emergências de proteção de civis da atualidade, com milhões de deslocados e escolas fechadas.\n\nA delegação defende sanções direcionadas a quem ataca civis e comboios humanitários, e a ampliação do mandato de monitoramento de direitos humanos na região.\n\nO Reino Unido apoiará a participação efetiva de mulheres nos processos de paz e a criação de mecanismos de alerta precoce com as comunidades locais.',
 		referencias: [REF_1325, REF_OCHA],
-		situacao: 'aprovado'
+		situacao: 'enviado'
 	},
 	Rússia: {
 		texto:
@@ -46,19 +47,19 @@ export const DPOS: Record<string, Dpo> = {
 		texto:
 			'O Reino do Bahrein condena o terrorismo em todas as suas formas e expressa solidariedade aos povos do Sahel.\n\nA delegação defende o combate ao financiamento de grupos armados, inclusive por meio do tráfico de ouro e de pessoas, e a cooperação de inteligência entre Estados.\n\nO Bahrein apoiará textos que equilibrem segurança e assistência humanitária, com respeito à soberania dos Estados da região.',
 		referencias: [REF_CARTA],
-		situacao: 'aprovado'
+		situacao: 'enviado'
 	},
 	Colômbia: {
 		texto:
 			'A República da Colômbia traz ao debate sua experiência com processos de paz construídos a partir dos territórios.\n\nA delegação defende que a mediação local, a reintegração de ex-combatentes e a participação das vítimas sejam o centro de qualquer resposta do Conselho.\n\nA Colômbia apoiará o financiamento previsível de mecanismos de diálogo comunitário e a proteção de defensores de direitos humanos.',
 		referencias: [REF_1325],
-		situacao: 'aprovado'
+		situacao: 'enviado'
 	},
 	Dinamarca: {
 		texto:
 			'O Reino da Dinamarca, que preside o debate de hoje, considera urgente uma resposta coordenada entre segurança, desenvolvimento e ação humanitária no Sahel.\n\nA delegação defende o acesso humanitário desimpedido, a proteção de escolas e hospitais e o combate aos efeitos da mudança do clima sobre a disputa por terra e água.\n\nA Dinamarca coescreve com a França um projeto de resolução e convida todas as delegações a contribuir com o texto.',
 		referencias: [REF_OCHA, REF_1325],
-		situacao: 'aprovado'
+		situacao: 'enviado'
 	},
 	Grécia: {
 		texto:
@@ -70,14 +71,14 @@ export const DPOS: Record<string, Dpo> = {
 		texto:
 			'A República da Letônia reafirma seu compromisso com o direito internacional e com a proteção de civis em conflitos armados.\n\nA delegação chama atenção para a desinformação, que alimenta a violência contra comunidades e trabalhadores humanitários no Sahel.',
 		referencias: [REF_CARTA],
-		situacao: 'pede_ajustes',
+		situacao: 'comentado',
 		comentario: 'O DPO precisa de uma proposta concreta e de mais referências.'
 	},
 	Libéria: {
 		texto:
 			'A República da Libéria fala ao Conselho com a experiência de quem viveu a guerra e a reconstrução.\n\nA delegação defende que soluções africanas para problemas africanos tenham financiamento previsível, como prevê a resolução 2719, e que a reconciliação nacional caminhe junto com a segurança.\n\nA Libéria apoiará textos que fortaleçam a União Africana e a CEDEAO na mediação dos conflitos do Sahel.',
 		referencias: [REF_2719, REF_CARTA],
-		situacao: 'aprovado'
+		situacao: 'enviado'
 	},
 	Paquistão: {
 		texto:
@@ -89,19 +90,19 @@ export const DPOS: Record<string, Dpo> = {
 		texto:
 			'A República do Panamá defende o multilateralismo e a proteção de civis como prioridade deste Conselho.\n\nA delegação apoia o acesso humanitário seguro e a responsabilização por ataques a civis, e propõe atenção especial às crianças recrutadas por grupos armados.',
 		referencias: [REF_1325],
-		situacao: 'pede_ajustes',
+		situacao: 'comentado',
 		comentario: 'Falta a posição sobre uma presença regional de proteção de civis.'
 	},
 	'República Democrática do Congo': {
 		texto:
 			'A República Democrática do Congo conhece de perto o custo humano dos conflitos prolongados e das operações de paz que se arrastam sem estratégia de saída.\n\nA delegação defende que qualquer presença internacional no Sahel tenha prazos, metas e transferência gradual de responsabilidades às forças nacionais.\n\nA RDC apoiará textos que priorizem a proteção de mulheres e meninas e a reparação às vítimas.',
 		referencias: [REF_1325, REF_2719],
-		situacao: 'aprovado'
+		situacao: 'enviado'
 	},
 	Somália: {
 		texto: 'A República Federal da Somália (rascunho): experiência com a missão da União Africana; financiamento previsível; reconciliação local.',
 		referencias: [REF_2719],
-		situacao: 'rascunho'
+		situacao: 'nao_enviado'
 	}
 };
 
@@ -115,7 +116,7 @@ export const DPOS_T2: Record<string, Dpo> = {
 	China: {
 		texto: 'A China defende a segurança das rotas marítimas por meio do diálogo regional e da desescalada no Oriente Médio.',
 		referencias: ['Convenção das Nações Unidas sobre o Direito do Mar (1982)'],
-		situacao: 'rascunho'
+		situacao: 'nao_enviado'
 	},
 	Somália: {
 		texto: 'A Somália lembra que a pirataria no Golfo de Áden diminuiu com cooperação regional e apoio às guardas costeiras locais.',
@@ -125,7 +126,7 @@ export const DPOS_T2: Record<string, Dpo> = {
 	Paquistão: {
 		texto: 'O Paquistão defende escoltas coordenadas e a proteção dos marítimos de países em desenvolvimento.',
 		referencias: ['Convenção das Nações Unidas sobre o Direito do Mar (1982)'],
-		situacao: 'rascunho'
+		situacao: 'nao_enviado'
 	}
 };
 

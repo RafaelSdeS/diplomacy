@@ -5,7 +5,7 @@
 	import { untrack } from 'svelte';
 	import { goto, invalidate } from '$app/navigation';
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
-	import { t } from '#lib/i18n.svelte.ts';
+	import { idioma, t } from '#lib/i18n.svelte.ts';
 	import { formatarHora } from '#lib/cronograma.ts';
 	import { marcacaoParaHtml } from '#lib/marcacao.ts';
 	import { diferencaPorPalavra } from '#lib/diferenca.ts';
@@ -16,11 +16,37 @@
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import Modal from '#lib/ui/Modal.svelte';
 	import FileText from '@lucide/svelte/icons/file-text';
+	import Projector from '@lucide/svelte/icons/projector';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 	const sigla = $derived(data.comite.sigla);
 	const doc = $derived(data.documento);
+
+	// "Fulano está editando": quem abre a escrita se anuncia no canal do documento, que só a mesa
+	// ouve. Só avisa; a conferência da versão ao salvar é que impede perder texto.
+	const docId = $derived(data.documento.id);
+	const meuId = $derived(data.usuario?.id);
+	let editando = $state<string[]>([]);
+	$effect(() => {
+		if (!data.ehMesa || !meuId) return;
+		const id = meuId;
+		const canal = supabase.channel(`edicao:${docId}`, { config: { private: true, presence: { key: id } } });
+		canal
+			.on('presence', { event: 'sync' }, () => {
+				editando = Object.entries(canal.presenceState<{ nome: string }>())
+					.filter(([chave]) => chave !== id)
+					.map(([, [p]]) => p?.nome || t('Alguém da mesa'));
+			})
+			.subscribe((status) => {
+				if (status === 'SUBSCRIBED') void canal.track({ nome: untrack(() => data.nome) ?? '' });
+			});
+		return () => {
+			editando = [];
+			void supabase.removeChannel(canal);
+		};
+	});
+	const nomesEditando = $derived(new Intl.ListFormat(idioma.atual === 'en' ? 'en' : 'pt-BR', { type: 'conjunction' }).format(editando));
 
 	// Leitura: marca a publicação como lida; se mudar com a página aberta, avisa.
 	const versaoAoAbrir = untrack(() => data.documento.versao);
@@ -110,6 +136,14 @@
 		if (error) erro = mensagemDeErro(error);
 		await invalidate('app:documento-mesa');
 	}
+	// O telão projeta o documento publicado no lugar do painel, até "Voltar à sessão".
+	async function telao(mostrar: boolean) {
+		erro = mensagem = '';
+		const { error } = await supabase.rpc('mostrar_documento_mesa_no_telao', { p_comite: data.comite.id, p_documento: mostrar ? doc.id : undefined });
+		if (error) erro = mensagemDeErro(error);
+		else mensagem = mostrar ? t('O documento está no telão.') : t('O telão voltou à sessão.');
+		await invalidate('app:documento-mesa');
+	}
 	async function anexar(evento: Event) {
 		const entrada = evento.currentTarget as HTMLInputElement;
 		const arquivo = entrada.files?.[0];
@@ -166,6 +200,11 @@
 
 {#if data.ehMesa && data.rascunho}
 	{@render situacao()}
+	{#if editando.length}
+		<p class="telegrama" role="status">
+			{editando.length === 1 ? t('{nomes} também está editando este documento.', { nomes: nomesEditando }) : t('{nomes} também estão editando este documento.', { nomes: nomesEditando })}
+		</p>
+	{/if}
 	{#if conflito}
 		<section class="cartao cartao--destaque" aria-labelledby="t-conflito">
 			<h2 id="t-conflito">{t('{nome} salvou este documento às {hora}', { nome: conflito.autor, hora: conflito.hora })}</h2>
@@ -211,6 +250,11 @@
 		<h2 id="t-ajustes">{t('Ajustes')}</h2>
 		<div class="acoes">
 			<label class="opcao"><input type="checkbox" checked={doc.fixado} onchange={(e) => ajustar(e.currentTarget.checked, doc.arquivo)} /> {t('Fixar no topo')}</label>
+			{#if doc.versao}
+				<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => telao(!doc.no_telao)}
+					><Projector aria-hidden="true" size={16} strokeWidth={1.75} /> {doc.no_telao ? t('Voltar o telão à sessão') : t('Mostrar no telão')}</button
+				>
+			{/if}
 			<label class="botao botao--secundario botao--pequeno">
 				<FileText aria-hidden="true" size={16} strokeWidth={1.75} />
 				{doc.arquivo ? t('Trocar o PDF') : t('Anexar um PDF')}

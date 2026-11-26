@@ -17,28 +17,6 @@ const lista = (nomes: string[], idioma: string) =>
 
 type Comite = { nome_oficial: string; idioma: string; topicos: string[] };
 
-/**
- * DPO: nome oficial do país no topo, comitê, faixa com o tópico, texto em duas
- * colunas, referências numeradas e a assinatura da delegação.
- */
-export function modeloDpo(
-	dpo: { topico: number; texto: string; referencias: string[] },
-	delegacao: { nome_oficial: string; bandeira: string | null },
-	comite: Comite
-) {
-	return {
-		pais: delegacao.nome_oficial,
-		bandeira: delegacao.bandeira,
-		titulo: EN(comite.idioma) ? 'Position Paper' : 'Documento de Posição Oficial',
-		comite: comite.nome_oficial,
-		topico: `${EN(comite.idioma) ? 'Topic' : 'Tópico'} ${dpo.topico}: ${comite.topicos[dpo.topico - 1] ?? ''}`.trim(),
-		paragrafos: paragrafos(dpo.texto),
-		referencias: dpo.referencias.map((texto, i) => ({ numero: i + 1, texto })),
-		rotuloReferencias: EN(comite.idioma) ? 'References' : 'Referências',
-		assinatura: EN(comite.idioma) ? `Delegation of ${delegacao.nome_oficial}` : `Delegação de ${delegacao.nome_oficial}`
-	};
-}
-
 /** Carta: cabeçalho do remetente, destinatários, corpo e assinatura. */
 export function modeloCarta(
 	carta: { titulo: string; corpo: string; publica: boolean },
@@ -68,8 +46,10 @@ const situacao = (rotulo: string, selo: string) => ({
 	selo
 });
 export const STATUS_DPO: Record<string, { rotulo: string; selo: string }> = {
+	enviado: situacao('Enviado', 'selo--ok'),
+	retirado: situacao('Retirado pela mesa', 'selo--alerta'),
+	// Os de antes do passo 53, quando a mesa aprovava um texto escrito no app.
 	rascunho: situacao('Rascunho', ''),
-	enviado: situacao('Enviado à mesa', 'selo--info'),
-	aprovado: situacao('Aprovado', 'selo--ok'),
+	aprovado: situacao('Enviado', 'selo--ok'),
 	pede_ajustes: situacao('A mesa pede ajustes', 'selo--alerta')
 };

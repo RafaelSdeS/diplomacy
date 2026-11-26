@@ -1,6 +1,7 @@
 import { expect, test, type Browser, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { contaDaDelegacao, isolado } from '../scripts/delegacoes.ts';
+import { pdfDeTexto } from '../scripts/demonstracao/pdf.ts';
 import { adotarAgenda, clienteComo, CONTAS, entrar, abrirAcao } from './ajuda.ts';
 
 // Passo 39: a cópia do CSNU-T só deste arquivo (scripts/delegacoes.ts).
@@ -10,7 +11,7 @@ const DPO = `/comite/${C.sigla}/dpo`;
 const CARTAS = `/comite/${C.sigla}/cartas`;
 const CARTA = `Proposta de cooperação ${Date.now()}`;
 
-// O DPO dos EUA passa da delegação para a mesa e para a impressão: roda em série, num projeto só.
+// O DPO dos EUA passa da delegação para o comitê e para a mesa: roda em série, num projeto só.
 test.describe.configure({ mode: 'serial' });
 test.beforeEach(({}, info) => {
 	test.skip(info.project.name !== 'notebook', 'o fluxo de impressão roda num projeto só');
@@ -31,82 +32,59 @@ async function semErrosDeAcessibilidade(page: Page) {
 	expect(violations).toEqual([]);
 }
 
-let dpo = '';
 let projeto = '';
 
-test('o DPO escrito no celular vai à mesa, que pede ajustes e depois aprova', async ({ browser }) => {
-	// Uma execução anterior deixa o DPO dos EUA enviado ou aprovado: a mesa devolve para ajuste.
-	const eua = await clienteComo(C.conta(CONTAS.delegado));
-	const anterior = (
-		await eua.from('dpo').select('id, status, delegacao!inner(nome)').eq('topico', 1).eq('delegacao.nome', 'EUA').maybeSingle()
-	).data;
-	if (anterior && (anterior.status === 'enviado' || anterior.status === 'aprovado')) {
-		const mesa = await clienteComo(C.conta(CONTAS.mesa));
-		expect((await mesa.rpc('avaliar_dpo', { p_dpo: anterior.id, p_status: 'pede_ajustes', p_comentario: 'De novo.' })).error).toBeNull();
-	}
+// Passo 53: o DPO é um PDF que a delegação envia e o comitê lê na hora, sem aprovação.
+test('o DPO em PDF: enviado no celular, lido por outra delegação, trocado, comentado e retirado pela mesa', async ({ browser }) => {
+	const celular = await abrir(browser, C.conta(CONTAS.delegado), DPO, { width: 390, height: 844 });
+	const meu = celular.getByRole('region', { name: /^Tópico 1:/ });
+	const arquivo = meu.getByLabel(/^(Enviar|Trocar) o PDF: Tópico 1$/);
 
-	const celular = await abrir(browser, C.conta(CONTAS.delegado), DPO, { width: 360, height: 740 });
-	await expect(celular.locator('[data-ao-vivo="sim"]')).toBeVisible({ timeout: 10_000 });
-	// Passo 51: o cartão do tópico mostra a situação; escrever abre o modal, com a prévia ao lado.
-	const topico = celular.getByRole('region', { name: /^Tópico 1:/ });
-	const escrita = celular.getByRole('dialog', { name: /^DPO · Tópico 1/ });
-	await topico.getByRole('button', { name: /^(Escrever|Continuar)$/ }).click();
-	await escrita.getByLabel(/^Texto/).fill(
-		'Os Estados Unidos condenam os ataques no Mar Vermelho.\n\nPropomos uma força naval conjunta.'
-	);
-	await expect(escrita).toContainText('Propomos uma força naval conjunta.');
-	await escrita.getByLabel(/^Referências/).fill('Resolução 2722 (2024)\nCarta das Nações Unidas');
-	await escrita.getByRole('button', { name: 'Salvar rascunho' }).click();
-	await expect(escrita.getByRole('status')).toHaveText('DPO salvo.');
-	await escrita.getByRole('button', { name: 'Enviar à mesa' }).click();
-	await expect(escrita).toBeHidden();
-	await expect(celular.getByRole('status')).toHaveText('DPO enviado à mesa.');
-	await expect(topico.getByRole('button', { name: /^(Escrever|Continuar)$/ })).toHaveCount(0);
+	// Recusado com mensagem clara: o que não é PDF e o que passa de 5 MB.
+	await arquivo.setInputFiles({ name: 'dpo.txt', mimeType: 'text/plain', buffer: Buffer.from('texto') });
+	await expect(celular.getByRole('alert')).toHaveText('O DPO precisa ser um arquivo PDF.');
+	await arquivo.setInputFiles({ name: 'grande.pdf', mimeType: 'application/pdf', buffer: Buffer.alloc(5 * 1024 * 1024 + 1) });
+	await expect(celular.getByRole('alert')).toContainText('passa de 5 MB');
 
+	await arquivo.setInputFiles({ name: 'dpo.pdf', mimeType: 'application/pdf', buffer: pdfDeTexto('DPO · EUA', 'Primeiro parágrafo.') });
+	await expect(celular.getByRole('status')).toHaveText('DPO enviado. O comitê já pode ler.');
+	await expect(meu.getByText('Enviado', { exact: true })).toBeVisible();
+
+	// Outra delegação do comitê lê o arquivo na hora, sem aprovação.
+	const brasil = await abrir(browser, C.conta(contaDaDelegacao('Brasil')), DPO);
+	const link = brasil.getByRole('link', { name: 'Abrir o PDF: DPO de EUA, Tópico 1' });
+	const href = (await link.getAttribute('href'))!;
+	const pdf = await brasil.request.get(href);
+	expect(pdf.ok()).toBe(true);
+	expect(pdf.headers()['content-type']).toBe('application/pdf');
+
+	// Enviar de novo troca o arquivo e guarda a data do envio anterior.
+	await meu.getByLabel('Trocar o PDF: Tópico 1').setInputFiles({ name: 'dpo.pdf', mimeType: 'application/pdf', buffer: pdfDeTexto('DPO · EUA', 'Versão nova.') });
+	await expect(celular.getByRole('status')).toHaveText('DPO enviado. O comitê já pode ler.');
+	await expect(meu.getByText('Envios anteriores:')).toBeVisible();
+
+	// A mesa comenta (só a delegação lê) e retira o arquivo, com o motivo.
 	const mesa = await abrir(browser, C.conta(CONTAS.mesa), DPO);
-	await mesa.getByRole('button', { name: 'Avaliar o DPO de EUA, tópico 1' }).click();
-	await mesa.getByRole('button', { name: 'Pedir ajustes' }).click();
-	await expect(mesa.getByRole('alert')).toHaveText('Diga o que precisa ser ajustado.');
-	await mesa.getByLabel('Comentário para a delegação').fill('Cite a fonte da força naval.');
-	await mesa.getByRole('button', { name: 'Pedir ajustes' }).click();
-	await expect(mesa.getByRole('status')).toHaveText('Ajustes pedidos.');
+	await mesa.getByRole('button', { name: 'Comentar: DPO de EUA, Tópico 1' }).click();
+	const comentar = mesa.getByRole('dialog', { name: /^Comentar: DPO de EUA/ });
+	await comentar.getByLabel('Comentário para a delegação').fill('Cite as fontes do segundo parágrafo.');
+	await comentar.getByRole('button', { name: 'Salvar' }).click();
+	await expect(mesa.getByRole('status')).toHaveText('Comentário salvo. Só a delegação lê.');
+	await expect(meu.getByRole('note', { name: 'Comentário da mesa' })).toHaveText('Cite as fontes do segundo parágrafo.');
 
-	// No celular, o comentário da mesa chega sem recarregar, e o texto volta a ser editável.
-	await expect(topico.getByRole('note', { name: 'Comentário da mesa' })).toHaveText('Cite a fonte da força naval.', {
-		timeout: 10_000
-	});
-	await topico.getByRole('button', { name: 'Continuar' }).click();
-	await escrita.getByLabel(/^Referências/).fill('Resolução 2722 (2024)\nCarta das Nações Unidas\nRelatório do Secretário-Geral');
-	await escrita.getByRole('button', { name: 'Enviar à mesa' }).click();
-	await expect(celular.getByRole('status')).toHaveText('DPO enviado à mesa.');
+	await mesa.getByRole('button', { name: 'Retirar: DPO de EUA, Tópico 1' }).click();
+	const retirar = mesa.getByRole('dialog', { name: /^Retirar: DPO de EUA/ });
+	await retirar.getByRole('button', { name: 'Retirar o arquivo' }).click();
+	await expect(retirar.getByRole('alert')).toHaveText('Diga por que o DPO foi retirado.');
+	await retirar.getByLabel('Motivo').fill('O arquivo é de outro comitê.');
+	await retirar.getByRole('button', { name: 'Retirar o arquivo' }).click();
+	await expect(mesa.getByRole('status')).toContainText('DPO retirado.');
 
-	await mesa.getByRole('button', { name: 'Avaliar o DPO de EUA, tópico 1' }).click();
-	await mesa.getByRole('button', { name: 'Aprovar' }).click();
-	await expect(mesa.getByRole('status')).toHaveText('DPO aprovado.');
-	await expect(topico.getByText('Aprovado', { exact: true })).toBeVisible({ timeout: 10_000 });
-
-	dpo = await topico.getByRole('link', { name: 'Imprimir ou salvar como PDF' }).getAttribute('href').then((h) => h!);
-	await Promise.all([celular, mesa].map((p) => p.context().close()));
-});
-
-test('o DPO impresso tem bandeira, nome oficial, tópico, duas colunas e referências', async ({ page }) => {
-	await entrar(page, C.conta(CONTAS.delegado));
-	await page.goto(dpo);
-	const folha = page.getByRole('article', { name: 'DPO para impressão' });
-	await expect(folha.getByRole('heading', { level: 1 })).toHaveText('United States of America');
-	await expect(folha).toContainText('Documento de Posição Oficial');
-	await expect(folha).toContainText('Tópico 1:');
-	await expect(folha.locator('.dpo-texto p')).toHaveCount(2);
-	await expect(folha.locator('.dpo-texto')).toHaveCSS('column-count', '2');
-	await expect(folha.getByRole('region', { name: 'Referências' }).getByRole('listitem')).toHaveCount(3);
-	await expect(folha).toContainText('Delegação de United States of America');
-	// Sem a moldura do app, e o botão some na impressão.
-	await expect(page.getByRole('navigation', { name: 'Principal' })).toHaveCount(0);
-	await page.emulateMedia({ media: 'print' });
-	await expect(page.getByRole('button', { name: 'Imprimir ou salvar como PDF' })).toBeHidden();
-	const pdf = await page.pdf({ format: 'A4' });
-	expect(pdf.byteLength).toBeGreaterThan(1000);
-	if (process.env.CAPTURAS) await expect(page).toHaveScreenshot('dpo-impresso.png', { fullPage: true });
+	await expect(meu.getByText('Retirado pela mesa')).toBeVisible();
+	await expect(meu.getByRole('note', { name: 'Comentário da mesa' })).toHaveText('O arquivo é de outro comitê.');
+	await expect(link).toBeHidden();
+	expect((await brasil.request.get(href)).ok()).toBe(false);
+	await Promise.all([celular, brasil, mesa].map((p) => p.context().close()));
 });
 
 test('o projeto impresso tem a linha do comitê e os signatários', async ({ page }) => {
@@ -185,7 +163,7 @@ for (const tema of ['light', 'dark'] as const) {
 	test(`as telas de DPO, cartas e impressão não têm erros de acessibilidade (tema ${tema})`, async ({ page }) => {
 		await page.emulateMedia({ colorScheme: tema });
 		await entrar(page, C.conta(CONTAS.delegado));
-		for (const rota of [DPO, CARTAS, dpo, `/imprimir/documento/${projeto}`]) {
+		for (const rota of [DPO, CARTAS, `/imprimir/documento/${projeto}`]) {
 			await page.goto(rota);
 			await expect(page.locator('main h1')).toBeVisible();
 			await semErrosDeAcessibilidade(page);

@@ -36,14 +36,14 @@
 	const meusDpos = $derived(data.dpos.filter((d) => d.delegacao?.id === data.minha));
 	const dosMeusBlocos = $derived(data.documentos.filter((d) => data.meusBlocos.includes(d.bloco_id)));
 	const paraAvaliar = $derived(
-		data.ehMesa ? data.dpos.filter((d) => d.status === 'enviado').length + data.documentos.filter((d) => d.status === 'enviado').length : 0
+		data.ehMesa ? data.documentos.filter((d) => d.status === 'enviado').length : 0
 	);
 	// O que espera a delegação: o DPO por fazer, a rodada aberta e a assinatura que falta.
 	const dposPorFazer = $derived(
 		data.minha
 			? data.comite.topicos
 					.map((_, i) => ({ topico: i + 1, dpo: meusDpos.find((d) => d.topico === i + 1) }))
-					.filter(({ dpo }) => !dpo || dpo.status === 'rascunho' || dpo.status === 'pede_ajustes')
+					.filter(({ dpo }) => dpo?.status !== 'enviado' && dpo?.status !== 'aprovado')
 			: []
 	);
 	const emRodada = $derived(dosMeusBlocos.filter((d) => rodadaAte.has(d.id)));
@@ -51,7 +51,8 @@
 		dosMeusBlocos.filter((d) => d.status === 'rascunho' && !rodadaAte.has(d.id) && !d.assinaturas.some((a) => a.delegacao?.id === data.minha))
 	);
 	const nadaParaVoce = $derived(!paraAvaliar && !dposPorFazer.length && !emRodada.length && !semMinhaAssinatura.length);
-	const dposVisiveis = $derived(data.dpos.filter((d) => d.status !== 'rascunho'));
+	// Passo 53: enviado, o DPO é do comitê.
+	const dposVisiveis = $derived(data.dpos.filter((d) => d.status === 'enviado' || d.status === 'aprovado'));
 
 	// As listas de cada etapa, por tópico, num modal.
 	type Etapa = 'working_paper' | 'projeto' | 'resolucao';
@@ -88,7 +89,7 @@
 	// Passo 51: as ações da área em cartões, como na aba Comitê.
 	const atalhos = $derived(
 		[
-			{ href: `/comite/${sigla}/dpo`, rotulo: t('DPO'), descricao: data.ehMesa ? t('Ler e avaliar os DPOs') : t('Escrever e enviar o seu DPO'), icone: ScrollText },
+			{ href: `/comite/${sigla}/dpo`, rotulo: t('DPO'), descricao: data.minha ? t('Enviar o seu DPO e ler os do comitê') : t('Ler os DPOs do comitê'), icone: ScrollText },
 			{ href: `/comite/${sigla}/blocos`, rotulo: t('Blocos'), descricao: t('Formar blocos e escrever documentos'), icone: Users },
 			{ href: `/comite/${sigla}/cartas`, rotulo: t('Cartas'), descricao: t('Ler e escrever cartas diplomáticas'), icone: Mail },
 			data.minha ? { href: `/comite/${sigla}/caderno`, rotulo: t('Caderno'), descricao: t('Suas anotações sobre as outras delegações e o debate'), icone: NotebookPen } : null
@@ -237,12 +238,6 @@
 <Modal bind:this={modalAvaliar} nome={t('Para avaliar')} classe="modal-acao">
 	<h3>{t('Para avaliar')}</h3>
 	<ul class="lista">
-		{#each data.dpos.filter((d) => d.status === 'enviado') as dpo (dpo.id)}
-			<li>
-				<span>{t('DPO')} · <NomeDelegacao {sigla} delegacao={dpo.delegacao} /> · {t('Tópico')} {dpo.topico}</span>
-				<a class="botao botao--secundario botao--pequeno" href={`/comite/${sigla}/dpo`}>{t('Ler e avaliar')}</a>
-			</li>
-		{/each}
 		{#each data.documentos.filter((d) => d.status === 'enviado') as d (d.id)}
 			<li>
 				<span>{nomeDoDocumento(d)} <span class="detalhe">{d.bloco?.nome}</span></span>

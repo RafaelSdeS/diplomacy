@@ -12,6 +12,7 @@ import { randomUUID } from 'node:crypto';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { conectarAdmin, criarContas, SENHA, tipoDoItem, usuariosPorEmail, verificar } from './admin.ts';
 import { bioFicticia, COM_DOIS_DELEGADOS, COMITES, CRONOGRAMA, EVENTO, nomeFicticio, type Comite } from './demonstracao/dados.ts';
+import { pdfDeTexto } from './demonstracao/pdf.ts';
 import { BLOCOS, CARTAS, CRISE, DPOS, DPOS_T2, NOTICIAS, PROJETO_A, PROJETO_B, WORKING_PAPERS, type Dpo } from './demonstracao/csnu.ts';
 
 const inicio = Date.now();
@@ -173,13 +174,22 @@ async function chamar<T = unknown>(cliente: SupabaseClient, funcao: string, args
 	return data as T;
 }
 
+// Passo 53: o DPO é um PDF na pasta da delegação; enviar registra o arquivo.
+async function enviarDpo(cliente: SupabaseClient, comite: string, delegacao: string, topico: number, titulo: string, texto: string) {
+	const { error } = await cliente.storage
+		.from('dpos')
+		.upload(`${comite}/${delegacao}/${topico}.pdf`, pdfDeTexto(titulo, texto), { upsert: true, contentType: 'application/pdf' });
+	if (error) throw new Error(`DPO: ${error.message}`);
+	return chamar<string>(cliente, 'enviar_dpo', { p_comite: comite, p_topico: topico });
+}
+
 async function conteudo(c: Comite) {
 	const ids = idsDe.get(c.sigla)!;
 	const en = c.idioma === 'en';
 	const tx = (pt: string, ingles: string) => (en ? ingles : pt);
 	// Só delegações membros escrevem os documentos de exemplo; o índice dá a conta.
 	const membros = c.delegacoes.flatMap((d, i) => (situacaoDe(d) === 'membro' ? [{ nome: d[0], id: ids.delegacoes.get(d[0])!, conta: email(c.sigla, doisDigitos(i)) }] : []));
-	const [abre, a, b, d3] = membros;
+	const [abre, a, b] = membros;
 	const topico = c.topicos[0];
 	const mesa = await como(email(c.sigla, 'mesa1'));
 
@@ -187,19 +197,18 @@ async function conteudo(c: Comite) {
 	const cb = await como(b.conta);
 	// Passo 43: o CSNU tem conteúdo completo e realista (scripts/demonstracao/csnu.ts).
 	if (c.sigla !== 'CSNU') {
-		// DPOs: um aprovado, um enviado e um rascunho.
+		// DPOs: dois enviados (um com comentário da mesa) e um por enviar.
 		const dpos: string[] = [];
-		for (const [k, m] of [a, b, d3].entries()) {
+		for (const m of [a, b]) {
 			const cliente = await como(m.conta);
 			const texto = tx(
 				`A delegação de ${m.nome} acompanha com preocupação "${topico}".\n\nDefendemos soluções construídas em conjunto, com respeito à soberania dos Estados e ao direito internacional.\n\nPropomos cooperação regional, troca de informações e apoio às populações afetadas.`,
 				`The delegation of ${m.nome} follows "${topico}" with concern.\n\nWe support jointly built solutions that respect the sovereignty of States and international law.\n\nWe propose regional cooperation, information sharing and support for affected populations.`
 			);
-			const id = await chamar<string>(cliente, 'salvar_dpo', { p_comite: ids.comite, p_topico: 1, p_texto: texto, p_referencias: ['Carta das Nações Unidas (1945)'] });
-			if (k < 2) await chamar(cliente, 'enviar_dpo', { p_dpo: id });
-			dpos.push(id);
+			const titulo = tx(`Documento de Posição Oficial · ${m.nome}`, `Position Paper · ${m.nome}`);
+			dpos.push(await enviarDpo(cliente, ids.comite, m.id, 1, titulo, `${texto}\n\n${tx('Referências', 'References')}\n1. Carta das Nações Unidas (1945)`));
 		}
-		await chamar(mesa, 'avaliar_dpo', { p_dpo: dpos[0], p_status: 'aprovado', p_comentario: tx('Bem fundamentado.', 'Well argued.') });
+		await chamar(mesa, 'comentar_dpo', { p_dpo: dpos[0], p_texto: tx('Bem fundamentado.', 'Well argued.') });
 
 		// Cartas: uma pública e uma privada.
 		await chamar(ca, 'enviar_carta', {
@@ -332,11 +341,10 @@ async function csnuCompleto(c: Comite, ids: { comite: string; veiculo: string; d
 	for (const [topico, dpos] of [[1, DPOS], [2, DPOS_T2]] as [number, Record<string, Dpo>][]) {
 		for (const [nome, dpo] of Object.entries(dpos)) {
 			const cliente = await de(nome);
-			const dpoId = await chamar<string>(cliente, 'salvar_dpo', { p_comite: ids.comite, p_topico: topico, p_texto: dpo.texto, p_referencias: dpo.referencias });
-			if (dpo.situacao === 'rascunho') continue;
-			await chamar(cliente, 'enviar_dpo', { p_dpo: dpoId });
-			if (dpo.situacao === 'aprovado') await chamar(mesa, 'avaliar_dpo', { p_dpo: dpoId, p_status: 'aprovado' });
-			if (dpo.situacao === 'pede_ajustes') await chamar(mesa, 'avaliar_dpo', { p_dpo: dpoId, p_status: 'pede_ajustes', p_comentario: dpo.comentario });
+			if (dpo.situacao === 'nao_enviado') continue;
+			const referencias = dpo.referencias.map((r, i) => `${i + 1}. ${r}`).join('\n');
+			const dpoId = await enviarDpo(cliente, ids.comite, id(nome), topico, `Documento de Posição Oficial · ${nome}`, `${dpo.texto}\n\nReferências\n${referencias}`);
+			if (dpo.situacao === 'comentado') await chamar(mesa, 'comentar_dpo', { p_dpo: dpoId, p_texto: dpo.comentario });
 		}
 	}
 

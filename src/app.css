@@ -1318,6 +1318,30 @@ kbd {
 	min-height: 0;
 }
 
+/* Passo 58: o documento da mesa ocupa o lugar do orador e da fila, em letra de projetor. */
+.telao-documento {
+	grid-row: orador;
+	grid-column: orador-start / fila-end;
+	min-height: 0;
+	overflow-y: auto;
+	font-size: clamp(1.25rem, 2.2vw, 2.25rem);
+	line-height: 1.45;
+}
+
+.telao-documento :is(h1, h2, h3, h4, a) {
+	color: var(--cor-texto);
+}
+
+.telao-documento h2 {
+	margin: 0 0 1vh;
+	font-family: var(--fonte-titulo);
+	font-size: clamp(2rem, 3.5vw, 4rem);
+}
+
+.telao-documento-texto {
+	max-width: 70ch;
+}
+
 .telao-orador .bandeira {
 	width: min(22vw, 30vh);
 	border-color: var(--cor-linha);
@@ -1699,7 +1723,7 @@ dialog.modal-acao {
 
 /* Passo 56: a largura de cada tipo de modal vale; o max-width de 28rem dos diálogos é só o
    padrão (antes, ele apertava estes em 28rem). */
-dialog:is(.modal-acao, .modal-dpo, .modal-painel, .modal-largo) {
+dialog:is(.modal-acao, .modal-painel, .modal-largo) {
 	max-width: calc(100vw - 2rem);
 }
 
@@ -2032,11 +2056,7 @@ dialog.escolha-modal {
 	gap: 0.5rem;
 }
 
-/* Passo 51: a aba do DPO, com a escrita num modal largo e a prévia ao lado. */
-dialog.modal-dpo {
-	width: min(72rem, calc(100vw - 2rem));
-}
-
+/* Passo 51: a escrita com a prévia ao lado (hoje, a dos documentos da mesa). */
 .dpo-escrita {
 	display: grid;
 	gap: 1rem;
@@ -2458,28 +2478,6 @@ dialog.modal-dpo {
 	color: #666666;
 }
 
-.dpo-cabecalho {
-	display: grid;
-	justify-items: center;
-	gap: 0.25rem;
-	text-align: center;
-}
-
-.dpo-cabecalho .bandeira {
-	width: 28mm;
-}
-
-.dpo-cabecalho h1 {
-	margin: 0.25rem 0 0;
-	font-size: 1.6rem;
-}
-
-.dpo-titulo {
-	margin: 0;
-	font-variant-caps: all-small-caps;
-	letter-spacing: 0.08em;
-}
-
 /* Faixa do tópico (passo 42): fios marinho e dourado em vez de fundo chapado, para gastar
    menos tinta e sair bem em preto e branco. */
 .faixa {
@@ -2491,27 +2489,6 @@ dialog.modal-dpo {
 	color: #071d41;
 	font-family: var(--fonte-titulo);
 	font-weight: 600;
-}
-
-.dpo-texto {
-	column-count: 2;
-	column-gap: 8mm;
-	text-align: justify;
-	hyphens: auto;
-}
-
-.dpo-texto p {
-	margin: 0 0 0.75rem;
-	break-inside: avoid-column;
-}
-
-.referencias {
-	margin-top: 1rem;
-	font-size: 0.85rem;
-}
-
-.referencias h2 {
-	font-size: 1rem;
 }
 
 .assinatura {
@@ -2549,10 +2526,6 @@ dialog.modal-dpo {
 	.a4 {
 		min-height: 0;
 		padding: 1.25rem;
-	}
-
-	.dpo-texto {
-		column-count: 1;
 	}
 }
 

@@ -85,8 +85,9 @@
 	);
 	// Tecnologia restrita: durante a sessão, a mesa opera o app (a placa fica com ela).
 	const restrita = $derived(!!data.aoVivo?.restrita && !!estado);
-	// Passo 43: os DPOs que ainda pedem algo da delegação (rascunho ou ajustes da mesa).
-	const dposPendentes = $derived(data.dpos.filter((d) => d.status === 'rascunho' || d.status === 'pede_ajustes'));
+	// Passo 43: os DPOs que ainda pedem algo da delegação (um texto antigo não enviado ou um arquivo
+	// que a mesa retirou). Passo 53: a mesa não avalia DPO, só lê.
+	const dposPendentes = $derived(data.dpos.filter((d) => d.status === 'rascunho' || d.status === 'pede_ajustes' || d.status === 'retirado'));
 	const paraJulgar = $derived(
 		(sessao?.pontos ?? []).filter((p) => p.status === 'aberto' && p.aprovado_bureau == null).length
 	);
@@ -101,7 +102,7 @@
 		!data.rodadas.length && !data.pedidosEntrevista.length && !data.chamadaColetiva && !dposPendentes.length && !data.bilhetes.length && !meusPontos && !ausente
 	);
 	// A mesa: três ações, e o que espera por ela em cada uma.
-	const documentosEnviados = $derived((data.mesa?.dpos ?? 0) + (data.mesa?.documentos ?? 0));
+	const documentosEnviados = $derived(data.mesa?.documentos ?? 0);
 </script>
 
 <svelte:head>

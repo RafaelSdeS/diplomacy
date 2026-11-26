@@ -1,7 +1,7 @@
 -- Passo 10: DPO e cartas diplomáticas.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(17);
+select plan(23);
 
 -- Cenário: C1 com d1..d4; a1..a4 delegados; a5 mesa. Bloco B com d1 e d2.
 insert into public.evento (id, nome, ano) values ('00000000-0000-0000-0000-0000000000e1', 'Evento 1', 2027);
@@ -33,49 +33,63 @@ create temp table ids (nome text primary key, id uuid);
 grant all on ids to authenticated;
 create function pg_temp.id(p_nome text) returns uuid language sql as $$ select id from ids where nome = p_nome $$;
 
--- DPO
+-- DPO (passo 53): um PDF por tópico, aberto ao comitê assim que chega. a6 é de outro comitê.
+
+insert into public.comite (id, evento_id, sigla, nome, nome_oficial, topicos) values
+	('00000000-0000-0000-0000-0000000000c2', '00000000-0000-0000-0000-0000000000e1', 'C2', 'C2', 'O Comitê 2', array['T1']);
+insert into public.delegacao (id, comite_id, nome, nome_oficial) values
+	('00000000-0000-0000-0000-0000000000d9', '00000000-0000-0000-0000-0000000000c2', 'D9', 'Delegação 9');
+insert into auth.users (id, email, raw_user_meta_data) values
+	('00000000-0000-0000-0000-0000000000a6', 'a6@exemplo.test', '{"nome": "A6"}');
+insert into public.participacao (pessoa_id, evento_id, papel, comite_id, delegacao_id) values
+	('00000000-0000-0000-0000-0000000000a6', '00000000-0000-0000-0000-0000000000e1', 'delegado',
+	'00000000-0000-0000-0000-0000000000c2', '00000000-0000-0000-0000-0000000000d9');
 
 select pg_temp.entrar(1);
-insert into ids values ('dpo', public.salvar_dpo('00000000-0000-0000-0000-0000000000c1', 1,
-	'Primeiro parágrafo.' || chr(10) || chr(10) || 'Segundo parágrafo.', array['Resolução 2178 (2014)', '  ', 'Carta da ONU']));
-select results_eq($$select referencias from public.dpo$$, $$values (array['Resolução 2178 (2014)', 'Carta da ONU'])$$,
-	'referências vazias são descartadas');
-select throws_ok($$select public.salvar_dpo('00000000-0000-0000-0000-0000000000c1', 3, 'x', '{}')$$,
+select throws_ok($$select public.enviar_dpo('00000000-0000-0000-0000-0000000000c1', 1)$$,
+	'22023', null, 'sem o PDF no Storage, não há envio');
+select throws_ok($$insert into storage.objects (bucket_id, name) values
+	('dpos', '00000000-0000-0000-0000-0000000000c1/00000000-0000-0000-0000-0000000000d2/1.pdf')$$,
+	'42501', null, 'a delegação não sobe arquivo na pasta de outra');
+insert into storage.objects (bucket_id, name) values
+	('dpos', '00000000-0000-0000-0000-0000000000c1/00000000-0000-0000-0000-0000000000d1/1.pdf');
+select throws_ok($$select public.enviar_dpo('00000000-0000-0000-0000-0000000000c1', 3)$$,
 	'22023', null, 'o DPO é de um tópico do comitê');
-select public.enviar_dpo(pg_temp.id('dpo'));
-select throws_ok($$select public.salvar_dpo('00000000-0000-0000-0000-0000000000c1', 1, 'mudança', '{}')$$,
-	'P0001', null, 'enviado, o DPO não muda');
-select throws_ok($$select public.avaliar_dpo(pg_temp.id('dpo'), 'aprovado')$$,
-	'42501', null, 'a delegação não aprova o próprio DPO');
+insert into ids values ('dpo', public.enviar_dpo('00000000-0000-0000-0000-0000000000c1', 1));
+select results_eq($$select arquivo, status, cardinality(envios) from public.dpo$$,
+	$$values ('00000000-0000-0000-0000-0000000000c1/00000000-0000-0000-0000-0000000000d1/1.pdf', 'enviado', 1)$$,
+	'o envio aponta para o arquivo');
+select public.enviar_dpo('00000000-0000-0000-0000-0000000000c1', 1);
+select results_eq($$select cardinality(envios) from public.dpo$$, array[2], 'enviar de novo troca o arquivo e guarda a data');
 
 select pg_temp.entrar(2);
-select is_empty($$select 1 from public.dpo$$, 'outra delegação não vê o DPO enviado');
-select throws_ok($$select public.avaliar_dpo(pg_temp.id('dpo'), 'aprovado')$$,
-	'42501', null, 'só a mesa muda a situação de um DPO');
+select results_eq($$select count(*)::int from public.dpo$$, array[1], 'outra delegação do comitê lê o DPO enviado, sem aprovação');
+select isnt_empty($$select 1 from storage.objects where bucket_id = 'dpos'$$, 'e lê o arquivo');
+select throws_ok($$select public.comentar_dpo(pg_temp.id('dpo'), 'x')$$, '42501', null, 'só a mesa comenta');
+
+select pg_temp.entrar(6);
+select is_empty($$select 1 from public.dpo$$, 'quem é de outro comitê não lê o DPO');
+select is_empty($$select 1 from storage.objects where bucket_id = 'dpos'$$, 'nem o arquivo');
 
 select pg_temp.entrar(5);
-select results_eq($$select count(*)::int from public.dpo$$, array[1], 'a mesa vê o DPO');
-select throws_ok($$select public.avaliar_dpo(pg_temp.id('dpo'), 'pede_ajustes', '')$$,
-	'22023', null, 'pedir ajustes exige um comentário');
-select public.avaliar_dpo(pg_temp.id('dpo'), 'pede_ajustes', 'Cite a fonte do segundo parágrafo.');
+select public.comentar_dpo(pg_temp.id('dpo'), 'Cite as fontes.');
+select pg_temp.entrar(2);
+select is_empty($$select 1 from public.dpo_comentario$$, 'o comentário da mesa é só para a delegação');
 select pg_temp.entrar(1);
-select lives_ok($$select public.salvar_dpo('00000000-0000-0000-0000-0000000000c1', 1, 'Texto ajustado.', array['Carta da ONU'])$$,
-	'com pedido de ajuste, o DPO volta a ser editável');
-select public.enviar_dpo(pg_temp.id('dpo'));
-select pg_temp.entrar(5);
-select public.avaliar_dpo(pg_temp.id('dpo'), 'aprovado');
+select results_eq($$select texto from public.dpo_comentario$$, array['Cite as fontes.'], 'a delegação lê o comentário');
 
-select pg_temp.entrar(2);
-select is_empty($$select 1 from public.dpo$$, 'aprovado, o DPO continua fechado enquanto a mesa não abre os DPOs');
-reset role;
-update public.comite set regras = '{"dpos_publicos": true}' where id = '00000000-0000-0000-0000-0000000000c1';
-select pg_temp.entrar(2);
-select results_eq($$select texto from public.dpo$$, array['Texto ajustado.'],
-	'com os DPOs abertos pela mesa, as outras delegações leem os aprovados');
 select pg_temp.entrar(5);
-select public.avaliar_dpo(pg_temp.id('dpo'), 'pede_ajustes', 'Reconsideramos: falta a conclusão.');
+select throws_ok($$select public.retirar_dpo(pg_temp.id('dpo'), ' ')$$, '22023', null, 'retirar exige o motivo');
+select results_eq($$select public.retirar_dpo(pg_temp.id('dpo'), 'Arquivo de outro comitê.')$$,
+	array['00000000-0000-0000-0000-0000000000c1/00000000-0000-0000-0000-0000000000d1/1.pdf'], 'a mesa retira o arquivo indevido');
+reset role;
+select results_eq($$select acao from public.registro where alvo = pg_temp.id('dpo')$$, array['retirar_dpo'], 'a retirada fica no registro');
 select pg_temp.entrar(2);
-select is_empty($$select 1 from public.dpo$$, 'a mesa reconsidera um DPO aprovado, que deixa de ficar aberto');
+select is_empty($$select 1 from public.dpo$$, 'retirado, o DPO sai do comitê');
+select is_empty($$select 1 from storage.objects where bucket_id = 'dpos'$$, 'e o arquivo também, mesmo antes de ser apagado');
+select pg_temp.entrar(1);
+select public.enviar_dpo('00000000-0000-0000-0000-0000000000c1', 1);
+select is_empty($$select 1 from public.dpo_comentario$$, 'enviar de novo responde ao comentário da mesa, que sai');
 
 -- Cartas
 

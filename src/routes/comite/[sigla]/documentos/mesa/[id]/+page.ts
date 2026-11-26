@@ -9,7 +9,7 @@ export const load: PageLoad = async ({ params, parent, depends }) => {
 	const { comite, participacoes } = await parent();
 	const ehMesa = participacoes.some((p) => p.papel === 'mesa' && p.comite_id === comite.id);
 	const [documento, versoes, rascunho] = await Promise.all([
-		supabase.from('documento_mesa').select('id, titulo, corpo, arquivo, fixado, versao, publicado_em').eq('id', params.id).maybeSingle(),
+		supabase.from('documento_mesa').select('id, titulo, corpo, arquivo, fixado, versao, publicado_em, no_telao').eq('id', params.id).maybeSingle(),
 		supabase.from('documento_mesa_versao').select('numero, titulo, corpo').eq('documento_id', params.id).order('numero', { ascending: false }).limit(2),
 		ehMesa
 			? supabase.from('documento_mesa_rascunho').select('titulo, corpo, versao, atualizado_em, autor:pessoa(nome)').eq('documento_id', params.id).maybeSingle()

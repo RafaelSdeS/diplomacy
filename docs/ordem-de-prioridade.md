@@ -1,6 +1,6 @@
 # Ordem de prioridade dos próximos planos
 
-**Atualizado:** 24 de novembro de 2026
+**Atualizado:** 26 de novembro de 2026
 
 Este documento consolida os planos discutidos e define uma ordem para o trabalho futuro. Cada plano virou um passo do [plano de implementação](implementacao/README.md) (passos 44 a 51; os passos 52 a 58 vieram de pedidos depois de usar o app), com esforço e dependências.
 
@@ -36,9 +36,9 @@ A sequência de execução tem o **piloto depois da interface**. Os passos 44, 4
 | 12 | [59](implementacao/59-presidencia-e-sessao.md) | Uma presidência só, numa tela só, e a sessão na ordem certa (**pronto**) | M | O uso de 25/11 mostrou a mesa presidindo junto com a delegação, a presidência passando a qualquer hora, as placas como fila e o ponto ou moção escondido; o roteiro passa por tudo isso | Bureau preside só a plenária, a fase de ação e casos excepcionais; no debate, só bureau; presidência muda só no fim da sessão ou na não-confiança, pulando a ausente; quem preside vota no painel; placas sem ordem, próximos com ordem; ponto ou moção em cima |
 | 13 | [61](implementacao/61-saber-onde-estou.md) | Saber onde estou e o que chegou (**pronto**) | M | Mesmo quem conhece as regras se perdeu na plenária, não viu bilhete chegar e achou que o documento assinado sumiu | Linha do comitê desde a plenária, com "Agora/Depois" por papel; "Como funciona"; contagem e aviso de bilhetes; "Seus documentos" |
 | 14 | [60](implementacao/60-agenda-do-bureau.md) | A agenda parte do documento do bureau (**pronto**) | M–G | O roteiro começa pela agenda, e o bureau já chega com ela pronta | Agenda do bureau cadastrada antes e liberada no dia; uma agenda por tópico, alterada como um working paper (por item, com posição e comentários), aceita pela presidência e adotada pela sala |
-| 15 | [58](implementacao/58-documentos-da-mesa.md) | Documentos da mesa para o comitê (**pronto em parte**, 25/11/2026: falta o telão) | M | Pedido novo; o piloto manda o guia por fora, e pode subir se a mesa do piloto pedir | Texto e PDF publicados ao vivo, versão conferida ao salvar, "o que mudou", telão |
+| 15 | [58](implementacao/58-documentos-da-mesa.md) | Documentos da mesa para o comitê (**pronto**; o telão e o "está editando" em 26/11/2026) | M | Pedido novo; o piloto manda o guia por fora, e pode subir se a mesa do piloto pedir | Texto e PDF publicados ao vivo, versão conferida ao salvar, "o que mudou", telão |
 | — | [12](implementacao/12-teste-do-piloto.md) | **Sessão de teste do piloto** ([piloto.md](piloto.md)) | — | Valida o app já com a interface limpa, antes de construir mais | Roteiro, questionário e plano B em papel |
-| 16 | [53](implementacao/53-dpo-como-arquivo.md) | DPO como arquivo público | M | O DPO é preparado antes do evento e é público; hoje o app o escreve num editor e esconde por regra | PDF por tópico, aberto ao comitê, sem aprovação; prévia; editor e impressão saem |
+| 16 | [53](implementacao/53-dpo-como-arquivo.md) | DPO como arquivo público (**pronto**, 26/11/2026, antes do piloto, a pedido) | M | O DPO é preparado antes do evento e é público; hoje o app o escreve num editor e esconde por regra | PDF por tópico, aberto ao comitê, sem aprovação; prévia; editor e impressão saem |
 | 17 | [48](implementacao/48-demonstracao-online.md) | Demonstração online com acesso rápido por papel | M | Depende da segurança, da coletiva e dos modais; mostra o app inteiro por papel | Projeto separado, um comitê completo, `/demo` por papel e reinício |
 | 18 | [49](implementacao/49-edicao-por-clausula.md) e [57](implementacao/57-escrita-de-documentos.md) **parte B** | Edição colaborativa por cláusula | G | Resolve o problema central de documentos sem discussões infinitas, **se o piloto confirmar**; a parte A do 57 já o diminui | Proposta estruturada, rodada com prazo, comparação e fusão básica |
 | 19 | [50](implementacao/50-preparacao-da-fala.md) | Preparação de discursos e notas | M | Permite acompanhar outras delegações enquanto prepara a próxima fala, **se o piloto confirmar** | Captura rápida por tipo, painel curto da delegação e rascunho da fala |
@@ -52,8 +52,9 @@ A sessão do piloto ([piloto.md](piloto.md), passo 12) não está registrada com
 
 - **Feito:** 44, 45 parte A, 46 e 47, o que o roteiro exercita (sessão, notas, aparelho compartilhado), o que não pode vazar e a base dos modais.
 - **Antes do piloto:** 52 (testes rápidos) e os lotes 0, 1 e 2 do 51 (feitos); depois, 54 (correções do uso de 24/11), 55 (países clicáveis), 56 (ordem do tópico, Agenda e Documentos) e a parte A do 57 (escrita de documentos), as telas que o roteiro mais usa (feitos em 25/11/2026). Do uso de 25/11/2026, como mesa, presidência e delegação, saíram o 59 (uma presidência só, numa tela só), o 61 (saber onde estou e o que chegou) e o 60 (agenda do bureau), também antes do piloto: mesmo quem conhece as regras se perdeu.
-- **Feitos antes do piloto, em 25/11/2026, a pedido:** o lote 3 do 51 (mensagens como conversa) e o 58 (documentos da mesa), menos o telão e o "está editando".
-- **Depois do piloto:** 53 (DPO como arquivo) e 48 têm requisitos claros (a 45 parte B já foi feita) e entram em seguida, ajustados ao que a sessão mostrar. A coletiva completa e a demonstração não fazem parte do roteiro do piloto.
+- **Feitos antes do piloto, em 25/11/2026, a pedido:** o lote 3 do 51 (mensagens como conversa) e o 58 (documentos da mesa); o telão e o "está editando" do 58 vieram em 26/11/2026.
+- **Feito antes do piloto, em 26/11/2026, a pedido:** o 53 (DPO como arquivo).
+- **Depois do piloto:** o 48 tem requisitos claros (a 45 parte B já foi feita) e entram em seguida, ajustados ao que a sessão mostrar. A coletiva completa e a demonstração não fazem parte do roteiro do piloto.
 - **Só com dor confirmada:** **os passos 49 e 50 só começam depois que o questionário do piloto responder às perguntas deles** (a rodada de propostas deu conta? o que faltou ao preparar a fala?). Se o piloto não mostrar dor, os dois ficam para depois do evento. O que o passo 46 já entrega (nota e próxima fala visíveis) pode bastar.
 - Os demais lotes do 51 entram aos poucos, o ano todo.
 
@@ -339,9 +340,8 @@ Mensagens como conversa (51, lote 3) e documentos da mesa (58)            (feito
 PILOTO (passo 12) ── mostra o que ajustar e o que vale construir
 
 DEPOIS DO PILOTO
-Documentos da mesa (58): falta "Mostrar no telão" e o "está editando"
 
-DPO como arquivo público (53)
+DPO como arquivo público (53)                                              (feito)
   └─ depende do DPO (10), do Storage (44) e da prévia (47)
 
 Demonstração (48)
@@ -390,7 +390,7 @@ Do passo 47 (feito): modal base; saída com confirmação e `Confirmar`; fichas 
 2. a linha do comitê desde a plenária, "Como funciona", o aviso de bilhetes e "Seus documentos" (61);
 3. a agenda do bureau, liberada no dia e alterada por consenso, como um working paper (60);
 4. as mensagens como conversa, em duas colunas, com quem escreveu e a sessão de cada mensagem (51, lote 3);
-5. os documentos da mesa, com rascunho, publicação, alterações e conflito entre duas pessoas da mesa (58; o telão e o "está editando" ficam para depois).
+5. os documentos da mesa, com rascunho, publicação, alterações e conflito entre duas pessoas da mesa (58; o telão e o "está editando" vieram em 26/11/2026).
 
 ### Piloto (passo 12)
 
@@ -398,7 +398,7 @@ Roteiro de [piloto.md](piloto.md), com a troca de conta no mesmo aparelho. A col
 
 ### Lote C — depois do piloto (passos 53 e 48)
 
-1. DPO como arquivo público;
+1. DPO como arquivo público (feito em 26/11/2026, antes do piloto);
 2. demonstração: ambiente separado, um comitê completo, contas por papel e roteiro manual.
 
 ### Lote D — produtividade (depois do piloto)
@@ -438,8 +438,8 @@ O [plano completo](plano-do-app.pdf) (seção 17) prevê validação de dezembro
 
 Proposta de encaixe, a confirmar quando a data sair:
 
-- **antes da sessão do piloto:** lote A e lote B (feitos) e lote B2 (passos 54, 55, 56 e a parte A do 57);
-- **depois da sessão do piloto:** lote C (passos 58, 53 e 48), ajustado ao que a sessão mostrar, e em seguida o lote D (passos 49 e 50), só com o que o questionário confirmar;
+- **antes da sessão do piloto:** lotes A, B, B2 e B3 (feitos) e, a pedido, o 53;
+- **depois da sessão do piloto:** o 48, ajustado ao que a sessão mostrar, e em seguida o lote D (passos 49 e 50), só com o que o questionário confirmar;
 - **lote E (demais lotes do passo 51):** em lotes pequenos, o ano todo, e congelado antes do ensaio de outubro.
 
 Para cada passo o esforço (P, M ou G) está na tabela; a duração em semanas depende de quanto tempo por semana a pessoa do projeto tem, e isso o documento não sabe.

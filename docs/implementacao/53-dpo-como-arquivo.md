@@ -3,6 +3,7 @@
 **Parte de:** pedido de 24/11/2026 ("o DPO é um arquivo público preparado de antemão")
 **Depende de:** 10 (DPO no app), 44 (cache e arquivos), 47 (prévia)
 **Esforço:** M
+**Situação:** pronto (26/11/2026), antes do piloto, a pedido.
 **Quando:** depois do piloto, antes da demonstração (48), para que ela já mostre o fluxo certo. O piloto usa um cenário fictício e não precisa de DPO.
 **Objetivo:** o DPO volta a ser o que é num MUN: um documento que a delegação prepara antes do evento, entrega como arquivo e fica aberto ao comitê.
 
@@ -39,9 +40,24 @@
 
 Modelo de DPO para baixar, contagem de palavras e verificação de formatação.
 
+## Feito (26/11/2026)
+
+- **Banco** (`20261229090000_dpo_como_arquivo.sql`): o DPO ganhou `arquivo`, `envios` (a data de cada envio) e `retirado_em`. O bucket `dpos` aceita só PDF de até 5 MB, em `<comitê>/<delegação>/<tópico>.pdf`. Só a própria delegação sobe e troca o arquivo. Lê quem pode ver o DPO, e a mesa lê todos (apagar exige ler).
+- **Sem aprovação:** saíram `salvar_dpo`, `avaliar_dpo` e o `enviar_dpo` antigo. O novo `enviar_dpo(comitê, tópico)` registra o arquivo que já subiu. Enviado, o DPO é do comitê, e a regra `dpos_publicos` deixou de valer.
+- **A mesa:** `comentar_dpo` grava um comentário numa tabela à parte (`dpo_comentario`), que só a delegação e a mesa leem. `retirar_dpo` pede o motivo, que vira o comentário e fica no `registro`. Depois a tela apaga o arquivo do Storage. Um envio novo apaga o comentário, como no passo 10.
+- **A aba DPO:** "Meu DPO" vem primeiro, com um cartão por tópico, a situação, "enviado em", o selo "depois do prazo", os envios anteriores e os botões "Enviar o PDF" ou "Trocar o PDF". Depois vem "DPOs do comitê", em cartões com bandeira e tópico, "Abrir o PDF" e, para a mesa, "Comentar" e "Retirar". O prazo é o fim do item do cronograma com "DPO" no título.
+- **A prévia:** abre o PDF numa aba nova. A CSP do app (`object-src 'none'`) não deixa embutir.
+- **Saíram:** o editor de texto, a tela `/imprimir/dpo` e o "Para avaliar" de DPOs, tanto na Agora da mesa quanto em Documentos.
+- **A demonstração** gera os PDFs a partir dos textos (`scripts/demonstracao/pdf.ts`, sem dependência nova).
+
+**Diferente do plano:**
+- Os textos escritos no app antes do passo **não viram PDF**. Continuam legíveis como texto, com "Ler o texto". Até aqui só há dados de teste, e gerar PDF numa migração SQL não é possível.
+- A lista de DPOs **não entrou na aba Comitê**. Ela fica na aba DPO e em Documentos, e a aba Comitê segue só com atalhos.
+- "Meu DPO" fica **acima** da lista do comitê, porque a ação principal da delegação precisa ficar à vista sem rolar.
+
 ## Testes
 
-- [ ] pgTAP: só a própria delegação envia ou troca o arquivo, e quem está no comitê lê. Quem é de outro comitê não lê.
-- [ ] Ponta a ponta: enviar um PDF, vê-lo na prévia de outra delegação, trocar o arquivo e ver a data nova.
-- [ ] Ponta a ponta: um arquivo que não é PDF, ou maior que 5 MB, é recusado com mensagem clara.
-- [ ] A migração converte um rascunho de texto em PDF e não perde nenhum DPO.
+- [x] pgTAP: só a própria delegação envia ou troca o arquivo, e quem está no comitê lê. Quem é de outro comitê não lê.
+- [x] Ponta a ponta: enviar um PDF, outra delegação abri-lo, trocar o arquivo e ver a data anterior; a mesa comenta e retira.
+- [x] Ponta a ponta: um arquivo que não é PDF, ou maior que 5 MB, é recusado com mensagem clara.
+- [x] A migração não perde nenhum DPO: os textos antigos ficam legíveis, e o comentário da mesa passa para `dpo_comentario`.

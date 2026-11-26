@@ -66,12 +66,12 @@ Cada passo só começa quando os passos de que ele depende estão prontos. As re
 | [50](50-preparacao-da-fala.md) | Preparação de discursos durante o debate (depois da validação do piloto) | 34, 46 |
 | [51](51-melhorias-gerais-de-interface.md) | Melhorias gerais de interface, por tela: ações em botões e modais, presidência e Agora sem rolagem (antes do piloto), troca de redator, estados, densidade e preferências | 47, 52 |
 | [52](52-testes-do-dia-a-dia.md) | Testes rápidos no dia a dia: só os testes da tela mexida, sem build à toa, sem espera fixa, capturas de uma tela | 39 |
-| [53](53-dpo-como-arquivo.md) | DPO como arquivo público: PDF por tópico, aberto ao comitê, sem aprovação | 10, 44, 47 |
+| [53](53-dpo-como-arquivo.md) | DPO como arquivo público: PDF por tópico, aberto ao comitê, sem aprovação (**pronto**) | 10, 44, 47 |
 | [54](54-correcoes-do-uso-de-24-11.md) | Correções do uso de 24/11: papéis somados (secretaria e mesa), modais no centro, sair do telão, lista de oradores junto de quem fala, página "Sobre" com créditos e LGPD | 51 |
 | [55](55-paises-clicaveis.md) | Todo país abre a sua ficha, sempre com as minhas anotações sobre ele (da delegação ou da mesa) | 47, 51, 54 |
 | [56](56-ordem-do-topico.md) | A ordem do tópico (agenda, working papers, projeto, resolução) à vista; aba Agenda sem sintaxe; aba Documentos pela ordem, sem rolar | 09, 22, 51, 54, 55 |
 | [57](57-escrita-de-documentos.md) | Escrever documentos sem atrito: o documento formatado editado no lugar, assinaturas no topo, posição num toque e comentários na cláusula | 09, 47, 55, 56 |
-| [58](58-documentos-da-mesa.md) | Documentos da mesa para o comitê: texto e PDF, publicados ao vivo, com o que mudou (**pronto**, menos o telão e o "está editando") | 44, 47, 53, 56 |
+| [58](58-documentos-da-mesa.md) | Documentos da mesa para o comitê: texto e PDF, publicados ao vivo, com o que mudou (**pronto**, menos a lista na aba Comitê) | 44, 47, 53, 56 |
 | [59](59-presidencia-e-sessao.md) | Uma presidência só, numa tela só: o bureau só na plenária, na fase de ação e em casos excepcionais, presidência muda só no fim da sessão ou na não-confiança, placas sem ordem, ponto ou moção em cima | 29, 30, 43, 46, 51, 54 |
 | [60](60-agenda-do-bureau.md) | A agenda parte do documento do bureau, liberada no dia: uma agenda por tópico, alterada como um working paper e adotada pela sala | 22, 56, 57 |
 | [61](61-saber-onde-estou.md) | Saber onde estou e o que chegou: linha do comitê desde a plenária, "Como funciona", aviso de bilhetes, "Seus documentos" | 51, 55, 56, 59 |

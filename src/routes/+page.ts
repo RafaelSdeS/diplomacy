@@ -92,14 +92,11 @@ export const load: PageLoad = async ({ parent, depends }) => {
 			? ler('rodadas', ['rodada'], () => supabase.from('rodada').select('fim, documento!inner(id, titulo)').order('fim', { ascending: false }).limit(10))
 			: { data: [], error: null },
 		papel === 'mesa' && minha?.comite_id
-			? Promise.all([
-					contar(ler('dpos-enviados', ['dpo'], () => supabase.from('dpo').select('id', { count: 'exact', head: true }).eq('comite_id', minha.comite_id!).eq('status', 'enviado'))),
-					contar(
-						ler('documentos-enviados', ['documento'], () =>
-							supabase.from('documento').select('id', { count: 'exact', head: true }).eq('comite_id', minha.comite_id!).eq('status', 'enviado')
-						)
+			? contar(
+					ler('documentos-enviados', ['documento'], () =>
+						supabase.from('documento').select('id', { count: 'exact', head: true }).eq('comite_id', minha.comite_id!).eq('status', 'enviado')
 					)
-				]).then(([dpos, documentos]) => ({ dpos, documentos }))
+				).then((documentos) => ({ documentos }))
 			: null,
 		papel === 'crise' && minha?.comite_id
 			? contar(

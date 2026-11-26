@@ -1583,6 +1583,46 @@ export const EN: Record<string, string> = {
 	'Ver alterações': 'See changes',
 	'Outra pessoa da mesa salvou este documento antes.': 'Someone else on the dais saved this document first.',
 	'O PDF fica na pasta do comitê, com o nome do documento.': "The PDF goes in the committee's folder, named after the document.",
+	// Passo 53: DPO como arquivo
+	'Enviado': 'Sent',
+	'Retirado pela mesa': 'Withdrawn by the dais',
+	'O DPO é um arquivo PDF. Abra para ler.': 'The position paper is a PDF file. Open it to read.',
+	'Enviar o seu DPO e ler os do comitê': "Send your position paper and read the committee's",
+	'Ler os DPOs do comitê': "Read the committee's position papers",
+	'O DPO precisa ser um arquivo PDF.': 'The position paper must be a PDF file.',
+	'O PDF passa de 5 MB. Diminua o arquivo e envie de novo.': 'The PDF is over 5 MB. Make the file smaller and send it again.',
+	'DPO enviado. O comitê já pode ler.': 'Position paper sent. The committee can read it now.',
+	'Comentário salvo. Só a delegação lê.': 'Comment saved. Only the delegation reads it.',
+	'Comentário apagado.': 'Comment deleted.',
+	'DPO retirado. A delegação vê o motivo e pode enviar de novo.': 'Position paper withdrawn. The delegation sees the reason and can send it again.',
+	'Cada delegação envia um PDF por tópico, de até 5 MB. Assim que chega, o comitê inteiro pode ler.':
+		'Each delegation sends one PDF per topic, up to 5 MB. As soon as it arrives, the whole committee can read it.',
+	'Prazo:': 'Deadline:',
+	'Não enviado': 'Not sent',
+	'depois do prazo': 'after the deadline',
+	'Envios anteriores:': 'Earlier submissions:',
+	'Há um texto escrito no app antes de o DPO virar arquivo. Envie o PDF para o comitê ler.':
+		'There is a text written in the app before position papers became files. Send the PDF for the committee to read.',
+	'Enviar o PDF': 'Send the PDF',
+	'Ler o texto': 'Read the text',
+	'Ver o comentário': 'See the comment',
+	'Só a delegação lê o comentário. Deixe vazio para apagar.': 'Only the delegation reads the comment. Leave it empty to delete it.',
+	'O arquivo sai do comitê e fica no registro da mesa. A delegação vê o motivo e pode enviar outro.':
+		"The file leaves the committee and stays in the dais's log. The delegation sees the reason and can send another.",
+	'Motivo': 'Reason',
+	'Retirar o arquivo': 'Withdraw the file',
+	'Envie o PDF primeiro.': 'Upload the PDF first.',
+	'Diga por que o DPO foi retirado.': 'Say why the position paper was withdrawn.',
+	// Passo 58: documento da mesa no telão
+	'Voltar à sessão': 'Back to the session',
+	'O documento está no telão.': 'The document is on the big screen.',
+	'O telão voltou à sessão.': 'The big screen is back to the session.',
+	'Voltar o telão à sessão': 'Return the big screen to the session',
+	'Mostrar no telão': 'Show on the big screen',
+	'Publique o documento antes de mostrá-lo no telão.': 'Publish the document before showing it on the big screen.',
+	'Alguém da mesa': 'Someone on the dais',
+	'{nomes} também está editando este documento.': '{nomes} is also editing this document.',
+	'{nomes} também estão editando este documento.': '{nomes} are also editing this document.',
 };
 
 /** Mensagens do banco com partes variáveis: [padrão em português, tradução]. */

@@ -16,24 +16,34 @@
 		quando?: string;
 		selo?: { rotulo: string; selo: string };
 		texto: string;
-		href: string;
-		link: string;
+		href?: string;
+		link?: string;
+		externo?: boolean;
 	};
 
 	async function carregar(tipo: TipoPrevia, id: string): Promise<Conteudo | null> {
 		if (tipo === 'dpo') {
-			const { data, error } = await supabase.from('dpo').select('topico, texto, status, delegacao(nome)').eq('id', id).maybeSingle();
+			const { data, error } = await supabase
+				.from('dpo')
+				.select('topico, texto, status, arquivo, enviado_em, delegacao(nome)')
+				.eq('id', id)
+				.maybeSingle();
 			if (error) throw error;
-			return (
-				data && {
-					rotulo: `${t('DPO')} · ${t('Tópico')} ${data.topico}`,
-					titulo: t('DPO de {delegacao}', { delegacao: data.delegacao?.nome ?? '' }),
-					selo: STATUS_DPO[data.status],
-					texto: data.texto,
-					href: `/imprimir/dpo/${id}`,
-					link: t('Imprimir ou salvar como PDF')
-				}
-			);
+			if (!data) return null;
+			// Passo 53: o DPO é um PDF, que abre numa aba (a CSP não deixa embutir). Os textos de antes
+			// do passo 53 aparecem como texto.
+			const pdf = data.arquivo ? await supabase.storage.from('dpos').createSignedUrl(data.arquivo, 3600) : null;
+			if (pdf?.error) throw pdf.error;
+			return {
+				rotulo: `${t('DPO')} · ${t('Tópico')} ${data.topico}`,
+				titulo: t('DPO de {delegacao}', { delegacao: data.delegacao?.nome ?? '' }),
+				selo: STATUS_DPO[data.status],
+				quando: data.enviado_em ?? undefined,
+				texto: pdf ? t('O DPO é um arquivo PDF. Abra para ler.') : data.texto,
+				href: pdf?.data.signedUrl,
+				link: t('Abrir o PDF'),
+				externo: true
+			};
 		}
 		if (tipo === 'carta') {
 			const { data, error } = await supabase
@@ -130,7 +140,9 @@
 		<p class={erro ? 'erro' : 'suave'}>{erro || t('Carregando…')}</p>
 	{/if}
 	<div class="acoes">
-		{#if conteudo}
+		{#if conteudo?.href && conteudo.externo}
+			<a class="botao" href={conteudo.href} target="_blank" rel="noopener">{conteudo.link}</a>
+		{:else if conteudo?.href}
 			<a class="botao botao--secundario" href={conteudo.href} onclick={() => modal?.fechar()}>{conteudo.link}</a>
 		{/if}
 		<form method="dialog"><button class="botao">{t('Fechar')}</button></form>
