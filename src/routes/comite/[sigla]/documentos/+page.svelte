@@ -218,9 +218,10 @@
 			<TrilhaDoTopico {sigla} mesa={data.ehMesa} {...resumo} onetapa={(etapa) => {
 					// Passo 63: com documentos da sala, a etapa leva direto a eles (a tela de cada um tem
 					// as abas dos outros); sem eles, abre a lista num modal.
-					const daSalaNaEtapa = etapa === 'working_papers' ? wps[0] : etapa === 'projeto' ? daSala.find((d) => d.tipo === 'projeto') : undefined;
+					const daSalaNaEtapa =
+						etapa === 'working_papers' ? wps[0] : etapa === 'projeto' || etapa === 'acao' ? daSala.find((d) => d.tipo === 'projeto') : undefined;
 					if (daSalaNaEtapa) void goto(`/documento/${daSalaNaEtapa.id}/sala`);
-					else abrirLista(topico, etapa === 'working_papers' ? 'working_paper' : etapa);
+					else abrirLista(topico, etapa === 'working_papers' ? 'working_paper' : etapa === 'acao' ? 'projeto' : etapa);
 				}} />
 		</article>
 	{/each}

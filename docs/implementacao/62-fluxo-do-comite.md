@@ -40,8 +40,8 @@
 2. **Crise compacta. Feito em 26/11/2026** (`AlertaCrise`). Uma faixa com o título, o prazo e "Ler o briefing" numa linha, e embaixo quem foi atingido e o começo do briefing (duas linhas cada); o briefing inteiro abre num modal. A crise encerrada vira uma linha. No painel, a faixa fica acima das colunas e tem só a linha de cima (`compacta`), para "Com a palavra" caber na tela.
 3. **Agora sem buracos. Feito em 26/11/2026** (`.cartoes--agora`). Os cartões seguem a ordem de importância (a crise, a sessão, o que precisa de você, o papel e o resto do evento); um cartão sozinho na linha ocupa a largura toda, e dois dividem a linha. Só na Agora: nas outras telas, `.cartoes` continua como era.
 4. ~~Projeto rejeitado volta aos working papers.~~ Foi para o passo 63 (item 7 do caminho).
-5. **Uma trilha só, com nomes** (depois do passo 63): Agenda → Working papers → Projeto → Fase de ação → Resolução, com a etapa atual, uma frase do que fazer e o botão principal do papel. A mesma na Agora, na Sessão e em Documentos. A trilha ignora o projeto rejeitado, que fica no histórico.
-6. **Destaque por papel e dicas** (depois do passo 63, para valer nas telas novas). Duas ou três ações principais por papel à vista e o resto em "Mais opções". Cada ação diz o que faz ao passar o mouse e no foco do teclado; a desativada diz por quê, também no celular.
+5. **Uma trilha só, com nomes** (depois do passo 63): Agenda → Working papers → Projeto → Fase de ação → Resolução, com a etapa atual, uma frase do que fazer e o botão principal do papel. A mesma na Agora, na Sessão e em Documentos. A trilha ignora o projeto rejeitado, que fica no histórico. **Feito em 26/11/2026:** cinco etapas com nome também na versão compacta (Sessão), que não repete mais a frase do "Agora"; a etapa atual é o botão principal do papel (o working paper ou o projeto da sala, o painel da mesa, a sessão); a contagem só nas etapas feitas e na atual, para a aba Documentos caber a 1366 × 768.
+6. **Destaque por papel e dicas** (depois do passo 63, para valer nas telas novas). Duas ou três ações principais por papel à vista e o resto em "Mais opções". Cada ação diz o que faz ao passar o mouse e no foco do teclado; a desativada diz por quê, também no celular. **Feito em 26/11/2026, nas telas mais usadas:** `{@attach dica(...)}` (`src/lib/dica.ts`), um balão ligado por `aria-describedby` que aparece ao passar o mouse e no foco do teclado; na Sessão, à vista só o principal de cada papel (ponto ou moção, painel, chamada, anotar) e o resto em "Mais opções"; dicas na barra da Sessão, na Agora, no painel e no documento da sala; desativado com o motivo em texto à vista (documento da sala, editor). **Falta:** passar as dicas às demais ações do app, aos poucos.
 7. ~~Emendas só do bloco.~~ Substituído pelo [passo 63](63-um-projeto-por-topico.md).
 
 ## Testes
@@ -49,5 +49,5 @@
 - [x] pgTAP (`62-fluxo`): entrar em outro bloco, ou criar um, tira do atual; a redação passa a quem está no bloco há mais tempo; o banco recusa uma delegação em dois blocos.
 - [x] Ponta a ponta (`35-crise-com-prazo`), a 1366 × 768 com uma crise de briefing longo: a Agora do delegado mostra a sessão na primeira tela e nenhuma metade vazia; o briefing abre inteiro no modal; o painel mostra "Com a palavra".
 - [x] Unidade: a trilha ignora o projeto rejeitado (passo 63, `ordem.test.ts`).
-- [ ] Unidade: a trilha tem as cinco etapas com nome (lote 5).
-- [ ] Ponta a ponta: cada ação principal diz o que faz ao passar o mouse, e o botão desativado diz o motivo.
+- [x] Unidade: a trilha tem as cinco etapas com nome (lote 5, `ordem.test.ts`).
+- [x] Ponta a ponta (`62-dicas`): as ações secundárias da Sessão ficam em "Mais opções"; a dica aparece ao passar o mouse e no foco, e é a descrição acessível.

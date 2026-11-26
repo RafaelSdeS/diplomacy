@@ -1661,7 +1661,33 @@ export const EN: Record<string, string> = {
 	'Ler o briefing': 'Read the briefing',
 	'Ler o briefing: {titulo}': 'Read the briefing: {titulo}',
 	'Atingidas': 'Affected',
+	// Passo 62 (lote 6): as dicas das ações
+	'Dar a palavra, decidir pontos e moções e conduzir as votações.':
+		'Give the floor, decide points and motions, and run the votes.',
+	'A lista de oradores, as placas, os pontos e as votações.':
+		"The speakers' list, the placards, the points and the votes.",
+	'As delegações que avisaram que chegaram.':
+		'The delegations that said they arrived.',
+	'Os pontos e moções que esperam o bureau julgar se estão em ordem.':
+		'The points and motions waiting for the bureau to rule whether they are in order.',
+	'As notas das delegações, a responder.':
+		"The delegations' notes, waiting for a reply.",
+	'Confirmar as chegadas e ver a ordem da presidência.':
+		'Confirm arrivals and see the chair rotation.',
+	'Os itens do tópico e as alterações propostas.':
+		"The topic's items and the proposed changes.",
+	'Os resultados das votações do comitê.':
+		"The results of the committee's votes.",
+	'Mandar notas à equipe de crise e ler as respostas.':
+		'Send notes to the crisis team and read the replies.',
+	'A tela do projetor, para a sala.':
+		'The projector screen, for the room.',
+	'As teclas do painel: dar a palavra, pausar e passar ao próximo.':
+		"The panel's keys: give the floor, pause and move to the next.",
+	'Esta delegação passa a falar, e o cronômetro começa.':
+		'This delegation takes the floor, and the timer starts.',
 	// Passo 63: a tela do documento da sala
+	'consenso ou voto': 'consensus or vote',
 	'cada grande item da agenda tem um, de toda a sala. O redator de cada bloco (ou a delegação sem bloco) propõe mudanças; todas marcam posição; quem preside aceita ou rejeita depois do debate. Assinar é opcional e mostra acordo.':
 		"each main agenda item has one, for the whole room. Each bloc's drafter (or a delegation without a bloc) proposes changes; everyone marks a position; the chair accepts or rejects after the debate. Signing is optional and shows agreement.",
 	'um por tópico: a mesa ouve a sala e transforma os working papers nele, com os preâmbulos primeiro e as assinaturas junto. Nasce fechado e vai à fase de ação com 5 assinaturas.':

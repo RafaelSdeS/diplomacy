@@ -4280,3 +4280,24 @@ dialog.ir-para {
 		grid-row: 1 / span 2;
 	}
 }
+
+/* Passo 62 (lote 6): a dica de uma ação (src/lib/dica.ts), ao passar o mouse e no foco. */
+.dica {
+	position: fixed;
+	z-index: 50;
+	max-width: 18rem;
+	padding: 0.35rem 0.55rem;
+	border-radius: var(--raio);
+	background: var(--cor-marinho);
+	color: var(--cor-sobre-marinho);
+	font-family: var(--fonte-ui);
+	font-size: 0.8rem;
+	font-weight: 400;
+	line-height: 1.35;
+	pointer-events: none;
+	box-shadow: 0 2px 8px rgb(0 0 0 / 20%);
+}
+
+.dica[hidden] {
+	display: none;
+}

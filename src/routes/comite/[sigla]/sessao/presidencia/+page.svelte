@@ -18,6 +18,7 @@
 	import Votar from '#lib/ui/Votar.svelte';
 	import { filtrarDelegacoes, LISTA_LONGA } from '#lib/filtro.ts';
 	import { manterTelaAcesa } from '#lib/aparelho.ts';
+	import { dica } from '#lib/dica.ts';
 	import AlertaCrise from '#lib/ui/AlertaCrise.svelte';
 	import { semVoz } from '#lib/crise.ts';
 	import { relogioDebate, restanteSeg, temDebate } from '#lib/cronometro.ts';
@@ -301,8 +302,16 @@
 		</p>
 		<div class="acoes">
 			{#if ehMesa}
-				<a class="botao botao--secundario botao--pequeno" href={`/comite/${data.comite.sigla}/sessao/chamada`}>{t('Chamada')}</a>
-				<a class="botao botao--secundario botao--pequeno" href={`/comite/${data.comite.sigla}/sessao/agenda`}>{t('Agenda')}</a>
+				<a
+					class="botao botao--secundario botao--pequeno"
+					href={`/comite/${data.comite.sigla}/sessao/chamada`}
+					{@attach dica(t('Confirmar as chegadas e ver a ordem da presidência.'))}>{t('Chamada')}</a
+				>
+				<a
+					class="botao botao--secundario botao--pequeno"
+					href={`/comite/${data.comite.sigla}/sessao/agenda`}
+					{@attach dica(t('Os itens do tópico e as alterações propostas.'))}>{t('Agenda')}</a
+				>
 				<!-- Passo 59: a mesa assume só em caso excepcional, com motivo; devolver volta à mesma delegação. -->
 				{#if data.fase === 'debate' && sessao.presidencia}
 					<details class="menu-painel">
@@ -366,7 +375,7 @@
 				</details>
 			{/if}
 			<details class="menu-painel">
-				<summary class="botao botao--secundario botao--pequeno">{t('Atalhos')}</summary>
+				<summary class="botao botao--secundario botao--pequeno" {@attach dica(t('As teclas do painel: dar a palavra, pausar e passar ao próximo.'))}>{t('Atalhos')}</summary>
 				<p class="cartao atalhos-ajuda">
 					<kbd>{t('Espaço')}</kbd> {t('pausa ou retoma;')} <kbd>{t('Enter')}</kbd> {t('dá a palavra ao primeiro dos próximos;')} <kbd>B</kbd> {t('baixa todas as placas.')}
 				</p>
@@ -458,6 +467,7 @@
 									class="botao botao--pequeno"
 									type="button"
 									aria-label={`Dar a palavra a ${pedido.delegacao?.nome}`}
+									{@attach dica(t('Esta delegação passa a falar, e o cronômetro começa.'))}
 									onclick={() => darPalavra(pedido.delegacao!.id)}>{t('Dar a palavra')}</button
 								>
 							</span>

@@ -5,6 +5,7 @@
 	import { mensagemDeErro } from '#lib/sessao.ts';
 	import { supabase } from '#lib/supabase.ts';
 	import { formatarDocumento } from '#lib/formatacao.ts';
+	import { dica } from '#lib/dica.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import Confirmar from '#lib/ui/Confirmar.svelte';
 	import Modal from '#lib/ui/Modal.svelte';
@@ -243,7 +244,7 @@
 						class="botao botao--secundario botao--pequeno botao--icone"
 						type="button"
 						aria-label={t('Propor uma mudança em "{trecho}"', { trecho: trecho(id) })}
-						title={t('Propor uma mudança nesta cláusula')}
+						{@attach dica(t('Propor uma mudança nesta cláusula'))}
 						onclick={() => proporEm(c)}><PencilLine aria-hidden="true" size={14} strokeWidth={1.75} /></button
 					>
 				{/if}
@@ -251,12 +252,12 @@
 					<button
 						class="botao botao--secundario botao--pequeno"
 						type="button"
-						title={t('A sala e o telão passam a debater esta cláusula.')}
+						{@attach dica(t('A sala e o telão passam a debater esta cláusula.'))}
 						onclick={() => executar(supabase.rpc('focar_clausula', { p_documento: d.id, p_clausula: id }))}>{t('Pôr em foco')}</button
 					>
 				{/if}
 				{#if corrijo}
-					<button class="botao botao--secundario botao--pequeno" type="button" title={t('Só correções de forma: gramática e digitação.')} onclick={() => corrigir(c)}
+					<button class="botao botao--secundario botao--pequeno" type="button" {@attach dica(t('Só correções de forma: gramática e digitação.'))} onclick={() => corrigir(c)}
 						>{t('Corrigir')}</button
 					>
 				{/if}
@@ -318,10 +319,10 @@
 				acao={() => executar(supabase.rpc('aprovar_documento', { p_documento: d.id, p_aprovar: true }), t('O projeto está na fase de ação.'))}
 			/>
 		{:else}
-			<button class="botao" type="button" disabled title={t('Faltam assinaturas: {n} de {min}.', { n: assinaturasQueContam, min: minimo })}
+			<button class="botao" type="button" disabled aria-describedby="faltam-assinaturas"
 				>{t('Levar à fase de ação')}</button
 			>
-			<span class="suave">{t('Faltam assinaturas: {n} de {min}.', { n: assinaturasQueContam, min: minimo })}</span>
+			<span class="suave" id="faltam-assinaturas">{t('Faltam assinaturas: {n} de {min}.', { n: assinaturasQueContam, min: minimo })}</span>
 		{/if}
 	{/if}
 </div>

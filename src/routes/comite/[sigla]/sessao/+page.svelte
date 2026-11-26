@@ -16,6 +16,7 @@
 		type TipoPonto
 	} from '#lib/sessao.ts';
 	import { supabase } from '#lib/supabase.ts';
+	import { dica } from '#lib/dica.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import Bandeira from '#lib/ui/Bandeira.svelte';
 	import NomeDelegacao from '#lib/ui/NomeDelegacao.svelte';
@@ -232,24 +233,38 @@
 		</AcaoEmModal>
 	{/if}
 	{#if data.podePresidir}
-		<a class="botao" href={`/comite/${data.comite.sigla}/sessao/presidencia`}>{t('Painel da presidência')}</a>
+		<a class="botao" href={`/comite/${data.comite.sigla}/sessao/presidencia`} {@attach dica(t('Dar a palavra, decidir pontos e moções e conduzir as votações.'))}
+			>{t('Painel da presidência')}</a
+		>
 	{/if}
-	<!-- Passo 51: botões com ícone, não links soltos. -->
-	{#if ehMesa}<a class="botao botao--secundario botao--pequeno" href={`/comite/${data.comite.sigla}/sessao/chamada`}
+	<!-- Passo 51: botões com ícone, não links soltos. Passo 62 (lote 6): à vista, só o principal de
+		 cada papel; o resto em "Mais opções". -->
+	{#if ehMesa}<a
+			class="botao botao--secundario botao--pequeno"
+			href={`/comite/${data.comite.sigla}/sessao/chamada`}
+			{@attach dica(t('Confirmar as chegadas e ver a ordem da presidência.'))}
 			><ClipboardCheck aria-hidden="true" size={16} strokeWidth={1.75} /> {t('Chamada e rodízio')}</a
 		>{/if}
-	<a class="botao botao--secundario botao--pequeno" href={`/comite/${data.comite.sigla}/sessao/agenda`}
-		><ListOrdered aria-hidden="true" size={16} strokeWidth={1.75} /> {t('Agenda')}</a
-	>
-	<a class="botao botao--secundario botao--pequeno" href={`/comite/${data.comite.sigla}/votacoes`}
-		><Vote aria-hidden="true" size={16} strokeWidth={1.75} /> {t('Votações')}</a
-	>
-	{#if data.comite.crise_ligada && eu}<a class="botao botao--secundario botao--pequeno" href={`/comite/${data.comite.sigla}/crise`}
-			><Siren aria-hidden="true" size={16} strokeWidth={1.75} /> {t('Notas de crise')}</a
-		>{/if}
-	<a class="botao botao--secundario botao--pequeno" href={`/telao/${data.comite.sigla}`}
-		><Presentation aria-hidden="true" size={16} strokeWidth={1.75} /> {t('Telão')}</a
-	>
+	<details class="mais-opcoes">
+		<summary class="botao botao--secundario botao--pequeno">{t('Mais opções')}</summary>
+		<div class="mais-opcoes-corpo">
+			<a class="botao botao--secundario botao--pequeno" href={`/comite/${data.comite.sigla}/sessao/agenda`} {@attach dica(t('Os itens do tópico e as alterações propostas.'))}
+				><ListOrdered aria-hidden="true" size={16} strokeWidth={1.75} /> {t('Agenda')}</a
+			>
+			<a class="botao botao--secundario botao--pequeno" href={`/comite/${data.comite.sigla}/votacoes`} {@attach dica(t('Os resultados das votações do comitê.'))}
+				><Vote aria-hidden="true" size={16} strokeWidth={1.75} /> {t('Votações')}</a
+			>
+			{#if data.comite.crise_ligada && eu}<a
+					class="botao botao--secundario botao--pequeno"
+					href={`/comite/${data.comite.sigla}/crise`}
+					{@attach dica(t('Mandar notas à equipe de crise e ler as respostas.'))}
+					><Siren aria-hidden="true" size={16} strokeWidth={1.75} /> {t('Notas de crise')}</a
+				>{/if}
+			<a class="botao botao--secundario botao--pequeno" href={`/telao/${data.comite.sigla}`} {@attach dica(t('A tela do projetor, para a sala.'))}
+				><Presentation aria-hidden="true" size={16} strokeWidth={1.75} /> {t('Telão')}</a
+			>
+		</div>
+	</details>
 	<!-- Passo 46: anotar sem sair da sessão. Passo 54: na barra, não no meio dos cartões. -->
 	{#if eu && data.estado && !restrita && !representada}
 		<NotaRapida comite={data.comite} estado={data.estado} onresultado={(r) => ({ erro, mensagem } = r)} />

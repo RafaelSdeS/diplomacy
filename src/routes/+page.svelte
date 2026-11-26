@@ -9,6 +9,7 @@
 	import { relogioDebate, temDebate } from '#lib/cronometro.ts';
 	import { FORMAS, momentoDoDebate } from '#lib/sessao.ts';
 	import { escolhasPermitidas } from '#lib/votacao.ts';
+	import { dica } from '#lib/dica.ts';
 	import AoVivo from '#lib/ui/AoVivo.svelte';
 	import TipoItem from '#lib/ui/TipoItem.svelte';
 	import BotaoPlaca from '#lib/ui/BotaoPlaca.svelte';
@@ -142,7 +143,9 @@
 	{#if preside && sessao}
 		<article class="cartao cartao--presidencia" aria-labelledby="c-preside">
 			<h2 id="c-preside">{t('Você preside a sessão {n}', { n: sessao.numero })}</h2>
-			<a class="botao" href={`/comite/${sigla}/sessao/presidencia`}>{t('Abrir o painel')}</a>
+			<a class="botao" href={`/comite/${sigla}/sessao/presidencia`} {@attach dica(t('Dar a palavra, decidir pontos e moções e conduzir as votações.'))}
+				>{t('Abrir o painel')}</a
+			>
 			{#if paraDecidir.length}
 				{@render decidir()}
 			{/if}
@@ -188,8 +191,10 @@
 					{/if}
 					<!-- Passo 59: ponto ou moção sempre à mão, não só na pausa. -->
 					<p class="acoes">
-						{#if minhaDelegacao && !restrita}<a class="botao" href={`/comite/${sigla}/sessao?ponto`}>{t('Fazer um ponto ou moção')}</a>{/if}
-						<a class="botao botao--secundario" href={`/comite/${sigla}/sessao`}>{t('Abrir a sessão')}</a>
+						{#if minhaDelegacao && !restrita}<a class="botao" href={`/comite/${sigla}/sessao?ponto`} {@attach dica(t('O pedido vai à mesa, que julga se está em ordem.'))}
+							>{t('Fazer um ponto ou moção')}</a
+						>{/if}
+						<a class="botao botao--secundario" href={`/comite/${sigla}/sessao`} {@attach dica(t('A lista de oradores, as placas, os pontos e as votações.'))}>{t('Abrir a sessão')}</a>
 					</p>
 					</div>
 				</div>
@@ -257,10 +262,16 @@
 			{#if estado && data.aoVivo}<LinhaDoComite compacta {sigla} estado={{ fase: data.aoVivo.fase, etapa_plenaria: estado.etapa_plenaria, topico_atual: estado.topico_atual }} papel="mesa" ordem={data.aoVivo.ordem} />{/if}
 			<!-- Passo 51 (lote 2): os três atalhos como botões numa linha, com a contagem dentro. -->
 			<div class="acoes">
-				<a class={['botao botao--pequeno', !sessao?.avisos.length && 'botao--secundario']} href={`/comite/${sigla}/sessao/chamada`}
+				<a
+					class={['botao botao--pequeno', !sessao?.avisos.length && 'botao--secundario']}
+					href={`/comite/${sigla}/sessao/chamada`}
+					{@attach dica(t('As delegações que avisaram que chegaram.'))}
 					>{t('Chegadas a confirmar')} <span class="selo">{sessao?.avisos.length ?? 0}</span></a
 				>
-				<a class={['botao botao--pequeno', !paraJulgar && 'botao--secundario']} href={`/comite/${sigla}/sessao/presidencia`}
+				<a
+					class={['botao botao--pequeno', !paraJulgar && 'botao--secundario']}
+					href={`/comite/${sigla}/sessao/presidencia`}
+					{@attach dica(t('Os pontos e moções que esperam o bureau julgar se estão em ordem.'))}
 					>{t('Pedidos para o bureau')} <span class="selo">{paraJulgar}</span></a
 				>
 				<a class={['botao botao--pequeno', !documentosEnviados && 'botao--secundario']} href={`/comite/${sigla}/documentos`}
@@ -288,7 +299,7 @@
 		<article class="cartao cartao--destaque" aria-labelledby="c-crise-equipe">
 			<h2 id="c-crise-equipe">{t('Crise')} · {sigla}</h2>
 			<p class="destaque">{t('{n} notas esperando resposta', { n: data.notasPendentes ?? 0 })}</p>
-			<a class="botao" href={`/crise/${sigla}`}>{t('Abrir a fila da crise')}</a>
+			<a class="botao" href={`/crise/${sigla}`} {@attach dica(t('As notas das delegações, a responder.'))}>{t('Abrir a fila da crise')}</a>
 		</article>
 	{/if}
 
