@@ -66,11 +66,13 @@ test('quem perdeu o crachá entra com o código da secretaria, uma vez só', asy
 	expect(error).toBeNull();
 
 	await page.goto('/entrar');
+	await page.getByRole('tab', { name: 'Código' }).click();
 	await page.getByLabel('Código de 8 letras e números').fill(codigo!.toLowerCase());
 	await page.getByRole('button', { name: 'Entrar com o código' }).click();
 	await expect(page.getByRole('heading', { level: 1, name: 'Agora' })).toBeVisible({ timeout: 15_000 });
 
 	await sair(page);
+	await page.getByRole('tab', { name: 'Código' }).click();
 	await page.getByLabel('Código de 8 letras e números').fill(codigo!);
 	await page.getByRole('button', { name: 'Entrar com o código' }).click();
 	await expect(page.getByRole('alert')).toHaveText('Código inválido ou vencido. Peça um novo à secretaria.');

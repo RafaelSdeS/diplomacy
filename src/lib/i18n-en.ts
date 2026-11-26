@@ -2396,6 +2396,23 @@ export const EN: Record<string, string> = {
 		"The panel's keys: give the floor, pause and move to the next.",
 	'Esta delegação passa a falar, e o cronômetro começa.':
 		'This delegation takes the floor, and the timer starts.',
+	// A tela de entrar, em abas
+	'Com o e-mail e a senha que a secretaria cadastrou.':
+		'With the e-mail and password the secretariat registered.',
+	'Código':
+		'Code',
+	'Com o código de 8 letras e números que a secretaria deu a você.':
+		'With the 8-character code the secretariat gave you.',
+	'Sem senha: um link e um código chegam no seu e-mail.':
+		'No password: a link and a code arrive in your e-mail.',
+	'Como entrar':
+		'How to sign in',
+	'ou':
+		'or',
+	'Perdeu o crachá? Peça um código à secretaria. Ele vale uma vez só.':
+		'Lost your badge? Ask the secretariat for a code. It works only once.',
+	'Sem senha: mandamos um link e um código para o seu e-mail.':
+		'No password: we send a link and a code to your e-mail.',
 	// Sobre: como é feito
 	'Como é feito':
 		'How it is built',

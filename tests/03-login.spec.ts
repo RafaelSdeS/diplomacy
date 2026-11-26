@@ -55,6 +55,24 @@ test('o formulário de entrar funciona só com o teclado', async ({ page }) => {
 	await expect(page.getByRole('heading', { level: 1, name: 'Agora' })).toBeVisible();
 });
 
+test('a tela de entrar cabe sem rolar, com as três formas em abas', async ({ page }) => {
+	await page.goto('/entrar');
+	const abas = page.getByRole('tablist', { name: 'Como entrar' });
+	await expect(abas.getByRole('tab', { name: 'Senha' })).toHaveAttribute('aria-selected', 'true');
+	for (const aba of ['Senha', 'Código', 'Por e-mail']) {
+		await abas.getByRole('tab', { name: aba }).click();
+		const sobra = await page.evaluate(() => document.documentElement.scrollHeight - innerHeight);
+		expect(sobra, aba).toBeLessThanOrEqual(0);
+	}
+	// Só a aba escolhida fica no Tab; as setas trocam de aba.
+	await abas.getByRole('tab', { name: 'Por e-mail' }).press('ArrowRight');
+	await expect(abas.getByRole('tab', { name: 'Senha' })).toBeFocused();
+	await expect(page.getByLabel('Senha')).toBeVisible();
+	await page.keyboard.press('ArrowLeft');
+	await expect(abas.getByRole('tab', { name: 'Por e-mail' })).toBeFocused();
+	await expect(page.getByLabel('E-mail da sua conta')).toBeVisible();
+});
+
 test('conta sem convite cai em /sem-acesso, sem menu', async ({ page }) => {
 	await entrar(page, CONTAS.semConvite);
 	await expect(page).toHaveURL(/\/sem-acesso$/);

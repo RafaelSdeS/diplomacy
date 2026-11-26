@@ -3408,31 +3408,150 @@ dialog.modal-lateral {
 
 /* Entrar (passo 37): a folha de acesso, com a marca. */
 .entrada {
-	max-width: 30rem;
-	margin: 1rem auto 2rem;
-	padding: 2rem 2rem 1rem;
+	display: grid;
+	max-width: 56rem;
+	margin: 0 auto;
 	border: var(--linha);
 	border-top: 6px solid var(--cor-marinho);
-	border-radius: var(--raio);
 	background: var(--cor-fundo);
 }
 
-.entrada h1 {
-	margin: 0 0 0.75rem;
+/* A marca do evento, ao lado (só com largura de notebook). */
+.entrada-marca {
+	display: none;
 }
 
-.entrada-logo {
-	display: block;
-	margin-bottom: 1rem;
-	border-radius: var(--raio);
+.entrada-cartao {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	padding: 1.25rem 1rem;
+}
+
+.entrada-cartao h1 {
+	margin: 0;
+}
+
+.entrada-cartao > .suave {
+	margin: -0.5rem 0 0;
+}
+
+.entrada-abas {
+	margin: 0;
+}
+
+.entrada-abas .aba {
+	flex: 1;
+	min-height: 2.75rem;
+}
+
+/* As três formas ocupam a mesma altura: trocar de aba não pula a página. */
+.entrada-forma {
+	min-height: 15rem;
+}
+
+/* Os campos e o botão ocupam a largura das abas. */
+.entrada-forma .formulario {
+	max-width: none;
+}
+
+.entrada-forma .formulario > .suave {
+	margin: 0;
+}
+
+.entrada-ou {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	margin: 0.75rem 0;
+	color: var(--cor-texto-suave);
+	font-size: 0.9rem;
+}
+
+.entrada-ou::before,
+.entrada-ou::after {
+	content: '';
+	flex: 1;
+	border-top: var(--linha);
+}
+
+.entrada-ou + .botao {
+	width: 100%;
+}
+
+.entrada-pe {
+	padding-top: 1rem;
+	border-top: var(--linha);
+	color: var(--cor-texto-suave);
+	font-size: 0.9rem;
+}
+
+.entrada-pe p {
+	margin: 0;
+}
+
+.entrada-pe p + p {
+	margin-top: 0.5rem;
+}
+
+.entrada-pe svg {
+	vertical-align: -0.3em;
+	margin-right: 0.25rem;
+	color: var(--cor-marinho);
 }
 
 @media (max-width: 639px) {
+	/* No celular, o cartão encosta nas bordas, logo abaixo do cabeçalho. */
+	main:has(> .entrada) {
+		padding: 0;
+	}
+
+	/* Sem moldura: o formulário fica direto na página, que já tem o fio dourado do cabeçalho. */
 	.entrada {
+		border: 0;
+		background: none;
+	}
+}
+
+@media (min-width: 900px) {
+	.entrada {
+		grid-template-columns: 20rem minmax(0, 1fr);
+		margin-top: clamp(0rem, 4vh - 0.5rem, 2rem);
+		border-top: var(--linha);
+	}
+
+	.entrada-marca {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		padding: 2rem;
+		border-top: 6px solid var(--cor-fio-dourado);
+		background: var(--cor-faixa);
+		color: var(--cor-sobre-faixa);
+	}
+
+	.entrada-marca p {
 		margin: 0;
-		padding: 1.25rem 1rem;
-		border-width: 0;
-		border-top-width: 6px;
+		line-height: 1.5;
+	}
+
+	.entrada-evento {
+		font-family: var(--fonte-titulo);
+		font-size: 2rem;
+		letter-spacing: 0.02em;
+	}
+
+	.entrada-marca .entrada-marca-pe {
+		margin-top: auto;
+		padding-top: 1rem;
+		border-top: 1px solid var(--cor-fio-dourado);
+		font-size: 0.9rem;
+		opacity: 0.85;
+	}
+
+	.entrada-cartao {
+		padding: 2rem 2.5rem 1.5rem;
+		border-top: 6px solid var(--cor-marinho);
 	}
 }
 
