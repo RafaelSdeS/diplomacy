@@ -116,7 +116,8 @@
 <h1>{t('Agora')}</h1>
 {#if erro}<p class="erro" role="alert">{erro}</p>{/if}
 
-<div class="cartoes">
+<!-- Passo 62 (lote 3): por ordem de importância; duas colunas só quando as duas têm conteúdo. -->
+<div class="cartoes cartoes--agora">
 	{#if data.aoVivo}<AlertaCrise incidentes={data.aoVivo.incidentes} {diferenca} />{/if}
 	{#if preside && sessao}
 		<article class="cartao cartao--presidencia" aria-labelledby="c-preside">

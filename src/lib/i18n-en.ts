@@ -1662,6 +1662,10 @@ export const EN: Record<string, string> = {
 	'Sua delegação deixa o bloco. A redação passa à delegação que está no bloco há mais tempo.':
 		'Your delegation leaves the bloc. Drafting passes to the delegation that has been in the bloc the longest.',
 	'Sua delegação sai do bloco {nome}: cada delegação fica num bloco por vez.': 'Your delegation leaves the bloc {nome}: each delegation is in one bloc at a time.',
+	// Passo 62 (lote 2): a crise compacta
+	'Ler o briefing': 'Read the briefing',
+	'Ler o briefing: {titulo}': 'Read the briefing: {titulo}',
+	'Atingidas': 'Affected',
 	'Abst.': 'Abst.',
 	'Falta': 'Missing',
 };

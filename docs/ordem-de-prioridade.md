@@ -37,7 +37,7 @@ A sequência de execução tem o **piloto depois da interface**. Os passos 44, 4
 | 13 | [61](implementacao/61-saber-onde-estou.md) | Saber onde estou e o que chegou (**pronto**) | M | Mesmo quem conhece as regras se perdeu na plenária, não viu bilhete chegar e achou que o documento assinado sumiu | Linha do comitê desde a plenária, com "Agora/Depois" por papel; "Como funciona"; contagem e aviso de bilhetes; "Seus documentos" |
 | 14 | [60](implementacao/60-agenda-do-bureau.md) | A agenda parte do documento do bureau (**pronto**) | M–G | O roteiro começa pela agenda, e o bureau já chega com ela pronta | Agenda do bureau cadastrada antes e liberada no dia; uma agenda por tópico, alterada como um working paper (por item, com posição e comentários), aceita pela presidência e adotada pela sala |
 | 15 | [58](implementacao/58-documentos-da-mesa.md) | Documentos da mesa para o comitê (**pronto**; o telão e o "está editando" em 26/11/2026) | M | Pedido novo; o piloto manda o guia por fora, e pode subir se a mesa do piloto pedir | Texto e PDF publicados ao vivo, versão conferida ao salvar, "o que mudou", telão |
-| 15a | [62](implementacao/62-fluxo-do-comite.md) **lotes 1, 2 e 3** | O fluxo do comitê: as regras do bloco (lote 1, **pronto** em 26/11/2026), a crise compacta e a Agora sem buracos | M | O uso de 26/11, com o CSNU-T online populado, mostrou a crise tomando a tela, metade da Agora vazia e o bloco podendo ficar sem redator | Um bloco por vez e o bloco nunca sem redator (feito); crise numa faixa, com o briefing num modal; Agora numa coluna por importância |
+| 15a | [62](implementacao/62-fluxo-do-comite.md) **lotes 1, 2 e 3** | O fluxo do comitê: as regras do bloco, a crise compacta e a Agora sem buracos (**prontos** em 26/11/2026) | M | O uso de 26/11, com o CSNU-T online populado, mostrou a crise tomando a tela, metade da Agora vazia e o bloco podendo ficar sem redator | Um bloco por vez e o bloco nunca sem redator (feito); crise numa faixa, com o briefing num modal; Agora numa coluna por importância |
 | 15b | [63](implementacao/63-um-projeto-por-topico.md) | Um working paper por item da agenda, de toda a sala, e um projeto por tópico | G | Vários textos por tópico fragmentam o debate e excluem as delegações pequenas; no UFRGSMUN a sala inteira trabalha num working paper por item | Um working paper por grande item, criado com a agenda; os redatores (ou a delegação sem bloco) propõem; quem preside aceita ou rejeita; a mesa transforma em projeto, com as assinaturas; consenso primeiro, voto com objeção; sem emendas. Absorve a primeira entrega do 49 e a parte B do 57 |
 | 15c | [62](implementacao/62-fluxo-do-comite.md) **lotes 5 e 6** | Uma trilha só, com nomes; destaque por papel e dicas | M | Vêm depois do 63 porque a trilha e os destaques usam o fluxo novo | Agenda → Working papers → Projeto → Fase de ação → Resolução; duas ou três ações por papel; cada ação diz o que faz e por que está desativada |
 | — | [12](implementacao/12-teste-do-piloto.md) | **Sessão de teste do piloto** ([piloto.md](piloto.md)) | — | Valida o app já com a interface limpa, antes de construir mais | Roteiro, questionário e plano B em papel |
@@ -57,7 +57,7 @@ A sessão do piloto ([piloto.md](piloto.md), passo 12) não está registrada com
 - **Antes do piloto:** 52 (testes rápidos) e os lotes 0, 1 e 2 do 51 (feitos); depois, 54 (correções do uso de 24/11), 55 (países clicáveis), 56 (ordem do tópico, Agenda e Documentos) e a parte A do 57 (escrita de documentos), as telas que o roteiro mais usa (feitos em 25/11/2026). Do uso de 25/11/2026, como mesa, presidência e delegação, saíram o 59 (uma presidência só, numa tela só), o 61 (saber onde estou e o que chegou) e o 60 (agenda do bureau), também antes do piloto: mesmo quem conhece as regras se perdeu.
 - **Feitos antes do piloto, em 25/11/2026, a pedido:** o lote 3 do 51 (mensagens como conversa) e o 58 (documentos da mesa); o telão e o "está editando" do 58 vieram em 26/11/2026.
 - **Feito antes do piloto, em 26/11/2026, a pedido:** o 53 (DPO como arquivo).
-- **Antes do piloto, do uso de 26/11/2026:** o 62 (lote 1 feito; lotes 2 e 3), depois o 63 (um working paper por item da agenda, de toda a sala, e um projeto por tópico), depois os lotes 5 e 6 do 62 (trilha com nomes, destaque e dicas). O roteiro do piloto já descreve o fluxo do 63.
+- **Antes do piloto, do uso de 26/11/2026:** o 62 (lotes 1, 2 e 3, feitos), depois o 63 (um working paper por item da agenda, de toda a sala, e um projeto por tópico), depois os lotes 5 e 6 do 62 (trilha com nomes, destaque e dicas). O roteiro do piloto já descreve o fluxo do 63.
 - **Depois do piloto:** o 48 tem requisitos claros (a 45 parte B já foi feita) e entram em seguida, ajustados ao que a sessão mostrar. A coletiva completa e a demonstração não fazem parte do roteiro do piloto.
 - **Só com dor confirmada:** **o passo 50, e o que sobrar do 49 depois do 63, só começam depois que o questionário do piloto responder às perguntas deles** (a rodada de propostas deu conta? o que faltou ao preparar a fala?). Se o piloto não mostrar dor, os dois ficam para depois do evento. O que o passo 46 já entrega (nota e próxima fala visíveis) pode bastar.
 - Os demais lotes do 51 entram aos poucos, o ano todo.
@@ -341,7 +341,7 @@ Testes rápidos no dia a dia (52)                      (feito)
 Uma presidência só (59) ── Saber onde estou (61) ── Agenda do bureau (60)   (feito)
 Mensagens como conversa (51, lote 3) e documentos da mesa (58)            (feito)
 Fluxo do comitê (62): regras do bloco, lote 1                             (feito)
-  └─ crise compacta e Agora sem buracos (62, lotes 2 e 3)
+  └─ crise compacta e Agora sem buracos (62, lotes 2 e 3)                   (feito)
        └─ Working paper da sala e projeto por tópico (63)
             └─ depende da agenda (60), da escrita (57, parte A) e do lote 1 do 62
             └─ Trilha com nomes, destaque e dicas (62, lotes 5 e 6)
@@ -404,7 +404,7 @@ Do passo 47 (feito): modal base; saída com confirmação e `Confirmar`; fichas 
 ### Lote B4 — uso de 26/11, antes do piloto (passos 62 e 63)
 
 1. as regras do bloco: um bloco por vez e o bloco nunca sem redator (62, lote 1; feito em 26/11/2026);
-2. a crise compacta e a Agora sem buracos (62, lotes 2 e 3);
+2. a crise compacta e a Agora sem buracos (62, lotes 2 e 3; feitos em 26/11/2026);
 3. um working paper por grande item da agenda, de toda a sala, e um projeto por tópico (63);
 4. a trilha com nomes, o destaque por papel e as dicas (62, lotes 5 e 6).
 

@@ -391,6 +391,8 @@
 		<p class="erro" role="alert">{erro}</p>
 	{/if}
 
+	<!-- Passo 62: a crise é uma faixa acima das colunas; "Com a palavra" fica sempre à vista. -->
+	<AlertaCrise compacta incidentes={data.incidentes} {diferenca} />
 	<!-- Passo 51: com a votação aberta, ninguém fala; o painel mostra só a votação e o que decidir. -->
 	<div class={['painel', data.podePresidir && votacao?.aberta && 'painel--votacao']}>
 		{#if !data.podePresidir}
@@ -491,7 +493,6 @@
 		</div>
 
 		<div class="painel-coluna">
-			<AlertaCrise incidentes={data.incidentes} {diferenca} />
 			{#if momento === 'pausa' && data.estado}
 				<section class="cartao cartao--destaque pausa-pontos" aria-labelledby="t-pausa">
 					<h2 id="t-pausa">{t('Há pontos ou moções?')}</h2>
@@ -645,7 +646,6 @@
 		{/if}
 
 		<div class="painel-coluna painel-coluna--decisao">
-			{#if votacao?.aberta}<AlertaCrise incidentes={data.incidentes} {diferenca} />{/if}
 			{#if souDaVez && minha}
 				<section class="cartao" aria-labelledby="t-sua-delegacao">
 					<h2 id="t-sua-delegacao">{t('Sua delegação')} · {minha.delegacao_nome}</h2>

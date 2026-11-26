@@ -3,7 +3,7 @@
 **Parte de:** uso de 26/11/2026, com o CSNU-T online populado por inteiro ("ainda está confuso e não muito intuitivo; as coisas que as pessoas mais usam não estão em destaque; fica difícil achar a ordem do que está acontecendo; com a crise, metade da tela fica vazia na Agora")
 **Depende de:** 51, 56, 57, 59, 61
 **Esforço:** G, em lotes
-**Quando:** antes do piloto (passo 12). Ordem: lote 1 (feito), lotes 2 e 3, depois o [passo 63](63-um-projeto-por-topico.md), depois os lotes 5 e 6, que usam o fluxo novo.
+**Quando:** antes do piloto (passo 12). Ordem: lotes 1, 2 e 3 (feitos), depois o [passo 63](63-um-projeto-por-topico.md), depois os lotes 5 e 6, que usam o fluxo novo.
 **Objetivo:** ajudar quem está no comitê a fazer a próxima coisa certa, sem procurar.
 
 ## O que a investigação achou (26/11/2026, dados reais, 1366 × 768)
@@ -37,8 +37,8 @@
    - o aviso ao encerrar a sessão com uma votação aberta.
 
    Saíram antes do commit, por causa do passo 63: a rodada e "Encerrar a rodada", o rascunho aberto ao comitê na rodada e as travas do envio à mesa.
-2. **Crise compacta.** Uma faixa com o título, o prazo, quem foi atingido, o começo do briefing e "Ler o briefing" (num modal). A crise encerrada vira uma linha. No painel, a faixa fica acima das colunas, e "Com a palavra" fica sempre à vista.
-3. **Agora sem buracos.** Uma coluna por ordem de importância: o que acontece agora, o que precisa de você e o resto do evento. Duas colunas só quando as duas têm conteúdo.
+2. **Crise compacta. Feito em 26/11/2026** (`AlertaCrise`). Uma faixa com o título, o prazo e "Ler o briefing" numa linha, e embaixo quem foi atingido e o começo do briefing (duas linhas cada); o briefing inteiro abre num modal. A crise encerrada vira uma linha. No painel, a faixa fica acima das colunas e tem só a linha de cima (`compacta`), para "Com a palavra" caber na tela.
+3. **Agora sem buracos. Feito em 26/11/2026** (`.cartoes--agora`). Os cartões seguem a ordem de importância (a crise, a sessão, o que precisa de você, o papel e o resto do evento); um cartão sozinho na linha ocupa a largura toda, e dois dividem a linha. Só na Agora: nas outras telas, `.cartoes` continua como era.
 4. ~~Projeto rejeitado volta aos working papers.~~ Foi para o passo 63 (item 7 do caminho).
 5. **Uma trilha só, com nomes** (depois do passo 63): Agenda → Working papers → Projeto → Fase de ação → Resolução, com a etapa atual, uma frase do que fazer e o botão principal do papel. A mesma na Agora, na Sessão e em Documentos. A trilha ignora o projeto rejeitado, que fica no histórico.
 6. **Destaque por papel e dicas** (depois do passo 63, para valer nas telas novas). Duas ou três ações principais por papel à vista e o resto em "Mais opções". Cada ação diz o que faz ao passar o mouse e no foco do teclado; a desativada diz por quê, também no celular.
@@ -47,6 +47,6 @@
 ## Testes
 
 - [x] pgTAP (`62-fluxo`): entrar em outro bloco, ou criar um, tira do atual; a redação passa a quem está no bloco há mais tempo; o banco recusa uma delegação em dois blocos.
-- [ ] Ponta a ponta, a 1366 × 768 com uma crise em curso: a Agora do delegado mostra a sessão na primeira tela; o painel mostra "Com a palavra"; nenhuma metade vazia.
+- [x] Ponta a ponta (`35-crise-com-prazo`), a 1366 × 768 com uma crise de briefing longo: a Agora do delegado mostra a sessão na primeira tela e nenhuma metade vazia; o briefing abre inteiro no modal; o painel mostra "Com a palavra".
 - [ ] Unidade: a trilha tem as cinco etapas com nome e ignora o projeto rejeitado.
 - [ ] Ponta a ponta: cada ação principal diz o que faz ao passar o mouse, e o botão desativado diz o motivo.

@@ -19,7 +19,8 @@ const etapaAtual = (page: Page) => page.getByRole('navigation', { name: 'Ordem d
 /** O tópico 1 está liberado para projeto na tela de blocos? */
 async function projetoLiberado(page: Page) {
 	await page.goto(BLOCOS);
-	const bloco = page.getByRole('article', { name: /^Bloco Agenda/ }).first();
+	// Passo 62: a delegação fica num bloco por vez; o dela é o que tem "Novo documento".
+	const bloco = page.getByRole('article', { name: /^Bloco Agenda/ }).filter({ has: page.getByRole('button', { name: 'Novo documento' }) });
 	await bloco.getByRole('button', { name: 'Novo documento' }).click();
 	const formulario = page.getByRole('form', { name: 'Novo documento' });
 	await formulario.getByRole('combobox', { name: /^Tipo/ }).selectOption({ label: 'Projeto de resolução' });

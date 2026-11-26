@@ -88,3 +88,50 @@ test('a crise deixa o Brasil sem voz, toma o telão e, no fim, devolve a voz', a
 	if (process.env.CAPTURAS) await expect(telao).toHaveScreenshot('telao-desfecho.png', { mask: mascaras, stylePath: OCULTAR_RODIZIO });
 	await expect(brasil.getByRole('button', { name: 'Fazer um ponto ou moção' })).toBeVisible();
 });
+
+// Passo 62: um cartão estreito na Agora sempre divide a linha com outro (nada de meia tela vazia).
+const metadesVazias = (page: Page) =>
+	page.locator('.cartoes--agora').evaluate((el) => {
+		const largura = el.getBoundingClientRect().width;
+		const cartoes = [...el.children].map((c) => c.getBoundingClientRect()).filter((r) => r.height > 0);
+		return cartoes.filter((r) => r.width < largura * 0.9 && !cartoes.some((o) => o !== r && Math.abs(o.top - r.top) < 2)).length;
+	});
+
+test('a crise é uma faixa: a sessão segue na primeira tela e o briefing abre num modal (passo 62)', async ({ browser }) => {
+	const crise = await clienteComo(CRISE);
+	const mesaCliente = await clienteComo(MESA);
+	const comite = (await crise.from('comite').select('id').eq('sigla', C.sigla).single()).data!.id;
+	const brasilId = (await mesaCliente.from('delegacao').select('id').eq('comite_id', comite).eq('nome', 'Brasil').single()).data!.id;
+	const titulo = `${TITULO} (longa)`;
+	const briefing = 'A fronteira fechou durante a noite. '.repeat(80).trim(); // cerca de 2.900 caracteres
+	const lancada = await crise.rpc('lancar_incidente', {
+		p_comites: [comite],
+		p_titulo: titulo,
+		p_texto: briefing,
+		p_minutos: 20,
+		p_efeitos: [{ delegacao_id: brasilId, texto: 'Delegado retido' }]
+	});
+	expect(lancada.error).toBeNull();
+	const notebook = { viewport: { width: 1366, height: 768 } };
+
+	const brasil = await (await browser.newContext(notebook)).newPage();
+	await entrar(brasil, BRASIL);
+	await brasil.goto('/');
+	await aoVivo(brasil);
+	const faixa = brasil.getByRole('article', { name: titulo });
+	await expect(faixa).toContainText('Brasil: Delegado retido');
+	await expect(brasil.getByRole('heading', { name: /Sessão ao vivo/ })).toBeInViewport();
+	expect(await metadesVazias(brasil)).toBe(0);
+	await faixa.getByRole('button', { name: `Ler o briefing: ${titulo}` }).click();
+	const modal = brasil.getByRole('dialog', { name: titulo });
+	await expect(modal).toContainText(briefing);
+	await modal.getByRole('button', { name: 'Fechar' }).click();
+	await expect(modal).toBeHidden();
+
+	const mesa = await (await browser.newContext(notebook)).newPage();
+	await entrar(mesa, MESA);
+	await mesa.goto(`/comite/${C.sigla}/sessao/presidencia`);
+	await aoVivo(mesa);
+	await expect(mesa.getByRole('article', { name: titulo })).toBeVisible();
+	await expect(mesa.getByRole('heading', { name: 'Com a palavra' })).toBeInViewport();
+});

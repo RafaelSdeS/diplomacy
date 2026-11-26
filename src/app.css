@@ -750,6 +750,24 @@ select:disabled {
 	}
 }
 
+/* Passo 62 (lote 3): na Agora, um cartão sozinho na linha ocupa a largura toda, sem deixar
+   meia tela vazia; dois cartões dividem a linha. A crise e os cartões largos têm a linha só deles. */
+@media (min-width: 1024px) {
+	.cartoes--agora {
+		display: flex;
+		flex-wrap: wrap;
+	}
+
+	.cartoes--agora > * {
+		flex: 1 1 calc(50% - 0.5rem);
+		min-width: 0;
+	}
+
+	.cartoes--agora > :is(.cartao--largo, .alerta-crise) {
+		flex-basis: 100%;
+	}
+}
+
 .cartao h2 {
 	margin: 0 0 0.75rem;
 	padding: 0;
@@ -3285,6 +3303,7 @@ dialog.modal-lateral {
 
 /* Crise com prazo (passo 35): sóbria, sem piscar. */
 .alerta-crise {
+	max-width: none;
 	border-color: var(--cor-erro);
 	border-left-width: 6px;
 }
@@ -3294,10 +3313,60 @@ dialog.modal-lateral {
 }
 
 .alerta-crise-prazo {
-	margin: 0.25rem 0;
+	margin: 0;
 	font-family: var(--fonte-mono);
-	font-size: 2rem;
+	font-size: 1.5rem;
 	font-weight: 600;
+}
+
+/* Passo 62: a crise é uma faixa. Título, prazo e "Ler o briefing" numa linha; quem foi
+   atingido e o começo do briefing em até duas linhas cada; o resto abre no modal. */
+.alerta-crise-topo {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0.25rem 1rem;
+}
+
+.alerta-crise .alerta-crise-topo > * {
+	margin: 0;
+}
+
+.alerta-crise .alerta-crise-topo > h2 {
+	color: var(--cor-texto);
+	font-size: 1rem;
+	font-variant-caps: normal;
+	font-weight: 700;
+	letter-spacing: 0;
+}
+
+.alerta-crise .alerta-crise-topo > .botao {
+	margin-left: auto;
+}
+
+.alerta-crise-resumo {
+	display: -webkit-box;
+	margin: 0.25rem 0 0;
+	overflow: hidden;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+}
+
+.alerta-crise-briefing {
+	white-space: pre-line;
+}
+
+.alerta-crise--encerrada {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0 0.75rem;
+	margin: 0;
+	padding-block: 0.5rem;
+}
+
+.alerta-crise--encerrada .rotulo {
+	margin: 0;
 }
 
 .telao-crise {
