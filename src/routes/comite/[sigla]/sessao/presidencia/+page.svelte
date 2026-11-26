@@ -875,12 +875,25 @@
 										{nomeDoDocumento(p)}
 										<span class="detalhe">
 											<span class="selo {STATUS_DOCUMENTO[p.status].selo}">{STATUS_DOCUMENTO[p.status].rotulo}</span>
-											{#if p.status === 'aprovado_mesa'}· {p.aprovacao === 'consenso' ? t('os signatários pedem consenso') : t('os signatários pedem votação')}{/if}
+											{#if p.status === 'aprovado_mesa'}
+												<!-- Passo 63: no projeto da sala, ninguém escolhe antes; o consenso vem primeiro. -->
+												· {p.aprovacao === 'consenso'
+													? t('os signatários pedem consenso')
+													: p.aprovacao === 'votacao'
+														? t('os signatários pedem votação')
+														: t('pergunte se alguma delegação se opõe: sem objeção, consenso; com objeção, votação')}
+											{/if}
 										</span>
 									</span>
 									{#if p.status === 'aprovado_mesa' || (p.status === 'em_votacao' && !votacao?.aberta)}
 										<span class="acoes">
 											{#if p.status === 'aprovado_mesa'}
+												<button
+													class="botao botao--pequeno"
+													type="button"
+													aria-label={`Aprovar por consenso: ${nomeDoDocumento(p)}`}
+													onclick={() => rpc('aprovar_por_consenso', { p_documento: p.id })}>{t('Aprovar por consenso')}</button
+												>
 												<button
 													class="botao botao--secundario botao--pequeno"
 													type="button"
@@ -889,20 +902,12 @@
 												>
 											{/if}
 											<button
-												class="botao botao--pequeno"
+												class={['botao botao--pequeno', p.status === 'aprovado_mesa' && 'botao--secundario']}
 												type="button"
 												aria-label={`Abrir a votação: ${nomeDoDocumento(p)}`}
 												onclick={() => rpc('abrir_votacao_projeto', { p_documento: p.id })}
 												>{p.status === 'em_votacao' ? t('Abrir a votação final') : t('Abrir votação')}</button
 											>
-											{#if p.status === 'aprovado_mesa'}
-											<button
-												class="botao botao--secundario botao--pequeno"
-												type="button"
-												aria-label={`Aprovar por consenso: ${nomeDoDocumento(p)}`}
-												onclick={() => rpc('aprovar_por_consenso', { p_documento: p.id })}>{t('Aprovar por consenso')}</button
-											>
-											{/if}
 										</span>
 									{/if}
 								</li>

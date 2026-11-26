@@ -1662,6 +1662,7 @@ export const EN: Record<string, string> = {
 	'Ler o briefing: {titulo}': 'Read the briefing: {titulo}',
 	'Atingidas': 'Affected',
 	// Passo 63: a tela do documento da sala
+	'pergunte se alguma delegação se opõe: sem objeção, consenso; com objeção, votação': 'ask whether any delegation objects: no objection, consensus; with an objection, a vote',
 	'Bloco {nome}': 'Bloc {nome}',
 	'Conversa do bloco': 'Bloc conversation',
 	'A conversa do seu bloco: só os membros leem. Leve aqui as sugestões ao redator.':
