@@ -1654,6 +1654,14 @@ export const EN: Record<string, string> = {
 	'Rascunho guardado neste aparelho.': 'Draft saved on this device.',
 	'Conduzir a votação': 'Run the vote',
 	'Documentos da mesa': 'Documents from the dais',
+	// Passo 62: o aviso ao encerrar a sessão e um bloco por vez
+	'Há uma votação aberta: ela fecha sem resultado (um projeto volta a esperar a mesa). Para ter o resultado, encerre a votação antes.':
+		'A vote is open: it closes without a result (a draft goes back to waiting for the dais). To get the result, close the vote first.',
+	'O cronômetro para e a presidência passa à próxima delegação na sessão seguinte.': 'The timer stops and the chair passes to the next delegation in the next session.',
+	'Sua delegação deixa o bloco e os documentos dele.': 'Your delegation leaves the bloc and its documents.',
+	'Sua delegação deixa o bloco. A redação passa à delegação que está no bloco há mais tempo.':
+		'Your delegation leaves the bloc. Drafting passes to the delegation that has been in the bloc the longest.',
+	'Sua delegação sai do bloco {nome}: cada delegação fica num bloco por vez.': 'Your delegation leaves the bloc {nome}: each delegation is in one bloc at a time.',
 	'Abst.': 'Abst.',
 	'Falta': 'Missing',
 };

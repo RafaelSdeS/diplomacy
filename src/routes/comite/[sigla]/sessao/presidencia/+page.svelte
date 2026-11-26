@@ -378,7 +378,9 @@
 					classe="botao botao--secundario botao--pequeno"
 					rotulo={t('Encerrar sessão')}
 					pergunta={t('Encerrar a sessão {n}?', { n: sessao.numero })}
-					explicacao={t('As votações abertas são fechadas e o cronômetro para.')}
+					explicacao={votacao?.aberta
+						? t('Há uma votação aberta: ela fecha sem resultado (um projeto volta a esperar a mesa). Para ter o resultado, encerre a votação antes.')
+						: t('O cronômetro para e a presidência passa à próxima delegação na sessão seguinte.')}
 					acao={encerrarSessao}
 				/>
 			{/if}

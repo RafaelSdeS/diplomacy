@@ -48,6 +48,7 @@
 
 	const eu = $derived(data.participacoes.find((p) => p.comite_id === data.comite.id && p.papel === 'delegado'));
 	const souDo = (bloco: (typeof data.blocos)[number]) => bloco.membros.some((m) => m.delegacao?.id === eu?.delegacao_id);
+	const meuBloco = $derived(data.blocos.find(souDo)); // um bloco por vez (passo 62)
 	const meusBlocos = $derived(new Set(data.blocos.filter(souDo).map((b) => b.id)));
 	const outrosDocumentos = $derived(data.documentos.filter((d) => !meusBlocos.has(d.bloco_id)));
 	const observadora = $derived(
@@ -135,6 +136,7 @@
 						{t('Nome do novo bloco')}
 						<input required maxlength="80" bind:value={nomeBloco} placeholder={t('Aliança dos Estados do Sahel')} />
 					</label>
+					{#if meuBloco}<p class="suave">{t('Sua delegação sai do bloco {nome}: cada delegação fica num bloco por vez.', { nome: meuBloco.nome })}</p>{/if}
 					{#if erro}<p class="erro">{erro}</p>{/if}
 					<div class="acoes">
 						<button class="botao">{t('Criar bloco')}</button>
@@ -190,9 +192,14 @@
 					<div class="acoes">
 						{#if membro}
 							<button class="botao botao--pequeno" type="button" onclick={() => (novoEm = bloco.id)}>{t('Novo documento')}</button>
+							<!-- Passo 62: o bloco nunca fica sem redator (o banco passa a redação a quem está há mais tempo). -->
+							{@const unicoRedator = souRedator(bloco) && redatoresDe(bloco).length === 1 && bloco.membros.length > 1}
 							<button
 								class="botao botao--secundario botao--pequeno"
 								type="button"
+								title={unicoRedator
+									? t('Sua delegação deixa o bloco. A redação passa à delegação que está no bloco há mais tempo.')
+									: t('Sua delegação deixa o bloco e os documentos dele.')}
 								onclick={() => executar(supabase.rpc('sair_bloco', { p_bloco: bloco.id }))}>{t('Sair do bloco')}</button
 							>
 						{:else}
@@ -200,6 +207,7 @@
 								class="botao botao--pequeno"
 								type="button"
 								aria-label={`Entrar no bloco ${bloco.nome}`}
+								title={meuBloco ? t('Sua delegação sai do bloco {nome}: cada delegação fica num bloco por vez.', { nome: meuBloco.nome }) : undefined}
 								onclick={() => executar(supabase.rpc('entrar_bloco', { p_bloco: bloco.id }))}>{t('Entrar no bloco')}</button
 							>
 						{/if}

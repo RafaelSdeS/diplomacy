@@ -75,6 +75,8 @@ Cada passo só começa quando os passos de que ele depende estão prontos. As re
 | [59](59-presidencia-e-sessao.md) | Uma presidência só, numa tela só: o bureau só na plenária, na fase de ação e em casos excepcionais, presidência muda só no fim da sessão ou na não-confiança, placas sem ordem, ponto ou moção em cima | 29, 30, 43, 46, 51, 54 |
 | [60](60-agenda-do-bureau.md) | A agenda parte do documento do bureau, liberada no dia: uma agenda por tópico, alterada como um working paper e adotada pela sala | 22, 56, 57 |
 | [61](61-saber-onde-estou.md) | Saber onde estou e o que chegou: linha do comitê desde a plenária, "Como funciona", aviso de bilhetes, "Seus documentos" | 51, 55, 56, 59 |
+| [62](62-fluxo-do-comite.md) | O fluxo do comitê: crise compacta, Agora sem buracos, trilha com nomes, destaque por papel, dicas e travas (envio, rodada, redator único) | 51, 56, 57, 59, 61 |
+| [63](63-um-projeto-por-topico.md) | Um working paper por item da agenda, de toda a sala, e um projeto por tópico: os redatores propõem, quem preside aceita ou rejeita, e a mesa transforma em projeto | 09, 56, 57, 60, 62 |
 
 ## Melhorias depois da revisão
 

@@ -335,14 +335,14 @@ isOneToOne: false
                   ]
                 },"bloco_membro": {
                   Row: {
-                    "bloco_id": string,"comite_id": string,"delegacao_id": string,"redator": boolean
+                    "bloco_id": string,"comite_id": string,"delegacao_id": string,"entrou_em": string,"redator": boolean
                   }
                   ComputedFields: never
                   Insert: {
-                    "bloco_id": string,"comite_id": string,"delegacao_id": string,"redator"?: boolean
+                    "bloco_id": string,"comite_id": string,"delegacao_id": string,"entrou_em"?: string,"redator"?: boolean
                   }
                   Update: {
-                    "bloco_id"?: string,"comite_id"?: string,"delegacao_id"?: string,"redator"?: boolean
+                    "bloco_id"?: string,"comite_id"?: string,"delegacao_id"?: string,"entrou_em"?: string,"redator"?: boolean
                   }
                   Relationships: [
                     {
@@ -2464,6 +2464,9 @@ isOneToOne: false
                            },
 "marcar_todas_presentes":
 { Args: { "p_comite": string }; Returns: undefined
+                           },
+"meu_bloco":
+{ Args: { "p_comite": string }; Returns: string
                            },
 "meus_comites":
 { Args: { "p_papeis": (Database["public"]['Enums']["papel"])[] }; Returns: string[]
