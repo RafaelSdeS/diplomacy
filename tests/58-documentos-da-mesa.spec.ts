@@ -87,6 +87,13 @@ test('a mesa mostra o documento no telão, que volta à sessão pelo próprio te
 	expect((await mesa.rpc('publicar_documento_mesa', { p_documento: id!, p_avisar: false })).error).toBeNull();
 	await page.getByRole('button', { name: 'Mostrar no telão' }).click();
 	await expect(page.getByRole('status')).toHaveText('O documento está no telão.');
+	// Passo 51: o publicado também aparece na aba Comitê, com "Novo" para quem não leu.
+	const alemanha = await (await browser.newContext()).newPage();
+	await entrar(alemanha, ALEMANHA);
+	await alemanha.goto(`/comite/${C.sigla}`);
+	const daMesa = alemanha.getByRole('region', { name: 'Da mesa' }).getByRole('listitem').filter({ hasText: titulo });
+	await expect(daMesa).toContainText('Novo');
+	await alemanha.context().close();
 
 	const telao = await (await browser.newContext()).newPage();
 	await entrar(telao, MESA);

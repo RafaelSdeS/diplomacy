@@ -252,7 +252,12 @@
 		</div>
 	{:else}
 		<h3 id="ficha-titulo">{t('Delegação')}</h3>
-		<p class={erro ? 'erro' : 'suave'}>{erro || t('Carregando…')}</p>
+		{#if erro}
+			<p class="erro">{erro}</p>
+		{:else}
+			<!-- Passo 51: o lugar do conteúdo, em CSS, enquanto ele chega. -->
+			<div class="esqueleto" role="status"><span class="so-leitor">{t('Carregando…')}</span><span></span><span></span><span></span></div>
+		{/if}
 	{/if}
 	{#if aviso && !escrever}<p class="sucesso" role="status">{aviso}</p>{/if}
 	<div class="acoes" hidden={!!escrever}>

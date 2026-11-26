@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { CONTAS, SENHA, entrar, sair } from './ajuda.ts';
+import { abrirAcao, CONTAS, SENHA, entrar, sair } from './ajuda.ts';
 
 const temas = ['light', 'dark'] as const;
 
@@ -96,10 +96,16 @@ test('a secretaria cria e remove um convite', async ({ page }, info) => {
 	await page.getByRole('navigation', { name: 'Principal' }).getByRole('link', { name: 'Participantes' }).click();
 	await expect(page.getByRole('heading', { level: 1, name: 'Participantes' })).toBeVisible();
 
-	await page.getByLabel('E-mail').fill(email);
-	await page.getByLabel('Papel').selectOption('mesa');
-	await page.getByLabel('Comitê').selectOption({ label: 'CSNU-T · Conselho de Segurança (teste)' });
-	await page.getByRole('button', { name: 'Convidar' }).click();
+	await abrirAcao(page, 'Novo convite');
+	const novo = page.getByRole('dialog', { name: 'Novo convite' });
+	await novo.getByLabel('E-mail').fill(email);
+	await novo.getByLabel('Papel').selectOption('mesa');
+	await novo.getByLabel('Comitê').selectOption({ label: 'CSNU-T · Conselho de Segurança (teste)' });
+	await novo.getByRole('button', { name: 'Convidar' }).click();
+	await expect(novo).toBeHidden();
+	// Passo 51: a busca acha o convite entre todos.
+	await page.getByRole('searchbox', { name: 'Buscar' }).fill(email);
+	await expect(page.getByRole('heading', { name: /^Convites \(1 de \d+\)$/ })).toBeVisible();
 
 	const item = page.getByRole('listitem').filter({ hasText: email });
 	await expect(item).toBeVisible();

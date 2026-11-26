@@ -12,7 +12,9 @@
 	import Bandeira from '#lib/ui/Bandeira.svelte';
 	import type { PageProps } from './$types';
 
-	import { definirTema, tema } from '#lib/preferencias.svelte.ts';
+	import { aparencia, definirAparencia, definirTema, tema } from '#lib/preferencias.svelte.ts';
+	import AcaoEmModal from '#lib/ui/AcaoEmModal.svelte';
+	import UserPen from '@lucide/svelte/icons/user-pen';
 	let { data }: PageProps = $props();
 
 	let nome = $state(untrack(() => data.pessoa.nome));
@@ -22,6 +24,9 @@
 	let fotoUrl = $state(untrack(() => data.fotoUrl));
 	let mensagem = $state('');
 	let erro = $state('');
+	// Passo 51: editar os dados abre num modal; a tela fica com a credencial e os cartões.
+	let modalPerfil = $state<AcaoEmModal>();
+	let mensagemFoto = $state(''); // dentro do modal, onde a foto é escolhida
 	let enviandoFoto = $state(false);
 	let push = $state<EstadoPush | null>(null);
 	let mudandoPush = $state(false);
@@ -66,6 +71,7 @@
 			return;
 		}
 		mensagem = t('Perfil salvo.');
+		modalPerfil?.fechar();
 		esquecerConta();
 		await invalidate('app:sessao'); // o nome do cabeçalho
 	}
@@ -73,7 +79,7 @@
 	async function enviarFoto(evento: Event & { currentTarget: HTMLInputElement }) {
 		const arquivo = evento.currentTarget.files?.[0];
 		if (!arquivo) return;
-		mensagem = erro = '';
+		mensagem = erro = mensagemFoto = '';
 		enviandoFoto = true;
 		try {
 			const imagem = await reduzirImagem(arquivo);
@@ -86,7 +92,7 @@
 			if (atualizacao.error) throw atualizacao.error;
 			esquecerLink('fotos', caminho);
 			fotoUrl = (await linksAssinados('fotos', [caminho])).get(caminho) ?? null;
-			mensagem = t('Foto atualizada.');
+			mensagemFoto = t('Foto atualizada.');
 		} catch {
 			erro = t('Não foi possível enviar a foto. Tente outra imagem.');
 		} finally {
@@ -120,107 +126,137 @@
 		</div>
 	</article>
 {/if}
-<p class="acoes"><a class="botao botao--secundario" href="/perfil/meus-dados">{t('Meus dados (LGPD)')}</a> <a class="botao botao--secundario" href="/pesquisa">{t('Pesquisa de satisfação')}</a></p>
+{#if mensagem}
+	<p class="sucesso" role="status">{mensagem}</p>
+{/if}
+<div class="acoes">
+	<AcaoEmModal bind:this={modalPerfil} rotulo={t('Editar perfil')} icone={UserPen} descricao={t('Foto, nome, minibiografia e idioma: valem em todo aparelho.')}>
+		<form class="formulario" onsubmit={salvar}>
+			<label class="campo">
+				{t('Foto')}
+				<input type="file" accept="image/*" disabled={enviandoFoto} onchange={enviarFoto} />
+			</label>
+			<label class="campo">
+				{t('Nome')}
+				<input required maxlength="80" autocomplete="name" bind:value={nome} />
+			</label>
+			<label class="campo">
+				{t('Minibiografia')}
+				<textarea maxlength="500" bind:value={bio} {@attach contador(bio)}></textarea>
+			</label>
+			<label class="campo">
+				{t('Idioma do app')}
+				<select bind:value={idiomaEscolhido}>
+					<option value="">{t('O do meu comitê')}</option>
+					<option value="pt">Português</option>
+					<option value="en">English</option>
+				</select>
+			</label>
+			{#if mensagemFoto}
+				<p class="sucesso" role="status">{mensagemFoto}</p>
+			{/if}
+			{#if erro}
+				<p class="erro" role="alert">{erro}</p>
+			{/if}
+			<button class="botao">{t('Salvar perfil')}</button>
+		</form>
+	</AcaoEmModal>
+	<a class="botao botao--secundario" href="/perfil/meus-dados">{t('Meus dados (LGPD)')}</a>
+	<a class="botao botao--secundario" href="/pesquisa">{t('Pesquisa de satisfação')}</a>
+</div>
 
-<section aria-labelledby="t-participacao">
-	<h2 id="t-participacao">{t('Sua participação')}</h2>
-	<ul class="lista">
-		{#each data.participacoes as p (p.id)}
-			<li>
-				<span class="com-bandeira">
-					<Bandeira codigo={p.delegacao_bandeira} />
-					{[rotuloPapel(p.papel), p.delegacao_nome, p.comite_sigla, p.evento_nome].filter(Boolean).join(' · ')}
-				</span>
-				{#if p.delegacao_id && p.comite_sigla}
-					<a href={`/comite/${p.comite_sigla}/delegacao/${p.delegacao_id}`}>{t('Página da delegação')}</a>
-				{/if}
-			</li>
-		{/each}
-	</ul>
-</section>
-
-<section aria-labelledby="t-dados">
-	<h2 id="t-dados">{t('Seus dados')}</h2>
-	<form class="formulario" onsubmit={salvar}>
-		<label class="campo">
-			{t('Foto')}
-			<input type="file" accept="image/*" disabled={enviandoFoto} onchange={enviarFoto} />
-		</label>
-		<label class="campo">
-			{t('Nome')}
-			<input required maxlength="80" autocomplete="name" bind:value={nome} />
-		</label>
-		<label class="campo">
-			{t('Minibiografia')}
-			<textarea maxlength="500" bind:value={bio} {@attach contador(bio)}></textarea>
-		</label>
-		<label class="campo">
-			{t('Idioma do app')}
-			<select bind:value={idiomaEscolhido}>
-				<option value="">{t('O do meu comitê')}</option>
-				<option value="pt">Português</option>
-				<option value="en">English</option>
-			</select>
-		</label>
-		{#if mensagem}
-			<p class="sucesso" role="status">{mensagem}</p>
-		{/if}
-		{#if erro}
-			<p class="erro" role="alert">{erro}</p>
-		{/if}
-		<button class="botao">{t('Salvar perfil')}</button>
-	</form>
-	<label class="campo campo--curto">
-		{t('Tema neste aparelho')}
-		<select value={tema.escolhido} onchange={(e) => definirTema(e.currentTarget.value)}>
-			<option value="">{t('Automático (o do sistema)')}</option>
-			<option value="light">{t('Claro')}</option>
-			<option value="dark">{t('Escuro')}</option>
-		</select>
-	</label>
-
-{#if data.recortes.length}
-	<section aria-labelledby="t-recortes">
-		<h2 id="t-recortes">{t('Recortes da sua delegação')}</h2>
+<div class="cartoes">
+	<section class="cartao" aria-labelledby="t-participacao">
+		<h2 id="t-participacao">{t('Sua participação')}</h2>
 		<ul class="lista">
-			{#each data.recortes as n (n.id)}
+			{#each data.participacoes as p (p.id)}
 				<li>
-					<span>
-						<a href={`/press/${n.veiculo?.comite?.sigla}?n=${n.id}`}>{n.titulo}</a>
-						<span class="detalhe">{n.veiculo?.nome}</span>
+					<span class="com-bandeira">
+						<Bandeira codigo={p.delegacao_bandeira} />
+						{[rotuloPapel(p.papel), p.delegacao_nome, p.comite_sigla, p.evento_nome].filter(Boolean).join(' · ')}
 					</span>
+					{#if p.delegacao_id && p.comite_sigla}
+						<a class="botao botao--secundario botao--pequeno" href={`/comite/${p.comite_sigla}/delegacao/${p.delegacao_id}`}>{t('Página da delegação')}</a>
+					{/if}
 				</li>
 			{/each}
 		</ul>
 	</section>
-{/if}
-</section>
 
-{#if push}
-	<section aria-labelledby="t-notificacoes">
-		<h2 id="t-notificacoes">{t('Notificações')}</h2>
-		<p class="suave">
-			{t('Só as importantes: avisos da organização e a resposta da crise às notas da sua delegação. Tudo continua aparecendo no app.')}
-		</p>
-		{#if push === 'indisponivel'}
-			<p>
-				{t('Este navegador não recebe notificações. No iPhone, adicione o app à tela de início (Compartilhar → Adicionar à Tela de Início) e abra por lá.')}
-			</p>
-		{:else if push === 'bloqueado'}
-			<p>{t('As notificações estão bloqueadas nas configurações do navegador para este site.')}</p>
-		{:else}
-			<button class="botao botao--secundario" disabled={mudandoPush} onclick={alternarPush}>
-				{push === 'ativo' ? t('Desativar notificações neste aparelho') : t('Ativar notificações neste aparelho')}
-			</button>
-		{/if}
-		{#if avisoPush}
-			<p class="sucesso" role="status">{avisoPush}</p>
-		{/if}
-		{#if erroPush}
-			<p class="erro" role="alert">{erroPush}</p>
-		{/if}
+	<!-- Passo 51 (preferências): o que vale só neste aparelho. -->
+	<section class="cartao" aria-labelledby="t-aparelho">
+		<h2 id="t-aparelho">{t('Neste aparelho')}</h2>
+		<div class="formulario">
+			<label class="campo">
+				{t('Tema neste aparelho')}
+				<select value={tema.escolhido} onchange={(e) => definirTema(e.currentTarget.value)}>
+					<option value="">{t('Automático (o do sistema)')}</option>
+					<option value="light">{t('Claro')}</option>
+					<option value="dark">{t('Escuro')}</option>
+				</select>
+			</label>
+			<label class="campo">
+				{t('Tamanho do texto')}
+				<select value={aparencia.texto} onchange={(e) => definirAparencia('texto', e.currentTarget.value)}>
+					<option value="">{t('Normal')}</option>
+					<option value="grande">{t('Grande')}</option>
+					<option value="maior">{t('Maior')}</option>
+				</select>
+			</label>
+			<label class="campo">
+				{t('Densidade')}
+				<select value={aparencia.densidade} onchange={(e) => definirAparencia('densidade', e.currentTarget.value)}>
+					<option value="">{t('A de cada tela')}</option>
+					<option value="confortavel">{t('Confortável: mais espaço')}</option>
+					<option value="compacta">{t('Compacta: mais coisas à vista')}</option>
+				</select>
+			</label>
+			<p class="suave">{t('Para marcar até cinco telas favoritas, use a estrela no "Ir para…" (a lupa do topo).')}</p>
+		</div>
 	</section>
-{/if}
+
+	{#if push}
+		<section class="cartao" aria-labelledby="t-notificacoes">
+			<h2 id="t-notificacoes">{t('Notificações')}</h2>
+			<p class="suave">
+				{t('Só as importantes: avisos da organização e a resposta da crise às notas da sua delegação. Tudo continua aparecendo no app.')}
+			</p>
+			{#if push === 'indisponivel'}
+				<p>
+					{t('Este navegador não recebe notificações. No iPhone, adicione o app à tela de início (Compartilhar → Adicionar à Tela de Início) e abra por lá.')}
+				</p>
+			{:else if push === 'bloqueado'}
+				<p>{t('As notificações estão bloqueadas nas configurações do navegador para este site.')}</p>
+			{:else}
+				<button class="botao botao--secundario" disabled={mudandoPush} onclick={alternarPush}>
+					{push === 'ativo' ? t('Desativar notificações neste aparelho') : t('Ativar notificações neste aparelho')}
+				</button>
+			{/if}
+			{#if avisoPush}
+				<p class="sucesso" role="status">{avisoPush}</p>
+			{/if}
+			{#if erroPush}
+				<p class="erro" role="alert">{erroPush}</p>
+			{/if}
+		</section>
+	{/if}
+
+	{#if data.recortes.length}
+		<section class="cartao" aria-labelledby="t-recortes">
+			<h2 id="t-recortes">{t('Recortes da sua delegação')}</h2>
+			<ul class="lista">
+				{#each data.recortes as n (n.id)}
+					<li>
+						<span>
+							<a href={`/press/${n.veiculo?.comite?.sigla}?n=${n.id}`}>{n.titulo}</a>
+							<span class="detalhe">{n.veiculo?.nome}</span>
+						</span>
+					</li>
+				{/each}
+			</ul>
+		</section>
+	{/if}
+</div>
 
 <!-- Passo 54: o acesso discreto à página "Sobre". -->
 <p class="suave"><a href="/sobre">{t('Sobre o Diplomacy')}</a></p>

@@ -151,20 +151,44 @@
 - **Teste** (`51-conversas`): a 1366 × 768, quem rola é a coluna, não a página; Enter envia; a resposta chega na conversa aberta sem recarregar; no celular, lista e conversa uma de cada vez, e a não lida tem o ponto.
 - **Limite:** a altura da conversa conta com o cabeçalho, o título e a regra; com um pedido de entrevista pendente, a página rola um pouco.
 
+**Lotes da crise, blocos e secretaria, preferências e o que vale em todos (26/11/2026):**
+
+- **Crise (equipe):** "Lançar uma crise", "Nova atualização" e "Encerrar: …" viram botões com modal, e o erro aparece dentro dele. As atualizações publicadas abrem num modal. O canal com a mesa virou botão. O filtro da fila tem contagem ("3 de 12") e "Limpar". No notebook, a fila e a nota aberta rolam por dentro, e a página não rola.
+- **Blocos:** o redator usa "Passar a redação": escolhe o membro, com bandeira, e confirma; quem passa deixa de ser redator. "Mudar" continua para dividir a redação. O estado vazio explica o que é um bloco e como criar. A troca por consenso segue esperando o piloto.
+- **Secretaria:**
+  - **Participantes:** "Novo convite" abre num modal. As listas ganharam busca, filtros por comitê e papel, contagem e "Limpar", e ficam lado a lado, cada uma rolando por dentro (antes, a página tinha 38 mil pixels).
+  - **Dados e arquivo:** virou cartões. "Preparar a próxima edição" e "Apagar os dados pessoais" abrem em modais.
+- **Perfil:** "Editar perfil" abre num modal (foto, nome, minibiografia e idioma), e a tela fica com a credencial e cartões. O novo cartão "Neste aparelho" reúne o tema, o tamanho do texto (normal, grande, maior) e a densidade (a de cada tela, confortável, compacta).
+- **Preferências** (`preferencias.svelte.ts`, guardadas no aparelho e aplicadas antes da primeira pintura, como o tema): até cinco telas favoritas, marcadas com a estrela no "Ir para…", que aparecem no topo dele e do "Mais".
+- **Em todas as telas:**
+  - "Rascunho guardado neste aparelho" aparece onde o texto já se guarda: carta, ponto ou moção, nota de crise e documento da mesa.
+  - A prévia e a ficha mostram um esqueleto em CSS enquanto carregam.
+  - Os documentos publicados pela mesa também aparecem na aba Comitê.
+  - Link com cara de botão (`a.botao`) deixou de ser sublinhado em todo o app.
+  - As notas da fila da crise viraram cartões clicáveis, em vez de texto solto.
+- **Testes:**
+  - `51-acabamento`: toda ação tem fundo, e o axe passa nos dois temas, nas telas revisadas; Participantes e a fila da crise não rolam a página; o texto de um modal de criar sobrevive a fechar e reabrir.
+  - `43-fluxo`: a favorita fica no topo e o texto grande vale depois de recarregar.
+  - `47-fichas`: passar a redação.
+- **Ainda não:**
+  - A presidência com a votação aberta, a 1366 × 768, ainda rola, como já registrado no lote 1.
+  - O "voltar" não preserva o filtro e a rolagem.
+  - A densidade automática por papel ficou como "a de cada tela", para não mudar as telas que já passaram pelo uso.
+
 ## Fora desta etapa
 
 Itens que dependem de um segundo evento, habilidades especiais para delegações, edição livre simultânea e telas inteiras de personalização.
 
 ## Testes
 
-- [ ] Lote 0, ponta a ponta: em cada tela da lista, a ação de criar é um botão que abre um modal no centro, e o texto digitado sobrevive a fechar e reabrir.
-- [ ] Lote 0: anotar sobre uma delegação a partir da sessão, da ficha e da página da delegação, sem ir à aba Caderno.
-- [ ] Lote 0: Perfil e Sair só com ícone, com nome acessível, no notebook e no celular.
-- [ ] Lote 0, captura: nenhuma ação sem fundo nas telas revisadas (botões têm fundo; links sublinhados só em texto corrido).
+- [x] Lote 0, ponta a ponta: em cada tela da lista, a ação de criar é um botão que abre um modal no centro, e o texto digitado sobrevive a fechar e reabrir (`51-acabamento`; os modais, nos testes de cada tela, com `abrirAcao`).
+- [x] Lote 0: anotar sobre uma delegação a partir da sessão, da ficha e da página da delegação, sem ir à aba Caderno (`47-cabecalho`, `55-paises`).
+- [x] Lote 0: Perfil e Sair só com ícone, com nome acessível, no notebook e no celular (`47-cabecalho`).
+- [x] Lote 0: nenhuma ação sem fundo nas telas revisadas (botões têm fundo; links sublinhados só em texto corrido), conferido pelo estilo calculado em `51-acabamento`.
 
 - [ ] Ponta a ponta, a 1366 × 768: a área principal da presidência não rola em cada fase (debate, votação aberta, plenária) e a da Agora não rola para a mesa e para o delegado; o teste compara a altura do conteúdo com a da janela.
-- [ ] Capturas e axe nas telas revisadas, no tema claro e no escuro.
+- [x] Axe nas telas revisadas, no tema claro e no escuro (`51-acabamento` e os testes de cada tela). As capturas cobrem as telas que já tinham.
 - [ ] Ponta a ponta: o voltar leva à tela de origem e preserva filtro e rolagem.
-- [ ] Ponta a ponta: um favorito marcado aparece no topo do "Ir para…" e continua lá depois de recarregar.
+- [x] Ponta a ponta: um favorito marcado aparece no topo do "Ir para…" e continua lá depois de recarregar (`43-fluxo`).
 - [ ] Teclado e leitor de tela nas modais e nas fichas.
 - [ ] Manual: uma pessoa nova encontra uma tarefa comum em poucos passos.

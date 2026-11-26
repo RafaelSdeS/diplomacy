@@ -137,7 +137,12 @@
 		<p class="ficha-texto">{conteudo.texto}</p>
 	{:else}
 		<h3 id="previa-titulo">{t('Documento')}</h3>
-		<p class={erro ? 'erro' : 'suave'}>{erro || t('Carregando…')}</p>
+		{#if erro}
+			<p class="erro">{erro}</p>
+		{:else}
+			<!-- Passo 51: o lugar do conteúdo, em CSS, enquanto ele chega. -->
+			<div class="esqueleto" role="status"><span class="so-leitor">{t('Carregando…')}</span><span></span><span></span><span></span></div>
+		{/if}
 	{/if}
 	<div class="acoes">
 		{#if conteudo?.href && conteudo.externo}

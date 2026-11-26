@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { contaDoTreino, isolado } from '../scripts/delegacoes.ts';
-import { clienteComo, entrar, escolher } from './ajuda.ts';
+import { abrirAcao, clienteComo, entrar, escolher } from './ajuda.ts';
 
 // Passo 39: a cópia do TREINO só deste arquivo (scripts/delegacoes.ts).
 const C = isolado('35');
@@ -49,6 +49,7 @@ const aoVivo = (page: Page) => expect(page.locator('[data-ao-vivo="sim"]')).toBe
 test('a crise deixa o Brasil sem voz, toma o telão e, no fim, devolve a voz', async ({ page, browser }) => {
 	await entrar(page, CRISE);
 	await page.goto(`/crise/${C.sigla}`);
+	await abrirAcao(page, 'Lançar uma crise');
 	const lancar = page.getByRole('form', { name: 'Lançar uma crise' });
 	await lancar.getByLabel('Título').fill(TITULO);
 	await lancar.getByLabel('Briefing').fill('O delegado brasileiro foi sequestrado. O comitê tem 20 minutos para negociar.');
@@ -78,6 +79,7 @@ test('a crise deixa o Brasil sem voz, toma o telão e, no fim, devolve a voz', a
 	await expect(brasil.getByRole('button', { name: 'Fazer um ponto ou moção' })).toHaveCount(0);
 
 	// A equipe encerra a crise: resolvida.
+	await page.getByRole('button', { name: `Encerrar: ${TITULO}` }).click();
 	const encerrar = page.getByRole('form', { name: `Encerrar: ${TITULO}` });
 	await encerrar.getByLabel('O que aconteceu').fill('O delegado foi libertado.');
 	await encerrar.getByRole('button', { name: 'Encerrar a crise' }).click();

@@ -25,6 +25,54 @@ export function definirTema(novo: string) {
 export const temaAtual = () => tema.escolhido || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
 export const alternarTema = () => definirTema(temaAtual() === 'dark' ? 'light' : 'dark');
 
+// Passo 51 (preferências): até cinco telas favoritas, o tamanho do texto e a densidade. Ficam
+// neste aparelho, como o tema; sem armazenamento, valem até fechar o app.
+function ler(chave: string) {
+	try {
+		return localStorage.getItem(chave) ?? '';
+	} catch {
+		return '';
+	}
+}
+function gravar(chave: string, valor: string) {
+	try {
+		if (valor) localStorage.setItem(chave, valor);
+		else localStorage.removeItem(chave);
+	} catch {
+		// sem armazenamento: vale até fechar o app
+	}
+}
+function lerLista(chave: string): string[] {
+	try {
+		const lista: unknown = JSON.parse(ler(chave) || '[]');
+		return Array.isArray(lista) ? lista.filter((x): x is string => typeof x === 'string') : [];
+	} catch {
+		return [];
+	}
+}
+
+export const MAX_FAVORITOS = 5;
+export const favoritos = $state({ hrefs: typeof document === 'undefined' ? [] : lerLista('favoritos').slice(0, MAX_FAVORITOS) });
+
+/** Marca ou desmarca uma tela; com cinco, não marca outra (devolve false). */
+export function alternarFavorito(href: string) {
+	const marcado = favoritos.hrefs.includes(href);
+	if (!marcado && favoritos.hrefs.length >= MAX_FAVORITOS) return false;
+	favoritos.hrefs = marcado ? favoritos.hrefs.filter((h) => h !== href) : [...favoritos.hrefs, href];
+	gravar('favoritos', favoritos.hrefs.length ? JSON.stringify(favoritos.hrefs) : '');
+	return true;
+}
+
+/** Tamanho do texto ('', 'grande', 'maior') e densidade ('', 'confortavel', 'compacta'). */
+const dataset = typeof document === 'undefined' ? {} : document.documentElement.dataset;
+export const aparencia = $state({ texto: dataset.texto ?? '', densidade: dataset.densidade ?? '' });
+export function definirAparencia(chave: 'texto' | 'densidade', valor: string) {
+	aparencia[chave] = valor;
+	if (valor) document.documentElement.dataset[chave] = valor;
+	else delete document.documentElement.dataset[chave];
+	gravar(chave, valor);
+}
+
 /** O botão de idioma fala na língua para onde leva (quem não lê a atual acha o caminho). */
 export const TROCAR_IDIOMA = { pt: 'Mudar o app para português', en: 'Switch the app to English' };
 

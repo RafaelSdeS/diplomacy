@@ -18,6 +18,7 @@
 	import Vote from '@lucide/svelte/icons/vote';
 	import GradeAtalhos, { type Atalho } from '#lib/ui/GradeAtalhos.svelte';
 	import CircleHelp from '@lucide/svelte/icons/circle-help';
+	import { lerLidas, seloDaPublicacao } from '#lib/nao-lidas.ts';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -27,6 +28,9 @@
 	const ehMesa = $derived(
 		data.participacoes.some((p) => p.papel === 'secretaria' || (p.papel === 'mesa' && p.comite_id === data.comite.id))
 	);
+	// Passo 58: "Novo" e "Alterado" pela publicação lida neste aparelho, como em Documentos.
+	const lidas = $derived(lerLidas(data.comite.id));
+	const SELO = (): Record<string, string> => ({ novo: t('Novo'), alterado: t('Alterado') });
 	const minha = $derived(data.participacoes.find((p) => p.papel === 'delegado' && p.comite_id === data.comite.id)?.delegacao_id);
 
 	// Passo 43: o que se faz no comitê, em atalhos que dizem para que servem.
@@ -72,6 +76,25 @@
 		{/each}
 	</ol>
 </section>
+
+{#if data.daMesa.length}
+	<section aria-labelledby="t-da-mesa">
+		<h2 id="t-da-mesa">{t('Da mesa')}</h2>
+		<ul class="lista">
+			{#each data.daMesa as d (d.id)}
+				{@const selo = seloDaPublicacao(lidas, d.id, d.versao)}
+				<li>
+					<span>
+						<a href={`/comite/${data.comite.sigla}/documentos/mesa/${d.id}`}>{d.titulo}</a>
+						{#if selo}<span class="selo selo--info">{SELO()[selo]}</span>{/if}
+						{#if d.fixado}<span class="detalhe">{t('fixado')}</span>{/if}
+					</span>
+				</li>
+			{/each}
+		</ul>
+		<p><a class="botao botao--secundario botao--pequeno" href={`/comite/${data.comite.sigla}/documentos`}>{t('Todos os documentos')}</a></p>
+	</section>
+{/if}
 
 <GradeAtalhos nome={t('Atalhos do comitê')} {atalhos} />
 

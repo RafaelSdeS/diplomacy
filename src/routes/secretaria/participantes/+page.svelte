@@ -5,6 +5,8 @@
 	import { supabase, type Papel } from '#lib/supabase.ts';
 	import Confirmar from '#lib/ui/Confirmar.svelte';
 	import Escolha from '#lib/ui/Escolha.svelte';
+	import AcaoEmModal from '#lib/ui/AcaoEmModal.svelte';
+	import UserPlus from '@lucide/svelte/icons/user-plus';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -17,6 +19,22 @@
 	let enviando = $state(false);
 
 	const delegacoesDoComite = $derived(data.delegacoes.filter((d) => d.comite_id === comite));
+
+	// Passo 51 (lote da secretaria): o convite abre num modal; as listas têm busca e filtros.
+	let modalConvite = $state<AcaoEmModal>();
+	let busca = $state('');
+	let filtroComite = $state('');
+	let filtroPapel = $state('');
+	const filtrando = $derived(!!(busca.trim() || filtroComite || filtroPapel));
+	const passa = (item: { papel: Papel; comite_id: string | null }, texto: string) =>
+		(!filtroComite || item.comite_id === filtroComite) &&
+		(!filtroPapel || item.papel === filtroPapel) &&
+		texto.toLocaleLowerCase('pt-BR').includes(busca.trim().toLocaleLowerCase('pt-BR'));
+	const convites = $derived(data.convites.filter((c) => passa(c, c.email)));
+	const inscritos = $derived(data.inscritos.filter((p) => passa(p, p.pessoa?.nome ?? '')));
+	function limpar() {
+		busca = filtroComite = filtroPapel = '';
+	}
 
 	function descrever(item: { papel: Papel; comite_id: string | null; delegacao_id: string | null }) {
 		const partes = [PAPEIS.find((p) => p.valor === item.papel)?.rotulo ?? item.papel];
@@ -47,6 +65,7 @@
 			return;
 		}
 		email = '';
+		modalConvite?.fechar();
 		await invalidate('app:participantes');
 	}
 
@@ -78,91 +97,129 @@
 
 <p class="rotulo">Secretaria</p>
 <h1>Participantes</h1>
-<nav class="atalhos" aria-label="Ferramentas da secretaria">
-	<a class="botao botao--secundario" href="/secretaria/importar">Importar inscrições</a>
-	<a class="botao botao--secundario" href="/imprimir/crachas">Crachás</a>
-	<a class="botao botao--secundario" href="/secretaria/checkin">Check-in</a>
-	<a class="botao botao--secundario" href="/secretaria/certificados">Certificados</a>
-	<a class="botao botao--secundario" href="/secretaria/dados">Dados e arquivo</a>
-</nav>
-<p class="suave">
-	Cada convite dá um papel a um e-mail. Quem já tem conta recebe o papel na hora; quem ainda não tem,
-	quando a conta for criada. Remover um convite não tira o papel de quem já o recebeu.
-</p>
-
-<section aria-labelledby="t-novo">
-	<h2 id="t-novo">Novo convite</h2>
-	<form class="formulario" onsubmit={convidar}>
-		<label class="campo">
-			E-mail
-			<input type="email" required autocomplete="off" bind:value={email} />
-		</label>
-		<label class="campo">
-			Papel
-			<select bind:value={papel}>
-				{#each PAPEIS as p (p.valor)}
-					<option value={p.valor}>{p.rotulo}</option>
-				{/each}
-			</select>
-		</label>
-		{#if papel !== 'secretaria' && papel !== 'diretoria_press'}
+<div class="acoes">
+	<AcaoEmModal
+		bind:this={modalConvite}
+		rotulo="Novo convite"
+		icone={UserPlus}
+		descricao="Cada convite dá um papel a um e-mail. Quem já tem conta recebe o papel na hora; quem ainda não tem, quando a conta for criada. Remover um convite não tira o papel de quem já o recebeu."
+	>
+		<form class="formulario" onsubmit={convidar}>
 			<label class="campo">
-				Comitê
-				<select required bind:value={comite} onchange={() => (delegacao = '')}>
-					<option value="" disabled>Escolha o comitê</option>
-					{#each data.comites as c (c.id)}
-						<option value={c.id}>{c.sigla} · {c.nome}</option>
+				E-mail
+				<input type="email" required autocomplete="off" bind:value={email} />
+			</label>
+			<label class="campo">
+				Papel
+				<select bind:value={papel}>
+					{#each PAPEIS as p (p.valor)}
+						<option value={p.valor}>{p.rotulo}</option>
 					{/each}
 				</select>
 			</label>
-		{/if}
-		{#if papel === 'delegado'}
-			<Escolha unica rotulo="Delegação" botao="Escolher" opcoes={delegacoesDoComite} bind:valor={delegacao} />
-		{/if}
-		{#if erro}
-			<p class="erro" role="alert">{erro}</p>
-		{/if}
-		<button class="botao" disabled={enviando}>Convidar</button>
-	</form>
-</section>
+			{#if papel !== 'secretaria' && papel !== 'diretoria_press'}
+				<label class="campo">
+					Comitê
+					<select required bind:value={comite} onchange={() => (delegacao = '')}>
+						<option value="" disabled>Escolha o comitê</option>
+						{#each data.comites as c (c.id)}
+							<option value={c.id}>{c.sigla} · {c.nome}</option>
+						{/each}
+					</select>
+				</label>
+			{/if}
+			{#if papel === 'delegado'}
+				<Escolha unica rotulo="Delegação" botao="Escolher" opcoes={delegacoesDoComite} bind:valor={delegacao} />
+			{/if}
+			{#if erro}
+				<p class="erro" role="alert">{erro}</p>
+			{/if}
+			<button class="botao" disabled={enviando}>Convidar</button>
+		</form>
+	</AcaoEmModal>
+	<nav class="acoes" aria-label="Ferramentas da secretaria">
+		<a class="botao botao--secundario" href="/secretaria/importar">Importar inscrições</a>
+		<a class="botao botao--secundario" href="/imprimir/crachas">Crachás</a>
+		<a class="botao botao--secundario" href="/secretaria/checkin">Check-in</a>
+		<a class="botao botao--secundario" href="/secretaria/certificados">Certificados</a>
+		<a class="botao botao--secundario" href="/secretaria/dados">Dados e arquivo</a>
+	</nav>
+</div>
 
-<section aria-labelledby="t-convites">
-	<h2 id="t-convites">Convites ({data.convites.length})</h2>
-	<ul class="lista">
-		{#each data.convites as c (c.id)}
-			<li>
-				<span>
-					{c.email}
-					<span class="detalhe">{descrever(c)}</span>
-				</span>
-				<button
-					class="botao botao--secundario botao--pequeno"
-					type="button"
-					aria-label={`Remover o convite de ${c.email}`}
-					onclick={() => remover(c.id)}>Remover</button
-				>
-			</li>
-		{/each}
-	</ul>
-</section>
+<div class="acoes filtros" role="search" aria-label="Filtrar participantes">
+	<label class="campo">
+		Buscar
+		<input type="search" placeholder="Nome ou e-mail" bind:value={busca} />
+	</label>
+	<label class="campo">
+		Filtrar por comitê
+		<select bind:value={filtroComite}>
+			<option value="">Todos os comitês</option>
+			{#each data.comites as c (c.id)}
+				<option value={c.id}>{c.sigla}</option>
+			{/each}
+		</select>
+	</label>
+	<label class="campo">
+		Filtrar por papel
+		<select bind:value={filtroPapel}>
+			<option value="">Todos os papéis</option>
+			{#each PAPEIS as p (p.valor)}
+				<option value={p.valor}>{p.rotulo}</option>
+			{/each}
+		</select>
+	</label>
+	{#if filtrando}
+		<button class="botao botao--secundario botao--pequeno" type="button" onclick={limpar}>Limpar</button>
+	{/if}
+</div>
+{#if erro}
+	<p class="erro" role="alert">{erro}</p>
+{/if}
 
-<section aria-labelledby="t-inscritos">
-	<h2 id="t-inscritos">Com acesso ({data.inscritos.length})</h2>
-	<ul class="lista">
-		{#each data.inscritos as p (p.id)}
-			<li>
-				<span>
-					{p.pessoa?.nome}
-					<span class="detalhe">{descrever(p)}</span>
-				</span>
-				<Confirmar
-					rotulo="Remover acesso"
-					classe="botao botao--secundario botao--pequeno"
-					pergunta={`Remover o acesso de ${p.pessoa?.nome ?? 'esta pessoa'} (${descrever(p)})?`}
-					explicacao="A pessoa sai do app em todos os aparelhos agora e para de receber notificações. Para voltar, precisa de um convite novo."
-					acao={() => removerAcesso(p.id)}
-				/>
-			</li>
-		{/each}
-	</ul>
-</section>
+<div class="colunas-que-rolam">
+	<section class="cartao" aria-labelledby="t-inscritos">
+		<h2 id="t-inscritos">Com acesso ({filtrando ? `${inscritos.length} de ${data.inscritos.length}` : data.inscritos.length})</h2>
+		<ul class="lista">
+			{#each inscritos as p (p.id)}
+				<li>
+					<span>
+						{p.pessoa?.nome}
+						<span class="detalhe">{descrever(p)}</span>
+					</span>
+					<Confirmar
+						rotulo="Remover acesso"
+						classe="botao botao--secundario botao--pequeno"
+						pergunta={`Remover o acesso de ${p.pessoa?.nome ?? 'esta pessoa'} (${descrever(p)})?`}
+						explicacao="A pessoa sai do app em todos os aparelhos agora e para de receber notificações. Para voltar, precisa de um convite novo."
+						acao={() => removerAcesso(p.id)}
+					/>
+				</li>
+			{:else}
+				<li class="suave">{filtrando ? 'Ninguém com acesso neste filtro.' : 'Ninguém tem acesso ainda: crie convites ou importe as inscrições.'}</li>
+			{/each}
+		</ul>
+	</section>
+
+	<section class="cartao" aria-labelledby="t-convites">
+		<h2 id="t-convites">Convites ({filtrando ? `${convites.length} de ${data.convites.length}` : data.convites.length})</h2>
+		<ul class="lista">
+			{#each convites as c (c.id)}
+				<li>
+					<span>
+						{c.email}
+						<span class="detalhe">{descrever(c)}</span>
+					</span>
+					<button
+						class="botao botao--secundario botao--pequeno"
+						type="button"
+						aria-label={`Remover o convite de ${c.email}`}
+						onclick={() => remover(c.id)}>Remover</button
+					>
+				</li>
+			{:else}
+				<li class="suave">{filtrando ? 'Nenhum convite neste filtro.' : 'Nenhum convite ainda: use "Novo convite" ou "Importar inscrições".'}</li>
+			{/each}
+		</ul>
+	</section>
+</div>

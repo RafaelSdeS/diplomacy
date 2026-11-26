@@ -24,6 +24,12 @@
 	import NomeDelegacao from '#lib/ui/NomeDelegacao.svelte';
 	import AlertaCrise from '#lib/ui/AlertaCrise.svelte';
 	import Escolha from '#lib/ui/Escolha.svelte';
+	import AcaoEmModal from '#lib/ui/AcaoEmModal.svelte';
+	import Modal from '#lib/ui/Modal.svelte';
+	import Siren from '@lucide/svelte/icons/siren';
+	import Megaphone from '@lucide/svelte/icons/megaphone';
+	import MessagesSquare from '@lucide/svelte/icons/messages-square';
+	import FlagOff from '@lucide/svelte/icons/flag-off';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -59,13 +65,21 @@
 	let comitesDaCrise = $state<string[]>(untrack(() => [data.comite.id]));
 	let efeitos = $state<{ delegacao_id: string; texto: string; minutos: number | null }[]>([]);
 	let desfecho = $state<Record<string, { resultado: string; texto: string }>>({});
+	// Passo 51 (lote da crise): lançar, atualizar e encerrar abrem num modal; o erro aparece nele.
+	let modalLancar = $state<AcaoEmModal>();
+	let modalAtualizar = $state<AcaoEmModal>();
+	let modalAtualizacoes = $state<Modal>();
+	let modalEncerrar = $state<Modal>();
+	let encerrando = $state<string | null>(null);
+	let erroModal = $state('');
+	const emEncerramento = $derived(ativos.find((i) => i.id === encerrando));
 	$effect(() => {
 		for (const i of ativos) if (!desfecho[i.id]) desfecho[i.id] = { resultado: 'resolvido', texto: '' };
 	});
 
 	async function lancar(evento: SubmitEvent) {
 		evento.preventDefault();
-		erro = mensagem = '';
+		erro = erroModal = mensagem = '';
 		const { data: id, error } = await supabase.rpc('lancar_incidente', {
 			p_comites: comitesDaCrise,
 			p_titulo: crise.titulo,
@@ -75,8 +89,9 @@
 				.filter((e) => e.delegacao_id && e.texto)
 				.map((e) => ({ delegacao_id: e.delegacao_id, texto: e.texto, ...(e.minutos ? { minutos: e.minutos } : {}) }))
 		});
-		if (error) erro = mensagemDeErro(error);
+		if (error) erroModal = mensagemDeErro(error);
 		else {
+			modalLancar?.fechar();
 			pedirNotificacao('crise', [id]);
 			mensagem = t('Crise lançada.');
 			crise = { titulo: '', texto: '', minutos: 20 };
@@ -86,11 +101,14 @@
 	}
 
 	async function encerrar(id: string) {
-		erro = mensagem = '';
+		erro = erroModal = mensagem = '';
 		const d = desfecho[id] ?? { resultado: 'resolvido', texto: '' };
 		const { error } = await supabase.rpc('encerrar_incidente', { p_id: id, p_desfecho: d.resultado, p_texto: d.texto });
-		if (error) erro = mensagemDeErro(error);
-		else mensagem = t('Crise encerrada.');
+		if (error) erroModal = mensagemDeErro(error);
+		else {
+			mensagem = t('Crise encerrada.');
+			modalEncerrar?.fechar();
+		}
 		await invalidate('app:crise');
 	}
 
@@ -138,11 +156,15 @@
 
 	async function publicar(evento: SubmitEvent) {
 		evento.preventDefault();
-		const ok = await executar(
-			supabase.rpc('publicar_atualizacao', { p_comites: comitesDaAtualizacao, p_texto: atualizacao }),
-			t('Atualização publicada.')
-		);
-		if (ok) atualizacao = '';
+		erro = erroModal = mensagem = '';
+		const { error } = await supabase.rpc('publicar_atualizacao', { p_comites: comitesDaAtualizacao, p_texto: atualizacao });
+		if (error) erroModal = mensagemDeErro(error);
+		else {
+			mensagem = t('Atualização publicada.');
+			atualizacao = '';
+			modalAtualizar?.fechar();
+		}
+		await invalidate('app:crise');
 	}
 </script>
 
@@ -161,7 +183,6 @@
 	/>
 </p>
 <h1>{t('Fila da crise')}</h1>
-<p><a href={`/comite/${data.comite.sigla}/mensagens`}>{t('Canal interno com a mesa')}</a></p>
 
 {#if !ehCrise}
 	<p class="suave">{t('Só a equipe de crise do comitê vê esta fila.')}</p>
@@ -174,6 +195,35 @@
 			</span>
 		{/if}
 	</p>
+
+	<div class="acoes">
+		<AcaoEmModal bind:this={modalLancar} rotulo={t('Lançar uma crise')} icone={Siren} descricao={t('O comitê vê o briefing e o prazo na hora, no telão e na sessão.')}>
+			{@render formularioDaCrise()}
+		</AcaoEmModal>
+		<AcaoEmModal bind:this={modalAtualizar} secundario rotulo={t('Nova atualização')} titulo={t('Publicar uma atualização de crise')} icone={Megaphone}>
+			{@render formularioDaAtualizacao()}
+		</AcaoEmModal>
+		{#each ativos as i (i.id)}
+			<button
+				class="botao botao--secundario"
+				type="button"
+				onclick={() => {
+					erroModal = '';
+					encerrando = i.id;
+					modalEncerrar?.abrir();
+				}}><FlagOff aria-hidden="true" size={18} strokeWidth={1.75} /> {t('Encerrar: {crise}', { crise: i.titulo })}</button
+			>
+		{/each}
+		{#if data.atualizacoes.length}
+			<button class="botao botao--secundario" type="button" onclick={() => modalAtualizacoes?.abrir()}
+				>{t('Atualizações publicadas')} <span class="selo">{data.atualizacoes.length}</span></button
+			>
+		{/if}
+		<a class="botao botao--secundario" href={`/comite/${data.comite.sigla}/mensagens`}
+			><MessagesSquare aria-hidden="true" size={18} strokeWidth={1.75} /> {t('Canal interno com a mesa')}</a
+		>
+	</div>
+	<AlertaCrise incidentes={data.incidentes} {diferenca} />
 
 	{#if erro}
 		<p class="erro" role="alert">{erro}</p>
@@ -196,6 +246,10 @@
 					</select>
 				</label>
 				<label class="opcao"><input type="checkbox" bind:checked={soEsperando} /> {t('Só as que esperam')}</label>
+				{#if filtro || soEsperando}
+					<span class="detalhe">{t('{n} de {total}', { n: fila.length, total: data.notas.length })}</span>
+					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => ((filtro = ''), (soEsperando = false))}>{t('Limpar')}</button>
+				{/if}
 			</div>
 			<ol class="lista fila-crise">
 				{#each fila as nota (nota.id)}
@@ -275,10 +329,10 @@
 		</section>
 	</div>
 
-	<section aria-labelledby="t-crise-prazo">
-		<h2 id="t-crise-prazo">{t('Crise com prazo')}</h2>
-		<AlertaCrise incidentes={data.incidentes} {diferenca} />
-		{#each ativos.filter((i) => desfecho[i.id]) as i (i.id)}
+	<Modal bind:this={modalEncerrar} rotulo="t-encerrar" classe="modal-acao" onclose={() => (encerrando = null)}>
+		{#if emEncerramento && desfecho[emEncerramento.id]}
+			{@const i = emEncerramento}
+			<h3 id="t-encerrar">{t('Encerrar: {crise}', { crise: i.titulo })}</h3>
 			<form
 				class="formulario"
 				aria-label={t('Encerrar: {crise}', { crise: i.titulo })}
@@ -293,76 +347,83 @@
 					<label class="opcao"><input type="radio" value="fracassou" bind:group={desfecho[i.id].resultado} /> {t('Fracassou')}</label>
 				</fieldset>
 				<label class="campo">{t('O que aconteceu')} <textarea rows="2" maxlength="3000" bind:value={desfecho[i.id].texto} {@attach contador(desfecho[i.id].texto)}></textarea></label>
+				{#if erroModal}<p class="erro" role="alert">{erroModal}</p>{/if}
 				<button class="botao">{t('Encerrar a crise')}</button>
 			</form>
-		{/each}
-
-		<form class="formulario formulario--largo" onsubmit={lancar} aria-label={t('Lançar uma crise')}>
-			<label class="campo">{t('Título')} <input required maxlength="120" bind:value={crise.titulo} {@attach contador(crise.titulo)} /></label>
-			<label class="campo">
-				{t('Briefing')}
-				<textarea required rows="4" maxlength="3000" bind:value={crise.texto} {@attach contador(crise.texto)}></textarea>
-			</label>
-			<label class="campo campo--curto">
-				{t('Prazo (minutos)')}
-				<input type="number" required min="1" max="240" bind:value={crise.minutos} />
-			</label>
-			{#if meusComites.length > 1}
-				<fieldset class="opcoes">
-					<legend>{t('Comitês (crise conjunta)')}</legend>
-					{#each meusComites as c (c.id)}
-						<label class="opcao"><input type="checkbox" value={c.id} bind:group={comitesDaCrise} /> {c.sigla}</label>
-					{/each}
-				</fieldset>
-			{/if}
-			<fieldset class="opcoes">
-				<legend>{t('Delegações atingidas (ficam sem voz)')}</legend>
-				{#each efeitos as e, i (i)}
-					<div class="acoes efeito">
-						<Escolha unica rotulo={t('Delegação')} botao={t('Escolher')} opcoes={data.delegacoes} bind:valor={e.delegacao_id} />
-						<label class="campo">{t('O que aconteceu com ela')} <input required maxlength="200" bind:value={e.texto} {@attach contador(e.texto)} /></label>
-						<label class="campo campo--curto">
-							{t('Minutos (vazio: até o fim)')}
-							<input type="number" min="1" max="240" bind:value={e.minutos} />
-						</label>
-						<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => (efeitos = efeitos.filter((_, j) => j !== i))}
-							>{t('Tirar')}</button
-						>
-					</div>
-				{/each}
-				<button
-					class="botao botao--secundario botao--pequeno"
-					type="button"
-					onclick={() => (efeitos = [...efeitos, { delegacao_id: '', texto: '', minutos: null }])}>{t('Adicionar uma delegação atingida')}</button
-				>
-			</fieldset>
-			<button class="botao">{t('Lançar a crise')}</button>
-		</form>
-	</section>
-
-	<section aria-labelledby="t-atualizacao">
-		<h2 id="t-atualizacao">{t('Atualização de crise')}</h2>
-		<form class="formulario formulario--largo" onsubmit={publicar}>
-			<label class="campo">
-				{t('Texto da atualização')}
-				<textarea required maxlength="3000" rows="4" bind:value={atualizacao} {@attach contador(atualizacao)}></textarea>
-			</label>
-			{#if meusComites.length > 1}
-				<fieldset class="opcoes">
-					<legend>{t('Comitês (crise conjunta)')}</legend>
-					{#each meusComites as c (c.id)}
-						<label class="opcao"><input type="checkbox" value={c.id} bind:group={comitesDaAtualizacao} /> {c.sigla}</label>
-					{/each}
-				</fieldset>
-			{/if}
-			<button class="botao">{t('Publicar atualização')}</button>
-		</form>
-		{#if data.atualizacoes.length}
-			<ul class="lista" aria-label={t('Atualizações publicadas')}>
-				{#each data.atualizacoes as a (a.id)}
-					<li>{a.texto}</li>
-				{/each}
-			</ul>
 		{/if}
-	</section>
+	</Modal>
+
+	<Modal bind:this={modalAtualizacoes} rotulo="t-atualizacoes" classe="modal-acao">
+		<h3 id="t-atualizacoes">{t('Atualizações publicadas')}</h3>
+		<ul class="lista">
+			{#each data.atualizacoes as a (a.id)}
+				<li>{a.texto}</li>
+			{/each}
+		</ul>
+		<form method="dialog" class="acoes"><button class="botao botao--secundario">{t('Fechar')}</button></form>
+	</Modal>
 {/if}
+
+{#snippet formularioDaCrise()}
+	<form class="formulario formulario--largo" onsubmit={lancar} aria-label={t('Lançar uma crise')}>
+		<label class="campo">{t('Título')} <input required maxlength="120" bind:value={crise.titulo} {@attach contador(crise.titulo)} /></label>
+		<label class="campo">
+			{t('Briefing')}
+			<textarea required rows="4" maxlength="3000" bind:value={crise.texto} {@attach contador(crise.texto)}></textarea>
+		</label>
+		<label class="campo campo--curto">
+			{t('Prazo (minutos)')}
+			<input type="number" required min="1" max="240" bind:value={crise.minutos} />
+		</label>
+		{#if meusComites.length > 1}
+			<fieldset class="opcoes">
+				<legend>{t('Comitês (crise conjunta)')}</legend>
+				{#each meusComites as c (c.id)}
+					<label class="opcao"><input type="checkbox" value={c.id} bind:group={comitesDaCrise} /> {c.sigla}</label>
+				{/each}
+			</fieldset>
+		{/if}
+		<fieldset class="opcoes">
+			<legend>{t('Delegações atingidas (ficam sem voz)')}</legend>
+			{#each efeitos as e, i (i)}
+				<div class="acoes efeito">
+					<Escolha unica rotulo={t('Delegação')} botao={t('Escolher')} opcoes={data.delegacoes} bind:valor={e.delegacao_id} />
+					<label class="campo">{t('O que aconteceu com ela')} <input required maxlength="200" bind:value={e.texto} {@attach contador(e.texto)} /></label>
+					<label class="campo campo--curto">
+						{t('Minutos (vazio: até o fim)')}
+						<input type="number" min="1" max="240" bind:value={e.minutos} />
+					</label>
+					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => (efeitos = efeitos.filter((_, j) => j !== i))}
+						>{t('Tirar')}</button
+					>
+				</div>
+			{/each}
+			<button
+				class="botao botao--secundario botao--pequeno"
+				type="button"
+				onclick={() => (efeitos = [...efeitos, { delegacao_id: '', texto: '', minutos: null }])}>{t('Adicionar uma delegação atingida')}</button
+			>
+		</fieldset>
+		{#if erroModal}<p class="erro" role="alert">{erroModal}</p>{/if}
+		<button class="botao">{t('Lançar a crise')}</button>
+	</form>
+{/snippet}
+
+{#snippet formularioDaAtualizacao()}
+	<form class="formulario formulario--largo" onsubmit={publicar} aria-label={t('Publicar uma atualização de crise')}>
+		<label class="campo">
+			{t('Texto da atualização')}
+			<textarea required maxlength="3000" rows="4" bind:value={atualizacao} {@attach contador(atualizacao)}></textarea>
+		</label>
+		{#if meusComites.length > 1}
+			<fieldset class="opcoes">
+				<legend>{t('Comitês (crise conjunta)')}</legend>
+				{#each meusComites as c (c.id)}
+					<label class="opcao"><input type="checkbox" value={c.id} bind:group={comitesDaAtualizacao} /> {c.sigla}</label>
+				{/each}
+			</fieldset>
+		{/if}
+		{#if erroModal}<p class="erro" role="alert">{erroModal}</p>{/if}
+		<button class="botao">{t('Publicar atualização')}</button>
+	</form>
+{/snippet}

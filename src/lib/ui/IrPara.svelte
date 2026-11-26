@@ -9,6 +9,8 @@
 	import type { Papel } from '#lib/supabase.ts';
 	import { supabase } from '#lib/supabase.ts';
 	import Bandeira from './Bandeira.svelte';
+	import Star from '@lucide/svelte/icons/star';
+	import { alternarFavorito, favoritos, MAX_FAVORITOS } from '#lib/preferencias.svelte.ts';
 	import Modal from './Modal.svelte';
 
 	// Passo 43: achar o que se quer sem saber onde fica. Telas do papel, delegações do
@@ -84,6 +86,9 @@
 		materias: termo ? materias.filter((m) => acha(m.titulo)).slice(0, LIMITE) : []
 	});
 	const nada = $derived(Object.values(achadas).every((lista) => !lista.length));
+	// Passo 51 (preferências): as telas favoritas ficam no topo, antes de digitar.
+	const favoritas = $derived(favoritos.hrefs.flatMap((h) => telas.filter((x) => x.href === h)));
+	const cheio = $derived(favoritos.hrefs.length >= MAX_FAVORITOS);
 
 	function fechar() {
 		modal?.fechar();
@@ -116,11 +121,32 @@
 		</label>
 	</form>
 
+	{#if !termo && favoritas.length}
+		<h3 class="rotulo">{t('Favoritos')}</h3>
+		<ul class="lista" aria-label={t('Favoritos')}>
+			{#each favoritas as tela (tela.href)}
+				<li><a href={tela.href} onclick={fechar}>{tela.rotulo} <span class="detalhe">{tela.descricao}</span></a></li>
+			{/each}
+		</ul>
+	{/if}
 	{#if achadas.telas.length}
 		<h3 class="rotulo">{t('Telas')}</h3>
 		<ul class="lista">
 			{#each achadas.telas as tela (tela.href)}
-				<li><a href={tela.href} onclick={fechar}>{tela.rotulo} <span class="detalhe">{tela.descricao}</span></a></li>
+				{@const favorita = favoritos.hrefs.includes(tela.href)}
+				<li>
+					<a href={tela.href} onclick={fechar}>{tela.rotulo} <span class="detalhe">{tela.descricao}</span></a>
+					<button
+						class="botao botao--secundario botao--pequeno botao--icone"
+						type="button"
+						aria-pressed={favorita}
+						aria-label={t('Favorita: {tela}', { tela: tela.rotulo })}
+						title={!favorita && cheio ? t('Até {n} favoritas: tire uma antes', { n: MAX_FAVORITOS }) : undefined}
+						disabled={!favorita && cheio}
+						onclick={() => alternarFavorito(tela.href)}
+						><Star aria-hidden="true" size={16} strokeWidth={1.75} fill={favorita ? 'currentColor' : 'none'} /></button
+					>
+				</li>
 			{/each}
 		</ul>
 	{/if}

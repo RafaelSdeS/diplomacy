@@ -1,5 +1,8 @@
 <script lang="ts">
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
+	import AcaoEmModal from '#lib/ui/AcaoEmModal.svelte';
+	import CopyPlus from '@lucide/svelte/icons/copy-plus';
+	import Eraser from '@lucide/svelte/icons/eraser';
 	import { contador } from '#lib/contador.ts';
 	import { invalidate } from '$app/navigation';
 	import { rotuloPapel } from '#lib/papeis.ts';
@@ -55,6 +58,7 @@
 		if (error) return falhar(error);
 		mensagem = `Dados pessoais apagados: ${contas} contas. Ficaram os documentos públicos e os certificados.`;
 		confirmacao = '';
+		modalApagar?.fechar();
 		await invalidate('app:dados');
 	}
 
@@ -71,7 +75,11 @@
 		const { error } = await supabase.rpc('copiar_evento', { p_origem: data.evento, p_nome: novoNome, p_ano: novoAno });
 		if (error) return falhar(error);
 		mensagem = `Evento ${novoNome} ${novoAno} criado com os comitês, as regras, as delegações e os veículos.`;
+		modalProxima?.fechar();
 	}
+	// Passo 51 (lote da secretaria): as duas ações raras e longas abrem num modal.
+	let modalProxima = $state<AcaoEmModal>();
+	let modalApagar = $state<AcaoEmModal>();
 
 	const resumo = $derived(
 		[...new Set(data.pesquisa.map((r) => r.papel))].map((papel) => {
@@ -95,73 +103,87 @@
 	<p class="sucesso" role="status">{mensagem}</p>
 {/if}
 
-<section aria-labelledby="t-pedidos">
-	<h2 id="t-pedidos">Pedidos de exclusão</h2>
-	<ul class="lista">
-		{#each data.pedidos as p (p.id)}
-			<li>
-				<span>{p.nome} <span class="detalhe">pedido em {new Date(p.criado_em).toLocaleDateString('pt-BR')}</span></span>
-				{#if p.pessoa_id}
-					<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => apagarPessoa(p.pessoa_id!, p.nome)}
-						>Apagar a conta de {p.nome}</button
-					>
-				{/if}
-			</li>
-		{:else}
-			<li class="suave">Nenhum pedido.</li>
-		{/each}
-	</ul>
-</section>
+<div class="cartoes">
+	<section class="cartao" aria-labelledby="t-pedidos">
+		<h2 id="t-pedidos">Pedidos de exclusão</h2>
+		<ul class="lista">
+			{#each data.pedidos as p (p.id)}
+				<li>
+					<span>{p.nome} <span class="detalhe">pedido em {new Date(p.criado_em).toLocaleDateString('pt-BR')}</span></span>
+					{#if p.pessoa_id}
+						<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => apagarPessoa(p.pessoa_id!, p.nome)}
+							>Apagar a conta de {p.nome}</button
+						>
+					{/if}
+				</li>
+			{:else}
+				<li class="suave">Nenhum pedido. Quem pede a exclusão no Perfil aparece aqui.</li>
+			{/each}
+		</ul>
+	</section>
 
-<section aria-labelledby="t-arquivo">
-	<h2 id="t-arquivo">Arquivo da edição</h2>
-	<p>Os documentos públicos para a organização: agenda aprovada, resoluções, atualizações de crise e notícias, com as regras de cada comitê.</p>
-	<p class="acoes">
-		<a class="botao" href="/imprimir/arquivo">Imprimir o arquivo (PDF)</a>
-		<button class="botao botao--secundario" type="button" onclick={baixarArquivo}>Baixar os dados públicos (JSON)</button>
-	</p>
-</section>
+	<section class="cartao" aria-labelledby="t-arquivo">
+		<h2 id="t-arquivo">Arquivo da edição</h2>
+		<p>Os documentos públicos para a organização: agenda aprovada, resoluções, atualizações de crise e notícias, com as regras de cada comitê.</p>
+		<p class="acoes">
+			<a class="botao" href="/imprimir/arquivo">Imprimir o arquivo (PDF)</a>
+			<button class="botao botao--secundario" type="button" onclick={baixarArquivo}>Baixar os dados públicos (JSON)</button>
+		</p>
+	</section>
 
-<section aria-labelledby="t-pesquisa">
-	<h2 id="t-pesquisa">Pesquisa de satisfação</h2>
-	<ul class="lista">
-		{#each resumo as r (r.papel)}
-			<li><span>{rotuloPapel(r.papel)}: {r.n} respostas, nota média {r.media.toFixed(1)}</span></li>
-		{:else}
-			<li class="suave">Nenhuma resposta ainda.</li>
-		{/each}
-	</ul>
-	{#if data.pesquisa.length}
-		<button class="botao botao--secundario" type="button" onclick={() => baixar('pesquisa.json', data.pesquisa)}>Baixar as respostas</button>
-	{/if}
-</section>
+	<section class="cartao" aria-labelledby="t-pesquisa">
+		<h2 id="t-pesquisa">Pesquisa de satisfação</h2>
+		<ul class="lista">
+			{#each resumo as r (r.papel)}
+				<li><span>{rotuloPapel(r.papel)}: {r.n} respostas, nota média {r.media.toFixed(1)}</span></li>
+			{:else}
+				<li class="suave">Nenhuma resposta ainda. A pesquisa aparece no Perfil de cada pessoa.</li>
+			{/each}
+		</ul>
+		{#if data.pesquisa.length}
+			<button class="botao botao--secundario" type="button" onclick={() => baixar('pesquisa.json', data.pesquisa)}>Baixar as respostas</button>
+		{/if}
+	</section>
 
-<section aria-labelledby="t-proxima">
-	<h2 id="t-proxima">Próxima edição</h2>
-	<form class="formulario" onsubmit={copiar}>
-		<label class="campo">
-			Nome do evento novo
-			<input required maxlength="120" bind:value={novoNome} {@attach contador(novoNome)} />
-		</label>
-		<label class="campo campo--curto">
-			Ano
-			<input type="number" required min="2020" max="2100" bind:value={novoAno} />
-		</label>
-		<button class="botao botao--secundario">Copiar comitês, regras e delegações</button>
-	</form>
-</section>
-
-<section aria-labelledby="t-apagar">
-	<h2 id="t-apagar">Apagar os dados pessoais</h2>
-	<p>
-		No prazo combinado com a organização: apaga as contas, os e-mails, as mensagens, as notas de crise e os rascunhos.
-		Ficam os documentos públicos e os certificados. Não dá para desfazer. Antes, imprima e baixe o arquivo da edição.
-	</p>
-	<form class="formulario" onsubmit={apagarEvento}>
-		<label class="campo">
-			Para confirmar, escreva o nome do evento ({data.nomeEvento})
-			<input autocomplete="off" bind:value={confirmacao} />
-		</label>
-		<button class="botao" disabled={confirmacao.trim() !== data.nomeEvento}>Apagar os dados pessoais</button>
-	</form>
-</section>
+	<section class="cartao" aria-labelledby="t-fim">
+		<h2 id="t-fim">Depois do evento</h2>
+		<div class="acoes">
+			<AcaoEmModal
+				bind:this={modalProxima}
+				secundario
+				rotulo="Preparar a próxima edição"
+				icone={CopyPlus}
+				descricao="Cria um evento novo com os comitês, as regras, as delegações e os veículos deste. Ninguém é convidado."
+			>
+				<form class="formulario" onsubmit={copiar}>
+					<label class="campo">
+						Nome do evento novo
+						<input required maxlength="120" bind:value={novoNome} {@attach contador(novoNome)} />
+					</label>
+					<label class="campo campo--curto">
+						Ano
+						<input type="number" required min="2020" max="2100" bind:value={novoAno} />
+					</label>
+					{#if erro}<p class="erro" role="alert">{erro}</p>{/if}
+					<button class="botao">Copiar comitês, regras e delegações</button>
+				</form>
+			</AcaoEmModal>
+			<AcaoEmModal
+				bind:this={modalApagar}
+				secundario
+				rotulo="Apagar os dados pessoais"
+				icone={Eraser}
+				descricao="No prazo combinado com a organização: apaga as contas, os e-mails, as mensagens, as notas de crise e os rascunhos. Ficam os documentos públicos e os certificados. Não dá para desfazer. Antes, imprima e baixe o arquivo da edição."
+			>
+				<form class="formulario" onsubmit={apagarEvento}>
+					<label class="campo">
+						Para confirmar, escreva o nome do evento ({data.nomeEvento})
+						<input autocomplete="off" bind:value={confirmacao} />
+					</label>
+					{#if erro}<p class="erro" role="alert">{erro}</p>{/if}
+					<button class="botao" disabled={confirmacao.trim() !== data.nomeEvento}>Apagar os dados pessoais</button>
+				</form>
+			</AcaoEmModal>
+		</div>
+	</section>
+</div>

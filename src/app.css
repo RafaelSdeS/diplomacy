@@ -474,6 +474,8 @@ main.main-sem-moldura {
 	color: var(--cor-sobre-marinho);
 	font: inherit;
 	font-weight: 600;
+	/* Passo 51: link com cara de botão não é sublinhado (sublinhado só no texto corrido). */
+	text-decoration: none;
 	cursor: pointer;
 	transition: background-color var(--transicao);
 }
@@ -1620,6 +1622,47 @@ kbd {
 	}
 }
 
+/* Passo 51 (lote da secretaria): duas listas lado a lado no notebook, cada uma rolando por
+   dentro; a página não rola. */
+.colunas-que-rolam {
+	display: grid;
+	gap: 1rem;
+}
+
+.colunas-que-rolam > .cartao {
+	max-width: none;
+	min-width: 0;
+}
+
+.filtros {
+	align-items: end;
+}
+
+@media (min-width: 1024px) and (min-height: 640px) {
+	.colunas-que-rolam {
+		grid-template-columns: 1fr 1fr;
+		height: calc(100dvh - 26rem);
+	}
+
+	.colunas-que-rolam > .cartao {
+		max-height: 100%;
+		overflow-y: auto;
+	}
+}
+
+/* Passo 51 (lote da crise): no notebook, a fila e a nota aberta rolam por dentro; a página não. */
+@media (min-width: 1024px) and (min-height: 640px) {
+	.crise {
+		height: calc(100dvh - 22rem);
+		margin-bottom: 0;
+	}
+
+	.crise .cartao {
+		max-height: 100%;
+		overflow-y: auto;
+	}
+}
+
 .contador-crise {
 	display: flex;
 	flex-wrap: wrap;
@@ -1642,13 +1685,20 @@ kbd {
 	flex: 1;
 	min-width: 0;
 	min-height: 2.75rem;
-	padding: 0.25rem 0;
-	border: 0;
-	background: none;
+	/* Passo 51: cada nota é um cartão clicável, não texto solto. */
+	padding: 0.4rem 0.6rem;
+	border: 1px solid var(--cor-linha);
+	border-radius: var(--raio);
+	background: var(--cor-superficie);
 	color: inherit;
 	font: inherit;
 	text-align: left;
 	cursor: pointer;
+}
+
+.nota-na-fila:hover,
+[aria-current='true'] > .nota-na-fila {
+	border-color: var(--cor-marinho);
 }
 
 .texto-nota {
@@ -3972,4 +4022,65 @@ dialog.ir-para {
 
 .arvore--numerada .botao--icone {
 	padding: 0.15rem 0.3rem;
+}
+
+/* Passo 51 (preferências): o tamanho do texto e a densidade escolhidos no Perfil, neste
+   aparelho. Sem escolha, vale o padrão de cada tela. */
+:root[data-texto='grande'] {
+	font-size: 112.5%;
+}
+
+:root[data-texto='maior'] {
+	font-size: 125%;
+}
+
+:root[data-densidade='compacta'] .cartao {
+	padding: 0.625rem 0.875rem;
+}
+
+:root[data-densidade='compacta'] .lista li {
+	padding: 0.4rem 0;
+}
+
+:root[data-densidade='confortavel'] .cartao {
+	padding: 1.375rem 1.625rem;
+}
+
+:root[data-densidade='confortavel'] .lista li {
+	padding: 1rem 0;
+}
+
+/* Passo 51: placeholders de carregamento, só CSS (sem imagens), nas fichas e na prévia. */
+.esqueleto {
+	display: grid;
+	gap: 0.6rem;
+	padding: 0.5rem 0;
+}
+
+.esqueleto span:not(.so-leitor) {
+	height: 0.9rem;
+	border-radius: var(--raio);
+	background: linear-gradient(90deg, var(--cor-linha) 25%, var(--cor-superficie) 50%, var(--cor-linha) 75%) 0 0 / 200% 100%;
+	opacity: 0.6;
+	animation: esqueleto 1.4s ease-in-out infinite;
+}
+
+.esqueleto span:nth-child(3) {
+	width: 85%;
+}
+
+.esqueleto span:nth-child(4) {
+	width: 60%;
+}
+
+@keyframes esqueleto {
+	to {
+		background-position: -200% 0;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.esqueleto span:not(.so-leitor) {
+		animation: none;
+	}
 }

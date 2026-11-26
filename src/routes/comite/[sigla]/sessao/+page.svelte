@@ -1,4 +1,5 @@
 <script lang="ts">
+	import RascunhoGuardado from '#lib/ui/RascunhoGuardado.svelte';
 	import { tituloDaAba } from '#lib/titulo.svelte.ts';
 	import { contador } from '#lib/contador.ts';
 	import { t } from '#lib/i18n.svelte.ts';
@@ -221,6 +222,7 @@
 					{t('Detalhe (opcional)')}
 					<textarea maxlength="300" bind:value={detalhe} {@attach contador(detalhe)}></textarea>
 				</label>
+				<RascunhoGuardado texto={detalhe} />
 				{#if erro}<p class="erro">{erro}</p>{/if}
 				<div class="acoes">
 					<button class="botao">{t('Enviar à mesa')}</button>

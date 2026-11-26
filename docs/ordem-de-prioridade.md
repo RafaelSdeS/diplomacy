@@ -42,7 +42,7 @@ A sequência de execução tem o **piloto depois da interface**. Os passos 44, 4
 | 17 | [48](implementacao/48-demonstracao-online.md) | Demonstração online com acesso rápido por papel | M | Depende da segurança, da coletiva e dos modais; mostra o app inteiro por papel | Projeto separado, um comitê completo, `/demo` por papel e reinício |
 | 18 | [49](implementacao/49-edicao-por-clausula.md) e [57](implementacao/57-escrita-de-documentos.md) **parte B** | Edição colaborativa por cláusula | G | Resolve o problema central de documentos sem discussões infinitas, **se o piloto confirmar**; a parte A do 57 já o diminui | Proposta estruturada, rodada com prazo, comparação e fusão básica |
 | 19 | [50](implementacao/50-preparacao-da-fala.md) | Preparação de discursos e notas | M | Permite acompanhar outras delegações enquanto prepara a próxima fala, **se o piloto confirmar** | Captura rápida por tipo, painel curto da delegação e rascunho da fala |
-| 20 | [51](implementacao/51-melhorias-gerais-de-interface.md) **demais lotes** | Melhorias gerais | G | Acabamento das demais telas, aos poucos | O lote 3 (bilhetes como conversa, em duas colunas) está pronto (25/11/2026); depois crise, blocos (com a troca de redator) e secretaria; estados vazios, densidade e preferências |
+| 20 | [51](implementacao/51-melhorias-gerais-de-interface.md) **demais lotes** | Melhorias gerais (**prontos**, 26/11/2026: crise, blocos, secretaria, perfil e preferências) | G | Acabamento das demais telas | Lote 3 (bilhetes como conversa) em 25/11; em 26/11, crise, blocos (passar a redação), secretaria, perfil, favoritos, tamanho do texto e densidade, estados vazios e rascunho guardado. Ficam o voltar com filtro e rolagem, a votação aberta sem rolar e a troca de redator por consenso (se o piloto pedir) |
 
 Esforço **P**, **M** ou **G** como nos passos 01 a 43. Os itens 18 e 19 só começam depois da validação com o piloto (abaixo).
 
@@ -351,8 +351,8 @@ Editor por cláusula (49) e preparação de discursos (50)
   └─ só se o questionário do piloto confirmar a dor
   └─ 49 depende de sessão, documentos e RLS; 50, da sessão unificada (46) e do caderno
 
-Demais lotes das melhorias gerais (51)
-  └─ entram aos poucos, o ano todo
+Demais lotes das melhorias gerais (51)                                    (feitos em 26/11/2026)
+  └─ o que sobrar do piloto entra aos poucos, o ano todo
 ```
 
 ## Sequência recomendada de trabalho
@@ -409,7 +409,7 @@ Roteiro de [piloto.md](piloto.md), com a troca de conta no mesmo aparelho. A col
 
 Só entra o que o piloto confirmar.
 
-### Lote E — acabamento (demais lotes do passo 51)
+### Lote E — acabamento (demais lotes do passo 51), feito em 26/11/2026; ajustes do piloto entram aos poucos
 
 1. visual oficial;
 2. consistência;
@@ -438,8 +438,8 @@ O [plano completo](plano-do-app.pdf) (seção 17) prevê validação de dezembro
 
 Proposta de encaixe, a confirmar quando a data sair:
 
-- **antes da sessão do piloto:** lotes A, B, B2 e B3 (feitos) e, a pedido, o 53;
+- **antes da sessão do piloto:** lotes A, B, B2 e B3 (feitos) e, a pedido, o 53 e os demais lotes do 51;
 - **depois da sessão do piloto:** o 48, ajustado ao que a sessão mostrar, e em seguida o lote D (passos 49 e 50), só com o que o questionário confirmar;
-- **lote E (demais lotes do passo 51):** em lotes pequenos, o ano todo, e congelado antes do ensaio de outubro.
+- **lote E (demais lotes do passo 51):** feito em 26/11/2026; o que o piloto pedir entra em lotes pequenos, o ano todo, e congela antes do ensaio de outubro.
 
 Para cada passo o esforço (P, M ou G) está na tabela; a duração em semanas depende de quanto tempo por semana a pessoa do projeto tem, e isso o documento não sabe.

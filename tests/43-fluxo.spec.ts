@@ -162,3 +162,31 @@ test('"Ir para…" (Ctrl+K) acha a delegação, que abre a ficha, e a tela pelo 
 	await page.getByRole('link', { name: '‹ Voltar para Presidência' }).click();
 	await expect(page).toHaveURL(PAINEL);
 });
+
+test('preferências: a tela favorita fica no topo do "Ir para…" e do "Mais", e o texto grande vale depois de recarregar (passo 51)', async ({ page }, info) => {
+	test.skip(info.project.name !== 'celular', 'o "Mais" é do celular');
+	await entrar(page, EUA);
+	await page.goto('/');
+	await page.getByRole('button', { name: 'Ir para…' }).click();
+	const busca = page.getByRole('dialog', { name: 'Ir para…' });
+	await busca.getByRole('searchbox').fill('crono');
+	const estrela = busca.getByRole('button', { name: 'Favorita: Cronograma' });
+	await expect(estrela).toHaveAttribute('aria-pressed', 'false');
+	await estrela.click();
+	await expect(estrela).toHaveAttribute('aria-pressed', 'true');
+	await page.keyboard.press('Escape');
+
+	await page.reload();
+	await page.getByRole('button', { name: 'Ir para…' }).click();
+	await expect(busca.getByRole('list', { name: 'Favoritos' }).getByRole('link')).toHaveText([/^Cronograma/]);
+	await page.keyboard.press('Escape');
+	await page.goto('/mais');
+	await expect(page.getByRole('list', { name: 'Favoritos' }).getByRole('link')).toHaveText([/Cronograma/]);
+
+	await page.goto('/perfil');
+	await page.getByLabel('Tamanho do texto').selectOption('grande');
+	await page.reload();
+	await expect(page.locator('html')).toHaveAttribute('data-texto', 'grande');
+	await expect(page.getByLabel('Tamanho do texto')).toHaveValue('grande');
+	await semErrosDeAcessibilidade(page);
+});

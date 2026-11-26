@@ -13,6 +13,11 @@
 			try {
 				var tema = localStorage.getItem('tema');
 				if (tema === 'light' || tema === 'dark') document.documentElement.dataset.theme = tema;
+				// Passo 51: o tamanho do texto e a densidade escolhidos no perfil.
+				var texto = localStorage.getItem('texto');
+				if (texto === 'grande' || texto === 'maior') document.documentElement.dataset.texto = texto;
+				var densidade = localStorage.getItem('densidade');
+				if (densidade === 'confortavel' || densidade === 'compacta') document.documentElement.dataset.densidade = densidade;
 			} catch (e) {}
 		</script>
 		%sveltekit.head%

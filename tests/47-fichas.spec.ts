@@ -203,3 +203,24 @@ test('o redator divide a redação do bloco com outra delegação (passo 51)', a
 	const chileRedator = await chile.from('bloco_membro').select('redator, delegacao!inner(nome)').eq('bloco_id', bloco).eq('delegacao.nome', 'Chile').single();
 	expect(chileRedator.data?.redator).toBe(true);
 });
+
+test('o redator passa a redação a outro membro e deixa de ser redator (passo 51, lote dos blocos)', async ({ page }) => {
+	const paraguai = await clienteComo(PARAGUAI);
+	const chile = await clienteComo(C.conta(contaDoTreino('Chile')));
+	const nome = `Bloco da passagem ${Date.now()}`;
+	const bloco = (await paraguai.rpc('criar_bloco', { p_comite: comite, p_nome: nome })).data!;
+	expect((await chile.rpc('entrar_bloco', { p_bloco: bloco })).error).toBeNull();
+
+	await entrar(page, PARAGUAI);
+	await page.goto(`/comite/${C.sigla}/blocos`);
+	const cartao = page.getByRole('article', { name: `Bloco ${nome}` });
+	await cartao.getByRole('button', { name: 'Passar a redação' }).click();
+	const modal = page.getByRole('dialog', { name: `Passar a redação · ${nome}` });
+	await expect(modal.getByRole('button', { name: 'Confirmar: passar a redação' })).toBeDisabled();
+	await modal.getByRole('radio', { name: /Chile/ }).check();
+	await modal.getByRole('button', { name: 'Confirmar: passar a redação' }).click();
+	await expect(modal).toBeHidden();
+	await expect(cartao.getByRole('listitem').filter({ hasText: 'Chile' })).toContainText('Redator');
+	await expect(cartao.getByRole('listitem').filter({ hasText: 'Paraguai' })).not.toContainText('Redator');
+	await expect(cartao.getByRole('button', { name: 'Passar a redação' })).toBeHidden();
+});

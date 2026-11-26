@@ -13,6 +13,7 @@
 	import Escolha from '#lib/ui/Escolha.svelte';
 	import Users from '@lucide/svelte/icons/users';
 	import Modal from '#lib/ui/Modal.svelte';
+	import Bandeira from '#lib/ui/Bandeira.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -31,6 +32,18 @@
 		for (const id of antes.filter((x) => !novos.includes(x)))
 			if (!(await executar(supabase.rpc('definir_redator', { p_bloco: b.id, p_delegacao: id, p_redator: false })))) break;
 		delete redatores[b.id];
+	}
+	// Passo 51 (lote dos blocos): o redator passa a redação a outro membro e deixa de ser redator.
+	let passando = $state<Bloco | null>(null);
+	let para = $state('');
+	async function passarRedacao() {
+		if (!passando || !para || !eu?.delegacao_id) return;
+		const b = passando;
+		if (
+			(await executar(supabase.rpc('definir_redator', { p_bloco: b.id, p_delegacao: para, p_redator: true }))) &&
+			(await executar(supabase.rpc('definir_redator', { p_bloco: b.id, p_delegacao: eu.delegacao_id, p_redator: false })))
+		)
+			passando = null;
 	}
 
 	const eu = $derived(data.participacoes.find((p) => p.comite_id === data.comite.id && p.papel === 'delegado'));
@@ -153,6 +166,17 @@
 						bind:escolhidos={() => redatores[bloco.id] ?? redatoresDe(bloco), (v) => (redatores[bloco.id] = v)}
 						onpronto={() => salvarRedatores(bloco)}
 					/>
+					{#if bloco.membros.length > 1}
+						<button
+							class="botao botao--secundario botao--pequeno"
+							type="button"
+							onclick={() => {
+								erro = '';
+								para = '';
+								passando = bloco;
+							}}>{t('Passar a redação')}</button
+						>
+					{/if}
 				{/if}
 				{#each data.documentos.filter((d) => d.bloco_id === bloco.id) as d (d.id)}
 					<p>
@@ -183,9 +207,34 @@
 				{/if}
 			</article>
 		{:else}
-			<p class="suave">{t('Ainda não há blocos.')}</p>
+			<p class="suave">
+				{eu
+					? t('Ainda não há blocos. Um bloco reúne delegações que escrevem documentos juntas: crie um em "Novo bloco" ou espere um convite.')
+					: t('Ainda não há blocos.')}
+			</p>
 		{/each}
 	</div>
+
+	<Modal aberto={!!passando} rotulo="t-passar" classe="modal-acao" onclose={() => (passando = null)}>
+		{#if passando}
+			<h3 id="t-passar">{t('Passar a redação')} · {passando.nome}</h3>
+			<p class="suave">{t('A delegação escolhida passa a redigir os documentos do bloco, e a sua deixa de ser redatora.')}</p>
+			<fieldset class="opcoes">
+				<legend>{t('Para quem')}</legend>
+				{#each passando.membros.filter((m) => m.delegacao && m.delegacao.id !== eu?.delegacao_id) as m (m.delegacao!.id)}
+					<label class="opcao"
+						><input type="radio" name="para" value={m.delegacao!.id} bind:group={para} />
+						<span class="com-bandeira"><Bandeira codigo={m.delegacao!.bandeira} /> {m.delegacao!.nome}</span></label
+					>
+				{/each}
+			</fieldset>
+			{#if erro}<p class="erro" role="alert">{erro}</p>{/if}
+			<div class="acoes">
+				<button class="botao" type="button" disabled={!para} onclick={passarRedacao}>{t('Confirmar: passar a redação')}</button>
+				<button class="botao botao--secundario" type="button" onclick={() => (passando = null)}>{t('Cancelar')}</button>
+			</div>
+		{/if}
+	</Modal>
 
 	<!-- Passo 51: o novo documento abre num modal no centro, a partir do bloco. -->
 	<Modal aberto={!!novoEm} rotulo="novo-documento-titulo" classe="modal-acao" onclose={() => (novoEm = null)}>

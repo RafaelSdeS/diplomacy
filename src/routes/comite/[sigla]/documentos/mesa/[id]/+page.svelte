@@ -1,4 +1,5 @@
 <script lang="ts">
+	import RascunhoGuardado from '#lib/ui/RascunhoGuardado.svelte';
 	// Passo 58: um documento da mesa. O comitê lê a última publicação, ao vivo, e vê o que mudou
 	// desde a anterior; a mesa escreve o rascunho com a prévia ao lado e publica. Se outra pessoa
 	// da mesa salvou antes, a tela mostra a diferença e a pessoa escolhe: nada se perde calado.
@@ -224,6 +225,7 @@
 				<span class="suave">{t('# título, - lista, **negrito**, [texto](https://link)')}</span>
 				<textarea rows="16" maxlength="50000" bind:value={corpo}></textarea>
 			</label>
+			<RascunhoGuardado texto={corpo} />
 			<div class="dpo-previa folha" role="region" aria-label={t('Prévia')}>
 				<p class="rotulo">{t('Prévia')}</p>
 				{#if corpo.trim()}{@html marcacaoParaHtml(corpo)}{:else}<p class="suave">{t('O texto aparece aqui.')}</p>{/if}

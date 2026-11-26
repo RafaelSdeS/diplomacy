@@ -123,14 +123,17 @@ test('o perfil salva a minibiografia e envia a foto', async ({ page }, info) => 
 	if (await perfil.isVisible()) await perfil.click();
 	else await irPeloMenu(page, 'Perfil');
 
+	// Passo 51: editar o perfil abre num modal.
+	await abrirAcao(page, 'Editar perfil');
 	await page.getByLabel('Minibiografia').fill(bio);
 	await page.getByRole('button', { name: 'Salvar perfil' }).click();
 	await expect(page.getByRole('status')).toHaveText('Perfil salvo.');
 	await page.reload();
+	await abrirAcao(page, 'Editar perfil');
 	await expect(page.getByLabel('Minibiografia')).toHaveValue(bio);
 
 	await page.getByLabel('Foto').setInputFiles({ name: 'foto.png', mimeType: 'image/png', buffer: PNG });
-	await expect(page.getByRole('status')).toHaveText('Foto atualizada.');
+	await expect(page.getByRole('dialog').getByRole('status')).toHaveText('Foto atualizada.');
 	await expect(page.getByRole('img', { name: 'Sua foto' })).toBeVisible();
 });
 
@@ -170,7 +173,7 @@ test.describe('celular com tela baixa', () => {
 		test.skip(info.project.name !== 'celular', 'a navegação fica fixa embaixo só no celular');
 		await entrar(page, CONTAS.delegado);
 		await page.goto('/perfil');
-		const botao = page.getByRole('button', { name: 'Salvar perfil' });
+		const botao = page.getByRole('link', { name: 'Sobre o Diplomacy' });
 		await botao.scrollIntoViewIfNeeded();
 
 		const nav = await page.getByRole('navigation', { name: 'Principal' }).boundingBox();

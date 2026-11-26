@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { adotarAgenda, clienteComo, CONTAS, entrar } from './ajuda.ts';
+import { abrirAcao, adotarAgenda, clienteComo, CONTAS, entrar } from './ajuda.ts';
 
 // Passo 18: um comitê em inglês (UNOCT-T, do seed) funciona em inglês, inclusive o
 // projeto impresso; as datas seguem o idioma; o perfil troca o idioma da pessoa. A
@@ -128,6 +128,7 @@ test('cada pessoa troca o idioma do app no perfil, e o impresso segue o do comit
 	await entrar(page, FRANCA);
 	await page.goto('/perfil');
 	try {
+		await abrirAcao(page, 'Edit profile');
 		await page.getByLabel('App language').selectOption('pt');
 		await page.getByRole('button', { name: 'Save profile' }).click();
 		await expect(page.getByRole('status')).toHaveText(SALVO);
@@ -142,6 +143,7 @@ test('cada pessoa troca o idioma do app no perfil, e o impresso segue o do comit
 	} finally {
 		// Volta ao idioma do comitê para as próximas execuções.
 		await page.goto('/perfil');
+		await page.getByRole('button', { name: /^(Editar perfil|Edit profile)$/ }).click();
 		await page.getByLabel(/^(Idioma do app|App language)/).selectOption('');
 		await page.getByRole('button', { name: /^(Salvar perfil|Save profile)$/ }).click();
 		await expect(page.getByRole('status')).toHaveText(SALVO);

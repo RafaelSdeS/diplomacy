@@ -1,7 +1,7 @@
 import { expect, test, type Browser, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { contaDaDelegacao, DELEGACOES, isolado } from '../scripts/delegacoes.ts';
-import { clienteComo, CONTAS, entrar, sair } from './ajuda.ts';
+import { abrirAcao, clienteComo, CONTAS, entrar, sair } from './ajuda.ts';
 
 // Passo 39: a cópia do CSNU-T só deste arquivo (scripts/delegacoes.ts).
 const C = isolado('08');
@@ -183,6 +183,7 @@ test('uma atualização de crise chega ao delegado e vira plantão no telão', a
 
 	await entrar(page, C.conta(CONTAS.crise));
 	await page.goto(CRISE);
+	await abrirAcao(page, 'Nova atualização');
 	await page.getByLabel('Texto da atualização').fill(texto);
 	await page.getByRole('button', { name: 'Publicar atualização' }).click();
 	await expect(page.getByRole('status')).toHaveText('Atualização publicada.');

@@ -1623,6 +1623,35 @@ export const EN: Record<string, string> = {
 	'Alguém da mesa': 'Someone on the dais',
 	'{nomes} também está editando este documento.': '{nomes} is also editing this document.',
 	'{nomes} também estão editando este documento.': '{nomes} are also editing this document.',
+	// Passo 51: lotes da crise, blocos, secretaria e preferências
+	'O comitê vê o briefing e o prazo na hora, no telão e na sessão.': 'The committee sees the briefing and the deadline right away, on the big screen and in the session.',
+	'Nova atualização': 'New update',
+	'Publicar uma atualização de crise': 'Publish a crisis update',
+	'Limpar': 'Clear',
+	'Passar a redação': 'Hand over drafting',
+	'Ainda não há blocos. Um bloco reúne delegações que escrevem documentos juntas: crie um em "Novo bloco" ou espere um convite.':
+		'No blocs yet. A bloc brings together delegations that write documents jointly: create one with "New bloc" or wait for an invitation.',
+	'A delegação escolhida passa a redigir os documentos do bloco, e a sua deixa de ser redatora.':
+		"The chosen delegation becomes the bloc's drafter, and yours stops drafting.",
+	'Para quem': 'To whom',
+	'Confirmar: passar a redação': 'Confirm: hand over drafting',
+	'Favoritos': 'Favorites',
+	'Favorita: {tela}': 'Favorite: {tela}',
+	'Até {n} favoritas: tire uma antes': 'Up to {n} favorites: remove one first',
+	'Editar perfil': 'Edit profile',
+	'Foto, nome, minibiografia e idioma: valem em todo aparelho.': 'Photo, name, short bio and language: they apply on every device.',
+	'Neste aparelho': 'On this device',
+	'Tamanho do texto': 'Text size',
+	'Normal': 'Normal',
+	'Grande': 'Large',
+	'Maior': 'Larger',
+	'Densidade': 'Density',
+	'A de cada tela': "Each screen's own",
+	'Confortável: mais espaço': 'Comfortable: more space',
+	'Compacta: mais coisas à vista': 'Compact: more on screen',
+	'Para marcar até cinco telas favoritas, use a estrela no "Ir para…" (a lupa do topo).': 'To mark up to five favorite screens, use the star in "Go to…" (the magnifier at the top).',
+	'Todos os documentos': 'All documents',
+	'Rascunho guardado neste aparelho.': 'Draft saved on this device.',
 };
 
 /** Mensagens do banco com partes variáveis: [padrão em português, tradução]. */
