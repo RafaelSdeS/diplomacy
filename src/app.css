@@ -644,17 +644,8 @@ main.main-sem-moldura {
 	min-width: 0;
 	min-height: 2.75rem;
 	padding: 0.5rem 0.75rem;
-	border: 1px solid var(--cor-texto-suave);
-	border-radius: var(--raio);
-	background-color: var(--cor-fundo);
-	color: var(--cor-texto);
 	font: inherit;
 	font-weight: 400;
-}
-
-.campo textarea {
-	min-height: 6rem;
-	resize: vertical;
 }
 
 /* Passo 47: o <select> com o visual do app em toda tela (seta própria, foco, erro e
@@ -696,6 +687,284 @@ select:user-invalid {
 select:disabled {
 	opacity: 0.6;
 	cursor: not-allowed;
+}
+
+/* Passo 67: todo campo com o visual do app, dentro ou fora de .campo (busca, comentário, chat,
+   filtro): borda, cantos e o foco com o anel marinho, nada do padrão do navegador. Com :where, a
+   especificidade é zero: o estilo próprio de uma tela continua valendo. */
+:where(input:not([type='checkbox'], [type='radio'], [type='range'], [type='file'], [type='color'], [type='hidden']), textarea) {
+	min-width: 0;
+	min-height: 2.75rem;
+	padding: 0.5rem 0.75rem;
+	border: 1px solid var(--cor-texto-suave);
+	border-radius: var(--raio);
+	background-color: var(--cor-fundo);
+	color: var(--cor-texto);
+	font: inherit;
+	font-weight: 400;
+	transition:
+		border-color var(--transicao),
+		box-shadow var(--transicao);
+}
+
+:where(textarea) {
+	line-height: 1.5;
+	resize: vertical;
+}
+
+:where(textarea:not([rows])) {
+	min-height: 6rem;
+}
+
+/* Passo 67: a seta de recolher desenhada pelo app em todo <details> (nada do triângulo do
+   navegador); o resumo com cara de botão (.botao) fica de fora. */
+details > summary:not(.botao) {
+	list-style: none;
+	cursor: pointer;
+}
+
+details > summary:not(.botao)::-webkit-details-marker {
+	display: none;
+}
+
+details > summary:not(.botao)::before {
+	content: '';
+	display: inline-block;
+	flex: none;
+	width: 0.45rem;
+	height: 0.45rem;
+	margin-right: 0.6rem;
+	border-right: 2px solid var(--cor-marinho);
+	border-bottom: 2px solid var(--cor-marinho);
+	vertical-align: 0.15em;
+	transform: rotate(-45deg);
+	transition: transform var(--transicao);
+}
+
+details[open] > summary:not(.botao)::before {
+	transform: rotate(45deg);
+}
+
+:where(input, textarea)::placeholder {
+	color: var(--cor-texto-suave);
+	opacity: 0.85;
+}
+
+:where(input:not([type='checkbox'], [type='radio'], [type='file']), textarea, select):hover {
+	border-color: var(--cor-texto);
+}
+
+:where(input:not([type='checkbox'], [type='radio'], [type='file']), textarea, select):focus-visible {
+	outline: none;
+	border-color: var(--cor-foco);
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--cor-foco) 28%, transparent);
+}
+
+:where(input, textarea):user-invalid {
+	border-color: var(--cor-erro);
+}
+
+:where(input, textarea):disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
+/* A caixa de marcar e o rádio desenhados pelo app: marcados, ficam cheios de marinho. */
+input:is([type='checkbox'], [type='radio']) {
+	appearance: none;
+	flex: none;
+	width: 1.15rem;
+	height: 1.15rem;
+	margin: 0;
+	border: 1.5px solid var(--cor-texto-suave);
+	border-radius: 2px;
+	background: var(--cor-fundo);
+	cursor: pointer;
+	vertical-align: -0.2em;
+	transition:
+		border-color var(--transicao),
+		background-color var(--transicao);
+}
+
+input[type='radio'] {
+	border-radius: 50%;
+}
+
+input:is([type='checkbox'], [type='radio']):hover {
+	border-color: var(--cor-marinho);
+}
+
+input:is([type='checkbox'], [type='radio']):checked {
+	border-color: var(--cor-marinho);
+	background: var(--cor-marinho);
+	box-shadow: inset 0 0 0 0.2rem var(--cor-fundo);
+}
+
+input:is([type='checkbox'], [type='radio']):disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+input[type='file']::file-selector-button {
+	margin-right: 0.75rem;
+	padding: 0.45rem 0.9rem;
+	border: 1px solid var(--cor-marinho);
+	border-radius: var(--raio);
+	background: var(--cor-marinho-suave);
+	color: var(--cor-marinho);
+	font: inherit;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+/* Os grupos de rádio viram botões de escolha: a opção marcada fica em marinho. */
+fieldset.opcoes:has(> .opcao > input[type='radio']) {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+fieldset.opcoes:has(> .opcao > input[type='radio']) > legend {
+	width: 100%;
+	margin-bottom: 0.35rem;
+}
+
+fieldset.opcoes:has(> .opcao > input[type='radio']) > .opcao {
+	margin: 0;
+	padding: 0.35rem 0.85rem;
+	min-height: 2.5rem;
+	border: 1px solid var(--cor-linha);
+	border-radius: var(--raio);
+	background: var(--cor-fundo);
+	font-weight: 500;
+	cursor: pointer;
+	transition:
+		border-color var(--transicao),
+		background-color var(--transicao);
+}
+
+fieldset.opcoes:has(> .opcao > input[type='radio']) > .opcao:hover {
+	border-color: var(--cor-marinho);
+}
+
+fieldset.opcoes:has(> .opcao > input[type='radio']) > .opcao:has(input:checked) {
+	border-color: var(--cor-marinho);
+	background: var(--cor-marinho-suave);
+	color: var(--cor-marinho);
+	font-weight: 600;
+}
+
+fieldset.opcoes:has(> .opcao > input[type='radio']) > .opcao:has(input:disabled) {
+	opacity: 0.55;
+	cursor: not-allowed;
+}
+
+/* Passo 67: cartões de escolha, com o nome e uma frase de quando usar (o ponto ou moção). */
+fieldset.opcoes.opcoes--cartoes:has(> .opcao > input[type='radio']) {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(min(100%, 13.5rem), 1fr));
+	gap: 0.5rem;
+}
+
+fieldset.opcoes.opcoes--cartoes:has(> .opcao > input[type='radio']) > .opcao {
+	align-items: flex-start;
+	gap: 0.6rem;
+	padding: 0.5rem 0.7rem;
+}
+
+.opcoes--cartoes .opcao input {
+	margin-top: 0.2rem;
+}
+
+.opcoes--cartoes .opcao > span {
+	display: grid;
+	gap: 0.15rem;
+}
+
+.opcoes--cartoes .opcao .detalhe {
+	font-size: 0.85rem;
+	font-weight: 400;
+	color: var(--cor-texto-suave);
+}
+
+/* Passo 67: o que recolhe (a última votação, os blocos): o resumo com a seta, clicável. */
+.recolhivel > summary {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.4rem 0.6rem;
+	list-style: none;
+	cursor: pointer;
+}
+
+.recolhivel > summary::before {
+	margin-right: 0;
+}
+
+.recolhivel[open] > summary {
+	margin-bottom: 0.6rem;
+}
+
+.recolhivel > summary h2 {
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+/* Os blocos na sessão: o nome e os membros na mesma linha. */
+.blocos-da-sessao li {
+	justify-content: flex-start;
+}
+
+.bloco-membros {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.3rem 0.4rem;
+}
+
+.bloco-membro {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.15rem;
+	color: var(--cor-marinho);
+}
+
+/* Passo 67: o "Anotar": o contexto em selos no topo e o caderno no pé, à direita. */
+.anotar-contexto {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35rem;
+	margin: -0.25rem 0 1rem;
+}
+
+.modal-anotar .opcao svg {
+	color: var(--cor-marinho);
+}
+
+.anotar-caderno {
+	margin-left: auto;
+}
+
+dialog.modal-acao.modal-anotar {
+	width: min(40rem, calc(100vw - 2rem));
+}
+
+/* Num modal, os campos usam a largura dele (fora, o formulário fica estreito para ler bem). */
+dialog .formulario {
+	max-width: none;
+	margin-bottom: 0;
+}
+
+/* Passo 67: num modal que rola (o de ponto ou moção, com muitos tipos), os botões do fim ficam
+   presos ao pé: a ação principal está sempre à vista. */
+dialog .formulario > .acoes:last-child {
+	position: sticky;
+	bottom: -1.25rem;
+	z-index: 1;
+	margin-bottom: -1.25rem;
+	padding-block: 0.75rem 1.25rem;
+	border-top: var(--linha);
+	background: var(--cor-fundo);
 }
 
 .sucesso {
@@ -1718,8 +1987,7 @@ kbd {
 /* Lista de quem votou como (passo 23): um grupo por escolha, com borda da cor dela. */
 .lista-votos {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(min(100%, 12rem), 1fr));
-	gap: 0.75rem;
+	gap: 0.6rem;
 	margin: 0.75rem 0;
 }
 
@@ -1736,6 +2004,9 @@ kbd {
 }
 
 .lista-votos-grupo ul {
+	display: flex; /* passo 67: os países lado a lado, quebrando a linha quando preciso */
+	flex-wrap: wrap;
+	gap: 0.3rem 0.4rem;
 	margin: 0;
 	padding: 0;
 	list-style: none;
@@ -3992,6 +4263,29 @@ dialog.ir-para {
 .sessao-colunas {
 	display: grid;
 	gap: 1rem;
+	grid-template-areas: 'acao' 'palavra' 'sala';
+}
+
+/* Passo 67: sem delegação (mesa, press), a palavra vem primeiro. */
+.sessao-colunas--uma {
+	grid-template-areas: 'palavra' 'acao' 'sala';
+}
+
+.sessao-acao {
+	grid-area: acao;
+}
+
+.sessao-palavra {
+	grid-area: palavra;
+	min-width: 0;
+}
+
+.sessao-sala {
+	grid-area: sala;
+}
+
+.sessao-palavra .cartao {
+	max-width: none;
 }
 
 .sessao-colunas > .cartoes {
@@ -4002,8 +4296,39 @@ dialog.ir-para {
 @media (min-width: 1024px) {
 	.sessao-colunas:not(.sessao-colunas--uma) {
 		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		grid-template-areas: 'palavra palavra' 'acao sala';
 		align-items: start;
 	}
+
+	/* Sem nada na coluna da ação, a sala usa a largura toda (nada de meia tela vazia). */
+	.sessao-colunas:not(.sessao-colunas--uma):has(> .sessao-acao:empty) {
+		grid-template-areas: 'palavra palavra' 'sala sala';
+	}
+
+	/* "A palavra" em três partes: quem fala, quem vem a seguir e a placa. */
+	.a-palavra-grade {
+		display: grid;
+		grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr);
+		gap: 1.5rem;
+		align-items: start;
+	}
+
+	.a-palavra-grade > :not(:first-child) {
+		padding-left: 1.5rem;
+		border-left: var(--linha);
+	}
+
+	.a-palavra-grade > .a-palavra-seguir:empty {
+		display: none;
+	}
+
+	.a-palavra-grade:has(> .a-palavra-seguir:empty) {
+		grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+	}
+}
+
+.a-palavra-grade > * > :first-child {
+	margin-top: 0;
 }
 
 /* Passo 54: uma coluna vazia (sem alerta nem votação) não deixa buraco. */

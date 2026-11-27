@@ -125,7 +125,7 @@ test('plenária de abertura: discursos pela lista de oradores e moção do tópi
 	await expect(plenaria).toContainText('Moção do tópico no topo da agenda');
 	const eua = await abrir(browser, C.conta(CONTAS.delegado), SESSAO, { width: 360, height: 740 });
 	await abrirAcao(eua, 'Fazer um ponto ou moção');
-	await eua.getByLabel('Tipo').selectOption({ label: 'Moção de introdução do tópico no topo da agenda' });
+	await eua.getByRole('radio', { name: /^Moção de introdução do tópico no topo da agenda/ }).check();
 	await eua.getByRole('combobox', { name: /^Tópico/ }).selectOption({ index: 1 });
 	await eua.getByRole('button', { name: 'Enviar à mesa' }).click();
 	await expect(eua.getByRole('status').filter({ hasText: 'enviado' })).toBeVisible();
@@ -244,7 +244,7 @@ test('Espaço pausa e retoma o cronômetro, mas não dentro de um campo', async 
 test('um ponto chega à presidência, e a resposta volta à delegação', async ({ browser }) => {
 	const delegado = await abrir(browser, C.conta(contaDaDelegacao(outra)), SESSAO);
 	await abrirAcao(delegado, 'Fazer um ponto ou moção');
-	await delegado.getByLabel('Tipo').selectOption({ label: 'Ponto de dúvida' });
+	await delegado.getByRole('radio', { name: /^Ponto de dúvida/ }).check();
 	await delegado.getByLabel('Detalhe (opcional)').fill('Qual é o tempo de fala?');
 	await delegado.getByRole('button', { name: 'Enviar à mesa' }).click();
 	await expect(delegado.getByRole('status').filter({ hasText: 'enviado' })).toBeVisible();

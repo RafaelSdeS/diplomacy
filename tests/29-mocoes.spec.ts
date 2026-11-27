@@ -46,7 +46,7 @@ test('o bureau recusa um pedido com motivo, e o delegado vê a etapa e o motivo'
 	await delegada.goto(`/comite/${C.sigla}/sessao`);
 	await aoVivo(delegada);
 	await abrirAcao(delegada, 'Fazer um ponto ou moção');
-	await delegada.getByLabel('Tipo').selectOption({ label: 'Moção de informal-informal' });
+	await delegada.getByRole('radio', { name: /^Moção de informal-informal/ }).check();
 	await delegada.getByLabel(/^Minutos \(até/).fill('10');
 	await delegada.getByRole('button', { name: 'Enviar à mesa' }).click();
 	await expect(delegada.getByRole('status').filter({ hasText: 'enviado à mesa' })).toBeVisible();
@@ -76,7 +76,7 @@ test('a delegação retira o próprio pedido enquanto ele espera (passo 38)', as
 	await page.goto(`/comite/${C.sigla}/sessao`);
 	await aoVivo(page);
 	await abrirAcao(page, 'Fazer um ponto ou moção');
-	await page.getByLabel('Tipo').selectOption({ label: 'Ponto de dúvida' });
+	await page.getByRole('radio', { name: /^Ponto de dúvida/ }).check();
 	await page.getByRole('button', { name: 'Enviar à mesa' }).click();
 	await expect(page.getByRole('status').filter({ hasText: 'enviado à mesa' })).toBeVisible();
 	const ultimo = page.getByRole('list', { name: 'Seus pontos e moções' }).getByRole('listitem').last();

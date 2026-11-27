@@ -169,6 +169,7 @@ Cada passo traz os testes que provam que ele funciona. Um passo só termina quan
 | [64](docs/implementacao/64-editar-o-topico.md) | Editar o tópico, da agenda à resolução |
 | [65](docs/implementacao/65-ata-da-sessao.md) | Ata da sessão |
 | [66](docs/implementacao/66-apoio-lista-e-espaco.md) | Apoio automático, debate por lista e mais espaço na tela |
+| [67](docs/implementacao/67-campos-e-sessao.md) | Campos estilizados e a aba Sessão mais aproveitada |
 
 As fases do projeto (validação, piloto, evento e crescimento) e o calendário até a edição de 2027 estão na seção 17 do plano completo.
 

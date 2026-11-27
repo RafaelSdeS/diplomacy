@@ -80,6 +80,7 @@ Cada passo só começa quando os passos de que ele depende estão prontos. As re
 | [64](64-editar-o-topico.md) | Editar o tópico, da agenda à resolução: o texto limpo na largura toda, o resumo ao lado e cada item ou cláusula num painel à direita; a trilha na sala, a fase de ação a um clique e a resolução na trilha | 60, 62, 63 |
 | [65](65-ata-da-sessao.md) | Ata da sessão, só para a mesa: presença, pontos e moções, votações e propostas decididas, pronta para imprimir | 23, 29, 63 |
 | [66](66-apoio-lista-e-espaco.md) | Apoio automático de quem propõe, moção de debate por lista, cabeçalho com quem preside, menu lateral recolhível, caderno com busca, painel da presidência mais alto e o olho na senha | 29, 51, 59, 63, 64 |
+| [67](67-campos-e-sessao.md) | Campos com o visual do app em todo lugar; modais de ponto ou moção e de anotar; a aba Sessão com "A palavra" no topo, a votação recolhível com os votos lado a lado e os blocos à vista | 46, 51, 54, 59, 66 |
 
 ## Melhorias depois da revisão
 
@@ -259,6 +260,7 @@ Cada passo tem uma seção "Testes" com os testes que provam que ele funciona e 
 | 64 | — | — | sim | sim |
 | 65 | — | — | sim | sim |
 | 66 | sim | — | sim | sim |
+| 67 | — | — | sim | sim |
 
 ## Aparência
 

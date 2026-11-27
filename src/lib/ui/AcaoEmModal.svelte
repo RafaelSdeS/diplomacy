@@ -13,9 +13,11 @@
 		titulo?: string;
 		descricao?: string;
 		secundario?: boolean;
+		/** A classe do modal (passo 67: o de ponto ou moção é mais largo). */
+		classe?: string;
 		children: Snippet;
 	};
-	let { rotulo, icone: Icone, titulo, descricao, secundario = false, children }: Props = $props();
+	let { rotulo, icone: Icone, titulo, descricao, secundario = false, classe = 'modal-acao', children }: Props = $props();
 	let modal = $state<Modal>();
 	const id = $props.id();
 
@@ -31,7 +33,7 @@
 <button class={['botao', secundario && 'botao--secundario']} type="button" onclick={abrir} {@attach dica(descricao)}
 	><Icone aria-hidden="true" size={18} strokeWidth={1.75} /> {rotulo}</button
 >
-<Modal bind:this={modal} rotulo={id} classe="modal-acao">
+<Modal bind:this={modal} rotulo={id} {classe}>
 	<h3 {id}>{titulo ?? rotulo}</h3>
 	{#if descricao}<p class="suave">{descricao}</p>{/if}
 	{@render children()}

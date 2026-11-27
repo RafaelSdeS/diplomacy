@@ -7,8 +7,10 @@
 	import { page } from '$app/state';
 	import {
 		descreverPonto,
+		ehPonto,
 		FORMAS,
 		mensagemDeErro,
+		PARA_QUE_SERVE_PONTO,
 		PONTOS,
 		pontosEmOrdem,
 		situacaoDoPonto,
@@ -39,6 +41,8 @@
 	import { assinaturasDesconfianca, escolhasPermitidas, ETAPAS, FASES, listaAtiva, textoResultado } from '#lib/votacao.ts';
 	import AcaoEmModal from '#lib/ui/AcaoEmModal.svelte';
 	import Hand from '@lucide/svelte/icons/hand';
+	import PenLine from '@lucide/svelte/icons/pen-line';
+	import { TABELAS_SESSAO } from '#lib/tempo-real.ts';
 	import ClipboardCheck from '@lucide/svelte/icons/clipboard-check';
 	import ListOrdered from '@lucide/svelte/icons/list-ordered';
 	import Presentation from '@lucide/svelte/icons/presentation';
@@ -78,6 +82,13 @@
 	const emDiscussao = $derived(pontos.find((p) => p.status === 'em_discussao'));
 	const lista = $derived(listaAtiva(data.lista, emDiscussao?.id, data.fase));
 	const tiposEmOrdem = $derived(pontosEmOrdem(data.fase, data.estado?.etapa_plenaria, data.salaFechada));
+	// Passo 67: no modal, os pontos e as moções em grupos, cada um com a frase de quando usar.
+	const gruposDePonto = $derived(
+		[
+			{ titulo: t('Pontos'), tipos: tiposEmOrdem.filter(ehPonto) },
+			{ titulo: t('Moções'), tipos: tiposEmOrdem.filter((x) => !ehPonto(x)) }
+		].filter((g) => g.tipos.length)
+	);
 	const minhaSituacao = $derived(data.delegacoes.find((d) => d.id === eu?.delegacao_id)?.situacao);
 	const presentes = $derived(new Set((sessao?.presenca ?? []).map((p) => p.delegacao_id)));
 	// Debate rápido (passo 30): a pausa para pontos e moções e a lista curta.
@@ -122,7 +133,7 @@
 	});
 	function irAoPonto() {
 		novoPonto?.abrir();
-		document.getElementById('tipo-ponto')?.focus();
+		document.querySelector<HTMLInputElement>('input[name="tipo-ponto"]:checked')?.focus();
 	}
 	const minhaPresenca = $derived(sessao?.presenca.find((p) => p.delegacao_id === eu?.delegacao_id)?.situacao);
 	// Passo 47: as fichas da votação e do ponto, abertas pelo nome, sem mudar a URL.
@@ -181,7 +192,7 @@
 	<title>{tituloDaAba(t('Sessão'), data.comite.sigla)}</title>
 </svelte:head>
 
-<p class="rotulo">{t('Comitê')} · {data.comite.sigla} <AoVivo comiteId={data.comite.id} bind:diferenca /></p>
+<p class="rotulo">{t('Comitê')} · {data.comite.sigla} <AoVivo comiteId={data.comite.id} tabelas={[...TABELAS_SESSAO, 'bloco', 'bloco_membro']} bind:diferenca /></p>
 <h1>{sessao ? t('Sessão {n}', { n: sessao.numero }) : t('Sessão')}</h1>
 
 <!-- Passo 43: só o que é da sessão, no topo (documentos e mensagens estão no menu). -->
@@ -190,20 +201,24 @@
 	{#if eu && data.estado && !restrita && !impedida}
 		<AcaoEmModal
 			bind:this={novoPonto}
+			classe="modal-largo"
 			rotulo={t('Fazer um ponto ou moção')}
 			icone={Hand}
 			titulo={t('Ponto ou moção')}
 			descricao={t('O pedido vai à mesa, que julga se está em ordem.')}
 		>
 			<form class="formulario" onsubmit={enviarPonto} aria-label={t('Ponto ou moção')}>
-				<label class="campo">
-					{t('Tipo')}
-					<select id="tipo-ponto" bind:value={tipoPonto}>
-						{#each tiposEmOrdem as tipo (tipo)}
-							<option value={tipo}>{PONTOS[tipo]}</option>
+				{#each gruposDePonto as grupo (grupo.titulo)}
+					<fieldset class="opcoes opcoes--cartoes">
+						<legend>{grupo.titulo}</legend>
+						{#each grupo.tipos as tipo (tipo)}
+							<label class="opcao">
+								<input type="radio" name="tipo-ponto" value={tipo} bind:group={tipoPonto} />
+								<span><strong>{PONTOS[tipo]}</strong><span class="detalhe">{PARA_QUE_SERVE_PONTO[tipo]}</span></span>
+							</label>
 						{/each}
-					</select>
-				</label>
+					</fieldset>
+				{/each}
 				{#if tipoPonto === 'topico_no_topo'}
 					<label class="campo">
 						{t('Tópico')}
@@ -221,7 +236,7 @@
 				{/if}
 				<label class="campo">
 					{t('Detalhe (opcional)')}
-					<textarea maxlength="300" bind:value={detalhe} {@attach contador(detalhe)}></textarea>
+					<textarea maxlength="300" rows="2" placeholder={t('O que a mesa precisa saber, se houver.')} bind:value={detalhe} {@attach contador(detalhe)}></textarea>
 				</label>
 				<RascunhoGuardado texto={detalhe} />
 				{#if erro}<p class="erro">{erro}</p>{/if}
@@ -320,7 +335,8 @@
 	     direita; no celular, a ação vem primeiro. Passo 54: sem delegação (mesa, crise, press),
 	     uma coluna, com "A palavra" largo no topo. -->
 	<div class={['sessao-colunas', !eu && 'sessao-colunas--uma']}>
-		{#if !eu}<div class="cartoes">{@render aPalavra(data.estado)}</div>{/if}
+		<!-- Passo 67: "A palavra" na largura toda, acima das colunas (no celular, depois da ação). -->
+		<div class="sessao-palavra">{@render aPalavra(data.estado)}</div>
 		<div class="cartoes sessao-acao">
 			<AlertaCrise incidentes={data.incidentes} {diferenca} />
 			{#if momento === 'pausa' && eu && !restrita && !impedida}
@@ -380,17 +396,29 @@
 			{#if data.votacao}
 				<article class="cartao cartao--destaque" aria-labelledby="c-votacao">
 					<h2 id="c-votacao" tabindex="-1">{data.votacao.aberta ? t('Votação aberta') : t('Última votação')}</h2>
-					<p class="destaque"><button class="abre-ficha" type="button" onclick={() => (verVotacao = true)} {@attach dica(t('Ver os detalhes e os votos desta votação.'))}>{data.votacao.objeto}</button></p>
-					{#if data.votacao.aberta && data.votacao.nominal}<p><strong>{t('Votação nominal:')}</strong> {t('a mesa chama as delegações em ordem alfabética.')}</p>{/if}
 					{#if !data.votacao.aberta}
-						<p>{textoResultado(data.votacao)}</p>
-						<ListaVotos sigla={data.comite.sigla} delegacoes={data.delegacoes} votos={data.votacao.votos} tipo={data.votacao.tipo} {presentes} />
-					{:else if impedida}
+						<!-- Passo 67: encerrada, a votação recolhe; o resumo diz o objeto e o resultado. -->
+						<details class="recolhivel" open>
+							<summary>
+								<strong>{data.votacao.objeto}</strong>
+								<span class="selo {data.votacao.aprovada ? 'selo--ok' : 'selo--erro'}">{data.votacao.aprovada ? t('Aprovada') : t('Rejeitada')}</span>
+							</summary>
+							<p>{textoResultado(data.votacao)}</p>
+							<ListaVotos sigla={data.comite.sigla} delegacoes={data.delegacoes} votos={data.votacao.votos} tipo={data.votacao.tipo} {presentes} />
+							<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => (verVotacao = true)} {@attach dica(t('Ver os detalhes e os votos desta votação.'))}
+								>{t('Ver a ficha da votação')}</button
+							>
+						</details>
+					{:else}
+					<p class="destaque"><button class="abre-ficha" type="button" onclick={() => (verVotacao = true)} {@attach dica(t('Ver os detalhes e os votos desta votação.'))}>{data.votacao.objeto}</button></p>
+					{#if data.votacao.nominal}<p><strong>{t('Votação nominal:')}</strong> {t('a mesa chama as delegações em ordem alfabética.')}</p>{/if}
+					{#if impedida}
 						<p class="suave">{t('Sua delegação está impedida pela crise.')}</p>
 					{:else if meuVoto || posso.length}
 						<Votar votacaoId={data.votacao.id} escolhas={posso} {meuVoto} representada={representada?.id} onerro={(m) => (erro = m)} />
 					{:else if eu}
 						<p class="suave">{t('Sua delegação não vota nesta questão (ausente na chamada, observadora ou suspensa).')}</p>
+					{/if}
 					{/if}
 				</article>
 			{/if}
@@ -422,7 +450,6 @@
 		{/if}
 		</div>
 		<div class="cartoes sessao-sala">
-			{#if eu}{@render aPalavra(data.estado)}{/if}
 
 			{#if emDiscussao && eu && !restrita}
 				<article class="cartao" aria-labelledby="c-inscricao">
@@ -434,6 +461,29 @@
 					</div>
 				</article>
 			{/if}
+			<!-- Passo 67: os blocos do comitê, à vista na sessão (o da sua delegação em destaque). -->
+			<details class="cartao recolhivel blocos-da-sessao" open>
+				<summary><h2>{t('Blocos')} <span class="selo">{data.blocos.length}</span></h2></summary>
+				<ul class="lista lista--compacta" aria-label={t('Blocos do comitê')}>
+					{#each data.blocos as b (b.id)}
+						<li class={[b.membros.some((m) => m.delegacao?.id === eu?.delegacao_id) && 'lista-minha']}>
+							<strong>{b.nome}</strong>
+							<span class="bloco-membros">
+								{#each b.membros as m (m.delegacao?.id)}
+									<span class="bloco-membro"
+										><NomeDelegacao ficha sigla={data.comite.sigla} delegacao={m.delegacao} />{#if m.redator}<PenLine aria-label={t('redator')} size={14} strokeWidth={2} />{/if}</span
+									>
+								{/each}
+							</span>
+						</li>
+					{:else}
+						<li class="suave">{t('Nenhum bloco ainda.')}</li>
+					{/each}
+				</ul>
+				<a class="botao botao--secundario botao--pequeno" href={`/comite/${data.comite.sigla}/blocos`} {@attach dica(t('Formar um bloco, entrar num bloco e ver os documentos de cada um.'))}
+					>{t('Abrir a aba Blocos')}</a
+				>
+			</details>
 		{#if data.votacoes.length}
 			<section aria-labelledby="t-votacoes">
 				<h2 id="t-votacoes">{t('Votações desta sessão')}</h2>
@@ -474,8 +524,11 @@
 <!-- Passo 54: quem fala, quem vem a seguir e as placas levantadas num cartão só, como no painel
      e no telão; a placa da delegação fica embaixo, onde está o efeito. -->
 {#snippet aPalavra(estado: NonNullable<typeof data.estado>)}
-	<article class="cartao cartao--ao-vivo" aria-labelledby="c-palavra">
+	<article class="cartao cartao--ao-vivo a-palavra" aria-labelledby="c-palavra">
 		<h2 id="c-palavra">{t('A palavra')}</h2>
+		<!-- Passo 67: no notebook, três partes lado a lado: quem fala, quem vem a seguir e a placa. -->
+		<div class="a-palavra-grade">
+		<div class="a-palavra-agora">
 		{#if estado.orador}
 			<p class="destaque"><NomeDelegacao sigla={data.comite.sigla} delegacao={estado.orador} /></p>
 		{:else}
@@ -486,6 +539,8 @@
 			<p class="rotulo">{FORMAS[estado.forma]} · {t('tempo do debate')}</p>
 			<Cronometro cronometro={relogioDebate(estado)} avisoSeg={60} {diferenca} />
 		{/if}
+		</div>
+		<div class="a-palavra-seguir">
 		{#if lista.length}
 			<h3>{emDiscussao ? t('Lista especial') : t('A seguir')}</h3>
 			{#if emDiscussao}<p>{descreverPonto(emDiscussao)}</p>{/if}
@@ -513,6 +568,8 @@
 				{/each}
 			</ol>
 		{/if}
+		</div>
+		<div class="a-palavra-placa">
 		{#if data.fase !== 'plenaria'}
 			<p>
 				<button
@@ -537,6 +594,8 @@
 				</button>
 			</p>
 		{/if}
+		</div>
+		</div>
 	</article>
 {/snippet}
 

@@ -168,6 +168,21 @@ export const PONTOS = bilingue({
 } as const);
 export type TipoPonto = keyof typeof PONTOS;
 
+/** Passo 67: quando usar cada ponto ou moção, numa frase (de docs/regras-de-procedimento.md). */
+export const PARA_QUE_SERVE_PONTO = bilingue({
+	ponto_ordem: 'Quando o bureau não segue as regras.',
+	ponto_duvida: 'Esclarecer o procedimento ou perguntar sobre o tópico.',
+	privilegio_pessoal: 'Não ouvir ou não ser ouvido, desconforto ou dignidade atingida.',
+	topico_no_topo: 'Escolher o tópico debatido primeiro.',
+	adiamento_debate: 'Passar ao outro tópico (dois terços).',
+	adiamento_sessao: 'Encerrar a sessão.',
+	informal_informal: 'Debate livre, sem o bureau, por alguns minutos.',
+	debate_lista: 'A palavra segue a ordem das placas.',
+	voto_desconfianca: 'Trocar a presidência (pedido com assinaturas).',
+	divisao_questao: 'Votar as operativas do projeto separadamente.',
+	votacao_nominal: 'Cada delegação vota em voz alta, chamada pela mesa.'
+} as const);
+
 /** Os pontos e moções em ordem em cada fase (o banco confere de novo). */
 export function pontosEmOrdem(fase: string, etapa: string | null | undefined, salaFechada = false): TipoPonto[] {
 	const pontos: TipoPonto[] = ['ponto_duvida', 'ponto_ordem', 'privilegio_pessoal'];

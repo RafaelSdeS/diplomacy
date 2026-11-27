@@ -54,7 +54,7 @@ test('uma votação nominal completa, do painel da mesa ao telão', async ({ bro
 	await abrirPainel(painel, 'Projetos de resolução');
 	await painel.getByRole('button', { name: new RegExp(`^Iniciar a votação \\(sala fechada\\): .*${TITULO}$`) }).click();
 	await abrirAcao(celular, 'Fazer um ponto ou moção');
-	await celular.getByRole('combobox', { name: /^Tipo/ }).selectOption('votacao_nominal');
+	await celular.getByRole('radio', { name: /^Moção de votação nominal/ }).check();
 	await celular.getByRole('button', { name: /^Enviar/ }).click();
 	await expect(celular.getByText('Moção de votação nominal: enviado à mesa.')).toBeVisible();
 	await abrirPainel(painel, 'Pontos e moções');

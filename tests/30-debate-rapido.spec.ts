@@ -71,7 +71,7 @@ test('a presidência escolhe a lista curta, e a pausa para pontos e moções vem
 	await expect(telao.locator('.telao-pausa')).toHaveText('Há pontos ou moções?');
 	const pausa = alemanha.getByRole('article', { name: 'Há pontos ou moções?' });
 	await pausa.getByRole('button', { name: 'Fazer agora' }).click();
-	await expect(alemanha.locator('#tipo-ponto')).toBeFocused();
+	await expect(alemanha.getByRole('dialog').getByRole('radio', { checked: true })).toBeFocused();
 
 	// A presidência encerra a pausa e baixa as placas.
 	await page.getByRole('button', { name: 'Encerrar a pausa' }).click();
