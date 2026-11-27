@@ -1,4 +1,5 @@
 import { error, redirect } from '@sveltejs/kit';
+import { carregarOrdem } from '#lib/ordem.ts';
 import type { Regras } from '#lib/regras.ts';
 import { supabase } from '#lib/supabase.ts';
 import type { PageLoad } from './$types';
@@ -19,7 +20,7 @@ export const load: PageLoad = async ({ params, parent, depends }) => {
 
 	const { participacoes } = await parent();
 	const eu = participacoes.find((p) => p.comite_id === d.comite_id && p.papel === 'delegado')?.delegacao_id ?? null;
-	const [comite, clausulas, propostas, assinaturas, regras, podePresidir, delegacoes, irmaos, meuBloco, minha] = await Promise.all([
+	const [comite, clausulas, propostas, assinaturas, regras, podePresidir, delegacoes, irmaos, meuBloco, minha, ordem] = await Promise.all([
 		supabase.from('comite').select('id, sigla, nome_oficial, idioma, topicos').eq('id', d.comite_id).single(),
 		supabase.from('clausula').select('id, tipo, pai_id, ordem, texto, versao').eq('documento_id', d.id).order('ordem'),
 		supabase
@@ -43,7 +44,9 @@ export const load: PageLoad = async ({ params, parent, depends }) => {
 			.is('bloco_id', null)
 			.neq('status', 'rejeitado'),
 		eu ? supabase.from('bloco_membro').select('redator, bloco(id, nome)').eq('delegacao_id', eu).maybeSingle() : null,
-		eu ? supabase.from('delegacao').select('situacao').eq('id', eu).single() : null
+		eu ? supabase.from('delegacao').select('situacao').eq('id', eu).single() : null,
+		// Passo 64: a trilha do tópico no topo da sala.
+		carregarOrdem(d.comite_id)
 	]);
 	for (const r of [comite, clausulas, propostas, assinaturas, regras, podePresidir, delegacoes, irmaos, meuBloco, minha])
 		if (r?.error) throw r.error;
@@ -62,6 +65,7 @@ export const load: PageLoad = async ({ params, parent, depends }) => {
 		irmaos: irmaos.data!.sort((a, b) => ordemDoItem(a) - ordemDoItem(b)),
 		eu,
 		meuBloco: meuBloco?.data ?? null,
-		observadora: minha?.data?.situacao === 'observadora'
+		observadora: minha?.data?.situacao === 'observadora',
+		ordem
 	};
 };

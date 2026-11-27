@@ -4,6 +4,7 @@
 	import { contador } from '#lib/contador.ts';
 	import { t } from '#lib/i18n.svelte.ts';
 	import { goto, invalidate } from '$app/navigation';
+	import { page } from '$app/state';
 	import type { Database } from '#lib/database.types.ts';
 	import { nomeDoDocumento, STATUS_DOCUMENTO } from '#lib/formatacao.ts';
 	import { assinaturasDesconfianca, REGRAS_VOTACAO } from '#lib/votacao.ts';
@@ -128,6 +129,10 @@
 	let modalBureau = $state<Modal>();
 	let modalChegadas = $state<Modal>();
 	let modalProjetos = $state<Modal>();
+	// Passo 64: o projeto na fase de ação leva até aqui com ?projetos, e a lista já abre.
+	$effect(() => {
+		if (modalProjetos && page.url.searchParams.has('projetos')) untrack(() => modalProjetos?.abrir());
+	});
 	// Passo 51 (lote 1): uma ação dentro do modal fecha ele e volta ao painel (a ficha, não).
 	const fecharAoAgir = (m: Modal | undefined) => (e: MouseEvent) => {
 		if ((e.target as Element).closest('button:not(.abre-ficha)')) setTimeout(() => m?.fechar(), 400);

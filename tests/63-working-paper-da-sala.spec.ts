@@ -51,14 +51,18 @@ test('a redatora propõe no working paper da sala, a sala marca posição e quem
 	await formulario.getByRole('button', { name: 'Propor' }).click();
 	await expect(page.getByRole('status')).toHaveText('Proposta feita. A sala debate e marca a posição; quem preside decide.');
 	const descricao = `Incluir (Operativa): "Decide cooperar ${marca}"`;
-	await expect(page.getByRole('region', { name: 'Cláusulas novas propostas' })).toContainText(descricao);
+	// Passo 64: a cláusula nova fica numa linha no fim do texto, que abre o painel à direita.
+	const NOVAS = /cláusulas? novas? propostas?/;
+	await page.getByRole('button', { name: NOVAS }).click();
+	await expect(page.getByRole('dialog', { name: 'Cláusulas novas propostas' })).toContainText(descricao);
 
 	// O Chile, membro do bloco, não propõe (a escrita é da redatora), mas marca posição.
 	const chile = await (await browser.newContext(NOTEBOOK)).newPage();
 	await entrar(chile, CHILE);
 	await chile.goto(`/documento/${wp.id}/sala`);
 	await expect(chile.getByRole('button', { name: 'Propor uma cláusula nova' })).toHaveCount(0);
-	const posicao = chile.getByRole('group', { name: `Sua posição sobre: ${descricao}` });
+	await chile.getByRole('button', { name: NOVAS }).click();
+	const posicao = chile.getByRole('dialog').getByRole('group', { name: `Sua posição sobre: ${descricao}` });
 	await posicao.getByRole('button', { name: 'Apoio' }).click();
 	await expect(posicao.getByRole('button', { name: 'Apoio' })).toHaveAttribute('aria-pressed', 'true');
 
@@ -67,27 +71,34 @@ test('a redatora propõe no working paper da sala, a sala marca posição e quem
 	await entrar(mesa, MESA);
 	await mesa.goto(`/documento/${wp.id}/sala`);
 	await expect(mesa.getByRole('button', { name: 'Transformar em projeto' })).toBeVisible();
+	await mesa.getByRole('button', { name: NOVAS }).click();
 	await mesa.getByRole('group', { name: `Decidir: ${descricao}` }).getByRole('button', { name: 'Aceitar' }).click();
-	await mesa.getByRole('dialog').getByRole('button', { name: 'Aceitar' }).click();
+	await mesa.getByRole('dialog', { name: 'Aceitar sem o sinal de consenso?' }).getByRole('button', { name: 'Aceitar' }).click();
 	await expect(mesa.getByRole('status')).toHaveText('Proposta aceita: o texto mudou.');
+	await mesa.keyboard.press('Escape');
 	const texto = mesa.getByRole('article', { name: 'Texto do documento' });
 	await expect(texto).toContainText(`Decide cooperar ${marca}`);
 
-	// A redatora propõe mudar o texto; a proposta fica ao lado da cláusula, no notebook.
+	// A redatora propõe mudar o texto em 3 cliques: a cláusula, "Mudar o texto" e "Propor".
 	await page.reload();
-	await page.getByRole('button', { name: `Propor uma mudança em "Decide cooperar ${marca}"` }).click();
-	await formulario.getByLabel('Texto novo').fill(`Decide cooperar mais ${marca}`);
-	await formulario.getByRole('button', { name: 'Propor' }).click();
-	await expect(page.getByRole('status')).toHaveText('Proposta feita. A sala debate e marca a posição; quem preside decide.');
+	const linha = (p: typeof page) => p.getByRole('article', { name: 'Texto do documento' }).getByRole('button', { name: new RegExp(`Decide cooperar ${marca}`) });
+	await linha(page).click();
+	const painel = page.getByRole('dialog');
+	await painel.getByRole('button', { name: 'Mudar o texto' }).click();
+	await painel.getByLabel('Texto novo').fill(`Decide cooperar mais ${marca}`);
+	await painel.getByRole('button', { name: 'Propor', exact: true }).click();
+	await expect(painel.getByRole('status')).toHaveText('Proposta feita. A sala debate e marca a posição; quem preside decide.');
+	await expect(painel.getByRole('list', { name: 'Propostas para esta cláusula' })).toContainText(`Mudar para: "Decide cooperar mais ${marca}"`);
+
+	// Na mesa, a linha mostra a proposta; o painel abre à direita, com a cláusula à vista ao lado.
 	await mesa.reload();
-	const clausula = mesa.locator('.clausula-sala', { hasText: `Decide cooperar ${marca}` });
-	const propostas = clausula.getByRole('list', { name: 'Propostas para esta cláusula' });
-	await expect(propostas).toContainText(`Mudar para: "Decide cooperar mais ${marca}"`);
-	await clausula.scrollIntoViewIfNeeded();
-	await expect(clausula.locator('.clausula-sala-texto')).toBeInViewport();
-	await expect(propostas).toBeInViewport();
-	const [caixaTexto, caixaPropostas] = [await clausula.locator('.clausula-sala-texto').boundingBox(), await propostas.boundingBox()];
-	expect(caixaPropostas!.x, 'as propostas ficam ao lado da cláusula').toBeGreaterThan(caixaTexto!.x + caixaTexto!.width / 2);
+	await expect(linha(mesa)).toContainText('1 proposta');
+	await linha(mesa).click();
+	const painelDaMesa = mesa.getByRole('dialog');
+	await expect(painelDaMesa.getByRole('list', { name: 'Propostas para esta cláusula' })).toContainText(`Mudar para: "Decide cooperar mais ${marca}"`);
+	await expect(linha(mesa)).toBeInViewport();
+	const [caixaLinha, caixaPainel] = [await linha(mesa).boundingBox(), await painelDaMesa.boundingBox()];
+	expect(caixaPainel!.x, 'o painel abre à direita, sem cobrir a cláusula').toBeGreaterThanOrEqual(caixaLinha!.x + caixaLinha!.width);
 });
 
 test('a conversa do bloco, "Suas propostas" na Agora e os documentos da sala na aba Documentos (passo 63)', async ({ page, browser }) => {
@@ -186,6 +197,8 @@ test('do working paper ao projeto: a mesa transforma, preâmbulos primeiro e ass
 	await page.getByRole('button', { name: 'Levar à fase de ação' }).click();
 	await page.getByRole('dialog').getByRole('button', { name: 'Levar à fase de ação' }).click();
 	await expect(page.getByRole('status')).toHaveText('O projeto está na fase de ação.');
+	// Passo 64: da sala do projeto, a fase de ação está a um clique (abre os projetos na Presidência).
+	await expect(page.getByRole('link', { name: 'Conduzir a fase de ação' })).toHaveAttribute('href', /\/sessao\/presidencia\?projetos$/);
 
 	// Rejeitado na votação (aqui direto no banco), os working papers do tópico reabrem.
 	await rejeitarProjeto(projeto);

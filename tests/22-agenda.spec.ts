@@ -66,18 +66,20 @@ test('a delegação propõe, a mesa inclui e registra a adoção; o item ganha o
 	// A Alemanha propõe mudar um item; a mesa vê e inclui.
 	const texto = `B. Respostas e prazos ${Date.now()}`;
 	await alemanha.goto(AGENDA1);
-	await alemanha.getByRole('button', { name: /^Propor uma alteração em "B\. Respostas/ }).first().click();
+	// Passo 64: o item abre o painel à direita; o verbo abre o formulário.
+	await alemanha.getByRole('article', { name: 'Agenda do bureau' }).getByRole('button', { name: /B\. Respostas/ }).first().click();
 	const modal = alemanha.getByRole('dialog');
-	await modal.getByRole('radio', { name: 'Mudar o texto' }).check();
+	await modal.getByRole('button', { name: 'Mudar o texto' }).click();
 	await modal.getByLabel('Texto novo').fill(texto);
 	await modal.getByRole('button', { name: 'Propor', exact: true }).click();
 	await expect(alemanha.getByRole('status')).toHaveText('Alteração proposta. As delegações debatem e marcam a posição.');
 
 	await page.reload();
-	const alteracoes = page.getByRole('region', { name: /^Alterações propostas/ });
-	const linha = alteracoes.getByRole('listitem').filter({ hasText: texto });
-	await linha.getByRole('button', { name: 'Incluir' }).click();
+	// A lista ao lado leva ao item; no painel dele, a mesa inclui.
+	await page.getByRole('region', { name: /^Alterações propostas/ }).getByRole('button', { name: texto }).click();
+	await page.getByRole('dialog').getByRole('listitem').filter({ hasText: texto }).getByRole('button', { name: 'Incluir', exact: true }).click();
 	await expect(page.getByRole('status')).toHaveText('Alteração incluída.');
+	await page.keyboard.press('Escape');
 	await expect(page.getByRole('article', { name: 'Agenda do bureau' })).toContainText(texto);
 
 	await page.getByRole('button', { name: 'Registrar a adoção' }).click();
@@ -91,18 +93,40 @@ test('o andamento fica ao incluir um item; retirar a adoção volta ao debate da
 	await page.goto(AGENDA1);
 	const adotada = page.getByRole('article', { name: 'Agenda adotada' });
 
-	const andamento = adotada.getByRole('combobox', { name: 'Andamento de A.1 Atores' });
+	// O andamento só muda com uma sessão aberta: sem ela, o banco recusa. (O seletor antigo, na
+	// árvore, mostrava o valor escolhido mesmo recusado; o painel do passo 64 relê o gravado.)
+	const api = await clienteComo(MESA);
+	const comite = (await api.from('comite').select('id').eq('sigla', 'CE-T').single()).data!.id;
+	if (!(await api.from('estado_sessao').select('sessao_id').eq('comite_id', comite).maybeSingle()).data?.sessao_id)
+		expect((await api.rpc('abrir_sessao', { p_comite: comite })).error).toBeNull();
+
+	// Passo 64: o andamento fica no painel do item.
+	const abrirItem = (nome: RegExp) => adotada.getByRole('button', { name: nome }).click();
+	const andamento = page.getByRole('dialog').getByRole('combobox', { name: 'Andamento de A.1 Atores' });
+	await abrirItem(/A\.1 Atores/);
 	await andamento.selectOption('em_debate');
+	await expect(page.getByRole('dialog').getByRole('alert')).toHaveCount(0);
 	await expect(andamento).toHaveValue('em_debate');
+	await page.keyboard.press('Escape');
+
+	// Do item grande ao working paper dele, em 2 cliques.
+	await abrirItem(/A\. Causas/);
+	await expect(page.getByRole('dialog').getByRole('link', { name: 'Abrir o working paper deste item' })).toHaveAttribute('href', /\/documento\/.+\/sala$/);
+	await page.keyboard.press('Escape');
 
 	// A mesa também propõe; incluída, a agenda muda no lugar.
 	const item = `C. Financiamento ${Date.now()}`;
 	await adotada.getByRole('button', { name: 'Propor um item no fim' }).click();
 	await page.getByRole('dialog').getByLabel('Item novo').fill(item);
 	await page.getByRole('dialog').getByRole('button', { name: 'Propor', exact: true }).click();
-	await page.getByRole('region', { name: /^Alterações propostas/ }).getByRole('listitem').filter({ hasText: item }).getByRole('button', { name: 'Incluir' }).click();
+	await page.getByRole('region', { name: /^Alterações propostas/ }).getByRole('button', { name: item }).click();
+	await page.getByRole('dialog').getByRole('listitem').filter({ hasText: item }).getByRole('button', { name: 'Incluir', exact: true }).click();
+	await expect(page.getByRole('status')).toHaveText('Alteração incluída.');
+	await page.keyboard.press('Escape');
 	await expect(adotada).toContainText(item);
-	await expect(adotada.getByRole('combobox', { name: 'Andamento de A.1 Atores' })).toHaveValue('em_debate');
+	await abrirItem(/A\.1 Atores/);
+	await expect(andamento).toHaveValue('em_debate');
+	await page.keyboard.press('Escape');
 
 	await retirarAdocao(page);
 	await expect(etapaAtual(page)).toContainText('Agenda');

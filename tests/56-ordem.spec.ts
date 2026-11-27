@@ -92,8 +92,11 @@ test('a mesa cadastra a agenda do bureau pelo teclado e a libera; a delegação 
 	await agenda.getByRole('dialog').getByLabel('Item novo').fill(item);
 	await agenda.getByRole('dialog').getByRole('button', { name: 'Propor', exact: true }).click();
 	await expect(agenda.getByRole('status')).toHaveText('Alteração proposta. As delegações debatem e marcam a posição.');
-	const linha = mesa.getByRole('region', { name: /^Alterações propostas/ }).getByRole('listitem').filter({ hasText: item });
-	await linha.getByRole('button', { name: 'Incluir' }).click({ timeout: 10_000 });
+	// Passo 64: a lista ao lado leva ao painel do item, onde a mesa inclui.
+	await mesa.getByRole('region', { name: /^Alterações propostas/ }).getByRole('button', { name: item }).click({ timeout: 10_000 });
+	await mesa.getByRole('dialog').getByRole('listitem').filter({ hasText: item }).getByRole('button', { name: 'Incluir', exact: true }).click();
+	await expect(mesa.getByRole('status')).toHaveText('Alteração incluída.');
+	await mesa.keyboard.press('Escape');
 	await expect(mesa.getByRole('article', { name: /^Agenda/ })).toContainText(item);
 	await mesa.getByRole('button', { name: 'Registrar a adoção' }).click();
 	await mesa.getByRole('dialog').getByRole('button', { name: 'Registrar a adoção' }).click();

@@ -40,12 +40,14 @@
 	});
 	// Passo 63: os documentos da sala do tópico (sem bloco dono).
 	const daSala = (tipo: string) => doTopico.find((d) => d.tipo === tipo && d.id && !d.bloco_id && d.status !== 'rejeitado');
+	const resolucao = $derived(daSala('projeto')?.status === 'aprovado' ? daSala('projeto') : undefined);
 	const destino = $derived<Record<Etapa, string>>({
 		agenda: `/comite/${sigla}/sessao/agenda?topico=${topico}`,
 		working_papers: daSala('working_paper') ? `/documento/${daSala('working_paper')!.id}/sala` : `/comite/${sigla}/documentos`,
 		projeto: daSala('projeto') ? `/documento/${daSala('projeto')!.id}/sala` : `/comite/${sigla}/documentos`,
 		acao: mesa ? `/comite/${sigla}/sessao/presidencia` : `/comite/${sigla}/sessao`,
-		resolucao: `/comite/${sigla}/votacoes`
+		// Passo 64: aprovado, o projeto é a resolução; a etapa leva ao texto dela.
+		resolucao: resolucao ? `/documento/${resolucao.id}/sala` : `/comite/${sigla}/votacoes`
 	});
 	// A dica de cada etapa diz aonde ela leva; na aba Documentos, o botão abre os documentos dela.
 	const dicaDoLink = $derived<Record<Etapa, string>>({
@@ -53,7 +55,7 @@
 		working_papers: daSala('working_paper') ? t('Abre o working paper da sala.') : t('Abre a lista de documentos do comitê.'),
 		projeto: daSala('projeto') ? t('Abre o projeto de resolução da sala.') : t('Abre a lista de documentos do comitê.'),
 		acao: mesa ? t('Abre o painel da presidência.') : t('Abre a sessão do comitê.'),
-		resolucao: t('Abre os resultados das votações do comitê.')
+		resolucao: resolucao ? t('Abre o texto da resolução aprovada.') : t('Abre os resultados das votações do comitê.')
 	});
 	const dicaDoBotao = $derived<Record<Etapa, string>>({
 		agenda: '',

@@ -77,6 +77,7 @@ Cada passo só começa quando os passos de que ele depende estão prontos. As re
 | [61](61-saber-onde-estou.md) | Saber onde estou e o que chegou: linha do comitê desde a plenária, "Como funciona", aviso de bilhetes, "Seus documentos" | 51, 55, 56, 59 |
 | [62](62-fluxo-do-comite.md) | O fluxo do comitê: um bloco por vez e o bloco nunca sem redator (lote 1, feito), crise compacta, Agora sem buracos, trilha com nomes, destaque por papel e dicas | 51, 56, 57, 59, 61 |
 | [63](63-um-projeto-por-topico.md) | Um working paper por item da agenda, de toda a sala, e um projeto por tópico: os redatores propõem, quem preside aceita ou rejeita, e a mesa transforma em projeto | 09, 56, 57, 60, 62 |
+| [64](64-editar-o-topico.md) | Editar o tópico, da agenda à resolução: o texto limpo na largura toda, o resumo ao lado e cada item ou cláusula num painel à direita; a trilha na sala, a fase de ação a um clique e a resolução na trilha | 60, 62, 63 |
 
 ## Melhorias depois da revisão
 
@@ -253,6 +254,7 @@ Cada passo tem uma seção "Testes" com os testes que provam que ele funciona e 
 | 61 | — | — | sim | sim |
 | 62 | sim | sim | sim | — |
 | 63 | sim | — | sim | sim |
+| 64 | — | — | sim | sim |
 
 ## Aparência
 

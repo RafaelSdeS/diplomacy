@@ -1660,13 +1660,6 @@ kbd {
 	margin: 0.25rem 0;
 }
 
-.arvore-item {
-	display: inline-flex;
-	flex-wrap: wrap;
-	align-items: center;
-	gap: 0.25rem 0.5rem;
-}
-
 .formulario--largo {
 	max-width: 36rem;
 }
@@ -3925,7 +3918,8 @@ dialog.ir-para {
 	counter-increment: item;
 }
 
-.arvore--numerada .arvore-item::before {
+.arvore--numerada .linha-item > span:first-child::before {
+	margin-right: 0.5rem;
 	content: counters(item, '.') '.';
 	font-weight: 600;
 	color: var(--cor-marinho);
@@ -4356,21 +4350,96 @@ dialog.ir-para {
 	}
 }
 
-/* Passo 63: o documento da sala. Cada cláusula com as propostas dela ao lado (no notebook)
-   ou embaixo (no celular); a cláusula em foco fica marcada. */
-.documento-sala {
+/* Passo 64: a agenda e a sala no mesmo esqueleto. O texto limpo à esquerda, na largura
+   toda; à direita, o resumo, que o painel do item (o modal lateral, da mesma largura) cobre
+   ao abrir, deixando o texto à vista. No celular, o resumo desce para depois do texto. */
+.editor-topico {
+	display: grid;
+	gap: 1rem 1.5rem;
+	align-items: start;
+	margin-top: 1rem;
+}
+
+.editor-lado {
+	display: grid;
+	gap: 1rem;
+	padding: 1rem 1.25rem;
+	border: var(--linha);
+	border-left: 3px solid var(--cor-fio-dourado);
+	background: var(--cor-fundo);
+}
+
+.editor-lado > *,
+.editor-lado .lista {
+	margin: 0;
+}
+
+.editor-lado h2 {
+	margin: 0 0 0.5rem;
+	font-size: 1.05rem;
+}
+
+@media (min-width: 1024px) {
+	.editor-topico {
+		grid-template-columns: minmax(0, 1fr) 26rem;
+	}
+
+	.editor-lado {
+		position: sticky;
+		top: 1rem;
+		max-height: calc(100dvh - 2rem);
+		overflow-y: auto;
+	}
+}
+
+.documento-sala,
+.editor-topico > .cartao {
 	max-width: none;
 }
 
-.clausula-sala {
-	display: grid;
-	gap: 0.25rem 1.5rem;
-	padding-block: 0.5rem;
-	border-bottom: 1px solid var(--cor-linha);
+/* O item ou a cláusula: uma linha só, sem botões dentro; o clique abre o painel. */
+.linha-item {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 0.25rem 0.75rem;
+	width: 100%;
+	margin: 0;
+	padding: 0.5rem 0.6rem;
+	border: 0;
+	border-left: 3px solid transparent;
+	background: none;
+	color: inherit;
+	font: inherit;
+	line-height: inherit;
+	text-align: left;
 }
 
-.clausula-sala-texto {
-	margin: 0;
+button.linha-item {
+	cursor: pointer;
+}
+
+button.linha-item:hover,
+.linha-item--foco {
+	background: var(--cor-marinho-suave);
+}
+
+.linha-item--foco {
+	border-left-color: var(--cor-fio-dourado);
+}
+
+.linha-item--novas {
+	margin-top: 0.5rem;
+	border: 1px dashed var(--cor-linha);
+	font-family: var(--fonte-ui);
+}
+
+.linha-item-selos {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35rem;
+	font-family: var(--fonte-ui);
 }
 
 .clausula-sala-texto .numero {
@@ -4378,33 +4447,29 @@ dialog.ir-para {
 	font-weight: 600;
 }
 
-.clausula-sala > .acoes {
-	margin: 0;
-}
-
-.clausula-sala--foco {
+/* O painel: o texto em destaque, os verbos e as propostas, uma embaixo da outra. */
+.painel-texto {
+	padding: 0.5rem 0.75rem;
+	border-left: 3px solid var(--cor-marinho);
 	background: var(--cor-marinho-suave);
-	box-shadow: -0.75rem 0 0 var(--cor-marinho-suave), 0.75rem 0 0 var(--cor-marinho-suave);
+	font-family: var(--fonte-titulo);
+	white-space: pre-line;
 }
 
-.propostas-sala {
+/* Os blocos do painel com o mesmo respiro (só aberto: fechado, o <dialog> fica escondido). */
+dialog.modal-lateral[open] {
+	display: grid;
+	align-content: start;
+	gap: 0.75rem;
+}
+
+dialog.modal-lateral[open] > * {
 	margin: 0;
 }
 
-@media (min-width: 1024px) {
-	.clausula-sala:has(> .propostas-sala) {
-		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-		grid-template-rows: auto 1fr;
-	}
-
-	.clausula-sala > .acoes {
-		align-self: start;
-	}
-
-	.clausula-sala > .propostas-sala {
-		grid-column: 2;
-		grid-row: 1 / span 2;
-	}
+dialog.modal-lateral .lista li {
+	flex-direction: column;
+	align-items: stretch;
 }
 
 /* Passo 62 (lote 6): a dica de uma ação (src/lib/dica.ts), ao passar o mouse e no foco. */
