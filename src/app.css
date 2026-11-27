@@ -4316,14 +4316,16 @@ dialog.ir-para {
 }
 
 @media (min-width: 1024px) {
-	.sessao-colunas:not(.sessao-colunas--uma) {
+	/* Passo 68: também para a mesa e a press: a votação e a crise de um lado, os blocos e as
+	   votações da sessão do outro (antes, uma coluna só, com cartões largos e vazios). */
+	.sessao-colunas {
 		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 		grid-template-areas: 'palavra palavra' 'acao sala';
 		align-items: start;
 	}
 
 	/* Sem nada na coluna da ação, a sala usa a largura toda (nada de meia tela vazia). */
-	.sessao-colunas:not(.sessao-colunas--uma):has(> .sessao-acao:empty) {
+	.sessao-colunas:has(> .sessao-acao:empty) {
 		grid-template-areas: 'palavra palavra' 'sala sala';
 	}
 

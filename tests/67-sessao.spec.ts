@@ -61,3 +61,16 @@ test('a sessão no notebook: a palavra em cima, a votação recolhe com os votos
 	await expect(modal.getByRole('group', { name: 'Pontos' })).toBeVisible();
 	await expect(modal.getByRole('group', { name: 'Moções' }).getByRole('radio', { name: /^Moção de debate por lista/ })).toBeVisible();
 });
+
+test('a sessão da mesa no notebook: a votação e os blocos lado a lado, abaixo da palavra', async ({ page }) => {
+	await comiteEmDebate(MESA, C.sigla, BRASIL);
+	await entrar(page, MESA);
+	await page.goto(`/comite/${C.sigla}/sessao`);
+	const votacao = page.getByRole('article', { name: 'Última votação' });
+	const blocos = page.getByRole('list', { name: 'Blocos do comitê' });
+	await expect(votacao).toBeVisible();
+	await expect(blocos).toBeVisible();
+	const [caixaVotacao, caixaBlocos] = [await votacao.boundingBox(), await blocos.boundingBox()];
+	expect(caixaBlocos!.x, 'os blocos à direita da votação').toBeGreaterThan(caixaVotacao!.x + caixaVotacao!.width - 1);
+	expect(caixaBlocos!.y, 'na mesma faixa').toBeLessThan(caixaVotacao!.y + caixaVotacao!.height);
+});

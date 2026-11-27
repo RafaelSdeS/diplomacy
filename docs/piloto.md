@@ -41,11 +41,12 @@ Roteiro para testar o app com um grupo pequeno (passo 12), no formato do **mock*
 | 10 min | Entrada | Login no celular de cada um; cada delegação vê o próprio comitê na Agora |
 | 10 min | Chamada | A mesa abre a sessão e faz a chamada em **Sessão → Chamada e rodízio**; o quórum aparece |
 | 20 min | Plenária de abertura | Briefing; discursos de abertura pela lista de oradores; moção do tópico no topo votada no celular; a agenda informal com as propostas lado a lado, e a mesa adota uma (sem agenda adotada, o working paper não abre: passo 56) |
-| 20 min | Debate formal-informal | O rodízio sorteia a delegação que preside; placas levantadas no celular; cronômetro no telão; pontos e moções |
+| 20 min | Debate formal-informal | O rodízio sorteia a delegação que preside (o cabeçalho mostra quem preside); placas levantadas no celular; cronômetro no telão; pontos e moções pelo modal de cartões, incluindo uma moção de debate por lista (aprovada, a palavra segue a ordem das placas: passo 66) |
 | 10 min | Crise | A equipe de crise publica uma atualização (plantão no telão); as delegações mandam notas; a crise responde |
 | 20 min | Working paper e projeto | No working paper do item em debate (um por grande item da agenda, de toda a sala), os redatores dos blocos propõem mudanças; a sala marca posição, e quem preside aceita ou rejeita; a mesa ouve a sala e transforma os working papers em projeto, que já traz as assinaturas (mínimo 5) (passo 63) |
 | 10 min | Fase de ação | A mesa assume a presidência, um signatário lê o projeto e a mesa pergunta se alguém se opõe; com objeção, abre a votação no painel (**Projetos de resolução**); as delegações votam no celular; o telão mostra o resultado |
 | o tempo todo | Press | A press publica do celular; uma nota urgente vira plantão no telão; a delegação citada vê na Agora |
+| 5 min | Ata | A mesa abre **Comitê → Atas das sessões** e confere presença, pontos e moções, votações e propostas decididas da sessão (passo 65) |
 | 5 min | Troca de conta (passo 44) | Num celular: sair, entrar com outra conta, ficar sem rede (modo avião) e conferir que nada da conta anterior aparece; sair com uma nota ainda na caixa de saída mostra o aviso |
 | 10 min | Fim | Questionário (abaixo) |
 

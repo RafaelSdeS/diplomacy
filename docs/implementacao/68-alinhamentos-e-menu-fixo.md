@@ -23,10 +23,12 @@
   - *Um detalhe que impedia isso:* o modo recolhido usava `overflow: hidden`, que transforma o menu num contêiner de rolagem e impede o `sticky`. Agora é `overflow: clip`, que corta igual.
   - No celular, a barra de baixo já era fixa.
 
+- **Sessão da mesa e da press:** no notebook, ficava numa coluna só, e a votação e os blocos ocupavam a largura toda com vazios. Agora segue o arranjo da delegação: "A palavra" em cima e, embaixo, a votação de um lado e os blocos e as votações da sessão do outro. Sem nada na coluna da votação, os blocos usam a largura toda.
+
 **Lição:** uma regra nova que contradiz uma antiga de mesma especificidade precisa de especificidade maior, porque é a ordem no CSS que decide.
 
 ## Testes
 
 - `66`: numa janela baixa, com a página rolada até o fim, o "Agora" do menu continua à vista, fixado e recolhido.
-- `67`: o primeiro membro do bloco fica na mesma margem do nome, numa linha abaixo.
+- `67`: o primeiro membro do bloco fica na mesma margem do nome, numa linha abaixo; na Sessão da mesa, a votação e os blocos ficam lado a lado.
 - `35`: o resumo da crise ocupa pelo menos 85% da largura da faixa.

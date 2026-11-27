@@ -81,7 +81,7 @@ Cada passo só começa quando os passos de que ele depende estão prontos. As re
 | [65](65-ata-da-sessao.md) | Ata da sessão, só para a mesa: presença, pontos e moções, votações e propostas decididas, pronta para imprimir | 23, 29, 63 |
 | [66](66-apoio-lista-e-espaco.md) | Apoio automático de quem propõe, moção de debate por lista, cabeçalho com quem preside, menu lateral recolhível, caderno com busca, painel da presidência mais alto e o olho na senha | 29, 51, 59, 63, 64 |
 | [67](67-campos-e-sessao.md) | Campos com o visual do app em todo lugar; modais de ponto ou moção e de anotar; a aba Sessão com "A palavra" no topo, a votação recolhível com os votos lado a lado e os blocos à vista | 46, 51, 54, 59, 66 |
-| [68](68-alinhamentos-e-menu-fixo.md) | Blocos alinhados na Sessão, Agora sem metade vazia (listas e resumo da crise na largura do cartão) e o menu lateral que acompanha a rolagem | 62, 66, 67 |
+| [68](68-alinhamentos-e-menu-fixo.md) | Blocos alinhados na Sessão, Agora sem metade vazia (listas e resumo da crise na largura do cartão), a Sessão da mesa em duas colunas e o menu lateral que acompanha a rolagem | 62, 66, 67 |
 
 ## Melhorias depois da revisão
 
