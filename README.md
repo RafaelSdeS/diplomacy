@@ -4,7 +4,7 @@ App web tudo em um para simulações da ONU (MUNs), começando pelo [UFRGSMUN](h
 
 **No ar:** [diplomacy.rafesilvadesouza.workers.dev](https://diplomacy.rafesilvadesouza.workers.dev). Não há cadastro livre: as contas são criadas pela secretaria.
 
-> **Status (26/11/2026):** os passos até o 63 estão prontos e no ar, incluindo o working paper de toda a sala e o projeto por tópico. Os comitês funcionam em português e em inglês; a secretaria, só em português. A próxima etapa é a sessão de teste do piloto, pelo roteiro em [docs/piloto.md](docs/piloto.md).
+> **Status (27/11/2026):** tudo o que está descrito aqui está pronto e no ar. Os comitês funcionam em português e em inglês; a secretaria, só em português. A próxima etapa é a sessão de teste do piloto, pelo roteiro em [docs/piloto.md](docs/piloto.md).
 
 ## O problema
 
@@ -14,6 +14,27 @@ Hoje uma simulação roda sobre ferramentas soltas: inscrição no Google Forms,
 - documentos coletivos caóticos, com muita gente editando o mesmo arquivo;
 - a equipe de crise perde notas quando todo mundo escreve ao mesmo tempo;
 - nada fica de uma edição para a outra.
+
+## Proposta de valor
+
+A sessão anda mais rápido e sem contagem à mão, e cada pessoa vê só o que o seu papel pede.
+
+| Para quem | O que muda |
+|---|---|
+| **Mesa** | Chamada, quórum, pontos e moções e votações num painel só. Os votos são contados na hora, e a ata de cada sessão sai pronta para imprimir. |
+| **Presidência** (a delegação da vez) | O painel mostra quem levantou a placa, os relógios e só o que está em ordem. Quem nunca presidiu não erra o procedimento. |
+| **Delegações** | Placa, pontos e moções, votos, bilhetes e documentos no celular, sem sair da cadeira. Cada uma sempre sabe quem preside e o que acontece agora. |
+| **Documentos** | Um working paper por item da agenda, de toda a sala. Quem propõe já apoia, as outras marcam posição, quem preside decide, e o projeto sai montado com as assinaturas. |
+| **Crise** | As notas chegam numa fila e são respondidas sem papel perdido. A crise vai ao telão com prazo e diz quem foi atingido. |
+| **Press** | Matérias, entrevistas e coletiva no mesmo lugar, com o plantão no telão. |
+| **Organização** | Inscritos, crachás com QR, check-in, avisos, certificados e o arquivo da edição, com a LGPD cuidada. |
+
+Também conta:
+
+- é um site: abre no navegador, sem instalar nada;
+- funciona em português e inglês;
+- com internet ruim, o que a pessoa envia fica guardado no aparelho e sai sozinho quando a conexão volta;
+- roda em serviços com plano gratuito (Supabase e Cloudflare).
 
 ## O que o app faz
 
@@ -90,110 +111,6 @@ tests/             testes de ponta a ponta (Playwright) e capturas de referênci
 scripts/           seed, evento de demonstração, carga, chaves de push e medidas
 docs/              plano do app, passos de implementação, regras, piloto e publicação
 ```
-
-## Plano de implementação
-
-O app é construído em passos, cada um com o seu plano: o que construir, banco, telas para celular e notebook, testes e quando está pronto. O índice, as convenções de código, a definição de pronto, a estratégia de testes e a aparência do app estão em [docs/implementacao/](docs/implementacao/README.md).
-
-Cada passo traz os testes que provam que ele funciona. Um passo só termina quando esses testes, e os de todos os passos anteriores, passam no CI.
-
-| Passo | Entrega |
-|---|---|
-| **Piloto** (grátis, poucos usuários, dados fictícios) | |
-| [01](docs/implementacao/01-fundacao.md) | Projeto, deploy, CI e layout responsivo |
-| [02](docs/implementacao/02-banco-e-permissoes.md) | Banco base, papéis, regras de acesso e dados fictícios |
-| [03](docs/implementacao/03-login-e-papeis.md) | Login e navegação por função |
-| [04](docs/implementacao/04-agora-e-informacoes.md) | Tela "Agora", perfis, comitê, cronograma e avisos |
-| [05](docs/implementacao/05-regras-de-procedimento.md) | Regras de procedimento como configuração |
-| [06](docs/implementacao/06-sessao-e-telao.md) | Sessão e telão |
-| [07](docs/implementacao/07-agenda-e-votacao.md) | Plenária de abertura, agenda e votação |
-| [08](docs/implementacao/08-crise.md) | Crise |
-| [09](docs/implementacao/09-editor-de-resolucoes.md) | Editor de resoluções |
-| [10](docs/implementacao/10-dpo-e-documentos-em-pdf.md) | DPO, cartas e documentos em PDF |
-| [11](docs/implementacao/11-press.md) | Press |
-| [12](docs/implementacao/12-teste-do-piloto.md) | Teste do piloto |
-| **Evento** (escala do UFRGSMUN) | |
-| [13](docs/implementacao/13-escala-e-tempo-real.md) | Escala e tempo real |
-| [14](docs/implementacao/14-login-completo-e-secretaria.md) | Login completo e secretaria |
-| [15](docs/implementacao/15-offline-e-pwa.md) | Offline, PWA e notificações |
-| [16](docs/implementacao/16-procedimento-completo.md) | Procedimento completo |
-| [17](docs/implementacao/17-comunicacao-completa.md) | Comunicação completa |
-| [18](docs/implementacao/18-idiomas.md) | Idiomas |
-| [19](docs/implementacao/19-lgpd-e-pos-evento.md) | LGPD e pós-evento |
-| **Melhorias depois da revisão** ([PDF](docs/melhorias-pos-revisao.pdf)) | |
-| [20](docs/implementacao/20-proposta-e-demonstracao.md) | Proposta de valor e evento de demonstração |
-| [21](docs/implementacao/21-chamada-e-sessao.md) | Chamada, abertura e encerramento de sessão |
-| [22](docs/implementacao/22-agenda.md) | Agenda antes das resoluções |
-| [23](docs/implementacao/23-lista-de-votos.md) | Lista de votos |
-| [24](docs/implementacao/24-bloqueio-de-bilhetes.md) | Bloqueio de bilhetes entre delegações |
-| [25](docs/implementacao/25-trilha.md) | Trilha de navegação |
-| [26](docs/implementacao/26-pagina-da-delegacao.md) | Página da delegação |
-| [27](docs/implementacao/27-diplomacy-nome-e-logo.md) | Nome Diplomacy e logo |
-| [28](docs/implementacao/28-dois-cronometros.md) | Dois cronômetros |
-| [29](docs/implementacao/29-mocoes-em-duas-etapas.md) | Pontos e moções em duas etapas |
-| [30](docs/implementacao/30-debate-rapido.md) | Debate rápido |
-| [31](docs/implementacao/31-bureau-representa-delegacao.md) | Bureau no lugar de uma delegação ausente |
-| [32](docs/implementacao/32-agora-por-papel.md) | Aba Agora e menu por papel |
-| [33](docs/implementacao/33-numeros-clicaveis.md) | Números clicáveis |
-| [34](docs/implementacao/34-caderno-da-delegacao.md) | Caderno da delegação |
-| [35](docs/implementacao/35-crise-com-prazo.md) | Crise com prazo |
-| [36](docs/implementacao/36-press-nas-redes.md) | Press nas redes |
-| [37](docs/implementacao/37-visual-geral.md) | Visual geral |
-| [38](docs/implementacao/38-melhorias-de-uso.md) | Melhorias de uso |
-| [39](docs/implementacao/39-testes-e-ci-rapidos.md) | Testes e CI mais rápidos |
-| [40](docs/implementacao/40-menos-dados-no-celular.md) | Menos dados no celular |
-| [41](docs/implementacao/41-pendencias.md) | Pendências |
-| [42](docs/implementacao/42-estilo-chancelaria.md) | Estilo chancelaria |
-| [43](docs/implementacao/43-facil-de-achar-e-voltar.md) | Fácil de achar e de voltar |
-| **Planos posteriores** ([ordem](docs/ordem-de-prioridade.pdf)) | |
-| [44](docs/implementacao/44-seguranca-dos-dados.md) | Segurança dos dados e das sessões |
-| [45](docs/implementacao/45-coletiva-oral.md) | Coletiva de imprensa como fluxo oral |
-| [46](docs/implementacao/46-agora-e-sessao-unificadas.md) | Agora operacional e sessão unificada |
-| [47](docs/implementacao/47-modais-saida-e-icones.md) | Modais, menus de escolha, saída com confirmação e ícones |
-| [48](docs/implementacao/48-demonstracao-online.md) | Demonstração online com acesso por papel |
-| [49](docs/implementacao/49-edicao-por-clausula.md) | Edição colaborativa por cláusula |
-| [50](docs/implementacao/50-preparacao-da-fala.md) | Preparação de discursos durante o debate |
-| [51](docs/implementacao/51-melhorias-gerais-de-interface.md) | Melhorias gerais de interface |
-| [52](docs/implementacao/52-testes-do-dia-a-dia.md) | Testes rápidos no dia a dia |
-| [53](docs/implementacao/53-dpo-como-arquivo.md) | DPO como arquivo público |
-| [54](docs/implementacao/54-correcoes-do-uso-de-24-11.md) | Correções do uso de 24/11 |
-| [55](docs/implementacao/55-paises-clicaveis.md) | Todo país abre a sua ficha |
-| [56](docs/implementacao/56-ordem-do-topico.md) | A ordem do tópico: agenda, working papers, resolução |
-| [57](docs/implementacao/57-escrita-de-documentos.md) | Escrever documentos sem atrito |
-| [58](docs/implementacao/58-documentos-da-mesa.md) | Documentos da mesa para o comitê |
-| [59](docs/implementacao/59-presidencia-e-sessao.md) | Uma presidência só, numa tela só, e a sessão na ordem certa |
-| [60](docs/implementacao/60-agenda-do-bureau.md) | A agenda parte do documento do bureau |
-| [61](docs/implementacao/61-saber-onde-estou.md) | Saber onde estou e o que chegou |
-| [62](docs/implementacao/62-fluxo-do-comite.md) | O fluxo do comitê: o que importa à vista, travas e a ordem clara |
-| [63](docs/implementacao/63-um-projeto-por-topico.md) | Um working paper por item da agenda, de toda a sala, e um projeto por tópico |
-| [64](docs/implementacao/64-editar-o-topico.md) | Editar o tópico, da agenda à resolução |
-| [65](docs/implementacao/65-ata-da-sessao.md) | Ata da sessão |
-| [66](docs/implementacao/66-apoio-lista-e-espaco.md) | Apoio automático, debate por lista e mais espaço na tela |
-| [67](docs/implementacao/67-campos-e-sessao.md) | Campos estilizados e a aba Sessão mais aproveitada |
-| [68](docs/implementacao/68-alinhamentos-e-menu-fixo.md) | Blocos alinhados, Agora sem vãos e o menu lateral sempre à mão |
-
-As fases do projeto (validação, piloto, evento e crescimento) e o calendário até a edição de 2027 estão na seção 17 do plano completo.
-
-## Documentos
-
-- [Plano completo (PDF)](docs/plano-do-app.pdf): problema, módulos, regras, arquitetura, riscos e calendário.
-- [Plano da coletiva de imprensa](docs/coletiva-de-imprensa.md): dinâmica oral, chamada de delegação, pauta, telão e produção posterior.
-- [Plano de segurança online](docs/seguranca-online.md): revisão de riscos, RLS, cache offline, Storage, demo e incidente.
-- [Melhorias de interface (PDF)](docs/melhorias-interface.pdf): fonte única das regras de interface; [melhorias.txt](docs/melhorias.txt) é só o texto de partida.
-- [Plano de interface oficial e demonstração](docs/interface-e-demonstracao.md): catálogo de modais, ícones do cabeçalho, ambiente público fictício e roteiro.
-- [Ordem de prioridade dos planos](docs/ordem-de-prioridade.pdf): consolidação e sequência recomendada para o trabalho futuro.
-- Protótipos visuais: [coletiva de imprensa](docs/prototipos-coletiva.pdf), [interface e demonstração](docs/prototipos-interface-demonstracao.pdf) e [segurança ao sair](docs/prototipos-seguranca.pdf).
-- Propostas visuais adicionais: [edição colaborativa](docs/prototipos-editor-documentos.pdf), [preparação de fala](docs/prototipos-preparacao-fala.pdf), [Agora e sessão](docs/prototipos-agora-sessao.pdf) e [melhorias gerais de interface](docs/prototipos-melhorias-interface.pdf).
-- Imagens dos protótipos em [docs/imagens/](docs/imagens/). O HTML-fonte está em [docs/prototipos-telas.html](docs/prototipos-telas.html).
-- [Plano da edição colaborativa de documentos (PDF)](docs/plano-editor-documentos.pdf): edição em tempo real, propostas por cláusula, rodadas curtas, conflitos e fusão de working papers.
-- [Plano de preparação de discursos durante o debate (PDF)](docs/plano-preparacao-discursos.pdf): notas rápidas, contexto das delegações, rascunho por blocos e ensaio da fala.
-- [Por que cada um usaria o Diplomacy](docs/proposta-de-valor.md): a frase de valor de cada papel e o roteiro do "mock and rules".
-- [Melhorias depois da revisão (PDF)](docs/melhorias-pos-revisao.pdf): as observações da revisão, priorizadas por impacto e esforço; fonte em [HTML](docs/melhorias-pos-revisao.html), gerada do mesmo jeito.
-- [Fonte do plano (HTML)](docs/plano-do-app.html). Para gerar o PDF de novo:
-
-  ```sh
-  chromium --headless --no-pdf-header-footer --print-to-pdf=docs/plano-do-app.pdf docs/plano-do-app.html
-  ```
 
 ## Desenvolvimento
 

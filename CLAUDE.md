@@ -36,7 +36,7 @@ App tudo em um para simulações da ONU (piloto: UFRGSMUN). SvelteKit com Svelte
 
 Cada mudança é um passo `NN`, com:
 
-- `docs/implementacao/NN-*.md`, mais a linha no índice `docs/implementacao/README.md` e na tabela do README;
+- `docs/implementacao/NN-*.md`, mais a linha no índice `docs/implementacao/README.md` (o README da raiz não lista os passos: fala do produto, da proposta de valor e de como rodar);
 - a linha em `docs/ordem-de-prioridade.md` e no `.html` (escrito à mão);
 - o PDF gerado de novo com `chromium-browser --headless --no-sandbox --no-pdf-header-footer --print-to-pdf=docs/ordem-de-prioridade.pdf docs/ordem-de-prioridade.html`.
 
