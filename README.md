@@ -17,7 +17,9 @@ Hoje uma simulação roda sobre ferramentas soltas: inscrição no Google Forms,
 
 ## Proposta de valor
 
-A sessão anda mais rápido e sem contagem à mão, e cada pessoa vê só o que o seu papel pede.
+Um lugar só para o evento inteiro, e que mantém a imersão. Bilhetes entre delegações, avisos da mesa, notas de crise e matérias da press passam pelos canais oficiais da simulação, então ninguém precisa abrir o WhatsApp no meio do debate, e quem está na sala segue no papel de delegado do começo ao fim.
+
+O app também faz a parte trabalhosa da mesa e dos diretores: controla quem fala e o cronômetro, conta os votos, junta as propostas no texto do documento e deixa a crise organizada, com prazo. A sessão anda mais rápido, e cada pessoa vê só o que o seu papel pede.
 
 | Para quem | O que muda |
 |---|---|
