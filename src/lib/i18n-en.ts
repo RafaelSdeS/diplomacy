@@ -634,6 +634,7 @@ export const EN: Record<string, string> = {
 	'Sem permissão': 'No permission',
 	'Sem quórum': 'No quorum',
 	'Senha': 'Password',
+	'Mostrar senha': 'Show password',
 	'Sessão': 'Session',
 	'Intervalo': 'Break',
 	'Cerimônia': 'Ceremony',

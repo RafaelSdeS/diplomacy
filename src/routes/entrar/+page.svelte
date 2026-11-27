@@ -10,6 +10,7 @@
 
 	let email = $state('');
 	let senha = $state('');
+	let verSenha = $state(false);
 	let erro = $state('');
 	let enviando = $state(false);
 
@@ -129,8 +130,9 @@
 					</label>
 					<label class="campo">
 						{t('Senha')}
-						<input type="password" autocomplete="current-password" required bind:value={senha} />
+						<input type={verSenha ? 'text' : 'password'} autocomplete="current-password" required bind:value={senha} />
 					</label>
+					<label class="opcao"><input type="checkbox" bind:checked={verSenha} /> {t('Mostrar senha')}</label>
 					{#if erro}
 						<p class="erro" role="alert">{erro}</p>
 					{/if}

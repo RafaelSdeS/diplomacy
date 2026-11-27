@@ -79,7 +79,7 @@ export async function sair(page: Page) {
 export async function entrar(page: Page, email: string) {
 	await page.goto('/entrar');
 	await page.getByLabel('E-mail', { exact: true }).fill(email);
-	await page.getByLabel('Senha').fill(SENHA);
+	await page.getByLabel('Senha', { exact: true }).fill(SENHA);
 	await page.getByRole('button', { name: 'Entrar', exact: true }).click();
 	// Passo 52: com 10 processos no mesmo Supabase, o login às vezes passa de 5 s.
 	await expect(page).not.toHaveURL(/\/entrar$/, { timeout: 15_000 });

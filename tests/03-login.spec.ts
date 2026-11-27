@@ -33,7 +33,10 @@ test('entra e sai com e-mail e senha', async ({ page }) => {
 test('senha errada mostra um aviso e não entra', async ({ page }) => {
 	await page.goto('/entrar');
 	await page.getByLabel('E-mail', { exact: true }).fill(CONTAS.delegado);
-	await page.getByLabel('Senha').fill('senha-errada');
+	await page.getByLabel('Senha', { exact: true }).fill('senha-errada');
+	// "Mostrar senha" tira a senha das bolinhas.
+	await page.getByLabel('Mostrar senha').check();
+	await expect(page.getByLabel('Senha', { exact: true })).toHaveAttribute('type', 'text');
 	await page.getByRole('button', { name: 'Entrar', exact: true }).click();
 	await expect(page.getByRole('alert')).toHaveText('E-mail ou senha incorretos.');
 	await expect(page).toHaveURL(/\/entrar$/);
@@ -49,7 +52,7 @@ test('o formulário de entrar funciona só com o teclado', async ({ page }) => {
 	await expect(email).toBeFocused();
 	await page.keyboard.type(CONTAS.delegado);
 	await page.keyboard.press('Tab');
-	await expect(page.getByLabel('Senha')).toBeFocused();
+	await expect(page.getByLabel('Senha', { exact: true })).toBeFocused();
 	await page.keyboard.type(SENHA);
 	await page.keyboard.press('Enter');
 	await expect(page.getByRole('heading', { level: 1, name: 'Agora' })).toBeVisible();
@@ -67,7 +70,7 @@ test('a tela de entrar cabe sem rolar, com as três formas em abas', async ({ pa
 	// Só a aba escolhida fica no Tab; as setas trocam de aba.
 	await abas.getByRole('tab', { name: 'Por e-mail' }).press('ArrowRight');
 	await expect(abas.getByRole('tab', { name: 'Senha' })).toBeFocused();
-	await expect(page.getByLabel('Senha')).toBeVisible();
+	await expect(page.getByLabel('Senha', { exact: true })).toBeVisible();
 	await page.keyboard.press('ArrowLeft');
 	await expect(abas.getByRole('tab', { name: 'Por e-mail' })).toBeFocused();
 	await expect(page.getByLabel('E-mail da sua conta')).toBeVisible();
