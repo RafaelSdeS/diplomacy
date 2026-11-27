@@ -2630,6 +2630,22 @@ export const EN: Record<string, string> = {
 	'Resumo do documento': 'Document summary',
 	'Abra a sessão para marcar o andamento.': 'Open the session to mark the progress.',
 	'Só a mesa vê esta agenda. Corrija o que precisar e libere no dia do evento.': 'Only the dais sees this agenda. Fix what you need and release it on the day of the event.',
+	// Passo 65
+	'A ata de cada sessão, pronta para imprimir': 'The minutes of each session, ready to print',
+	'Ata da sessão': 'Session minutes',
+	'Ata da sessão {n}': 'Minutes of session {n}',
+	'Atas das sessões': 'Session minutes',
+	'Ausentes': 'Absent',
+	'Incluir: "{texto}"': 'Add: "{texto}"',
+	'Mover: "{texto}"': 'Move: "{texto}"',
+	'Nenhuma proposta decidida.': 'No proposals decided.',
+	'Nenhuma sessão ainda.': 'No sessions yet.',
+	'Nenhuma votação.': 'No votes.',
+	'Presente e votando': 'Present and voting',
+	'Propostas decididas nos working papers': 'Proposals decided in the working papers',
+	'Retirar: "{texto}"': 'Remove: "{texto}"',
+	'em andamento': 'in progress',
+	'{n} de {total} presentes': '{n} of {total} present',
 };
 
 /** Mensagens do banco com partes variáveis: [padrão em português, tradução]. */

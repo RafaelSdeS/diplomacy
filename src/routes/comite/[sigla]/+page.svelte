@@ -5,6 +5,7 @@
 	import { abrirFicha } from '#lib/ficha.svelte.ts';
 	import { dica } from '#lib/dica.ts';
 	import BookOpen from '@lucide/svelte/icons/book-open';
+	import ClipboardCheck from '@lucide/svelte/icons/clipboard-check';
 	import FileText from '@lucide/svelte/icons/file-text';
 	import Gavel from '@lucide/svelte/icons/gavel';
 	import ListOrdered from '@lucide/svelte/icons/list-ordered';
@@ -55,6 +56,8 @@
 			{ href: `/comite/${sigla}/votacoes`, rotulo: t('Votações'), descricao: t('Quem votou como, em cada votação'), icone: Vote },
 			{ href: `/comite/${sigla}/regras`, rotulo: t('Regras de procedimento'), descricao: t('Quórum, maiorias, tempos e moções'), icone: Scale },
 			ehMesa ? { href: `/telao/${sigla}`, rotulo: t('Telão'), descricao: t('Para o projetor da sala'), icone: Presentation } : null,
+			// Passo 65: a ata de cada sessão é da mesa.
+			ehMesa ? { href: `/imprimir/ata/${sigla}`, rotulo: t('Atas das sessões'), descricao: t('A ata de cada sessão, pronta para imprimir'), icone: ClipboardCheck } : null,
 			data.comite.guia_url
 				? { href: data.comite.guia_url, rotulo: t('Guia de estudos'), descricao: t('O guia do comitê (abre em outra aba)'), icone: BookOpen, externo: true }
 				: null

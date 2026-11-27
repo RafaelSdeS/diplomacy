@@ -167,6 +167,7 @@ Cada passo traz os testes que provam que ele funciona. Um passo só termina quan
 | [62](docs/implementacao/62-fluxo-do-comite.md) | O fluxo do comitê: o que importa à vista, travas e a ordem clara |
 | [63](docs/implementacao/63-um-projeto-por-topico.md) | Um working paper por item da agenda, de toda a sala, e um projeto por tópico |
 | [64](docs/implementacao/64-editar-o-topico.md) | Editar o tópico, da agenda à resolução |
+| [65](docs/implementacao/65-ata-da-sessao.md) | Ata da sessão |
 
 As fases do projeto (validação, piloto, evento e crescimento) e o calendário até a edição de 2027 estão na seção 17 do plano completo.
 
