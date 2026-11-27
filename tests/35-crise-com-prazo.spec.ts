@@ -122,6 +122,12 @@ test('a crise é uma faixa: a sessão segue na primeira tela e o briefing abre n
 	await expect(faixa).toContainText('Brasil: Delegado retido');
 	await expect(brasil.getByRole('heading', { name: /Sessão ao vivo/ })).toBeInViewport();
 	expect(await metadesVazias(brasil)).toBe(0);
+	// Passo 68: o resumo da crise ocupa a faixa toda (sem metade vazia à direita).
+	const [faixaLargura, resumoLargura] = await faixa.evaluate((el) => [
+		el.clientWidth,
+		Math.max(...[...el.querySelectorAll('.alerta-crise-resumo')].map((p) => p.getBoundingClientRect().width))
+	]);
+	expect(resumoLargura, 'o resumo usa a faixa').toBeGreaterThan(faixaLargura * 0.85);
 	await faixa.getByRole('button', { name: `Ler o briefing: ${titulo}` }).click();
 	const modal = brasil.getByRole('dialog', { name: titulo });
 	await expect(modal).toContainText(briefing);

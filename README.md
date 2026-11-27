@@ -170,6 +170,7 @@ Cada passo traz os testes que provam que ele funciona. Um passo só termina quan
 | [65](docs/implementacao/65-ata-da-sessao.md) | Ata da sessão |
 | [66](docs/implementacao/66-apoio-lista-e-espaco.md) | Apoio automático, debate por lista e mais espaço na tela |
 | [67](docs/implementacao/67-campos-e-sessao.md) | Campos estilizados e a aba Sessão mais aproveitada |
+| [68](docs/implementacao/68-alinhamentos-e-menu-fixo.md) | Blocos alinhados, Agora sem vãos e o menu lateral sempre à mão |
 
 As fases do projeto (validação, piloto, evento e crescimento) e o calendário até a edição de 2027 estão na seção 17 do plano completo.
 

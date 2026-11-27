@@ -92,6 +92,22 @@ test('o menu lateral se recolhe, abre ao passar o mouse e lembra a escolha', asy
 	await menu.getByRole('button', { name: 'Fixar o menu' }).click();
 	await page.mouse.move(900, 500);
 	await expect.poll(largura).toBeGreaterThan(200);
+
+	// Passo 68: o menu acompanha a rolagem, fixado e recolhido (não é preciso voltar ao topo).
+	await page.setViewportSize({ width: 1366, height: 500 });
+	await page.goto(`/comite/${C.sigla}/sessao`);
+	await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+	const agora = menu.getByRole('link', { name: 'Agora' });
+	for (const modo of ['fixado', 'recolhido']) {
+		if (modo === 'recolhido') await menu.getByRole('button', { name: 'Recolher o menu' }).click();
+		await page.mouse.move(900, 300);
+		await page.evaluate(() => scrollTo(0, document.body.scrollHeight));
+		await expect.poll(() => page.evaluate(() => scrollY), { message: modo }).toBeGreaterThan(100);
+		await expect(agora, modo).toBeInViewport();
+		await page.evaluate(() => scrollTo(0, 0));
+	}
+	await menu.hover();
+	await menu.getByRole('button', { name: 'Fixar o menu' }).click();
 });
 
 test('a busca do caderno acha a anotação sem rolar', async ({ page }) => {

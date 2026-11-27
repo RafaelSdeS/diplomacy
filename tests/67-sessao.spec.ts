@@ -49,6 +49,11 @@ test('a sessão no notebook: a palavra em cima, a votação recolhe com os votos
 
 	// Os blocos à vista, com o da delegação.
 	await expect(page.getByRole('list', { name: 'Blocos do comitê' })).toContainText(nomeDoBloco);
+	// Passo 68: o nome do bloco em cima e os membros embaixo, na mesma margem esquerda.
+	const bloco = page.getByRole('list', { name: 'Blocos do comitê' }).getByRole('listitem').filter({ hasText: nomeDoBloco });
+	const [caixaNome, caixaMembro] = [await bloco.locator('strong').first().boundingBox(), await bloco.locator('.bloco-membro').first().boundingBox()];
+	expect(Math.abs(caixaNome!.x - caixaMembro!.x), 'mesma margem').toBeLessThan(4);
+	expect(caixaMembro!.y, 'os membros embaixo do nome').toBeGreaterThan(caixaNome!.y);
 
 	// O ponto ou moção mostra os tipos em cartões, em grupos.
 	await page.getByRole('button', { name: 'Fazer um ponto ou moção' }).click();

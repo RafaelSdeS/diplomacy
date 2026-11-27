@@ -471,7 +471,10 @@ main.main-sem-moldura {
 		background: var(--cor-fundo);
 	}
 
+	/* Passo 68: a lista do menu acompanha a rolagem; o <nav> segue esticado na coluna. */
 	.navegacao ul {
+		position: sticky;
+		top: 0.75rem;
 		flex-direction: column;
 		justify-content: flex-start;
 		gap: 0.25rem;
@@ -534,7 +537,7 @@ main.main-sem-moldura {
 		z-index: 6;
 		width: 3.5rem;
 		padding-inline: 0.4rem;
-		overflow: hidden;
+		overflow: clip; /* passo 68: hidden criaria uma rolagem e o menu não acompanharia a página */
 		transition:
 			width var(--transicao),
 			box-shadow var(--transicao);
@@ -912,8 +915,17 @@ fieldset.opcoes.opcoes--cartoes:has(> .opcao > input[type='radio']) > .opcao {
 }
 
 /* Os blocos na sessão: o nome e os membros na mesma linha. */
-.blocos-da-sessao li {
-	justify-content: flex-start;
+/* Passo 68: o nome do bloco em cima e os membros embaixo, alinhados à esquerda. A
+   especificidade é maior que a de .lista li (que espalha os itens), que vem depois no CSS. */
+.blocos-da-sessao .lista li {
+	display: grid;
+	justify-items: start;
+	gap: 0.35rem;
+}
+
+.blocos-da-sessao .lista li.lista-minha {
+	padding-inline: 0.6rem;
+	box-shadow: inset 3px 0 0 var(--cor-fio-dourado);
 }
 
 .bloco-membros {
@@ -991,6 +1003,11 @@ dialog .formulario > .acoes:last-child {
 	padding: 0;
 	list-style: none;
 	border-top: var(--linha);
+}
+
+/* Passo 68: dentro de um cartão, a lista usa a largura dele (o cartão já é o limite). */
+.cartao .lista {
+	max-width: none;
 }
 
 .lista li {
@@ -3787,6 +3804,11 @@ dialog.modal-lateral {
 
 .alerta-crise .rotulo {
 	color: var(--cor-erro);
+}
+
+/* Passo 68: o resumo da crise (duas linhas) ocupa a faixa toda, sem o limite de leitura. */
+.alerta-crise p {
+	max-width: none;
 }
 
 .alerta-crise-prazo {
