@@ -64,6 +64,7 @@ Para quem quiser os detalhes técnicos. Os números são de 26/11/2026.
 - Svelte 5 com runes; componentes em `src/lib/ui/`; a lógica pura em `src/lib/*.ts`, com testes de unidade ao lado.
 - Ícones [Lucide](https://lucide.dev), bandeiras [flag-icons](https://flagicons.lipis.dev), fonte Spectral nos títulos, CSS próprio com variáveis de cor e tema escuro (`src/app.css`).
 - Idiomas: português e inglês, com o dicionário em `src/lib/i18n-en.ts`; um teste confere que todo texto da tela e toda mensagem de erro do banco têm tradução.
+- Ações em botões com ícone; criar algo abre um modal no centro. Na agenda, no working paper e no projeto, o texto fica limpo na largura toda, o resumo fica ao lado, e cada item ou cláusula abre um painel à direita com o que dá para fazer nele (passo 64).
 - Acessibilidade (WCAG 2.2 AA): o axe roda nos testes de ponta a ponta, nos dois temas; toda ação tem dica ao passar o mouse e no foco do teclado (`src/lib/dica.ts`).
 
 ### Testes e CI
@@ -155,6 +156,17 @@ Cada passo traz os testes que provam que ele funciona. Um passo só termina quan
 | [51](docs/implementacao/51-melhorias-gerais-de-interface.md) | Melhorias gerais de interface |
 | [52](docs/implementacao/52-testes-do-dia-a-dia.md) | Testes rápidos no dia a dia |
 | [53](docs/implementacao/53-dpo-como-arquivo.md) | DPO como arquivo público |
+| [54](docs/implementacao/54-correcoes-do-uso-de-24-11.md) | Correções do uso de 24/11 |
+| [55](docs/implementacao/55-paises-clicaveis.md) | Todo país abre a sua ficha |
+| [56](docs/implementacao/56-ordem-do-topico.md) | A ordem do tópico: agenda, working papers, resolução |
+| [57](docs/implementacao/57-escrita-de-documentos.md) | Escrever documentos sem atrito |
+| [58](docs/implementacao/58-documentos-da-mesa.md) | Documentos da mesa para o comitê |
+| [59](docs/implementacao/59-presidencia-e-sessao.md) | Uma presidência só, numa tela só, e a sessão na ordem certa |
+| [60](docs/implementacao/60-agenda-do-bureau.md) | A agenda parte do documento do bureau |
+| [61](docs/implementacao/61-saber-onde-estou.md) | Saber onde estou e o que chegou |
+| [62](docs/implementacao/62-fluxo-do-comite.md) | O fluxo do comitê: o que importa à vista, travas e a ordem clara |
+| [63](docs/implementacao/63-um-projeto-por-topico.md) | Um working paper por item da agenda, de toda a sala, e um projeto por tópico |
+| [64](docs/implementacao/64-editar-o-topico.md) | Editar o tópico, da agenda à resolução |
 
 As fases do projeto (validação, piloto, evento e crescimento) e o calendário até a edição de 2027 estão na seção 17 do plano completo.
 
@@ -200,17 +212,13 @@ SEM_RESET=1 npm run capturas -- tests/06-sessao.spec.ts  # regrava as capturas d
 
 Contas do seed para entrar: `delegado01@exemplo.test` a `delegado16`, `mesa01`, `crise01`, `press01`, `secretaria01` e `semconvite` (sem convite), todas `@exemplo.test` com a senha `senha-de-teste`. No evento de demonstração (`npm run demo`), as contas seguem o padrão `demo.<sigla>.<nn>@exemplo.test` (delegação `nn` do comitê, em ordem; `01b` e `02b` são segundos delegados), `demo.<sigla>.mesa1`, `.press`, `.crise1`, mais `demo.secretaria` e `demo.diretoria-press`. O CSNU da demonstração tem conteúdo completo para testar: `demo.csnu.mesa1` (mesa), `demo.csnu.08` (Dinamarca, primeira presidência do sorteio), `demo.csnu.03` (França). Não há cadastro livre: as contas são criadas pelo seed ou pelo administrador, e os convites da secretaria definem o papel.
 
-**Versão online** (<https://diplomacy.rafesilvadesouza.workers.dev>): o CSNU-T do evento UFRGSMUN tem contas de teste, `delegado-eua`, `delegado-china`, `delegado-franca`, `delegado-russia`, `delegado-reino-unido`, `press-csnu` e `crise-csnu`, todas `@exemplo.test`, além de `delegado-brasil`. A mesa é a conta do administrador. A senha não fica no repositório, que é público: está em `docs/contas-online.local.md`, um arquivo só local (`*.local.md` fica fora do git), que também explica como criar e apagar contas. O seed e a demonstração recusam a produção de propósito.
+**Versão online** (<https://diplomacy.rafesilvadesouza.workers.dev>): o CSNU-T do evento UFRGSMUN tem contas de teste, `delegado-eua`, `delegado-china`, `delegado-franca`, `delegado-russia`, `delegado-reino-unido`, `mesa-csnu`, `press-csnu` e `crise-csnu`, todas `@exemplo.test`, além de `delegado-brasil`. O comitê tem conteúdo completo (sessões, documentos, mensagens, crise e press). A conta do administrador é mesa e secretaria. A senha não fica no repositório, que é público: está em `docs/contas-online.local.md`, um arquivo só local (`*.local.md` fica fora do git), que também explica como criar e apagar contas. O seed e a demonstração recusam a produção de propósito.
 
 Para ver uma sessão funcionando: entre como `mesa01`, abra o Painel e clique em Abrir sessão; na Chamada, sorteie o rodízio, marque as presenças e conclua (volta ao Painel). No Painel, conduza a plenária de abertura (briefing, discursos e moção do tópico no topo); em outra janela, um delegado propõe o tópico e vota. Depois da plenária, preside a delegação sorteada. O telão fica em `/telao/CSNU-T`.
 
 Para parar o Supabase local: `npx supabase stop`. Depois de criar uma migração, rode `npm run db:resetar` (recria o banco), `npm run seed` e `npm run db:tipos`.
 
-**Capturas de referência:** os testes de aparência comparam telas com capturas geradas no CI, sempre no mesmo contêiner. No seu computador eles são pulados. Para gerar ou atualizar as capturas:
-
-1. Em Actions, abra o workflow "CI", clique em "Run workflow" na branch desejada e marque "Gerar novas capturas".
-2. Baixe o artefato `capturas`.
-3. Coloque o conteúdo em `tests/capturas/` e faça o commit.
+**Capturas de referência:** os testes de aparência comparam telas com capturas geradas sempre no mesmo contêiner do Playwright, o do CI. Fora dele, esses testes são pulados. `npm run capturas` zera o banco local, roda o seed e a build e regrava no contêiner só as capturas que mudaram; confira as imagens no `git diff` antes do commit.
 
 **Publicar:** o passo a passo do Supabase na nuvem, do Cloudflare e do login com Google está em [docs/publicar.md](docs/publicar.md).
 
