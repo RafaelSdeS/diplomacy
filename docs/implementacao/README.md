@@ -79,6 +79,7 @@ Cada passo só começa quando os passos de que ele depende estão prontos. As re
 | [63](63-um-projeto-por-topico.md) | Um working paper por item da agenda, de toda a sala, e um projeto por tópico: os redatores propõem, quem preside aceita ou rejeita, e a mesa transforma em projeto | 09, 56, 57, 60, 62 |
 | [64](64-editar-o-topico.md) | Editar o tópico, da agenda à resolução: o texto limpo na largura toda, o resumo ao lado e cada item ou cláusula num painel à direita; a trilha na sala, a fase de ação a um clique e a resolução na trilha | 60, 62, 63 |
 | [65](65-ata-da-sessao.md) | Ata da sessão, só para a mesa: presença, pontos e moções, votações e propostas decididas, pronta para imprimir | 23, 29, 63 |
+| [66](66-apoio-lista-e-espaco.md) | Apoio automático de quem propõe, moção de debate por lista, cabeçalho com quem preside, menu lateral recolhível, caderno com busca, painel da presidência mais alto e o olho na senha | 29, 51, 59, 63, 64 |
 
 ## Melhorias depois da revisão
 
@@ -257,6 +258,7 @@ Cada passo tem uma seção "Testes" com os testes que provam que ele funciona e 
 | 63 | sim | — | sim | sim |
 | 64 | — | — | sim | sim |
 | 65 | — | — | sim | sim |
+| 66 | sim | — | sim | sim |
 
 ## Aparência
 

@@ -47,7 +47,7 @@
 	let diferenca = $state(0);
 	let erro = $state('');
 	let tempoFala = $state(0);
-	let forma = $state<'formal_informal' | 'informal_informal'>('formal_informal');
+	let forma = $state<'formal_informal' | 'formal_formal' | 'informal_informal'>('formal_informal');
 	let minutos = $state<number | null>(null);
 
 	const comite = $derived(data.comite.id);
@@ -57,7 +57,14 @@
 	);
 	// Passo 59: as placas levantadas não são uma ordem: em ordem alfabética, sem número. A ordem
 	// de fala é a dos próximos, que a presidência monta.
-	const fila = $derived([...(sessao?.pedidos ?? [])].sort((a, b) => (a.delegacao?.nome ?? '').localeCompare(b.delegacao?.nome ?? '')));
+	// Passo 66: no debate por lista (formal-formal no debate), a fila é a lista de oradores, na ordem
+	// em que as placas subiram; no formal-informal, em ordem alfabética, e a presidência escolhe.
+	const porLista = $derived(data.fase === 'debate' && data.estado?.forma === 'formal_formal');
+	const fila = $derived(
+		porLista
+			? [...(sessao?.pedidos ?? [])]
+			: [...(sessao?.pedidos ?? [])].sort((a, b) => (a.delegacao?.nome ?? '').localeCompare(b.delegacao?.nome ?? ''))
+	);
 	const pontosAbertos = $derived((sessao?.pontos ?? []).filter((p) => !['aceito', 'recusado', 'retirado'].includes(p.status)));
 	const emDiscussao = $derived(pontosAbertos.find((p) => p.status === 'em_discussao'));
 	// Passo 29: com uma delegação presidindo, o bureau aprova antes e a presidência só vê o aprovado.
@@ -251,11 +258,118 @@
 	<title>{tituloDaAba(t('Presidência'), data.comite.sigla)}</title>
 </svelte:head>
 
-<p class="rotulo">{t('Comitê')} · {data.comite.sigla} <AoVivo comiteId={data.comite.id} bind:diferenca /></p>
-<h1>
-	{t('Presidência')}{#if quemPreside}<span class="painel-quem">{' · '}<Bandeira codigo={quemPreside.bandeira} /> {quemPreside.nome}</span
-		>{:else if sessao}<span class="painel-quem">{' · '}{t('Mesa')}</span>{/if}
-</h1>
+<!-- Passo 66: o título e a barra da sessão numa linha só: a altura que sobra vai para as colunas. -->
+<div class="topo-painel">
+	<div>
+		<p class="rotulo">{t('Comitê')} · {data.comite.sigla} <AoVivo comiteId={data.comite.id} bind:diferenca /></p>
+		<h1>
+			{t('Presidência')}{#if quemPreside}<span class="painel-quem">{' · '}<Bandeira codigo={quemPreside.bandeira} /> {quemPreside.nome}</span
+				>{:else if sessao}<span class="painel-quem">{' · '}{t('Mesa')}</span>{/if}
+		</h1>
+	</div>
+	{#if (data.podePresidir || ehMesa) && data.estado && sessao}
+		<div class="barra-painel">
+			<p class="suave">
+				<Contagem rotulo={t('Presentes: {n} de {total}', { n: presentesN, total: chamada.length })} itens={chamada} /> ·
+				{t('Sessão {n}', { n: sessao.numero })} · {FASES[data.fase]} · {FORMAS[data.estado.forma]}
+			</p>
+			<div class="acoes">
+				{#if ehMesa}
+					<a
+						class="botao botao--secundario botao--pequeno"
+						href={`/comite/${data.comite.sigla}/sessao/chamada`}
+						{@attach dica(t('Confirmar as chegadas e ver a ordem da presidência.'))}>{t('Chamada')}</a
+					>
+					<a
+						class="botao botao--secundario botao--pequeno"
+						href={`/comite/${data.comite.sigla}/sessao/agenda`}
+						{@attach dica(t('Os itens do tópico e as alterações propostas.'))}>{t('Agenda')}</a
+					>
+					<!-- Passo 59: a mesa assume só em caso excepcional, com motivo; devolver volta à mesma delegação. -->
+					{#if data.fase === 'debate' && sessao.presidencia}
+						<details class="menu-painel">
+							<summary class="botao botao--secundario botao--pequeno" {@attach dica(t('O caso excepcional: a mesa assume ou devolve a presidência.'))}>{t('Mais opções')}</summary>
+							<section class="cartao" aria-label={t('Caso excepcional')}>
+								{#if data.estado.mesa_assumiu}
+									<button
+										class="botao botao--secundario botao--pequeno"
+										type="button"
+										{@attach dica(t('A delegação da vez volta a conduzir o debate.'))}
+										onclick={() => rpc('assumir_presidencia', { p_comite: comite, p_assumir: false })}
+										>{t('Devolver a presidência a {delegacao}', { delegacao: sessao.presidencia.nome })}</button
+									>
+								{:else}
+									<label class="campo">
+										{t('Motivo (caso excepcional)')}
+										<input maxlength="200" bind:value={motivoMesa} />
+									</label>
+									<Confirmar
+										classe="botao botao--secundario botao--pequeno"
+										rotulo={t('Mesa assume a presidência')}
+										pergunta={t('A mesa assume a presidência desta sessão?')}
+										explicacao={t('Só em caso excepcional. A delegação da vez fica sem os controles até a mesa devolver.')}
+										acao={() => rpc('assumir_presidencia', { p_comite: comite, p_assumir: true, p_motivo: motivoMesa })}
+									/>
+								{/if}
+							</section>
+						</details>
+					{/if}
+					<details class="menu-painel" bind:open={representarAberto}>
+						<summary class="botao botao--secundario botao--pequeno" {@attach dica(t('A mesa age no lugar de uma delegação que faltou.'))}>{representada ? t('No lugar de {delegacao}', { delegacao: representada.nome }) : t('Assumir uma delegação')}</summary>
+						<section class="cartao" aria-labelledby="t-representar">
+							<h2 id="t-representar">{t('Assumir uma delegação')}</h2>
+							{#if representada}
+								<p>{t('Você está no lugar de {delegacao}.', { delegacao: representada.nome })}</p>
+								<div class="acoes">
+									<a class="botao botao--secundario botao--pequeno" href={`/comite/${data.comite.sigla}/sessao`} {@attach dica(t('Vai à tela da sessão para pedir a palavra e votar por ela.'))}>{t('Agir pela delegação')}</a>
+									<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => rpc('representar', { p_comite: comite, p_delegacao: null as unknown as string })}
+										{@attach dica(t('Você deixa de agir no lugar desta delegação.'))}
+										>{t('Deixar')}</button
+									>
+								</div>
+							{:else}
+								<form
+									class="acoes"
+									aria-label={t('Assumir uma delegação')}
+									onsubmit={(e) => {
+										e.preventDefault();
+										if (assumir) void rpc('representar', { p_comite: comite, p_delegacao: assumir });
+									}}
+								>
+									<ListaEscolha
+										unica
+										rotulo={t('Delegação')}
+										botao={t('Escolher')}
+										opcoes={paraAssumir.map((d) => ({ ...d, detalhe: ausentes.has(d.id) ? t('ausente') : undefined }))}
+										bind:valor={assumir}
+									/>
+									<button class="botao botao--secundario botao--pequeno" {@attach dica(t('Você passa a agir pela delegação escolhida nesta sessão.'))}>{t('Assumir')}</button>
+								</form>
+							{/if}
+						</section>
+					</details>
+				{/if}
+				<details class="menu-painel">
+					<summary class="botao botao--secundario botao--pequeno" {@attach dica(t('As teclas do painel: dar a palavra, pausar e passar ao próximo.'))}>{t('Atalhos')}</summary>
+					<p class="cartao atalhos-ajuda">
+						<kbd>{t('Espaço')}</kbd> {t('pausa ou retoma;')} <kbd>{t('Enter')}</kbd> {t('dá a palavra ao primeiro dos próximos;')} <kbd>B</kbd> {t('baixa todas as placas.')}
+					</p>
+				</details>
+				{#if ehMesa}
+					<Confirmar
+						classe="botao botao--secundario botao--pequeno"
+						rotulo={t('Encerrar sessão')}
+						pergunta={t('Encerrar a sessão {n}?', { n: sessao.numero })}
+						explicacao={votacao?.aberta
+							? t('Há uma votação aberta: ela fecha sem resultado (um projeto volta a esperar a mesa). Para ter o resultado, encerre a votação antes.')
+							: t('O cronômetro para e a presidência passa à próxima delegação na sessão seguinte.')}
+						acao={encerrarSessao}
+					/>
+				{/if}
+			</div>
+		</div>
+	{/if}
+</div>
 
 {#if !data.podePresidir && !ehMesa}
 	<p class="suave">{t('Você não preside esta sessão. Quando for a vez da sua delegação, o painel aparece aqui.')}</p>
@@ -300,106 +414,6 @@
 		<p class="suave">{t('Nenhuma sessão aberta. A mesa abre a sessão na chamada.')}</p>
 	{/if}
 {:else}
-	<div class="barra-painel">
-		<p class="suave">
-			<Contagem rotulo={t('Presentes: {n} de {total}', { n: presentesN, total: chamada.length })} itens={chamada} /> ·
-			{t('Sessão {n}', { n: sessao.numero })} · {FASES[data.fase]} · {FORMAS[data.estado.forma]}
-		</p>
-		<div class="acoes">
-			{#if ehMesa}
-				<a
-					class="botao botao--secundario botao--pequeno"
-					href={`/comite/${data.comite.sigla}/sessao/chamada`}
-					{@attach dica(t('Confirmar as chegadas e ver a ordem da presidência.'))}>{t('Chamada')}</a
-				>
-				<a
-					class="botao botao--secundario botao--pequeno"
-					href={`/comite/${data.comite.sigla}/sessao/agenda`}
-					{@attach dica(t('Os itens do tópico e as alterações propostas.'))}>{t('Agenda')}</a
-				>
-				<!-- Passo 59: a mesa assume só em caso excepcional, com motivo; devolver volta à mesma delegação. -->
-				{#if data.fase === 'debate' && sessao.presidencia}
-					<details class="menu-painel">
-						<summary class="botao botao--secundario botao--pequeno" {@attach dica(t('O caso excepcional: a mesa assume ou devolve a presidência.'))}>{t('Mais opções')}</summary>
-						<section class="cartao" aria-label={t('Caso excepcional')}>
-							{#if data.estado.mesa_assumiu}
-								<button
-									class="botao botao--secundario botao--pequeno"
-									type="button"
-									{@attach dica(t('A delegação da vez volta a conduzir o debate.'))}
-									onclick={() => rpc('assumir_presidencia', { p_comite: comite, p_assumir: false })}
-									>{t('Devolver a presidência a {delegacao}', { delegacao: sessao.presidencia.nome })}</button
-								>
-							{:else}
-								<label class="campo">
-									{t('Motivo (caso excepcional)')}
-									<input maxlength="200" bind:value={motivoMesa} />
-								</label>
-								<Confirmar
-									classe="botao botao--secundario botao--pequeno"
-									rotulo={t('Mesa assume a presidência')}
-									pergunta={t('A mesa assume a presidência desta sessão?')}
-									explicacao={t('Só em caso excepcional. A delegação da vez fica sem os controles até a mesa devolver.')}
-									acao={() => rpc('assumir_presidencia', { p_comite: comite, p_assumir: true, p_motivo: motivoMesa })}
-								/>
-							{/if}
-						</section>
-					</details>
-				{/if}
-				<details class="menu-painel" bind:open={representarAberto}>
-					<summary class="botao botao--secundario botao--pequeno" {@attach dica(t('A mesa age no lugar de uma delegação que faltou.'))}>{representada ? t('No lugar de {delegacao}', { delegacao: representada.nome }) : t('Assumir uma delegação')}</summary>
-					<section class="cartao" aria-labelledby="t-representar">
-						<h2 id="t-representar">{t('Assumir uma delegação')}</h2>
-						{#if representada}
-							<p>{t('Você está no lugar de {delegacao}.', { delegacao: representada.nome })}</p>
-							<div class="acoes">
-								<a class="botao botao--secundario botao--pequeno" href={`/comite/${data.comite.sigla}/sessao`} {@attach dica(t('Vai à tela da sessão para pedir a palavra e votar por ela.'))}>{t('Agir pela delegação')}</a>
-								<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => rpc('representar', { p_comite: comite, p_delegacao: null as unknown as string })}
-									{@attach dica(t('Você deixa de agir no lugar desta delegação.'))}
-									>{t('Deixar')}</button
-								>
-							</div>
-						{:else}
-							<form
-								class="acoes"
-								aria-label={t('Assumir uma delegação')}
-								onsubmit={(e) => {
-									e.preventDefault();
-									if (assumir) void rpc('representar', { p_comite: comite, p_delegacao: assumir });
-								}}
-							>
-								<ListaEscolha
-									unica
-									rotulo={t('Delegação')}
-									botao={t('Escolher')}
-									opcoes={paraAssumir.map((d) => ({ ...d, detalhe: ausentes.has(d.id) ? t('ausente') : undefined }))}
-									bind:valor={assumir}
-								/>
-								<button class="botao botao--secundario botao--pequeno" {@attach dica(t('Você passa a agir pela delegação escolhida nesta sessão.'))}>{t('Assumir')}</button>
-							</form>
-						{/if}
-					</section>
-				</details>
-			{/if}
-			<details class="menu-painel">
-				<summary class="botao botao--secundario botao--pequeno" {@attach dica(t('As teclas do painel: dar a palavra, pausar e passar ao próximo.'))}>{t('Atalhos')}</summary>
-				<p class="cartao atalhos-ajuda">
-					<kbd>{t('Espaço')}</kbd> {t('pausa ou retoma;')} <kbd>{t('Enter')}</kbd> {t('dá a palavra ao primeiro dos próximos;')} <kbd>B</kbd> {t('baixa todas as placas.')}
-				</p>
-			</details>
-			{#if ehMesa}
-				<Confirmar
-					classe="botao botao--secundario botao--pequeno"
-					rotulo={t('Encerrar sessão')}
-					pergunta={t('Encerrar a sessão {n}?', { n: sessao.numero })}
-					explicacao={votacao?.aberta
-						? t('Há uma votação aberta: ela fecha sem resultado (um projeto volta a esperar a mesa). Para ter o resultado, encerre a votação antes.')
-						: t('O cronômetro para e a presidência passa à próxima delegação na sessão seguinte.')}
-					acao={encerrarSessao}
-				/>
-			{/if}
-		</div>
-	</div>
 
 	{#if erro}
 		<p class="erro" role="alert">{erro}</p>
@@ -449,12 +463,17 @@
 			{/if}
 
 			<section class="cartao" aria-labelledby="t-fila">
-				<h2 id="t-fila">{t('Placas levantadas')}</h2>
+				<h2 id="t-fila">{porLista ? t('Lista de oradores, pela ordem das placas') : t('Placas levantadas')}</h2>
+				{#if porLista && fila[0]?.delegacao}
+					<button class="botao" type="button" onclick={() => darPalavra(fila[0].delegacao!.id)} {@attach dica(t('No debate por lista, a palavra segue a ordem das placas.'))}>
+						{t('Dar a palavra a {delegacao}', { delegacao: fila[0].delegacao.nome })}
+					</button>
+				{/if}
 				{#if fila.length > LISTA_LONGA}
 					<label class="campo">{t('Filtrar')} <input type="search" bind:value={buscaFila} /></label>
 				{/if}
 				<ul class="lista">
-					{#each filaVisivel as pedido (pedido.id)}
+					{#each filaVisivel as pedido, i (pedido.id)}
 						{@const ordem = escolhidos.indexOf(pedido.delegacao?.id ?? '')}
 						<li>
 							<span>
@@ -462,6 +481,9 @@
 								{#if pedido.pela_mesa}<span class="selo">{t('pela mesa')}</span>{/if}
 								{#if semVoz(data.incidentes, pedido.delegacao?.id, agora + diferenca)}<span class="selo selo--alerta">{t('impedida')}</span>{/if}
 							</span>
+							{#if porLista}
+								<span class="selo">{i + 1}º</span>
+							{:else}
 							<span class="acoes">
 								<button
 									class="botao botao--secundario botao--pequeno"
@@ -479,6 +501,7 @@
 									onclick={() => darPalavra(pedido.delegacao!.id)}>{t('Dar a palavra')}</button
 								>
 							</span>
+							{/if}
 						</li>
 					{:else}
 						<li class="suave">{fila.length ? t('Nenhuma delegação encontrada.') : t('Nenhuma placa levantada.')}</li>
@@ -486,6 +509,7 @@
 				</ul>
 				{#if fila.length}
 					<div class="acoes">
+						{#if !porLista}
 						<button class="botao botao--secundario botao--pequeno" type="button" onclick={definirProximos}
 							{@attach dica(
 								escolhidos.length ? t('Os escolhidos passam a ser os próximos, nesta ordem.') : t('Escolha pelo menos uma delegação entre as placas.'),
@@ -493,6 +517,7 @@
 							)}
 							>{t('Definir os próximos ({n})', { n: escolhidos.length })}</button
 						>
+						{/if}
 						<button class="botao botao--secundario botao--pequeno" type="button" onclick={baixarTodas} {@attach dica(t('Abaixa as placas de todas as delegações (atalho: B).'))}>{t('Baixar todas as placas')}</button>
 					</div>
 				{/if}
@@ -657,6 +682,7 @@
 								{t('Forma de debate')}
 								<select bind:value={forma}>
 									<option value="formal_informal">{FORMAS.formal_informal}</option>
+									<option value="formal_formal">{FORMAS.formal_formal}</option>
 									<option value="informal_informal">{FORMAS.informal_informal}</option>
 								</select>
 							</label>

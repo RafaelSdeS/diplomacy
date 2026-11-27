@@ -46,7 +46,9 @@ test('os EUA anotam sobre o Irã, o outro delegado vê, e a França lê só o co
 	const recebidas = franca.getByRole('region', { name: 'Compartilhadas com a sua delegação' });
 	await expect(recebidas).toContainText(TEXTO);
 	await expect(recebidas).toContainText('De EUA');
-	await expect(recebidas.getByRole('button')).toHaveCount(0);
+	// Só leitura: dá para abrir inteira (passo 66), não para apagar nem compartilhar.
+	await expect(recebidas.getByRole('button', { name: /Apagar|Compartilhar/ })).toHaveCount(0);
+	await expect(recebidas.getByRole('button', { name: 'Ler' })).not.toHaveCount(0);
 
 	// O Irã, que não recebeu, não vê.
 	const ira = await (await browser.newContext()).newPage();

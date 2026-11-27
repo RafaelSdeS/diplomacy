@@ -20,6 +20,8 @@ async function workingPaperDoItem(page: Page, item: string) {
 	await page.goto('/comite/CE-T/documentos');
 	await page.getByRole('navigation', { name: 'Ordem do tópico 1' }).getByRole('button', { name: /^Working papers/ }).click();
 	await expect(page).toHaveURL(/\/documento\/.+\/sala$/);
+	// Passo 66: os documentos do tópico ficam num menu recolhido.
+	await page.getByText(/^Documentos do tópico \(\d+\)$/).click();
 	await expect(page.getByRole('navigation', { name: 'Documentos do tópico' })).toContainText(item);
 }
 
@@ -73,6 +75,8 @@ test('a delegação propõe, a mesa inclui e registra a adoção; o item ganha o
 	await modal.getByLabel('Texto novo').fill(texto);
 	await modal.getByRole('button', { name: 'Propor', exact: true }).click();
 	await expect(alemanha.getByRole('status')).toHaveText('Alteração proposta. As delegações debatem e marcam a posição.');
+	// Passo 66: quem propõe já apoia, sem clicar.
+	await expect(modal.getByRole('listitem').filter({ hasText: texto })).toContainText('Apoio 1');
 
 	await page.reload();
 	// A lista ao lado leva ao item; no painel dele, a mesa inclui.

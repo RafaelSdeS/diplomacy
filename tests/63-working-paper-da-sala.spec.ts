@@ -55,6 +55,10 @@ test('a redatora propõe no working paper da sala, a sala marca posição e quem
 	const NOVAS = /cláusulas? novas? propostas?/;
 	await page.getByRole('button', { name: NOVAS }).click();
 	await expect(page.getByRole('dialog', { name: 'Cláusulas novas propostas' })).toContainText(descricao);
+	// Passo 66: quem propõe já apoia, sem clicar.
+	const minhaPosicao = page.getByRole('dialog').getByRole('group', { name: `Sua posição sobre: ${descricao}` });
+	await expect(minhaPosicao.getByRole('button', { name: 'Apoio' })).toHaveAttribute('aria-pressed', 'true');
+	await expect(page.getByRole('dialog')).toContainText('Apoio 1');
 
 	// O Chile, membro do bloco, não propõe (a escrita é da redatora), mas marca posição.
 	const chile = await (await browser.newContext(NOTEBOOK)).newPage();
@@ -65,6 +69,7 @@ test('a redatora propõe no working paper da sala, a sala marca posição e quem
 	const posicao = chile.getByRole('dialog').getByRole('group', { name: `Sua posição sobre: ${descricao}` });
 	await posicao.getByRole('button', { name: 'Apoio' }).click();
 	await expect(posicao.getByRole('button', { name: 'Apoio' })).toHaveAttribute('aria-pressed', 'true');
+	await expect(chile.getByRole('dialog')).toContainText('Apoio 2');
 
 	// Quem preside (a mesa) aceita; sem o sinal de consenso, confirma antes.
 	const mesa = await (await browser.newContext(NOTEBOOK)).newPage();

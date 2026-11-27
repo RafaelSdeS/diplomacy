@@ -314,17 +314,6 @@
 <h1>{titulo}</h1>
 {#if d.topico}<TrilhaDoTopico {sigla} mesa={ehMesa} compacta {...doTopico(data.ordem, d.topico)} />{/if}
 
-{#if data.irmaos.length > 1}
-	<nav class="abas-topicos" aria-label={t('Documentos do tópico')}>
-		{#each data.irmaos as x (x.id)}
-			<a class={['botao botao--pequeno', x.id !== d.id && 'botao--secundario']} href={`/documento/${x.id}/sala`} aria-current={x.id === d.id ? 'page' : undefined}
-				{@attach dica(x.tipo === 'projeto' ? t('O projeto de resolução do tópico, feito dos working papers.') : t('Um working paper do tópico, de um item da agenda.'))}
-				>{x.tipo === 'projeto' ? t('Projeto') : x.titulo}</a
-			>
-		{/each}
-	</nav>
-{/if}
-
 {#if !painelAberto}{@render avisos()}{/if}
 
 <!-- A ação principal de cada papel, sem rolar. -->
@@ -384,6 +373,21 @@
 	{/if}
 	{#if ehWp && !aberto && projeto}
 		<a class="botao" href={`/documento/${projeto.id}/sala`} {@attach dica(t('Este working paper já virou projeto: o debate segue lá.'))}>{t('Abrir o projeto do tópico')}</a>
+	{/if}
+	<!-- Passo 66: os outros documentos do tópico ficam num menu, sem disputar a atenção com o texto. -->
+	{#if data.irmaos.length > 1}
+		<details class="mais-opcoes documentos-do-topico">
+			<summary class="botao botao--secundario botao--pequeno" {@attach dica(t('Os outros working papers e o projeto deste tópico.'))}
+				>{t('Documentos do tópico ({n})', { n: data.irmaos.length })}</summary
+			>
+			<nav class="mais-opcoes-corpo" aria-label={t('Documentos do tópico')}>
+				{#each data.irmaos as x (x.id)}
+					<a class={['botao botao--pequeno', x.id !== d.id && 'botao--secundario']} href={`/documento/${x.id}/sala`} aria-current={x.id === d.id ? 'page' : undefined}
+						>{x.tipo === 'projeto' ? t('Projeto') : x.titulo}</a
+					>
+				{/each}
+			</nav>
+		</details>
 	{/if}
 </div>
 
@@ -480,13 +484,17 @@
 						><Eraser aria-hidden="true" size={16} strokeWidth={1.75} /> {t('Retirar')}</button
 					>
 				{/if}
-				{#if possoFocar && d.clausula_em_foco_id !== alvo.id}
+				{#if possoFocar}
+					{@const emFoco = d.clausula_em_foco_id === alvo.id}
+					<!-- Passo 66: em foco, o mesmo botão tira do foco (a função aceita "nenhuma cláusula"). -->
 					<button
 						class="botao botao--secundario botao--pequeno"
 						type="button"
-						{@attach dica(t('A sala e o telão passam a debater esta cláusula.'))}
-						onclick={() => executar(supabase.rpc('focar_clausula', { p_documento: d.id, p_clausula: alvo.id }))}
-						><Crosshair aria-hidden="true" size={16} strokeWidth={1.75} /> {t('Pôr em foco')}</button
+						aria-pressed={emFoco}
+						{@attach dica(emFoco ? t('A cláusula sai do destaque da sala e do telão.') : t('A sala e o telão passam a debater esta cláusula.'))}
+						onclick={() =>
+							executar(supabase.rpc('focar_clausula', { p_documento: d.id, p_clausula: (emFoco ? null : alvo.id) as string }))}
+						><Crosshair aria-hidden="true" size={16} strokeWidth={1.75} /> {emFoco ? t('Tirar do foco') : t('Pôr em foco')}</button
 					>
 				{/if}
 				{#if corrijo}

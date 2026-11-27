@@ -161,6 +161,7 @@ export const PONTOS = bilingue({
 	adiamento_debate: 'Moção de adiamento do debate',
 	adiamento_sessao: 'Moção de adiamento da sessão',
 	informal_informal: 'Moção de informal-informal',
+	debate_lista: 'Moção de debate por lista',
 	voto_desconfianca: 'Moção de não-confiança',
 	divisao_questao: 'Moção de divisão da questão',
 	votacao_nominal: 'Moção de votação nominal'
@@ -173,7 +174,7 @@ export function pontosEmOrdem(fase: string, etapa: string | null | undefined, sa
 	// Durante a votação de um projeto, só a divisão da questão e a votação nominal.
 	if (salaFechada) return [...pontos, 'divisao_questao', 'votacao_nominal'];
 	if (fase === 'plenaria') return [...pontos, ...(etapa === 'topico' ? ['topico_no_topo' as const] : []), 'adiamento_sessao'];
-	if (fase === 'debate') return [...pontos, 'informal_informal', 'adiamento_debate', 'adiamento_sessao', 'voto_desconfianca'];
+	if (fase === 'debate') return [...pontos, 'informal_informal', 'debate_lista', 'adiamento_debate', 'adiamento_sessao', 'voto_desconfianca'];
 	return pontos;
 }
 

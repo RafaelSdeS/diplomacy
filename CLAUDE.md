@@ -26,7 +26,8 @@ App tudo em um para simulações da ONU (piloto: UFRGSMUN). SvelteKit com Svelte
 ## Interface
 
 - Toda ação é um botão com fundo e ícone, nunca com cara de link. Criar algo abre um modal no centro (`src/lib/ui/Modal.svelte`). Ação sem volta passa por `Confirmar`.
-- Na agenda, no working paper e no projeto, o texto fica limpo, o resumo fica ao lado, e cada item abre o painel à direita (`<Modal lateral>`), com os verbos e as propostas (passo 64).
+- Na agenda, no working paper e no projeto, o texto fica limpo, o resumo fica ao lado, e cada item abre o painel à direita (`<Modal lateral>`), com os verbos e as propostas (passo 64). Quem propõe já apoia a própria proposta (no banco, passo 66).
+- O cabeçalho mostra primeiro o país e o comitê, e quem preside, ao vivo. O menu lateral pode ficar recolhido (`definirAparencia('menu', 'recolhido')`, restaurado no `app.html`) e abre no hover ou no foco do teclado (`:has(:focus-visible)`, nunca `:focus-within`, que segura aberto depois de um clique). A `.folha` é sempre branca e redeclara as cores do tema claro (passo 66).
 - Toda ação tem dica (`src/lib/dica.ts`): com o mouse e no foco do teclado (`:focus-visible`), não no foco por clique. A ação indisponível diz por quê, e o que o banco recusaria nem aparece como ação (ex.: andamento sem sessão). A ação principal de cada tela fica visível sem rolar, e deve ser fácil achar as coisas e voltar de onde se veio.
 
 ## Passos e documentação

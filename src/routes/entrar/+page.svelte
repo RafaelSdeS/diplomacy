@@ -6,6 +6,8 @@
 	import { LOGIN_GOOGLE } from '$app/env/public';
 	import { entrarComCodigo } from '#lib/credenciais.ts';
 	import { supabase } from '#lib/supabase.ts';
+	import Eye from '@lucide/svelte/icons/eye';
+	import EyeOff from '@lucide/svelte/icons/eye-off';
 	import QrCode from '@lucide/svelte/icons/qr-code';
 
 	let email = $state('');
@@ -128,11 +130,21 @@
 						{t('E-mail')}
 						<input type="email" autocomplete="email" required bind:value={email} />
 					</label>
-					<label class="campo">
-						{t('Senha')}
-						<input type={verSenha ? 'text' : 'password'} autocomplete="current-password" required bind:value={senha} />
-					</label>
-					<label class="opcao"><input type="checkbox" bind:checked={verSenha} /> {t('Mostrar senha')}</label>
+					<!-- Passo 66: o olho, dentro do campo, mostra ou esconde a senha. -->
+					<div class="campo">
+						<label for="senha">{t('Senha')}</label>
+						<span class="campo-senha">
+							<input id="senha" type={verSenha ? 'text' : 'password'} autocomplete="current-password" required bind:value={senha} />
+							<button
+								class="campo-senha-olho"
+								type="button"
+								aria-label={verSenha ? t('Esconder senha') : t('Mostrar senha')}
+								aria-pressed={verSenha}
+								onclick={() => (verSenha = !verSenha)}
+								>{#if verSenha}<EyeOff aria-hidden="true" size={18} strokeWidth={1.75} />{:else}<Eye aria-hidden="true" size={18} strokeWidth={1.75} />{/if}</button
+							>
+						</span>
+					</div>
 					{#if erro}
 						<p class="erro" role="alert">{erro}</p>
 					{/if}

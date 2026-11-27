@@ -277,6 +277,40 @@ a.identidade:hover .identidade-nome {
 	box-shadow: 0 0 0 1px rgb(255 255 255 / 0.35);
 }
 
+/* Passo 66: quem preside, à vista no cabeçalho. A delegação que preside ganha a linha dourada e
+   o martelo no próprio crachá; as outras veem, ao lado do crachá, quem preside agora. */
+.identidade--preside {
+	padding: 0.15rem 0.5rem;
+	background: rgb(195 153 42 / 0.2);
+	box-shadow: inset 0 -3px 0 var(--cor-fio-dourado);
+}
+
+.identidade-preside {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+	font-family: var(--fonte-ui);
+	font-size: 0.75rem;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--cor-fio-dourado);
+}
+
+.preside-agora {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	padding: 0.1rem 0.5rem;
+	border-left: 3px solid var(--cor-fio-dourado);
+	font-size: 0.85rem;
+	color: var(--cor-sobre-faixa);
+}
+
+.preside-agora svg {
+	color: var(--cor-fio-dourado);
+}
+
 .identidade-comite {
 	font-family: var(--fonte-ui);
 	font-size: 0.8rem;
@@ -402,6 +436,11 @@ main.main-sem-moldura {
 }
 
 /* Notebook: navegação na lateral. */
+/* Passo 66: recolher o menu é só do notebook; no celular, a barra de baixo não muda. */
+.item-recolher {
+	display: none;
+}
+
 @media (min-width: 1024px) {
 	.navegacao .item-mais {
 		display: none;
@@ -412,8 +451,15 @@ main.main-sem-moldura {
 		grid-template-areas: 'timbre timbre' 'nav conteudo';
 	}
 
+	/* Passo 66: a faixa de cima mais baixa, com a marca numa linha só. */
 	.timbre {
-		padding: 1rem 1.5rem;
+		padding: 0.4rem 1.5rem;
+	}
+
+	.marca-texto {
+		flex-direction: row;
+		align-items: baseline;
+		gap: 0.6rem;
 	}
 
 	.navegacao {
@@ -448,6 +494,69 @@ main.main-sem-moldura {
 	.navegacao a[aria-current] {
 		background: var(--cor-marinho-suave);
 		box-shadow: inset 3px 0 0 var(--cor-fio-dourado);
+	}
+
+	/* Passo 66: o menu recolhível. Recolhido, fica só com os ícones e abre por cima do conteúdo
+	   ao passar o mouse (ou no foco do teclado), sem empurrar a página. */
+	.item-recolher {
+		display: block;
+		margin-top: 0.5rem;
+		padding-top: 0.5rem;
+		border-top: var(--linha);
+	}
+
+	.item-recolher button {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+		width: 100%;
+		min-height: 2.75rem;
+		padding: 0.25rem 0.75rem;
+		border: 0;
+		background: none;
+		color: var(--cor-texto-suave);
+		font: inherit;
+		font-size: 0.9rem;
+		text-align: left;
+		cursor: pointer;
+	}
+
+	.item-recolher button:hover {
+		color: var(--cor-marinho);
+	}
+
+	:root[data-menu='recolhido'] .app:not(.app--sem-menu) {
+		grid-template-columns: 3.5rem 1fr;
+	}
+
+	:root[data-menu='recolhido'] .navegacao {
+		position: relative;
+		z-index: 6;
+		width: 3.5rem;
+		padding-inline: 0.4rem;
+		overflow: hidden;
+		transition:
+			width var(--transicao),
+			box-shadow var(--transicao);
+	}
+
+	/* No foco do teclado abre; o foco de um clique (no próprio botão de recolher) não segura aberto. */
+	:root[data-menu='recolhido'] .navegacao:is(:hover, :has(:focus-visible)) {
+		width: var(--largura-nav);
+		box-shadow: 4px 0 16px rgb(0 0 0 / 0.15);
+	}
+
+	:root[data-menu='recolhido'] .navegacao :is(a, button) {
+		white-space: nowrap;
+	}
+
+	:root[data-menu='recolhido'] .navegacao svg {
+		flex: none;
+	}
+
+	/* Recolhido, só os ícones: o texto some da vista (o leitor de tela continua lendo). */
+	:root[data-menu='recolhido'] .navegacao:not(:hover, :has(:focus-visible)) :is(a, button) > span {
+		opacity: 0;
 	}
 
 	main {
@@ -1202,6 +1311,51 @@ kbd {
 	}
 }
 
+/* Passo 66: o título do painel e a barra da sessão na mesma linha (no celular, uma embaixo da outra). */
+.topo-painel {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	justify-content: space-between;
+	gap: 0.5rem 1.5rem;
+	margin-bottom: 1rem;
+}
+
+.topo-painel .barra-painel {
+	flex: 1 1 24rem;
+	margin-bottom: 0;
+}
+
+/* Passo 66: no painel da presidência, o topo da página e os cartões ocupam menos, e a altura
+   que sobra vai para as colunas (com o cabeçalho mais baixo e o menu recolhível). */
+@media (min-width: 1024px) {
+	.app:has(.painel) main {
+		padding-block: 1rem;
+	}
+
+	.app:has(.painel) .caminho {
+		margin-bottom: 0.35rem;
+	}
+
+	.app:has(.painel) .topo-painel h1 {
+		margin-bottom: 0;
+		font-size: 1.4rem;
+	}
+
+	.app:has(.painel) .topo-painel {
+		margin-bottom: 0.6rem;
+	}
+
+	.painel,
+	.painel-coluna {
+		gap: 0.75rem;
+	}
+
+	.painel .cartao {
+		padding: 0.75rem 1rem;
+	}
+}
+
 /* Passo 51: com a votação aberta, o painel do notebook é só a votação (larga, com a grade em
    colunas) e o que decidir; placas e "Com a palavra" voltam quando ela fecha. */
 @media (min-width: 1024px) {
@@ -1796,6 +1950,35 @@ kbd {
 
 .texto-nota {
 	white-space: pre-wrap;
+}
+
+/* Passo 66: no caderno, cada anotação mostra três linhas; "Ler" abre inteira. */
+.anotacoes .texto-nota {
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 3;
+	line-clamp: 3;
+	overflow: hidden;
+}
+
+.busca-caderno {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5rem 1rem;
+	margin: 0.75rem 0;
+}
+
+.busca-caderno input {
+	flex: 1 1 16rem;
+	max-width: 28rem;
+	min-height: 2.5rem;
+	padding: 0.4rem 0.75rem;
+	border: 1px solid var(--cor-texto-suave);
+	border-radius: var(--raio);
+	background: var(--cor-fundo);
+	color: var(--cor-texto);
+	font: inherit;
 }
 
 /* A resposta da crise tem cara de telegrama. */
@@ -2413,6 +2596,29 @@ dialog.escolha-modal {
 }
 
 /* O documento formatado na tela: a mesma folha da impressão (.a4), sem o tamanho A4. */
+/* Passo 66: a folha é sempre papel branco. Dentro dela valem as cores do tema claro, também no
+   escuro: o "em foco", os selos e o destaque das linhas ficavam ilegíveis. ponytail: os
+   valores repetem os do :root claro; mudou a paleta, mude aqui também. */
+.folha {
+	color-scheme: light;
+	--cor-fundo: #ffffff;
+	--cor-superficie: #f6f6f6;
+	--cor-linha: #dddddd;
+	--cor-texto: #161616;
+	--cor-texto-suave: #666666;
+	--cor-marinho: #0c326f;
+	--cor-marinho-suave: #eef1f7;
+	--cor-sobre-marinho: #ffffff;
+	--cor-foco: #0c326f;
+	--cor-ok: #1e6b3a;
+	--cor-ok-fundo: #e7f3eb;
+	--cor-alerta: #7a5000;
+	--cor-alerta-fundo: #fbf1dc;
+	--cor-erro: #c9191e;
+	--cor-erro-fundo: #fef4f4;
+	--linha: 1px solid var(--cor-linha);
+}
+
 .folha {
 	max-width: 46rem;
 	padding: 2.5rem 2.75rem;
@@ -4465,6 +4671,39 @@ dialog.modal-lateral[open] {
 
 dialog.modal-lateral[open] > * {
 	margin: 0;
+}
+
+/* Passo 66: o olho da senha, dentro do campo, à direita. */
+.campo-senha {
+	position: relative;
+	display: block;
+}
+
+.campo-senha input {
+	padding-right: 2.75rem;
+}
+
+.campo-senha-olho {
+	position: absolute;
+	top: 0;
+	right: 0;
+	display: grid;
+	place-items: center;
+	width: 2.75rem;
+	height: 100%;
+	border: 0;
+	background: none;
+	color: var(--cor-texto-suave);
+	cursor: pointer;
+}
+
+.campo-senha-olho:hover {
+	color: var(--cor-marinho);
+}
+
+/* Passo 66: o menu dos documentos do tópico, no fim da fileira de ações, à direita. */
+.acoes > .documentos-do-topico {
+	margin-left: auto;
 }
 
 dialog.modal-lateral .lista li {

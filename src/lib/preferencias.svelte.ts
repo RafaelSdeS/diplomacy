@@ -63,10 +63,10 @@ export function alternarFavorito(href: string) {
 	return true;
 }
 
-/** Tamanho do texto ('', 'grande', 'maior') e densidade ('', 'confortavel', 'compacta'). */
+/** Tamanho do texto ('', 'grande', 'maior'), densidade ('', 'confortavel', 'compacta') e o menu lateral ('', 'recolhido', passo 66). */
 const dataset = typeof document === 'undefined' ? {} : document.documentElement.dataset;
-export const aparencia = $state({ texto: dataset.texto ?? '', densidade: dataset.densidade ?? '' });
-export function definirAparencia(chave: 'texto' | 'densidade', valor: string) {
+export const aparencia = $state({ texto: dataset.texto ?? '', densidade: dataset.densidade ?? '', menu: dataset.menu ?? '' });
+export function definirAparencia(chave: 'texto' | 'densidade' | 'menu', valor: string) {
 	aparencia[chave] = valor;
 	if (valor) document.documentElement.dataset[chave] = valor;
 	else delete document.documentElement.dataset[chave];

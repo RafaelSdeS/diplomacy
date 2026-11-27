@@ -2646,6 +2646,24 @@ export const EN: Record<string, string> = {
 	'Retirar: "{texto}"': 'Remove: "{texto}"',
 	'em andamento': 'in progress',
 	'{n} de {total} presentes': '{n} of {total} present',
+	// Passo 66
+	'A cláusula sai do destaque da sala e do telão.': 'The clause leaves the spotlight of the room and the big screen.',
+	'Abre a anotação inteira.': 'Opens the whole note.',
+	'Buscar no caderno': 'Search the notebook',
+	'Documentos do tópico ({n})': 'Topic documents ({n})',
+	'Esconder senha': 'Hide password',
+	'Fixar o menu': 'Pin the menu',
+	'Lista de oradores, pela ordem das placas': 'Speakers list, in the order placards were raised',
+	'Moção de debate por lista': 'Motion for a speakers-list debate',
+	'Nada encontrado com essa busca.': 'Nothing found for this search.',
+	'No debate por lista, a palavra segue a ordem das placas.': 'In a speakers-list debate, the floor follows the order of the placards.',
+	'Os outros working papers e o projeto deste tópico.': 'The other working papers and the draft resolution of this topic.',
+	'Preside': 'Chair',
+	'Quem preside a sessão agora.': 'Who chairs the session now.',
+	'Recolher o menu': 'Collapse the menu',
+	'Tirar do foco': 'Remove from focus',
+	'preside': 'chairs',
+	'preside a sessão': 'chairs the session',
 };
 
 /** Mensagens do banco com partes variáveis: [padrão em português, tradução]. */

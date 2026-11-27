@@ -2,7 +2,7 @@
 -- agenda informal, com as regras do UNOCT.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(46);
+select plan(49);
 
 -- Cenário: C1 com dois tópicos e 7 delegações: d01..d05 membros, d06 observadora
 -- (Fiji), d07 suspensa (Gana). a1 = d01 (Brasil), a2 = d02 (China), a4 = d03
@@ -213,6 +213,22 @@ from unnest(array['00000000-0000-0000-0000-000000000001', '00000000-0000-0000-00
 select public.encerrar_votacao(pg_temp.votacao());
 select results_eq($$select topico_atual from public.estado_sessao$$, array[2],
 	'com 4 de 6 (dois terços), o debate passa ao outro tópico');
+
+-- Passo 66: a moção de debate por lista, por maioria simples; aprovada, o debate fica em lista
+-- (formal-formal) até outra moção ou a presidência mudar a forma.
+select pg_temp.entrar('00000000-0000-0000-0000-0000000000a2');
+select public.enviar_ponto('00000000-0000-0000-0000-0000000000c1', 'debate_lista');
+select pg_temp.entrar('00000000-0000-0000-0000-0000000000a3');
+select public.abrir_votacao(pg_temp.ponto('debate_lista'));
+select results_eq($$select objeto, regra from public.votacao where id = pg_temp.votacao()$$,
+	$$values ('Debate por lista'::text, 'maioria_simples'::text)$$, 'a moção de debate por lista vai a voto por maioria simples');
+select public.registrar_voto(pg_temp.votacao(), d, 'a_favor')
+from unnest(array['00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000002',
+	'00000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000004']::uuid[]) as d;
+select public.encerrar_votacao(pg_temp.votacao());
+select is((pg_temp.estado()).forma, 'formal_formal'::public.forma_debate, 'aprovada, o debate passa a ser por lista');
+select lives_ok($$select public.mudar_forma('00000000-0000-0000-0000-0000000000c1', 'formal_informal')$$,
+	'a presidência volta ao formal-informal quando quiser');
 
 -- Votação substantiva: observadora não vota; quem está presente pode se abster
 -- (no UFRGSMUN, "presente" e "presente e votando" são o mesmo, passo 21)

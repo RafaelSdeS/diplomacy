@@ -3,7 +3,7 @@
 -- mesa transforma em projeto (preâmbulos primeiro, assinaturas sem as das observadoras).
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(42);
+select plan(43);
 
 -- Cenário: d1 a d6 são membros e d7 é observadora; a8 é a mesa. Sem sessão aberta, quem preside é a mesa.
 insert into public.evento (id, nome, ano) values ('00000000-0000-0000-0000-0000000000e1', 'Evento 1', 2027);
@@ -76,6 +76,8 @@ select pg_temp.entrar(1);
 insert into ids values ('p1', public.propor_no_documento(pg_temp.wp('Segurança regional'), 'incluir', null, 'Decide A', 'operativa', null, 'O centro do texto'));
 select results_eq($$select bloco_id, delegacao_id from public.proposta_alteracao where id = pg_temp.id('p1')$$,
 	$$values (pg_temp.id('bloco'), '00000000-0000-0000-0000-0000000000d1'::uuid)$$, 'a redatora propõe em nome do bloco');
+select results_eq($$select delegacao_id, posicao from public.posicao_proposta where proposta_id = pg_temp.id('p1')$$,
+	$$values ('00000000-0000-0000-0000-0000000000d1'::uuid, 'apoio'::text)$$, 'passo 66: quem propõe já apoia, sem clicar');
 select pg_temp.entrar(3);
 insert into ids values ('p2', public.propor_no_documento(pg_temp.wp('Segurança regional'), 'incluir', null, 'Recordando X', 'preambular'));
 select results_eq($$select bloco_id from public.proposta_alteracao where id = pg_temp.id('p2')$$, array[null::uuid],
@@ -98,7 +100,7 @@ select pg_temp.entrar(7);
 select lives_ok($$select public.marcar_posicao_proposta(pg_temp.id('p1'), 'contra')$$, 'a observadora marca contra');
 select lives_ok($$select public.marcar_posicao_proposta(pg_temp.id('p1'), 'ressalva')$$, 'e muda de ideia');
 select results_eq($$select posicao from public.posicao_proposta where proposta_id = pg_temp.id('p1') order by posicao$$,
-	$$values ('apoio'::text), ('ressalva')$$, 'uma posição por delegação');
+	$$values ('apoio'::text), ('apoio'), ('ressalva')$$, 'uma posição por delegação (a de quem propôs e as das outras)');
 select pg_temp.entrar(8);
 select throws_ok($$select public.marcar_posicao_proposta(pg_temp.id('p1'), 'apoio')$$, '42501', null, 'a mesa não marca posição');
 

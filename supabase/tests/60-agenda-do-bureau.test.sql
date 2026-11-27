@@ -2,7 +2,7 @@
 -- posição; só a mesa inclui (havendo consenso), e a alteração muda a agenda no lugar.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(8);
+select plan(9);
 
 insert into public.evento (id, nome, ano) values ('00000000-0000-0000-0000-0000000000e1', 'Evento 1', 2027);
 insert into public.comite (id, evento_id, sigla, nome, nome_oficial) values
@@ -58,7 +58,10 @@ insert into alt values ('retirar', public.propor_alteracao_agenda(pg_temp.base()
 select pg_temp.entrar(3);
 select public.marcar_posicao_alteracao((select id from alt where nome = 'incluir'), 'ressalva');
 select public.marcar_posicao_alteracao((select id from alt where nome = 'incluir'), 'apoio');
-select is((select count(*)::int from public.posicao_alteracao), 1, 'uma posição por delegação, que muda');
+select is((select count(*)::int from public.posicao_alteracao a join alt on alt.id = a.alteracao_id and alt.nome = 'incluir'), 2,
+	'uma posição por delegação, que muda (a de quem propôs e a da outra)');
+select is((select string_agg(distinct posicao, ',') from public.posicao_alteracao a join public.alteracao_agenda x on x.id = a.alteracao_id and x.delegacao_id = a.delegacao_id),
+	'apoio', 'passo 66: quem propõe a alteração já apoia, sem clicar');
 select throws_ok($$select public.responder_alteracao_agenda((select id from alt where nome = 'incluir'), true)$$,
 	'42501', null, 'a delegação não inclui a alteração');
 

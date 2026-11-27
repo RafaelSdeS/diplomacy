@@ -18,6 +18,8 @@
 				if (texto === 'grande' || texto === 'maior') document.documentElement.dataset.texto = texto;
 				var densidade = localStorage.getItem('densidade');
 				if (densidade === 'confortavel' || densidade === 'compacta') document.documentElement.dataset.densidade = densidade;
+				// Passo 66: o menu lateral recolhido.
+				if (localStorage.getItem('menu') === 'recolhido') document.documentElement.dataset.menu = 'recolhido';
 			} catch (e) {}
 		</script>
 		%sveltekit.head%

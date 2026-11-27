@@ -17,6 +17,7 @@
 	import { dica } from '#lib/dica.ts';
 	import Mic from '@lucide/svelte/icons/mic';
 	import NotebookPen from '@lucide/svelte/icons/notebook-pen';
+	import { semAcento } from '#lib/filtro.ts';
 	import type { PageProps, Snapshot } from './$types';
 
 	let { data }: PageProps = $props();
@@ -33,6 +34,16 @@
 		{ chave: 'fala', rotulo: t('Falas'), dica: t('Discursos escritos antes, com o tempo estimado de fala.') }
 	] as const;
 	let aba = $state<'nota' | 'sobre' | 'fala'>('nota');
+
+	// Passo 66: com muitas anotações, a busca acha a que se quer sem rolar (no texto, no título e
+	// na delegação, sem acento); cada uma mostra três linhas e abre inteira em "Ler".
+	let busca = $state('');
+	type Anotacao = (typeof data.anotacoes)[number];
+	const casa = (a: Anotacao) =>
+		semAcento([a.texto, a.titulo ?? '', nomeDe(a.sobre_delegacao_id), a.orador?.nome ?? '', nomeDe(a.delegacao_id)].join(' ')).includes(semAcento(busca.trim()));
+	const daAba = $derived(minhas.filter((a) => a.tipo === aba));
+	const achadas = $derived(daAba.filter(casa));
+	const recebidasAchadas = $derived(recebidas.filter(casa));
 
 	let erro = $state('');
 	let mensagem = $state('');
@@ -77,7 +88,9 @@
 		await invalidate('app:caderno');
 	}
 
-	function usarNaFala(a: { titulo: string | null; texto: string }) {
+	let lendoFala = $state(false);
+	function usarNaFala(a: { titulo: string | null; texto: string; tipo?: string }) {
+		lendoFala = a.tipo === 'fala';
 		lendo = a;
 		leitura?.abrir();
 	}
@@ -145,8 +158,15 @@
 			</AcaoEmModal>
 		</div>
 
+		{#if daAba.length > 3 || busca}
+			<p class="busca-caderno">
+				<label class="so-leitor" for="busca-caderno">{t('Buscar no caderno')}</label>
+				<input id="busca-caderno" type="search" placeholder={t('Buscar no caderno')} bind:value={busca} />
+				{#if busca.trim()}<span class="suave">{t('{n} de {total}', { n: achadas.length, total: daAba.length })}</span>{/if}
+			</p>
+		{/if}
 		<ul class="lista anotacoes">
-			{#each minhas.filter((a) => a.tipo === aba) as a (a.id)}
+			{#each achadas as a (a.id)}
 				<li>
 					<div>
 						{#if a.tipo === 'sobre'}<NomeDelegacao sigla={data.comite.sigla} delegacao={data.delegacoes.find((d) => d.id === a.sobre_delegacao_id)} />{/if}
@@ -163,6 +183,8 @@
 					<div class="acoes">
 						{#if a.tipo === 'fala'}
 							<button class="botao botao--pequeno" type="button" onclick={() => usarNaFala(a)} {@attach dica(t('Abre o texto num quadro grande, para ler enquanto fala.'))}>{t('Usar na próxima fala')}</button>
+						{:else}
+							<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => usarNaFala(a)} {@attach dica(t('Abre a anotação inteira.'))}>{t('Ler')}</button>
 						{/if}
 						<!-- Passo 51: com bandeiras e modal, como o "Para" do bilhete; salva ao fechar a lista. -->
 						<Escolha
@@ -188,7 +210,7 @@
 					</div>
 				</li>
 			{:else}
-				<li class="suave">{t('Nada anotado aqui ainda.')}</li>
+				<li class="suave">{busca.trim() ? t('Nada encontrado com essa busca.') : t('Nada anotado aqui ainda.')}</li>
 			{/each}
 		</ul>
 	</div>
@@ -197,12 +219,15 @@
 		<section aria-labelledby="t-recebidas">
 			<h2 id="t-recebidas">{t('Compartilhadas com a sua delegação')}</h2>
 			<ul class="lista anotacoes">
-				{#each recebidas as a (a.id)}
+				{#each recebidasAchadas as a (a.id)}
 					<li>
 						<div>
 							<span class="rotulo">{t('De {delegacao}', { delegacao: nomeDe(a.delegacao_id) })}</span>
 							{#if a.titulo}<strong>{a.titulo}</strong>{/if}
 							<p class="texto-nota">{a.texto}</p>
+						</div>
+						<div class="acoes">
+							<button class="botao botao--secundario botao--pequeno" type="button" onclick={() => usarNaFala(a)} {@attach dica(t('Abre a anotação inteira.'))}>{t('Ler')}</button>
 						</div>
 					</li>
 				{/each}
@@ -210,7 +235,7 @@
 		</section>
 	{/if}
 
-	<Modal classe="leitura-fala" bind:this={leitura} nome={t('Texto da fala')}>
+	<Modal classe="leitura-fala" bind:this={leitura} nome={lendoFala ? t('Texto da fala') : t('Anotação')}>
 		{#if lendo}
 			{#if lendo.titulo}<h2>{lendo.titulo}</h2>{/if}
 			<p>{lendo.texto}</p>

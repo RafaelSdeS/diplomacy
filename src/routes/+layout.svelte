@@ -14,7 +14,11 @@
 	import Moon from '@lucide/svelte/icons/moon';
 	import Sun from '@lucide/svelte/icons/sun';
 	import { idioma } from '#lib/i18n.svelte.ts';
-	import { alternarIdioma, alternarTema, saida, tema, temaAtual, TROCAR_IDIOMA } from '#lib/preferencias.svelte.ts';
+	import { alternarIdioma, alternarTema, aparencia, definirAparencia, saida, tema, temaAtual, TROCAR_IDIOMA } from '#lib/preferencias.svelte.ts';
+	import { bureauPreside } from '#lib/sessao.ts';
+	import Gavel from '@lucide/svelte/icons/gavel';
+	import PanelLeftClose from '@lucide/svelte/icons/panel-left-close';
+	import PanelLeftOpen from '@lucide/svelte/icons/panel-left-open';
 	import { abrirIrPara, irPara } from '#lib/ir-para.svelte.ts';
 	import { menu } from '#lib/menu.ts';
 	import { caixa } from '#lib/caixa.ts';
@@ -55,6 +59,35 @@
 	const outrosPapeis = $derived([...new Set(data.participacoes.map((p) => p.papel))].filter((p) => p !== eu?.papel).map(rotuloPapel));
 	// As bandeiras (271 arquivos) ficam fora da primeira abertura: o componente vem sob demanda.
 	const bandeira = import('#lib/ui/Bandeira.svelte');
+
+	// Passo 66: quem preside a sessão do comitê da pessoa, no cabeçalho, ao vivo: para a delegação
+	// que preside (o crachá dela ganha o martelo) e para as outras (ao lado, quem preside).
+	type Presidencia = { pelaMesa: boolean; delegacao: { id: string; nome: string; bandeira: string | null } | null };
+	let presidencia = $state<Presidencia | null>(null);
+	async function lerPresidencia(comite: string) {
+		const { data: e } = await supabase
+			.from('estado_sessao')
+			.select('fase, mesa_assumiu, sessao(presidencia:delegacao!sessao_presidencia_delegacao_id_comite_id_fkey(id, nome, bandeira))')
+			.eq('comite_id', comite)
+			.maybeSingle();
+		const p = e?.sessao?.presidencia ?? null;
+		presidencia = e?.sessao ? { pelaMesa: bureauPreside(e.fase, e.mesa_assumiu, p?.id), delegacao: p } : null;
+	}
+	// ponytail: ouve só a tabela sessao (abrir, fechar, o rodízio), não o estado_sessao, que muda a
+	// cada fala e custaria uma leitura por mudança no celular (passo 40). A mesa assumir num caso
+	// excepcional só muda o estado: o cabeçalho acompanha na próxima troca de tela (o quadro "Preside
+	// a sessão" da Agora e da Sessão é ao vivo). Se isso pesar, o broadcast do estado pode levar a fase.
+	$effect(() => {
+		const comite = eu?.comite_id;
+		presidencia = null;
+		if (!comite) return;
+		void lerPresidencia(comite);
+		return assinar([`comite:${comite}`], ['sessao'], () => void lerPresidencia(comite));
+	});
+	afterNavigate(({ type }) => {
+		if (type !== 'enter' && eu?.comite_id) void lerPresidencia(eu.comite_id);
+	});
+	const presido = $derived(!!presidencia && !presidencia.pelaMesa && eu?.papel === 'delegado' && presidencia.delegacao?.id === eu.delegacao_id);
 	const comMenu = $derived(data.participacoes.length > 0);
 	// O telão e as páginas de impressão ocupam a tela inteira, sem cabeçalho nem menu.
 	const semMoldura = $derived(/^\/(telao|imprimir)\//.test(page.url.pathname));
@@ -320,6 +353,35 @@
 			</a>
 			{#if data.usuario}
 				<div class="conta">
+					<!-- Passo 66: o país e o comitê vêm primeiro. -->
+					{#if eu?.papel === 'delegado' && eu.delegacao_id}
+						<a
+							class={['identidade', presido && 'identidade--preside']}
+							href={`/comite/${eu.comite_sigla}/delegacao/${eu.delegacao_id}`}
+							aria-label={presido ? `${eu.delegacao_nome} · ${eu.comite_sigla} · ${t('preside a sessão')}` : `${eu.delegacao_nome} · ${eu.comite_sigla}`}
+							title={data.nome ?? undefined}
+						>
+							{#await bandeira then { default: Bandeira }}<Bandeira codigo={eu.delegacao_bandeira} />{/await}
+							<span class="identidade-nome">{eu.delegacao_nome}</span>
+							<span class="identidade-comite">{eu.comite_sigla}</span>
+							{#if presido}<span class="identidade-preside"><Gavel aria-hidden="true" size={14} strokeWidth={2} /> {t('preside')}</span>{/if}
+						</a>
+					{:else if eu}
+						<span class="identidade" title={data.nome ?? undefined}>
+							<span class="identidade-nome">{rotuloPapel(eu.papel)}</span>
+							{#if eu.comite_sigla}<span class="identidade-comite">{eu.comite_sigla}</span>{/if}
+							{#each outrosPapeis as outro (outro)}<span class="identidade-comite">{outro}</span>{/each}
+						</span>
+					{/if}
+					<!-- Passo 66: para as outras, quem preside a sessão agora. -->
+					{#if presidencia && !presido}
+						<span class="preside-agora" {@attach dica(t('Quem preside a sessão agora.'))}>
+							<Gavel aria-hidden="true" size={14} strokeWidth={2} />
+							<span class="so-largo">{t('Preside')}:</span>
+							{#if presidencia.pelaMesa || !presidencia.delegacao}{t('Mesa')}{:else}{#await bandeira then { default: Bandeira }}<Bandeira codigo={presidencia.delegacao.bandeira} />{/await}
+								<span class="so-largo">{presidencia.delegacao.nome}</span>{/if}
+						</span>
+					{/if}
 					{#if comMenu}
 						<button
 							class="botao botao--secundario botao--pequeno botao--icone ir-para-botao"
@@ -354,24 +416,6 @@
 					{/if}
 					{#if !online}<span class="selo selo--alerta">{t('Sem conexão')}</span>{/if}
 					<CaixaDeSaida {pendentes} />
-					{#if eu?.papel === 'delegado' && eu.delegacao_id}
-						<a
-							class="identidade"
-							href={`/comite/${eu.comite_sigla}/delegacao/${eu.delegacao_id}`}
-							aria-label={`${eu.delegacao_nome} · ${eu.comite_sigla}`}
-							title={data.nome ?? undefined}
-						>
-							{#await bandeira then { default: Bandeira }}<Bandeira codigo={eu.delegacao_bandeira} />{/await}
-							<span class="identidade-nome">{eu.delegacao_nome}</span>
-							<span class="identidade-comite">{eu.comite_sigla}</span>
-						</a>
-					{:else if eu}
-						<span class="identidade" title={data.nome ?? undefined}>
-							<span class="identidade-nome">{rotuloPapel(eu.papel)}</span>
-							{#if eu.comite_sigla}<span class="identidade-comite">{eu.comite_sigla}</span>{/if}
-							{#each outrosPapeis as outro (outro)}<span class="identidade-comite">{outro}</span>{/each}
-						</span>
-					{/if}
 					<!-- Passo 47: no celular, tema, idioma, Perfil e Sair ficam em "Mais" (.so-largo). -->
 					<button
 						class={['botao botao--secundario botao--pequeno botao--icone', temMais && 'so-largo']}
@@ -465,6 +509,13 @@
 							</a>
 						</li>
 					{/if}
+					<!-- Passo 66: no notebook, o menu se recolhe e abre ao passar o mouse (ou no foco do teclado). -->
+					<li class="item-recolher">
+						<button type="button" aria-pressed={!!aparencia.menu} onclick={() => definirAparencia('menu', aparencia.menu ? '' : 'recolhido')}>
+							{#if aparencia.menu}<PanelLeftOpen aria-hidden="true" size={20} strokeWidth={1.5} />{:else}<PanelLeftClose aria-hidden="true" size={20} strokeWidth={1.5} />{/if}
+							<span>{aparencia.menu ? t('Fixar o menu') : t('Recolher o menu')}</span>
+						</button>
+					</li>
 				</ul>
 			</nav>
 		{/if}

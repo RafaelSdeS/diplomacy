@@ -34,9 +34,11 @@ test('senha errada mostra um aviso e não entra', async ({ page }) => {
 	await page.goto('/entrar');
 	await page.getByLabel('E-mail', { exact: true }).fill(CONTAS.delegado);
 	await page.getByLabel('Senha', { exact: true }).fill('senha-errada');
-	// "Mostrar senha" tira a senha das bolinhas.
-	await page.getByLabel('Mostrar senha').check();
+	// O olho no campo tira a senha das bolinhas, e de novo esconde.
+	await page.getByRole('button', { name: 'Mostrar senha' }).click();
 	await expect(page.getByLabel('Senha', { exact: true })).toHaveAttribute('type', 'text');
+	await page.getByRole('button', { name: 'Esconder senha' }).click();
+	await expect(page.getByLabel('Senha', { exact: true })).toHaveAttribute('type', 'password');
 	await page.getByRole('button', { name: 'Entrar', exact: true }).click();
 	await expect(page.getByRole('alert')).toHaveText('E-mail ou senha incorretos.');
 	await expect(page).toHaveURL(/\/entrar$/);

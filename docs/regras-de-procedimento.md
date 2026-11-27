@@ -46,7 +46,7 @@ Termina com a **moção de introdução do tópico no topo da agenda**.
 
 | Forma | Quando | Como |
 |---|---|---|
-| Formal-formal | Só na plenária de abertura | Lista de oradores |
+| Formal-formal | Na plenária de abertura e, no debate, por moção (debate por lista) | Lista de oradores: quem levanta a placa entra na lista, na ordem |
 | Formal-informal | Fluxo normal do debate | A presidência escolhe quem tem a palavra entre as placas levantadas |
 | Informal-informal | Por moção | Sem interferência do bureau; aprovado por maioria simples; no máximo 45 minutos somados em cada sessão |
 
@@ -66,6 +66,7 @@ Podem ser levantados entre discursos ou durante o próprio discurso.
 | Adiamento do debate | Dois terços | Lista especial (2 a favor, 2 contra) | Com a palavra aberta | Passa ao outro tópico |
 | Adiamento da sessão | Simples | Sem debate | Quando o bureau diz que está em ordem | Encerra a sessão |
 | Informal-informal | Simples | Pedido ao bureau | Debate | Até 45 minutos sem o bureau |
+| Debate por lista | Simples | Pedido ao bureau | Debate | A palavra segue a ordem das placas, até outra moção ou a presidência mudar a forma |
 | Não-confiança | Simples | Pedido escrito com 1/5 de assinaturas das previstas | Sessão fechada, quando a presidência não cumpre o papel | Assume a próxima da lista de espera |
 | Divisão da questão | Simples | Lista especial (2 a favor, 2 contra) | Só na votação de um projeto | Vota as operativas separadamente |
 | Votação nominal | Nenhuma | Aprovada automaticamente quando reconhecida | Só na votação de um projeto | O bureau chama cada delegação em ordem alfabética |
