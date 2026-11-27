@@ -26,7 +26,11 @@ test('as ações secundárias da sessão ficam em "Mais opções", e cada uma di
 	await page.mouse.move(0, 0);
 	await expect(page.getByRole('tooltip')).toHaveCount(0);
 
+	// No foco do teclado também (o foco por clique, como o inicial de um modal, não mostra).
 	await agenda.focus();
+	await page.keyboard.press('Shift+Tab');
+	await page.keyboard.press('Tab');
+	await expect(agenda).toBeFocused();
 	await expect(page.getByRole('tooltip')).toHaveText(texto);
 	await page.keyboard.press('Escape');
 	await expect(page.getByRole('tooltip')).toHaveCount(0);

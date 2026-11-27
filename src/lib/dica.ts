@@ -29,6 +29,11 @@ export function dica(texto: string | null | undefined, indisponivel = false) {
 			balao.style.left = `${Math.max(8, Math.min(r.left, innerWidth - balao.offsetWidth - 8))}px`;
 			balao.style.top = `${r.bottom + 6}px`;
 		};
+		// Passo 64: no foco, só quando ele vem do teclado. O foco que o modal põe no primeiro
+		// botão ao abrir, depois de um clique, não cobre o conteúdo com o balão.
+		const noFoco = () => {
+			if (alvo.matches(':focus-visible, :has(:focus-visible)')) mostrar();
+		};
 		const esconder = () => (balao.hidden = true);
 		const tecla = (e: KeyboardEvent) => {
 			if (e.key === 'Escape') esconder();
@@ -43,7 +48,7 @@ export function dica(texto: string | null | undefined, indisponivel = false) {
 		const eventos: [string, EventListener][] = [
 			['pointerenter', mostrar],
 			['pointerleave', esconder],
-			['focusin', mostrar],
+			['focusin', noFoco],
 			['focusout', esconder],
 			['keydown', tecla as EventListener]
 		];

@@ -89,16 +89,17 @@ test('a delegação propõe, a mesa inclui e registra a adoção; o item ganha o
 });
 
 test('o andamento fica ao incluir um item; retirar a adoção volta ao debate da agenda', async ({ page }) => {
-	await entrar(page, MESA);
-	await page.goto(AGENDA1);
-	const adotada = page.getByRole('article', { name: 'Agenda adotada' });
-
 	// O andamento só muda com uma sessão aberta: sem ela, o banco recusa. (O seletor antigo, na
 	// árvore, mostrava o valor escolhido mesmo recusado; o painel do passo 64 relê o gravado.)
+	// Sem sessão, o painel mostra o porquê no lugar do seletor.
 	const api = await clienteComo(MESA);
 	const comite = (await api.from('comite').select('id').eq('sigla', 'CE-T').single()).data!.id;
 	if (!(await api.from('estado_sessao').select('sessao_id').eq('comite_id', comite).maybeSingle()).data?.sessao_id)
 		expect((await api.rpc('abrir_sessao', { p_comite: comite })).error).toBeNull();
+
+	await entrar(page, MESA);
+	await page.goto(AGENDA1);
+	const adotada = page.getByRole('article', { name: 'Agenda adotada' });
 
 	// Passo 64: o andamento fica no painel do item.
 	const abrirItem = (nome: RegExp) => adotada.getByRole('button', { name: nome }).click();

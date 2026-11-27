@@ -20,13 +20,14 @@ App tudo em um para simulações da ONU (piloto: UFRGSMUN). SvelteKit com Svelte
 - Por mudança, rode só os testes da tela mexida, e a suíte completa uma vez antes do commit. Testes longos vão em segundo plano.
 - Teste de ponta a ponta que muda o estado de um comitê usa uma cópia isolada (`isolado('NN')` em `scripts/delegacoes.ts`) e acrescenta a entrada em `ISOLADOS`. A exceção é o `tests/22-agenda.spec.ts`, que usa o CE-T de verdade.
 - Antes da suíte, confira `docker ps -a | grep edge_runtime` (a função do crachá precisa dele) e `free -h`: a máquina tem 15 GiB, e o config usa 4 processos.
+- No CI, os testes rodam no contêiner do Playwright, sem Docker. O workflow passa as chaves do Supabase local pelo ambiente (`SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY`), e o `scripts/admin.ts` lê essas chaves de lá. Não dependa de `npx supabase` dentro de um teste.
 - Contas locais do seed: `@exemplo.test`, com a senha `senha-de-teste`.
 
 ## Interface
 
 - Toda ação é um botão com fundo e ícone, nunca com cara de link. Criar algo abre um modal no centro (`src/lib/ui/Modal.svelte`). Ação sem volta passa por `Confirmar`.
 - Na agenda, no working paper e no projeto, o texto fica limpo, o resumo fica ao lado, e cada item abre o painel à direita (`<Modal lateral>`), com os verbos e as propostas (passo 64).
-- Toda ação tem dica (`src/lib/dica.ts`), e a ação desativada diz por quê. A ação principal de cada tela fica visível sem rolar, e deve ser fácil achar as coisas e voltar de onde se veio.
+- Toda ação tem dica (`src/lib/dica.ts`): com o mouse e no foco do teclado (`:focus-visible`), não no foco por clique. A ação indisponível diz por quê, e o que o banco recusaria nem aparece como ação (ex.: andamento sem sessão). A ação principal de cada tela fica visível sem rolar, e deve ser fácil achar as coisas e voltar de onde se veio.
 
 ## Passos e documentação
 

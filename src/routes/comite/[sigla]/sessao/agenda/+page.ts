@@ -6,7 +6,7 @@ export const load: PageLoad = async ({ parent, depends }) => {
 	depends('app:agenda');
 	const { comite } = await parent();
 	const [estado, propostas, podePresidir, ordem, alteracoes, delegacoes] = await Promise.all([
-		supabase.from('estado_sessao').select('fase, topico_atual, ordem_topicos').eq('comite_id', comite.id).maybeSingle(),
+		supabase.from('estado_sessao').select('sessao_id, fase, topico_atual, ordem_topicos').eq('comite_id', comite.id).maybeSingle(),
 		supabase
 			.from('proposta_agenda')
 			.select('id, topico, adotada, liberada, delegacao(id, nome, bandeira), pontos:ponto_pauta(id, pai_id, texto, ordem, status)')
@@ -34,6 +34,8 @@ export const load: PageLoad = async ({ parent, depends }) => {
 	return {
 		topicos: sequencia.map((n) => ({ numero: n, titulo: comite.topicos[n - 1] })),
 		topicoAtual: estado.data?.topico_atual ?? null,
+		// Passo 64: o andamento dos itens só muda com a sessão aberta.
+		sessaoAberta: !!estado.data?.sessao_id,
 		propostas: propostas.data,
 		podePresidir: podePresidir.data ?? false,
 		ordem,

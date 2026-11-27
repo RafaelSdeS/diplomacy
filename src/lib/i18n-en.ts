@@ -2628,6 +2628,7 @@ export const EN: Record<string, string> = {
 	'Resolução do tópico {n}': 'Resolution on topic {n}',
 	'Resumo da agenda': 'Agenda summary',
 	'Resumo do documento': 'Document summary',
+	'Abra a sessão para marcar o andamento.': 'Open the session to mark the progress.',
 	'Só a mesa vê esta agenda. Corrija o que precisar e libere no dia do evento.': 'Only the dais sees this agenda. Fix what you need and release it on the day of the event.',
 };
 

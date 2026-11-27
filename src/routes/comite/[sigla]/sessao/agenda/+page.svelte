@@ -267,7 +267,7 @@
 
 <p class="rotulo">
 	{t('Comitê')} · {data.comite.sigla}
-	<AoVivo comiteId={data.comite.id} tabelas={['proposta_agenda', 'ponto_pauta', 'alteracao_agenda', 'posicao_alteracao', 'documento']} dependencia="app:agenda" />
+	<AoVivo comiteId={data.comite.id} tabelas={['proposta_agenda', 'ponto_pauta', 'alteracao_agenda', 'posicao_alteracao', 'documento', 'estado_sessao']} dependencia="app:agenda" />
 </p>
 <h1>{t('Agenda')}</h1>
 
@@ -423,7 +423,7 @@
 		<h3 id="painel-agenda">{alvoId ? (alvo?.texto ?? t('(item retirado)')) : t('Itens novos propostos')}</h3>
 		{@render avisos()}
 		{#if alvo && agenda?.adotada}
-			{#if data.podePresidir}
+			{#if data.podePresidir && data.sessaoAberta}
 				<label class="campo campo--curto">
 					{t('Andamento')}
 					<select
@@ -441,7 +441,11 @@
 					</select>
 				</label>
 			{:else}
-				<p><span class="selo">{ANDAMENTO[alvo.status as keyof typeof ANDAMENTO]}</span></p>
+				<!-- Sem sessão aberta, o banco recusa o andamento: quem preside vê o porquê. -->
+				<p>
+					<span class="selo">{ANDAMENTO[alvo.status as keyof typeof ANDAMENTO]}</span>
+					{#if data.podePresidir}<span class="suave">{t('Abra a sessão para marcar o andamento.')}</span>{/if}
+				</p>
 			{/if}
 			{#if wpDoAlvo}
 				<p>

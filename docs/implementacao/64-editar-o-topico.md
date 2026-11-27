@@ -48,6 +48,12 @@ O teste 63 confere também que o painel abre à direita sem cobrir a cláusula, 
 
 **Um falso positivo achado no caminho.** O andamento de um item só muda com uma sessão aberta, e o banco recusa sem ela. O seletor antigo, na árvore, continuava mostrando o valor escolhido mesmo quando a mudança era recusada, então o teste 22 passava sem gravar nada. O painel relê o valor gravado, o que expôs o problema. Agora o seletor volta ao andamento gravado quando a mudança é recusada, e o teste 22 abre uma sessão antes de marcar o andamento.
 
+## Acabamento (27/11/2026)
+
+- **Andamento sem sessão:** quem preside, sem sessão aberta, vê o andamento como selo e o aviso "Abra a sessão para marcar o andamento.", em vez de um seletor que o banco recusaria. A agenda se atualiza sozinha quando a sessão abre.
+- **A dica não cobre o painel:** no foco, a dica só aparece quando o foco vem do teclado (`:focus-visible`). O foco que um modal põe no primeiro botão ao abrir, depois de um clique, não abre mais o balão por cima do conteúdo. Com o mouse e no Tab, nada muda. Vale para o app inteiro (`src/lib/dica.ts`).
+- **CI verde de novo:** desde 26/11, os testes que preparam dados com o service role falhavam no CI, porque dentro do contêiner do Playwright não há Docker para o `supabase status`. O workflow agora passa as chaves do Supabase local pelo ambiente (`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` e `SUPABASE_ANON_KEY`), que `scripts/admin.ts` já lia.
+
 ## Fora deste passo
 
 - **O editor antigo do bloco e a resolução de crise** (`/documento/[id]`), os documentos da mesa e as matérias da press continuam como estavam.
